@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Maps;
 
 namespace Jrpg.Game.Battle;
 
@@ -9,11 +10,20 @@ namespace Jrpg.Game.Battle;
 /// <param name="AttackEffectFile">The effect an attack by this combatant plays.</param>
 internal sealed record BattlerArt(string SpriteFile, bool IsFlipped, string PortraitFile, string AttackEffectFile)
 {
+    /// <summary>
+    /// The sprite's loop, its frames side by side at their battle size (ADR 0047); an enemy's, null for a still sprite
+    /// and for party members, whose animation is later work (decision 641).
+    /// </summary>
+    public TileAnimation? IdleAnimation { get; init; }
+
     /// <exception cref="ArgumentException">The combatant is neither a party member nor an enemy.</exception>
     public static BattlerArt Of(Combatant combatant) => combatant switch
     {
         { Member: { } member } => new(member.Definition.BattleSpriteFile, false, member.Definition.PortraitFile, member.Definition.AttackEffectFile),
-        { Enemy: { } enemy } => new(enemy.BattleSpriteFile, enemy.IsSpriteFlipped, enemy.PortraitFile, enemy.AttackEffectFile),
+        { Enemy: { } enemy } => new(enemy.BattleSpriteFile, enemy.IsSpriteFlipped, enemy.PortraitFile, enemy.AttackEffectFile)
+        {
+            IdleAnimation = enemy.IdleAnimation,
+        },
         _ => throw new ArgumentException($"{combatant.Name} is neither a party member nor an enemy.", nameof(combatant)),
     };
 }

@@ -4,7 +4,9 @@ namespace Jrpg.Game.Battle;
 
 /// <summary>
 /// How a battler image reaches the screen (developer decision 100, placeholders until battle sprite sheets): a painting
-/// is shrunk smoothly once to a fixed square, pixel art is point-scaled by a whole factor so its pixels stay crisp.
+/// is shrunk smoothly once to a fixed square, pixel art is point-scaled by a whole factor so its pixels stay crisp. An
+/// animated strip's frame is drawn at its own size (decision 637), since its import already scaled it to the battle
+/// height the developer chose.
 /// </summary>
 /// <param name="DrawnSize">The size it is drawn at, in screen pixels.</param>
 /// <param name="IsShrunkSmoothly">Whether it is drawn from a smoothly shrunk copy rather than the source itself.</param>
@@ -18,6 +20,9 @@ internal readonly record struct BattlerScaling(Point DrawnSize, bool IsShrunkSmo
 
     // The goblin's 256 px art at half size, 128 px (decision 100).
     private const int PixelArtDivisor = 2;
+
+    /// <param name="frameSize">One frame of an animated strip, in pixels.</param>
+    public static BattlerScaling AtOwnSize(Point frameSize) => new(frameSize, false);
 
     /// <param name="sourceSize">The image's width and height in pixels.</param>
     public static BattlerScaling Of(Point sourceSize) =>

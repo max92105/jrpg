@@ -1,3 +1,4 @@
+using Jrpg.Core.Maps;
 using Jrpg.Core.Stats;
 
 namespace Jrpg.Core.Battle;
@@ -12,6 +13,12 @@ public sealed record EnemyDefinition
     public required string PortraitFile { get; init; }
 
     public required string BattleSpriteFile { get; init; }
+
+    /// <summary>
+    /// Its battle sprite's loop, frames side by side in one row at their drawn size (ADR 0047); null when the sprite is
+    /// a still image.
+    /// </summary>
+    public TileAnimation? IdleAnimation { get; init; }
 
     public required string AttackEffectFile { get; init; }
 

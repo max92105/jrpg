@@ -1,6 +1,6 @@
-using Jrpg.Core.Maps;
 using Jrpg.Core.Sprites;
 using Jrpg.Data.Content;
+using Jrpg.Data.Maps;
 
 namespace Jrpg.Data.Sprites;
 
@@ -36,6 +36,5 @@ internal static class FieldSpriteCatalogValidator
         ?? RangeProblems.AtLeast("walk.rows.up", walk.Rows.Up, 0)
         ?? RangeProblems.AtLeast("walk.rows.left", walk.Rows.Left, 0)
         ?? RangeProblems.AtLeast("walk.rows.right", walk.Rows.Right, 0)
-        ?? RangeProblems.AtLeast("walk.frames.frameCount", walk.Frames.FrameCount, TileAnimation.MinFrames)
-        ?? RangeProblems.AtLeast("walk.frames.frameMilliseconds", walk.Frames.FrameMilliseconds, 1);
+        ?? AnimationProblems.Find("walk.frames", walk.Frames);
 }

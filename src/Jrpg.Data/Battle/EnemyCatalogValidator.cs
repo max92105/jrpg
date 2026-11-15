@@ -1,7 +1,9 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
+using Jrpg.Data.Maps;
 using static Jrpg.Data.Content.RangeProblems;
 
 namespace Jrpg.Data.Battle;
@@ -19,6 +21,7 @@ internal static class EnemyCatalogValidator
         new ContentListValidator<EnemyDefinition>(fileName, "enemy", enemy => enemy.Id)
             .Validate(enemies, enemy => FindProblem(enemy)
                 ?? FindDropTableProblem(enemy, references.DropTableIds)
+                ?? FindIdleAnimationProblem(enemy.IdleAnimation)
                 ?? EnemyTacticsValidator.FindProblem(enemy.Tactics, "tactics", references.Skills)
                 ?? EnemyTacticsValidator.FindPhasesProblem(enemy.Phases, references.Skills));
 
@@ -37,6 +40,10 @@ internal static class EnemyCatalogValidator
                 ?? AtLeast("experienceReward", enemy.ExperienceReward, 0)
                 ?? FindGoldProblem(enemy.Gold)
                 ?? FindResistanceProblem(enemy.Resistances);
+
+    // ADR 0047: whether the strip splits into its frames is the startup art check's (ArtReferenceCheck).
+    private static string? FindIdleAnimationProblem(TileAnimation? idle) =>
+        idle is null ? null : AnimationProblems.Find("idleAnimation", idle);
 
     // Both ends within the purse (ADR 0031); the max is checked from the min, so a max below it is named.
     private static string? FindGoldProblem(GoldRange? gold) =>

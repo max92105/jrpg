@@ -72,6 +72,49 @@ public sealed class ContentWriterArtImportTests : IDisposable
     }
 
     [Fact]
+    public void ImportArtImage_BattlerWiderThan4096_IsRefusedNamingTheWidth()
+    {
+        var source = PngHeaderFile.Write(ImportSource("GnollWarrior.png"), width: 4097, height: 128);
+
+        var exception = Assert.Throws<ContentValidationException>(() => Import(ArtFolders.Battlers, source));
+
+        Assert.Equal(
+            "GnollWarrior.png: a 4097 px wide image is wider than the game loads (4096 px); import it at a smaller height.",
+            exception.Message);
+        Assert.False(_writer.HasArtImage(ArtFolders.Battlers, "GnollWarrior.png"));
+    }
+
+    [Fact]
+    public void ImportArtImage_Battler4096Wide_IsCopied()
+    {
+        var source = PngHeaderFile.Write(ImportSource("Wide.png"), width: 4096, height: 128);
+
+        Import(ArtFolders.Battlers, source);
+
+        Assert.True(_writer.HasArtImage(ArtFolders.Battlers, "Wide.png"));
+    }
+
+    // 41 square frames of 100 px: a whole strip, refused for its width alone.
+    [Fact]
+    public void ImportArtImage_EffectWiderThan4096_IsRefused()
+    {
+        var source = PngHeaderFile.Write(ImportSource("Long.png"), width: 4100, height: 100);
+
+        Assert.Throws<ContentValidationException>(() => Import(ArtFolders.Effects, source));
+        Assert.False(_writer.HasArtImage(ArtFolders.Effects, "Long.png"));
+    }
+
+    [Fact]
+    public void ImportArtImage_PortraitWiderThan4096_IsCopied()
+    {
+        var source = PngHeaderFile.Write(ImportSource("Panorama.png"), width: 4097, height: 128);
+
+        Import(ArtFolders.Portraits, source);
+
+        Assert.True(_writer.HasArtImage(ArtFolders.Portraits, "Panorama.png"));
+    }
+
+    [Fact]
     public void ImportArtImage_NotAPng_Refuses()
     {
         var source = ImportSource("Notes.png");

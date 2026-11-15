@@ -151,6 +151,20 @@
                           Text="{Binding Art.BattleSpriteFile, UpdateSourceTrigger=PropertyChanged}" />
                 <Button Content="Import..." Width="70" Margin="6,0,0,0" Tag="{x:Static art:ArtFolders.Battlers}" Click="OnImportClicked" />
               </StackPanel>
+              <!-- The battle sprite's idle loop (ADR 0047): its boxes greyed, still kept as typed, while not animated. -->
+              <GroupBox Header="Idle animation" Margin="0,6,0,0">
+                <StackPanel Margin="4">
+                  <CheckBox Content="Animated" IsChecked="{Binding Art.IsAnimated}" />
+                  <StackPanel Orientation="Horizontal" Margin="0,4,0,0" IsEnabled="{Binding Art.IsAnimated}">
+                    <TextBlock Text="Frames" Style="{StaticResource FieldLabel}" />
+                    <TextBox Style="{StaticResource NumberBox}" Text="{Binding Art.FrameCountText, UpdateSourceTrigger=PropertyChanged}" />
+                  </StackPanel>
+                  <StackPanel Orientation="Horizontal" IsEnabled="{Binding Art.IsAnimated}">
+                    <TextBlock Text="Frame time (ms)" Style="{StaticResource FieldLabel}" />
+                    <TextBox Style="{StaticResource NumberBox}" Text="{Binding Art.FrameMillisecondsText, UpdateSourceTrigger=PropertyChanged}" />
+                  </StackPanel>
+                </StackPanel>
+              </GroupBox>
               <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
                 <TextBlock Text="Portrait" Style="{StaticResource FieldLabel}" />
                 <ComboBox Width="220"
@@ -172,7 +186,8 @@
               <TextBlock x:Name="ImportStatusText" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap" Margin="0,4,0,0" />
             </StackPanel>
 
-            <!-- The battle sprite fitted to the box, mirrored when flipped; the battle's own scaling isn't the editor's. -->
+            <!-- The battle sprite fitted to the box, mirrored when flipped, one frame at a time while animated; the battle's own
+                 scaling isn't the editor's. -->
             <StackPanel Margin="0,10,0,0" HorizontalAlignment="Left">
               <Border Width="240" Height="240" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
                 <Image x:Name="BattlerPreview"

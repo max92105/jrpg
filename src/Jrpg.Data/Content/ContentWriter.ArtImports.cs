@@ -50,7 +50,8 @@ public sealed partial class ContentWriter
     /// <summary>
     /// Copies a PNG into an art folder under its own file name, replacing one already there (the caller asks first),
     /// after the folder's own check: a field sprite must hold the frames of the record of the same name, if it has one
-    /// yet (ADR 0043); an effect strip must be whole square frames (decision 57); a battler, portrait or background
+    /// yet (ADR 0043); a battler or an effect strip at most <see cref="TextureLimit.MaxSide"/> wide, the widest the
+    /// game loads (decision 637); an effect strip must be whole square frames (decision 57); a portrait or background
     /// only needs to be a PNG.
     /// </summary>
     /// <param name="artFolder">The folder, one of field sprites, battlers, portraits, effects or backgrounds.</param>
@@ -72,6 +73,7 @@ public sealed partial class ContentWriter
 
         var fileName = Path.GetFileName(sourcePath);
         var size = PngSize.Read(sourcePath);
+        RefuseTooWide(artFolder, fileName, size);
         if (artFolder == ArtFolders.FieldSprites)
         {
             RefuseSpriteTooSmall(fileName, size, catalog);
@@ -84,6 +86,18 @@ public sealed partial class ContentWriter
 
         CopyInto(artFolder, sourcePath, fileName);
         return fileName;
+    }
+
+    // Only battle art is drawn whole by the battle, as one texture; a portrait or a background is drawn by other code,
+    // which this import doesn't limit.
+    private static void RefuseTooWide(string artFolder, string fileName, (int Width, int Height) size)
+    {
+        if (artFolder is ArtFolders.Battlers or ArtFolders.Effects && size.Width > TextureLimit.MaxSide)
+        {
+            throw new ContentValidationException(
+                $"{fileName}: a {size.Width} px wide image is wider than the game loads ({TextureLimit.MaxSide} px); "
+                + "import it at a smaller height.");
+        }
     }
 
     // A sprite without a record yet is taken: the window sets the record up after the import, the start checks it.

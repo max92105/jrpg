@@ -233,3 +233,22 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Ui/CoverFit.DrawOverScreen` draws what `DrawZoomedOverScreen(..., 1)` draws, and both repeat the `SourceIn` line (the cinematics plan's CG6): make the first call the second with the next change to either. (CG6, CR3 reviews)
 - The Game's cinematic presenter tests copy their fixed-step helpers: `Run(presenter, time)` in `EventPresenterCinematicTests`, `...VoiceTests` and `...SkipTests`, `StartPastTheLeadIn` in the same three, and `HoldConfirmToSkip` in `EventPresenterTests` and `GameFlowNewGameTests`: move them into `EventPresenters` (or a `CinematicSteps` test helper) with the next test that needs one. (cinematics retro)
 
+## From the animated monsters plan (2026-11-14, out of scope)
+
+- **The party's battle animation** (decision 641): move right or left and an idle loop for party members; a member's
+  loop would be the enemy's `idleAnimation` field on `PartyMemberDefinition`.
+- **A monster's own attack or hit animation**, and a skill's own effect strip (skills name no effect today).
+- **Per-frame times in a battler's loop** (decision 632): one frame time per loop, as ADR 0039, so a GIF whose delays
+  vary plays evenly.
+- `Editor/GifImport/GifFrame` is a record holding a `uint[]`: two frames compare their pixels by reference, and `with`
+  shares the array (MB3's review; its summary says so). A test asserting two frames equal would fail for no visible
+  reason: a plain class, or equality over the pixels, if one ever compares them.
+- **The gnolls' stats, tactics, drops and encounters** (decision 640): the developer's content, in Database >
+  Enemies... after MB5, with an encounter in `encounters.json` kept off the start area's random table.
+
+## From the animated monsters plan's retro (2026-11-14)
+
+- `Editor/Battle/EnemyCatalogWindow.xaml.cs` grew 114 → 202 lines in this plan (the strip preview, the GIF options):
+  the next Art tab feature moves the battle sprite preview (`ShowFrame`, `FrameOf`, `SizeLineOf`) into its own type first.
+- `Game/Battle/BattlersView.FrameRectangle` cuts a strip's frame from the drawn size, which equals the frame's own size
+  only because `BattlerScaling.AtOwnSize` never scales (MB7's review): pass the frame size if the drawn size ever differs.

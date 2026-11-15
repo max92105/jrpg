@@ -1,5 +1,6 @@
 using System.IO;
 using Jrpg.Data.Art;
+using Jrpg.Editor.GifImport;
 using Jrpg.Editor.Objects;
 using Jrpg.Editor.Sprites;
 using Jrpg.Editor.Tiles;
@@ -28,7 +29,7 @@ internal sealed partial class MainViewModel
     /// <param name="paths">The images chosen in the file dialog.</param>
     public SheetImportResult ImportFieldSprites(IReadOnlyList<string> paths)
     {
-        var result = ImportArtImages(ArtFolders.FieldSprites, paths);
+        var result = ImportArtImages(ArtFolders.FieldSprites, paths, GifImportOptions.Default);
         if (result.Imported.Count > 0)
         {
             ImagesImported?.Invoke(this, result.Imported);

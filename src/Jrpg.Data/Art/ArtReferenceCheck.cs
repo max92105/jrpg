@@ -12,15 +12,16 @@ namespace Jrpg.Data.Art;
 /// Checks that the art content names exists (ADR 0009). It runs at startup, apart from the content loader, so content
 /// tests don't need art.
 /// </summary>
-public static class ArtReferenceCheck
+public static partial class ArtReferenceCheck
 {
     /// <summary>
     /// Every tilesheet, the player's and every NPC object's field sprite, every dialogue portrait, every cinematic's
     /// still, every party member's portrait, every item's icon, every skill icon named (a skill may have none), every
     /// battle sprite, every enemy's portrait, every attack effect and every encounter's background exist as PNGs, every
-    /// tile's cell and its animation's last frame lie inside its sheet, every effect strip is whole square frames, and
-    /// every field sprite holds the frames its record needs (ADR 0043). The names of skill icons, NPC sprites, stills
-    /// and battle art must match their files exactly, case included.
+    /// tile's cell and its animation's last frame lie inside its sheet, every effect strip is whole square frames,
+    /// every animated enemy's battle strip splits into its loop's frames (ADR 0047), and every field sprite holds the
+    /// frames its record needs (ADR 0043). The names of skill icons, NPC sprites, stills and battle art must match
+    /// their files exactly, case included.
     /// </summary>
     /// <returns>One line per problem, naming the file; empty when the art is complete.</returns>
     public static IReadOnlyList<string> FindProblems(ContentCatalog catalog, string artRoot)
@@ -63,18 +64,7 @@ public static class ArtReferenceCheck
             .OrderBy(skill => skill.Id, StringComparer.Ordinal);
         var skillIcons = skillsWithIcons.Select(skill => (skill.IconFile, $"skill '{skill.Id}'"));
         AddMissingByExactName(problems, artRoot, ArtFolders.Icons, skillIcons);
-        var memberBattlers = members.Select(member => (member.BattleSpriteFile, $"party member '{member.Id}'"));
-        AddMissingByExactName(problems, artRoot, ArtFolders.Battlers, memberBattlers);
-        var enemies = catalog.Enemies.Values.OrderBy(enemy => enemy.Id, StringComparer.Ordinal);
-        var enemyBattlers = enemies.Select(enemy => (enemy.BattleSpriteFile, $"enemy '{enemy.Id}'"));
-        AddMissingByExactName(problems, artRoot, ArtFolders.Battlers, enemyBattlers);
-        var enemyPortraits = enemies.Select(enemy => (enemy.PortraitFile, $"enemy '{enemy.Id}'"));
-        AddMissingByExactName(problems, artRoot, ArtFolders.Portraits, enemyPortraits);
-        var attackEffects = members.Select(member => (File: member.AttackEffectFile, NamedBy: $"party member '{member.Id}'"))
-            .Concat(enemies.Select(enemy => (File: enemy.AttackEffectFile, NamedBy: $"enemy '{enemy.Id}'")))
-            .ToList();
-        AddMissingByExactName(problems, artRoot, ArtFolders.Effects, attackEffects);
-        AddPartialFrameStrips(problems, artRoot, attackEffects.Select(effect => effect.File));
+        AddBattleArtProblems(problems, catalog, artRoot, members);
         var encounters = catalog.Encounters.Values.OrderBy(encounter => encounter.Id, StringComparer.Ordinal);
         var backgrounds = encounters.Select(encounter => (encounter.BackgroundFile, $"encounter '{encounter.Id}'"));
         AddMissingByExactName(problems, artRoot, ArtFolders.Backgrounds, backgrounds);
@@ -136,34 +126,12 @@ public static class ArtReferenceCheck
         }
     }
 
-    // An effect strip is square frames side by side (decision 57), so its width must be a whole number of its heights.
-    private static void AddPartialFrameStrips(List<string> problems, string artRoot, IEnumerable<string> files)
-    {
-        foreach (var file in files.Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal))
-        {
-            if (ReadSize(artRoot, ArtFolders.Effects, file).Size is not { } size)
-            {
-                continue;
-            }
-
-            if (!IsRowOfSquareFrames(size))
-            {
-                problems.Add(
-                    $"{ExactFileName.ShownPath(ArtFolders.Effects, file)}: a {size.Width}x{size.Height} strip "
-                    + "isn't a row of whole square frames.");
-            }
-        }
-    }
-
     /// <summary>
     /// Whether an image this size holds the frames a record needs, by counts (a frame count near the int limit never
     /// wraps); the startup check and the import share it.
     /// </summary>
     internal static bool HoldsFrames(FieldSpriteSheet sheet, (int Width, int Height) size) =>
         size.Width / sheet.FrameWidth >= sheet.ColumnsNeeded && size.Height / sheet.FrameHeight >= sheet.RowsNeeded;
-
-    /// <summary>Whether an effect strip this size is whole square frames side by side (decision 57).</summary>
-    internal static bool IsRowOfSquareFrames((int Width, int Height) size) => size.Height > 0 && size.Width % size.Height == 0;
 
     // Matched by exact name, case included (see ExactFileName).
     private static void AddMissingByExactName(List<string> problems, string artRoot, string folder, IEnumerable<(string File, string NamedBy)> references)

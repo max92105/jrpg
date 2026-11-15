@@ -1,6 +1,7 @@
 using System.Text.Json.Nodes;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
+using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
 
 namespace Jrpg.Data.Tests.Content;
@@ -64,6 +65,25 @@ public sealed class ContentWriterEnemyTests : IDisposable
         var written = WrittenEnemies();
         Assert.True((bool?)written["goblin_king"]["isBoss"]);
         Assert.False(written["goblin"].AsObject().ContainsKey("isBoss"));
+    }
+
+    [Fact]
+    public void WriteMapCatalogs_EnemyWithoutLoop_LeavesIdleAnimationOut()
+    {
+        _writer.WriteMapCatalogs(WithEnemies(_catalog.Enemies["goblin"] with { IdleAnimation = null }));
+
+        Assert.False(WrittenEnemies()["goblin"].AsObject().ContainsKey("idleAnimation"));
+    }
+
+    [Fact]
+    public void WriteMapCatalogs_EnemyWithLoop_WritesIt()
+    {
+        var loop = new TileAnimation { FrameCount = 8, FrameMilliseconds = 120 };
+        var gnoll = _catalog.Enemies["goblin"] with { Id = "gnoll", IdleAnimation = loop };
+
+        _writer.WriteMapCatalogs(WithEnemies(gnoll));
+
+        Assert.Equal(loop, ContentCatalogLoader.Load(_content.Path).Enemies["gnoll"].IdleAnimation);
     }
 
     [Fact]

@@ -30,6 +30,15 @@ public sealed class BattlerScalingTests
         Assert.Equal(new BattlerScaling(new Point(128, 128), IsShrunkSmoothly: false), scaling);
     }
 
+    // An animated strip is already at its battle height (decision 637): a frame past 512 px isn't taken for a painting.
+    [Fact]
+    public void AtOwnSize_FrameOver512_IsNotShrunk()
+    {
+        var scaling = BattlerScaling.AtOwnSize(new Point(600, 700));
+
+        Assert.Equal(new BattlerScaling(new Point(600, 700), IsShrunkSmoothly: false), scaling);
+    }
+
     // A boss looks bigger only through its art (decision 408): art past 512 px would draw as a painting and fail here.
     [Fact]
     public void Of_RepositoryChiefArt_IsTwiceTheGoblinsDrawnSize()

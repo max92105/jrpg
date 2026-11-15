@@ -51,6 +51,9 @@ internal static class AbsentWhenNullFilter
         (typeof(EnemyDefinition), "dropTableId"),
         (typeof(EnemyDefinition), "gold"),
 
+        // ADR 0047: only an animated sprite has a loop.
+        (typeof(EnemyDefinition), "idleAnimation"),
+
         // ADR 0046: a cinematic without a track keeps the map's; a still may have no subtitle, voice or zoom.
         (typeof(CinematicDefinition), "musicFile"),
         (typeof(CinematicStill), "caption"),

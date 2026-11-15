@@ -10,8 +10,8 @@ namespace Jrpg.Editor.Battle;
 /// One enemy as the Enemies window edits it (ADR 0045): its id (typed while new, fixed once the draft holds it,
 /// decision 582), name, numbers, resistances, rewards and art as typed. What no form edits yet (its tactics and phases)
 /// is carried from the record it came from, so the window never wipes it; a duplicate carries it too (decision 585).
-/// <see cref="Problem"/> is the typed id's or a box that isn't a number; the ranges are Data's rules, shown by the
-/// list.
+/// <see cref="Problem"/> is the typed id's or a box that isn't a number, the art's loop boxes last; the ranges are
+/// Data's rules, shown by the list.
 /// </summary>
 internal sealed partial class EnemyViewModel : ObservableObject
 {
@@ -150,7 +150,8 @@ internal sealed partial class EnemyViewModel : ObservableObject
 
     /// <summary>Why the typed id or a number can't be read; null when the record can be built.</summary>
     public string? Problem =>
-        (IsNew ? ObjectIds.ProblemOf(Id, []) : null) ?? FirstNumberProblem() ?? FirstResistanceProblem() ?? FirstGoldProblem();
+        (IsNew ? ObjectIds.ProblemOf(Id, []) : null) ?? FirstNumberProblem() ?? FirstResistanceProblem() ?? FirstGoldProblem()
+        ?? Art.Problem;
 
     /// <summary>The record it came from with the edited fields over it.</summary>
     /// <exception cref="InvalidOperationException">There is a <see cref="Problem"/>.</exception>

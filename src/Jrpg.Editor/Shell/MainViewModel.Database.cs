@@ -4,6 +4,7 @@ using Jrpg.Data.Audio;
 using Jrpg.Editor.Battle;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Cinematics;
+using Jrpg.Editor.GifImport;
 using Jrpg.Editor.Loot;
 using Jrpg.Editor.Tiles;
 using Jrpg.Editor.Trade;
@@ -43,10 +44,11 @@ internal sealed partial class MainViewModel
     /// </summary>
     /// <param name="artFolder">The field sprites, battlers, portraits or effects folder.</param>
     /// <param name="paths">The images chosen in the file dialog.</param>
-    public SheetImportResult ImportArtImages(string artFolder, IReadOnlyList<string> paths)
+    /// <param name="gifOptions">How a GIF chosen for the battlers becomes a strip (ADR 0047).</param>
+    public SheetImportResult ImportArtImages(string artFolder, IReadOnlyList<string> paths, GifImportOptions gifOptions)
     {
         var result = new ArtImageImport(_writer, Content!)
-            .Import(artFolder, paths, file => _confirm($"{file} is already in the {artFolder} art. Replace it?"));
+            .Import(artFolder, paths, gifOptions, file => _confirm($"{file} is already in the {artFolder} art. Replace it?"));
         if (result.Imported.Count > 0)
         {
             Art!.Refresh();

@@ -16,6 +16,7 @@ Older plans are single files with the same sections.
 | Plan | Status |
 |---|---|
 | [2026-11-14-battle-turn-presentation](2026-11-14-battle-turn-presentation/README.md) | in progress (phase 1 done; phases 2-4 next, after animated-monsters) |
+| [2026-11-14-animated-monsters](done/2026-11-14-animated-monsters/README.md) | done |
 | [2026-11-14-cinematics](done/2026-11-14-cinematics/README.md) | done |
 | [2026-11-13-drop-table-editor](done/2026-11-13-drop-table-editor/README.md) | done |
 | [2026-11-12-character-sprites-and-npcs](done/2026-11-12-character-sprites-and-npcs/README.md) | done |

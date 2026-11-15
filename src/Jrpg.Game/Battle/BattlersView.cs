@@ -9,8 +9,9 @@ namespace Jrpg.Game.Battle;
 
 /// <summary>
 /// Draws every living battler at its spot in the formation, centered on it with its feet on the spot's bottom, the
-/// party actor stepped out toward the enemies. The actor blinks white twice as its action winds up, a soft spill past
-/// its outline each time (decision 648); whoever falls, party member or enemy, is lit white, then fades out.
+/// party actor stepped out toward the enemies; an animated enemy loops its strip's frames
+/// (<see cref="BattlerFrames"/>). The actor blinks white twice as its action winds up, a soft spill past its outline
+/// each time (decision 648); whoever falls, party member or enemy, is lit white, then fades out.
 /// </summary>
 internal sealed class BattlersView
 {
@@ -21,6 +22,7 @@ internal sealed class BattlersView
     private readonly FormationSlide _slide = new();
     private IReadOnlyList<Combatant> _covered = [];
     private readonly BattlerArt[] _arts;
+    private readonly BattlerFrames _frames;
 
     // The blink's spill: its silhouette again around the sprite, 6 px out in the eight directions, each faint, so the
     // white seems to glow past the outline (decision 648).
@@ -53,6 +55,7 @@ internal sealed class BattlersView
         _spots = BattleLayout.SpotsOf(combatants, _formation);
         _spotsBefore = _spots;
         _arts = [.. combatants.Select(BattlerArt.Of)];
+        _frames = new BattlerFrames(combatants, _arts);
         _ui = ui;
     }
 
@@ -73,7 +76,11 @@ internal sealed class BattlersView
         _slide.Restart();
     }
 
-    public void Update(TimeSpan delta) => _slide.Update(delta);
+    public void Update(TimeSpan delta)
+    {
+        _slide.Update(delta);
+        _frames.Advance(delta);
+    }
 
     /// <summary>The allies a choice being aimed would cover all at once, such as an aura's; their spots glow.</summary>
     public void ShowCoverage(IReadOnlyList<Combatant> covered) => _covered = covered;
@@ -146,26 +153,36 @@ internal sealed class BattlersView
         return spot;
     }
 
+    private static Rectangle DrawnArea(TextureLibrary textures, BattlerArt art, Rectangle spot) =>
+        AreaOn(spot, ScalingOf(textures.Get(ArtFolders.Battlers, art.SpriteFile), art).DrawnSize);
+
     // Centered on the spot, feet on its bottom.
-    private static Rectangle DrawnArea(TextureLibrary textures, BattlerArt art, Rectangle spot)
-    {
-        var source = textures.Get(ArtFolders.Battlers, art.SpriteFile);
-        var size = BattlerScaling.Of(new Point(source.Width, source.Height)).DrawnSize;
-        return new Rectangle(spot.Center.X - (size.X / 2), spot.Bottom - size.Y, size.X, size.Y);
-    }
+    private static Rectangle AreaOn(Rectangle spot, Point size) =>
+        new(spot.Center.X - (size.X / 2), spot.Bottom - size.Y, size.X, size.Y);
+
+    // An animated strip's frame is the image's width shared by its frames, at its own size (decision 637).
+    private static BattlerScaling ScalingOf(Texture2D source, BattlerArt art) =>
+        art.IdleAnimation is { } loop
+            ? BattlerScaling.AtOwnSize(new Point(source.Width / loop.FrameCount, source.Height))
+            : BattlerScaling.Of(new Point(source.Width, source.Height));
+
+    // The shown frame's part of a strip; null for a still battler, drawn whole.
+    private Rectangle? FrameRectangle(int index, BattlerArt art, Point frameSize) =>
+        art.IdleAnimation is null ? null : new Rectangle(_frames.FrameOf(index) * frameSize.X, 0, frameSize.X, frameSize.Y);
 
     // The spill goes under the sprite, the white over it, so the battler's own colors still show through.
     private void DrawBattler(SpriteBatch batch, TextureLibrary textures, int index, float opacity)
     {
         var (combatant, art) = (_combatants[index], _arts[index]);
-        var area = DrawnArea(textures, art, SteppedSpot(combatant, SlidSpot(index)));
         var source = textures.Get(ArtFolders.Battlers, art.SpriteFile);
-        var scaling = BattlerScaling.Of(new Point(source.Width, source.Height));
+        var scaling = ScalingOf(source, art);
+        var area = AreaOn(SteppedSpot(combatant, SlidSpot(index)), scaling.DrawnSize);
         var image = scaling.IsShrunkSmoothly ? _ui.Battler(textures, art.SpriteFile, scaling.DrawnSize.X) : source;
+        var frame = FrameRectangle(index, art, scaling.DrawnSize);
         var effects = art.IsFlipped ? SpriteEffects.FlipHorizontally : SpriteEffects.None;
-        var white = new WhiteLayer(_ui.WhiteSilhouette(textures, image), area, effects);
+        var white = new WhiteLayer(_ui.WhiteSilhouette(textures, image), area, frame, effects);
         DrawSpill(batch, white, opacity * SpillShare * (_sequence.WindUp?.BlinkOf(combatant) ?? 0));
-        batch.Draw(image, area, null, Color.White * opacity, 0, Vector2.Zero, effects, 0);
+        batch.Draw(image, area, frame, Color.White * opacity, 0, Vector2.Zero, effects, 0);
         var whiteness = BattlerWhiteness.Of(combatant, _sequence.WindUp);
         if (whiteness > 0)
         {
@@ -186,14 +203,14 @@ internal sealed class BattlersView
         }
     }
 
-    // A battler's white silhouette where its sprite is drawn, flipped as the sprite.
-    private readonly record struct WhiteLayer(Texture2D Silhouette, Rectangle Area, SpriteEffects Effects)
+    // A battler's white silhouette where its sprite is drawn, the same frame of it, flipped as the sprite.
+    private readonly record struct WhiteLayer(Texture2D Silhouette, Rectangle Area, Rectangle? Frame, SpriteEffects Effects)
     {
         public void Draw(SpriteBatch batch, Point offset, float strength)
         {
             var area = Area;
             area.Offset(offset);
-            batch.Draw(Silhouette, area, null, Color.White * strength, 0, Vector2.Zero, Effects, 0);
+            batch.Draw(Silhouette, area, Frame, Color.White * strength, 0, Vector2.Zero, Effects, 0);
         }
     }
 }

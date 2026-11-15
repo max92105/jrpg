@@ -71,7 +71,8 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject
 
     /// <summary>
     /// After an Import... beside an art box: the folders are read again, and the last file copied is picked in that box
-    /// for the chosen enemy; nothing picked when nothing was copied.
+    /// for the chosen enemy, and a strip imported from a GIF fills its idle loop's boxes (ADR 0047); nothing picked
+    /// when nothing was copied.
     /// </summary>
     /// <param name="artFolder">The battlers, portraits or effects folder the import went to.</param>
     /// <param name="result">What the import copied and refused.</param>
@@ -84,6 +85,10 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject
 
         ArtChoices.Refresh();
         SelectedEnemy!.Art.Pick(artFolder, file);
+        if (result.Animations.TryGetValue(file, out var loop))
+        {
+            SelectedEnemy.Art.TakeLoop(loop);
+        }
     }
 
     /// <summary>

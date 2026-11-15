@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
@@ -44,6 +45,8 @@ public sealed class EnemyCatalogValidatorTests
         { _goblin with { Gold = new GoldRange(0, Purse.MaxGold + 1) }, "gold.max must be within 0..9999999 (was 10000000)." },
         { _goblin with { Resistances = Resistances.None with { Fire = 760 } }, "resistances.fire must be within -100..75 (was 76)." },
         { _goblin with { Resistances = Resistances.None with { Ice = -1010 } }, "resistances.ice must be within -100..75 (was -101)." },
+        { _goblin with { IdleAnimation = Loop(1, 100) }, "idleAnimation.frameCount must be at least 2 (was 1)." },
+        { _goblin with { IdleAnimation = Loop(8, 0) }, "idleAnimation.frameMilliseconds must be at least 1 (was 0)." },
     };
 
     [Fact]
@@ -61,6 +64,24 @@ public sealed class EnemyCatalogValidatorTests
         var exception = Assert.Throws<ContentValidationException>(() => EnemyCatalogValidator.Validate("enemies.json", [enemy], _references));
 
         Assert.Equal($"enemies.json: enemy 'goblin': {problem}", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_IdleAnimationTwoFramesOneMillisecond_Passes()
+    {
+        var exception = Record.Exception(
+            () => EnemyCatalogValidator.Validate("enemies.json", [_goblin with { IdleAnimation = Loop(2, 1) }], _references));
+
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void Validate_NoIdleAnimation_Passes()
+    {
+        var exception = Record.Exception(
+            () => EnemyCatalogValidator.Validate("enemies.json", [_goblin with { IdleAnimation = null }], _references));
+
+        Assert.Null(exception);
     }
 
     [Fact]
@@ -82,4 +103,7 @@ public sealed class EnemyCatalogValidatorTests
 
         Assert.Equal("enemies.json: enemy 'goblin': dropTableId has unknown drop table id 'slime'.", exception.Message);
     }
+
+    private static TileAnimation Loop(int frameCount, int frameMilliseconds) =>
+        new() { FrameCount = frameCount, FrameMilliseconds = frameMilliseconds };
 }

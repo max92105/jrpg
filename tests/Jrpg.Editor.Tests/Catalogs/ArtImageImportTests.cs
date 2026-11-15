@@ -1,6 +1,7 @@
 using Jrpg.Data.Art;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.GifImport;
 using Jrpg.Editor.Tests.Tiles;
 
 namespace Jrpg.Editor.Tests.Catalogs;
@@ -24,7 +25,7 @@ public sealed class ArtImageImportTests : IDisposable
     {
         var source = PngHeaderFile.Write(Path.Combine(_root, "source", "Villager.png"), 128, 224);
 
-        var result = _import.Import(ArtFolders.FieldSprites, [source], Ask(answer: true));
+        var result = _import.Import(ArtFolders.FieldSprites, [source], GifImportOptions.Default, Ask(answer: true));
 
         Assert.Equal("Villager.png", result.LastImported);
         Assert.True(File.Exists(Art(ArtFolders.FieldSprites, "Villager.png")));
@@ -36,7 +37,7 @@ public sealed class ArtImageImportTests : IDisposable
     {
         var source = PngHeaderFile.Write(Path.Combine(_root, "source", "Wolf.png"), 96, 96);
 
-        var result = _import.Import(ArtFolders.Battlers, [source], Ask(answer: true));
+        var result = _import.Import(ArtFolders.Battlers, [source], GifImportOptions.Default, Ask(answer: true));
 
         Assert.Equal("Wolf.png", result.LastImported);
         Assert.True(File.Exists(Art(ArtFolders.Battlers, "Wolf.png")));
@@ -49,7 +50,7 @@ public sealed class ArtImageImportTests : IDisposable
         var oldBytes = File.ReadAllBytes(old);
         var source = PngHeaderFile.Write(Path.Combine(_root, "source", "Wolf.png"), 96, 96);
 
-        var result = _import.Import(ArtFolders.Portraits, [source], Ask(answer: false));
+        var result = _import.Import(ArtFolders.Portraits, [source], GifImportOptions.Default, Ask(answer: false));
 
         Assert.Equal(["Wolf.png"], _questions);
         Assert.Null(result.LastImported);
@@ -62,7 +63,7 @@ public sealed class ArtImageImportTests : IDisposable
     {
         var source = PngHeaderFile.Write(Path.Combine(_root, "source", "npc_placeholder.png"), 48, 48);
 
-        var result = _import.Import(ArtFolders.FieldSprites, [source], Ask(answer: true));
+        var result = _import.Import(ArtFolders.FieldSprites, [source], GifImportOptions.Default, Ask(answer: true));
 
         Assert.Null(result.LastImported);
         var refusal = Assert.Single(result.Refusals);
@@ -75,7 +76,7 @@ public sealed class ArtImageImportTests : IDisposable
     {
         var source = PngHeaderFile.Write(Path.Combine(_root, "source", "Bite.png"), 100, 32);
 
-        var result = _import.Import(ArtFolders.Effects, [source], Ask(answer: true));
+        var result = _import.Import(ArtFolders.Effects, [source], GifImportOptions.Default, Ask(answer: true));
 
         Assert.Null(result.LastImported);
         Assert.Equal(["Bite.png: a 100x32 strip isn't a row of whole square frames."], result.Refusals);

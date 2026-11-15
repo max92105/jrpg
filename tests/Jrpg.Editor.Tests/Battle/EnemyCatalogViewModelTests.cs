@@ -1,7 +1,10 @@
 using Jrpg.Core.Content;
+using Jrpg.Core.Maps;
 using Jrpg.Core.Stats;
+using Jrpg.Data.Art;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Battle;
+using Jrpg.Editor.Tiles;
 
 namespace Jrpg.Editor.Tests.Battle;
 
@@ -92,6 +95,43 @@ public sealed class EnemyCatalogViewModelTests
         Assert.Equal("enemies.json: enemy 'goblin': dodge must be within 0..50 (was 51).", catalog.Problem);
         Assert.Contains(nameof(EnemyCatalogViewModel.Problem), notified);
         Assert.Contains(nameof(EnemyCatalogViewModel.CanApply), notified);
+    }
+
+    [Fact]
+    public void Problem_FrameCountOne_IsDatasMessage()
+    {
+        var catalog = new EnemyCatalogViewModel(_catalog, _ => []);
+        var goblin = catalog.Enemies.Single(enemy => enemy.Id == "goblin");
+
+        goblin.Art.IsAnimated = true;
+        goblin.Art.FrameCountText = "1";
+
+        Assert.Equal("enemies.json: enemy 'goblin': idleAnimation.frameCount must be at least 2 (was 1).", catalog.Problem);
+    }
+
+    [Fact]
+    public void TakeImport_GifResult_FillsTheIdleBoxes()
+    {
+        var catalog = new EnemyCatalogViewModel(_catalog, _ => []);
+        var loop = new TileAnimation { FrameCount = 4, FrameMilliseconds = 260 };
+        var animations = new Dictionary<string, TileAnimation> { ["Gnoll.png"] = loop };
+        var result = new SheetImportResult(["Gnoll.png"], []) { Animations = animations };
+
+        catalog.TakeImport(ArtFolders.Battlers, result);
+
+        Assert.Equal(("Gnoll.png", loop), (catalog.SelectedEnemy!.Art.BattleSpriteFile, catalog.SelectedEnemy.Art.PreviewLoop));
+    }
+
+    [Fact]
+    public void TakeImport_PngResult_LeavesTheBoxes()
+    {
+        var catalog = new EnemyCatalogViewModel(_catalog, _ => []);
+        var loop = new TileAnimation { FrameCount = 6, FrameMilliseconds = 120 };
+        catalog.SelectedEnemy!.Art.TakeLoop(loop);
+
+        catalog.TakeImport(ArtFolders.Battlers, new SheetImportResult(["Wolf.png"], []));
+
+        Assert.Equal(("Wolf.png", loop), (catalog.SelectedEnemy.Art.BattleSpriteFile, catalog.SelectedEnemy.Art.PreviewLoop));
     }
 
     [Fact]

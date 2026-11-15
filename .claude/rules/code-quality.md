@@ -55,6 +55,7 @@ The bar: a professional reviewer reads the diff and understands the intent from 
 - Inside Core, trust non-nullable types. Don't add null checks the compiler already guarantees.
 - Never swallow exceptions. A `catch` handles, translates with context, or isn't there.
 - Throw specific exceptions (`ArgumentOutOfRangeException`, `InvalidOperationException`), never bare `Exception`.
+- A loop over a computed area of pixels or cells clamps both ends to the source (`Right` from `Left` to the size), computes its edges from integer products divided last, and gets a test with the area wholly outside and one whose step doesn't divide evenly (the animated monsters plan's MB3, MB4 Criticals).
 - A bound on a typed or loaded count is written `count > limit - start`, never `start + count > limit`, and gets a test with `int.MaxValue` (the composer plan's AE1, AN1).
 
 ## What AI-generated code tends to add — don't

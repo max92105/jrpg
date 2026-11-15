@@ -53,7 +53,7 @@ internal sealed partial class MainWindow
 
     private void OnEditEnemiesClicked(object sender, RoutedEventArgs e)
     {
-        if (_viewModel.EnemyEditing is not { } enemyEditing)
+        if (_viewModel.EnemyEditing is not { } enemyEditing || _viewModel.AnimationTime is not { } animationTime)
         {
             return;
         }
@@ -61,8 +61,10 @@ internal sealed partial class MainWindow
         var edited = enemyEditing.Start();
         var window = new EnemyCatalogWindow(
             edited,
-            _viewModel.ImportArtImages,
-            file => SpriteImageFile.LoadFrom(_viewModel.ArtRoot, ArtFolders.Battlers, file),
+            new EnemyArtSources(
+                _viewModel.ImportArtImages,
+                file => SpriteImageFile.LoadFrom(_viewModel.ArtRoot, ArtFolders.Battlers, file),
+                animationTime),
             (owner, tableId) =>
             {
                 if (EditDropTables(owner, tableId))

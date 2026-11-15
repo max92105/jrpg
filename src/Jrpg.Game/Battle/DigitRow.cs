@@ -1,8 +1,8 @@
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// Where each digit of a floating number sits along its row, from the row's left, at the font's own size: drawn digit
-/// by digit so each can hop on its own (decision 650). Built once per number when its playback starts.
+/// Where each digit of a floating number sits along its row, from the row's left, by the digit strip's measured widths:
+/// drawn digit by digit so each can hop on its own (decision 650). Built once per number when its playback starts.
 /// </summary>
 internal readonly struct DigitRow
 {
@@ -17,7 +17,9 @@ internal readonly struct DigitRow
     public float Width { get; }
 
     /// <param name="digits">The number's text: digits only.</param>
-    /// <param name="advances">Each digit's width in the font, indexed by its value, 0 to 9.</param>
+    /// <param name="advances">
+    /// Each digit's width in its digit strip (<see cref="DigitStrip.Advances"/>), by its value, 0 to 9.
+    /// </param>
     /// <param name="spacing">Added between two digits; negative to set them tight.</param>
     public static DigitRow Of(string digits, ReadOnlySpan<float> advances, float spacing)
     {

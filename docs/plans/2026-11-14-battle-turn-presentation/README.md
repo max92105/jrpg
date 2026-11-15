@@ -121,7 +121,7 @@ slice is done and write its deviations in the slice file. Tunables, the timeline
   [slices/TN5.md](slices/TN5.md)
 - [x] **NU2. The digit strips generated from Cormorant Garamond by a script in `art-src/`** (art + script, about 150
   lines) → [slices/NU2.md](slices/NU2.md)
-- [ ] **NU3. The digits drawn from the strips; a critical from its own bigger strip** (Game, about 200 lines) →
+- [x] **NU3. The digits drawn from the strips; a critical from its own bigger strip** (Game, about 200 lines) →
   [slices/NU3.md](slices/NU3.md)
 
 ### Phase 3: the slash and the impact

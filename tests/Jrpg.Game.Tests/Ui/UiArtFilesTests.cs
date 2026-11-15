@@ -12,6 +12,7 @@ public sealed class UiArtFilesTests
     [Theory]
     [InlineData(typeof(UiArtFiles.Backgrounds), ArtFolders.Backgrounds)]
     [InlineData(typeof(UiArtFiles.Icons), ArtFolders.Icons)]
+    [InlineData(typeof(UiArtFiles.Fonts), ArtFolders.Fonts)]
     public void EveryConstant_ExistsInItsFolder(Type group, string folder)
     {
         var files = group.GetFields(BindingFlags.Public | BindingFlags.Static)
@@ -27,6 +28,6 @@ public sealed class UiArtFilesTests
     [Fact]
     public void EveryGroup_IsCheckedAbove()
     {
-        Assert.Equal(2, typeof(UiArtFiles).GetNestedTypes().Length);
+        Assert.Equal(3, typeof(UiArtFiles).GetNestedTypes().Length);
     }
 }

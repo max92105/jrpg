@@ -43,3 +43,9 @@ is built; a strip whose width isn't ten cells or with an empty cell stops the ba
    readable.
 3. A "1" in a number ("31", "117"): no gap around it.
 
+- **Done, with deviations:** the strips are measured on the view's first draw (it gets the texture library only
+  there), not when the battle screen is built, so a broken strip stops the battle at its first number; a private
+  `DigitStripImage` in the view holds each strip's texture, measured digits and advances. `ArtFolders.Fonts` is a
+  constant only: `FontLibrary` keeps its own `art/fonts` path. The `SizeOf` tests went with `SizeOf`.
+  Review: no Critical; `DigitRow`'s summary and param say the strip's measured widths; `DigitStrip.Advances` (a span,
+  replacing `AdvanceOf`) so the view no longer repeats the ten; `DigitStripImage` holds no array.

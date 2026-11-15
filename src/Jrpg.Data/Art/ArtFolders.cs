@@ -28,6 +28,9 @@ public static class ArtFolders
     /// <summary>The stills cutscenes show over the whole screen (ADR 0016).</summary>
     public const string Cinematics = "cinematics";
 
+    /// <summary>The game's fonts, and the damage digit strips drawn as one (decision 653).</summary>
+    public const string Fonts = "fonts";
+
     public static string RootIn(string contentRoot) => Path.Combine(contentRoot, "art");
 
     /// <summary>The PNG file names in the tilesheet folder, set up as sheets or not, sorted ordinally.</summary>

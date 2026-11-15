@@ -134,7 +134,7 @@ internal sealed class BattleScene : IScene
 
         _enemyTags.Draw(batch, textures);
         _impactEffects.Draw(batch, textures);
-        _numbers.Draw(batch);
+        _numbers.Draw(batch, textures);
         _turnOrder.Draw(batch, textures);
         _bannerView.Draw(batch, textures);
         _partyStatus.Draw(batch, textures, _sequence.IsOver ? null : _sequence.Actor);

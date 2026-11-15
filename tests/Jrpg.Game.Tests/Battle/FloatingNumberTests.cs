@@ -110,18 +110,6 @@ public sealed class FloatingNumberTests
     }
 
     [Fact]
-    public void SizeOf_Critical_IsBigger()
-    {
-        Assert.Equal(1.4f, FloatingNumber.SizeOf(FloatingNumberTone.Critical));
-    }
-
-    [Fact]
-    public void SizeOf_Damage_IsTheNormalSize()
-    {
-        Assert.Equal(1, FloatingNumber.SizeOf(FloatingNumberTone.Damage));
-    }
-
-    [Fact]
     public void ColorOf_DamageAndHeal_KeepTheirColors()
     {
         Assert.Equal(

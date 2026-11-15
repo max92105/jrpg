@@ -23,14 +23,13 @@ namespace Jrpg.Game.Battle;
 /// </param>
 internal readonly record struct FloatingNumber(Combatant Target, string Text, FloatingNumberTone Tone, TimeSpan ShowsAt = default, int Stack = 0, HitAffinity Affinity = HitAffinity.Neutral)
 {
-    /// <summary>A little less than the 54 px digits, so a stack stays close; the outline keeps the numbers apart.</summary>
+    /// <summary>
+    /// A little less than the 52 px digit strip, so a stack stays close; the dark edge keeps the numbers apart.
+    /// </summary>
     public const float StackSpacing = 48;
 
     /// <summary>Between two digits, so they sit tight as the clip's.</summary>
     public const float DigitSpacing = -2;
-
-    // Placeholder: a crit's number is drawn this much bigger than a normal one, so it stands out at a glance.
-    private const float CriticalSize = 1.4f;
 
     // Each digit rests this much lower than the one before it, and hops this high.
     private const float DigitStep = 6;
@@ -54,9 +53,6 @@ internal readonly record struct FloatingNumber(Combatant Target, string Text, Fl
         FloatingNumberTone.Poison => UiTheme.FloatingPoison,
         _ => throw new ArgumentOutOfRangeException(nameof(tone), tone, null),
     };
-
-    /// <summary>How much bigger than a normal number one of this tone is drawn: a crit's, else 1.</summary>
-    public static float SizeOf(FloatingNumberTone tone) => tone == FloatingNumberTone.Critical ? CriticalSize : 1;
 
     /// <summary>
     /// Digit <paramref name="digit"/> rises over a frame from its turn (digit 0 two frames in), stays up at least a

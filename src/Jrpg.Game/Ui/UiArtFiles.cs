@@ -8,6 +8,16 @@ namespace Jrpg.Game.Ui;
 /// </summary>
 internal static class UiArtFiles
 {
+    /// <summary>
+    /// In <see cref="ArtFolders.Fonts"/>: the damage digits, the critical's 1.4x bigger (decision 653).
+    /// </summary>
+    public static class Fonts
+    {
+        public const string DamageDigits = "DamageDigits.png";
+
+        public const string CriticalDigits = "CriticalDigits.png";
+    }
+
     /// <summary>In <see cref="ArtFolders.Backgrounds"/>.</summary>
     public static class Backgrounds
     {

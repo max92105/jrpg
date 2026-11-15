@@ -1,5 +1,5 @@
 # Battle turn presentation: a turn that reads like the reference clip
-Status: approved
+Status: done (retro applied 2026-11-15)
 
 Drafted on 2026-11-14 from the developer's request (cleaned up by the caller):
 

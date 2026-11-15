@@ -12,6 +12,8 @@
   <SolidColorBrush x:Key="StatusTextBrush" Color="#88CC88" />
   <SolidColorBrush x:Key="ProblemTextBrush" Color="#FF6B6B" />
   <SolidColorBrush x:Key="WarningTextBrush" Color="#E0A040" />
+  <!-- The cinematic focus marker, a light gold (decision 755). -->
+  <SolidColorBrush x:Key="FocusMarkBrush" Color="#FFD45A" />
   <SolidColorBrush x:Key="HoverBackgroundBrush" Color="#2C2C2C" />
   <SolidColorBrush x:Key="PressedBackgroundBrush" Color="#3A3A3A" />
   <SolidColorBrush x:Key="SelectionBrush" Color="#2A4D6E" />

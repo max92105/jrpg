@@ -83,3 +83,8 @@ so.
 7. Reopen the window, set a point on a still, press **Cancel**: reopened, the still has no point (the session dropped).
 8. After a build, `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/scripts/open-editor-windows.ps1`: no
    `ERROR` line for the Cinematics window.
+
+- **Done, with deviations:** as planned, the marker's dark outline drawn 3 px under a 2 px gold stroke (a ring and a
+  cross each). The implementer ran step 8: the Cinematics window opened with no `ERROR` and no binding-error line,
+  its capture showing the focus line and the greyed Clear focus under the zoom boxes. Steps 1 to 7 are the
+  developer's, left unticked; no content file was edited.

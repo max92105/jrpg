@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Jrpg.Editor.Hosting;
@@ -8,8 +9,9 @@ namespace Jrpg.Editor.Cinematics;
 
 /// <summary>
 /// The Cinematics window (ADR 0046): OK keeps the session's cinematics when nothing would be refused, Cancel drops
-/// them. The problem line shows live and greys OK while it shows; the preview shows the chosen still's picture. Play
-/// runs the cinematic on the render loop's clock, stopped when the window closes.
+/// them. The problem line shows live and greys OK while it shows; the preview shows the chosen still's picture, and a
+/// click on it sets where its zoom heads. Play runs the cinematic on the render loop's clock; closing the window stops
+/// the clock and the preview with it.
 /// </summary>
 internal sealed partial class CinematicCatalogWindow : Window
 {
@@ -43,6 +45,15 @@ internal sealed partial class CinematicCatalogWindow : Window
     }
 
     private void OnOkClicked(object sender, RoutedEventArgs e) => DialogResult = true;
+
+    // The still's panel is disabled with no still chosen, and Play's layer takes clicks while it shows, so a click here
+    // always lands on the chosen still's picture.
+    private void OnStillPictureClicked(object sender, MouseButtonEventArgs e)
+    {
+        var picture = (FrameworkElement)sender;
+        var at = e.GetPosition(picture);
+        ((CinematicStillRow)picture.DataContext).SetFocusAt(at.X / PreviewWidth, at.Y / PreviewHeight);
+    }
 
     private void OnPreviewChanged(object? sender, PropertyChangedEventArgs e)
     {

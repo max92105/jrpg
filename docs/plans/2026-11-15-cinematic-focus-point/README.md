@@ -1,5 +1,5 @@
 # Cinematic focus point
-Status: approved
+Status: retro pending
 
 Approved on 2026-11-15 by the coordinator, on the developer's delegation, after the devil's advocate's review (applied:
 `CoverFit` draws from the crop's top-left at `zoom.PositionOf(Vector2.Zero)`; Play's existing black grid takes the
@@ -75,7 +75,7 @@ Today a still zooms from a start to an end percent about its picture's center (d
 
 ### Phase 3: the editor
 - [x] **FP3. The still's focus as the window edits it** (Editor, about 210 lines) → [slices/FP3.md](slices/FP3.md)
-- [ ] **FP4. Click to set, marker, Clear focus, Play about it** (Editor, about 140 lines) →
+- [x] **FP4. Click to set, marker, Clear focus, Play about it** (Editor, about 140 lines) →
   [slices/FP4.md](slices/FP4.md)
 
 ## Decisions

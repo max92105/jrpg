@@ -11,6 +11,7 @@
         ShowInTaskbar="False">
   <Window.Resources>
     <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
+    <local:FocusMarkerMarginConverter x:Key="FocusMarkerMargin" />
     <Style x:Key="FieldLabel" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
       <Setter Property="Width" Value="90" />
       <Setter Property="VerticalAlignment" Value="Center" />
@@ -125,19 +126,41 @@
             <TextBox Width="50" Text="{Binding ZoomEndText, UpdateSourceTrigger=PropertyChanged}"
                      ToolTip="100 to 150; 100 at both ends is no zoom" />
           </StackPanel>
+          <StackPanel Style="{StaticResource FieldRow}">
+            <TextBlock Text="{Binding FocusText}" Foreground="{StaticResource MutedTextBrush}" VerticalAlignment="Center" />
+            <Button Content="Clear focus" Margin="12,0,0,0" Command="{Binding ClearFocusCommand}" ToolTip="The zoom heads to the center again" />
+          </StackPanel>
           <Grid Width="{x:Static local:CinematicCatalogWindow.PreviewWidth}" Height="{x:Static local:CinematicCatalogWindow.PreviewHeight}" HorizontalAlignment="Left" Margin="0,12,0,0" Background="Black" ClipToBounds="True">
-            <TextBlock Text="No picture to show" Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-            <Image Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" Source="{Binding ImageFile, Converter={StaticResource PictureOf}}" />
-            <!-- Play's still over black, faded and zoomed about the center by Core's rules, as the game draws it. -->
+            <!-- The chosen still: a click sets where its zoom heads (decision 753); transparent, so an empty frame takes it. -->
+            <Grid Background="Transparent" Cursor="Cross" MouseLeftButtonDown="OnStillPictureClicked" ToolTip="Click to choose where the zoom heads">
+              <TextBlock Text="No picture to show" Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+              <Image Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" Source="{Binding ImageFile, Converter={StaticResource PictureOf}}" />
+              <!-- The focus: a gold ring and cross over a dark outline, seen on light and dark pictures (decision 755); a
+                   click goes through it, so a click on it moves the point. -->
+              <Grid Width="{x:Static local:FocusMarkerMarginConverter.MarkerSize}" Height="{x:Static local:FocusMarkerMarginConverter.MarkerSize}"
+                    HorizontalAlignment="Left" VerticalAlignment="Top" IsHitTestVisible="False"
+                    Margin="{Binding Focus, Converter={StaticResource FocusMarkerMargin}}"
+                    Visibility="{Binding HasFocus, Converter={StaticResource VisibleWhenTrue}}">
+                <Ellipse Stroke="{StaticResource WindowBackgroundBrush}" StrokeThickness="3" />
+                <Line X1="8" Y1="3" X2="8" Y2="13" Stroke="{StaticResource WindowBackgroundBrush}" StrokeThickness="3" />
+                <Line X1="3" Y1="8" X2="13" Y2="8" Stroke="{StaticResource WindowBackgroundBrush}" StrokeThickness="3" />
+                <Ellipse Margin="0.5" Stroke="{StaticResource FocusMarkBrush}" StrokeThickness="2" />
+                <Line X1="8" Y1="3" X2="8" Y2="13" Stroke="{StaticResource FocusMarkBrush}" StrokeThickness="2" />
+                <Line X1="3" Y1="8" X2="13" Y2="8" Stroke="{StaticResource FocusMarkBrush}" StrokeThickness="2" />
+              </Grid>
+            </Grid>
+            <!-- Play's still over black, faded and zoomed about its focus by Core's rules, as the game draws it. The zoom
+                 is on this frame-filling grid, not the image, which UniformToFill can make larger than the frame; at
+                 100 % or more it still covers the frame, and it takes any click while it shows (decision 753). -->
             <Grid Background="Black"
                   DataContext="{Binding DataContext.Preview, RelativeSource={RelativeSource AncestorType=Window}}"
-                  Visibility="{Binding IsPlaying, Converter={StaticResource VisibleWhenTrue}}">
-              <Image Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center" RenderTransformOrigin="0.5,0.5"
-                     Opacity="{Binding Opacity}" Source="{Binding ShownImage, Converter={StaticResource PictureOf}}">
-                <Image.RenderTransform>
-                  <ScaleTransform ScaleX="{Binding Scale}" ScaleY="{Binding Scale}" />
-                </Image.RenderTransform>
-              </Image>
+                  Visibility="{Binding IsPlaying, Converter={StaticResource VisibleWhenTrue}}"
+                  RenderTransformOrigin="{Binding ZoomOrigin}">
+              <Grid.RenderTransform>
+                <ScaleTransform ScaleX="{Binding Scale}" ScaleY="{Binding Scale}" />
+              </Grid.RenderTransform>
+              <Image Stretch="UniformToFill" HorizontalAlignment="Center" VerticalAlignment="Center"
+                     Opacity="{Binding Opacity}" Source="{Binding ShownImage, Converter={StaticResource PictureOf}}" />
             </Grid>
           </Grid>
         </StackPanel>

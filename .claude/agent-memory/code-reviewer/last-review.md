@@ -5,11 +5,10 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-cinematic-focus-point, slice FP1 (StillFocus record, CinematicStill.Focus and ZoomOrigin, validator
-FindOptionalFieldProblem/FindFocusProblem, AbsentWhenNullFilter focus, ADR 0046 amendment). 2026-11-15. Round 1.
-Verdict: Ready to commit.
+Plan 2026-11-15-cinematic-focus-point, slice FP2 (Game/Ui/ScreenZoom, StillFrame.At with ScreenZoom, CoverFit
+.DrawZoomedOverScreen from the crop's top-left at zoom.PositionOf(0), ScreenZoomTests, StillFrameTests). 2026-11-15.
+Round 1. Verdict: Ready to commit. No findings.
 
-- EW6 Suggestion (open-editor-windows.ps1 Test-StepListKeys one Alt+Down): dropped, other plan, never acted on.
-- Suggestion, open: ContentCatalogLoaderCinematicTests.Load_FocusMissingYPercent_ThrowsNamingTheFile asserts only the
-  "cinematics.json" prefix, so any error in the file passes it; assert the focus path or "yPercent" too.
-- Noted, not raised: CinematicStillRow.From/ToStill drop Focus until FP3 (planned there; no content has a focus).
+- FP1 Suggestion (Load_FocusMissingYPercent_ThrowsNamingTheFile asserts only the file prefix): fixed (asserts
+  "yPercent" now).
+- Checked: new draw is the old one exactly when the origin is the screen center (top-left = center * (1 - scale)).

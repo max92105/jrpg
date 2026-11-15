@@ -68,3 +68,8 @@ Existing tests: `FieldSpriteSheetTests` (72) and `FacingRowsTests` (20) compile 
 
 ## Verify by hand
 None: no record names a sequence, and Data doesn't check one until SC2 (design.md, "Risks").
+
+- **Done, with deviations:** SC2's `AbsentWhenNullFilter` line for `FacingCycle` `sequences` lands here: without
+  it the writer wrote `"sequences": null` into every record and the repository's identical-bytes test failed (the
+  `FacingSequences` facings' lines stay SC2's). `ColumnsNeeded` and `RowsNeeded` take the maximum over the four
+  facings, a sequence counting its farthest cell (none for an empty one, which Data refuses from SC2).

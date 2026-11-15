@@ -4,6 +4,7 @@ using Jrpg.Core.Cinematics;
 using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Quests;
+using Jrpg.Core.Sprites;
 
 namespace Jrpg.Data.Content;
 
@@ -46,6 +47,9 @@ internal static class AbsentWhenNullFilter
 
         // ADR 0044: only a turned NPC has a facing.
         (typeof(PlacedObject), "facing"),
+
+        // ADR 0054: a walk whose facings all read their rows has no sequences.
+        (typeof(FacingCycle), "sequences"),
 
         // Decision 586: an enemy the editor writes reads like a hand-written one; null drops nothing, no gold.
         (typeof(EnemyDefinition), "dropTableId"),

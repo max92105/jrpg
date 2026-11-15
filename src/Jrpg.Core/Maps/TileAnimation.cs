@@ -24,9 +24,17 @@ public sealed record TileAnimation
     /// are in step. Ticks are counted in <see cref="long"/>, so years of play stay in range.
     /// </summary>
     /// <exception cref="ArgumentOutOfRangeException">A negative time: both shells only add deltas.</exception>
-    public int FrameAt(TimeSpan elapsed)
+    public int FrameAt(TimeSpan elapsed) => LoopFrameAt(elapsed, FrameDuration, FrameCount);
+
+    /// <summary>
+    /// The frame shown after <paramref name="elapsed"/> of a loop of <paramref name="frameCount"/> frames, from 0: the
+    /// one loop formula, for <see cref="FrameAt"/> and a field sprite facing's sequence, whose count is its own (ADR
+    /// 0054). Ticks are counted in <see cref="long"/>.
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">A negative time: both shells only add deltas.</exception>
+    public static int LoopFrameAt(TimeSpan elapsed, TimeSpan frameTime, int frameCount)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(elapsed, TimeSpan.Zero);
-        return (int)(elapsed.Ticks / FrameDuration.Ticks % FrameCount);
+        return (int)(elapsed.Ticks / frameTime.Ticks % frameCount);
     }
 }

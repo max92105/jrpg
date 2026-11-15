@@ -117,8 +117,8 @@ public static partial class ArtReferenceCheck
 
             if (!HoldsFrames(sheet, size))
             {
-                var neededWidth = (long)sheet.ColumnsNeeded * sheet.FrameWidth;
-                var neededHeight = (long)sheet.RowsNeeded * sheet.FrameHeight;
+                var neededWidth = sheet.ColumnsNeeded * sheet.FrameWidth;
+                var neededHeight = sheet.RowsNeeded * sheet.FrameHeight;
                 problems.Add(
                     $"{ExactFileName.ShownPath(ArtFolders.FieldSprites, file)}: a {size.Width}x{size.Height} sprite doesn't hold "
                     + $"{sheet.ColumnsNeeded} x {sheet.RowsNeeded} frames of {sheet.FrameWidth} x {sheet.FrameHeight} px "

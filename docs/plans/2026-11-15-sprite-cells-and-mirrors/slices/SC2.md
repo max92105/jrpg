@@ -50,3 +50,6 @@ record built in the test with `with` over the test world's player record).
 2. In a scratch copy of `content/` (`-- --content <folder>`), give `npc_placeholder.png`'s Up a sequence whose first
    cell has column -1: the start stops naming `field-sprites.json`, `npc_placeholder.png` and
    `walk.sequences.up.cells[0].column` (read the console line, not a capture).
+
+- **Note from SC1:** the `AbsentWhenNullFilter` line for `FacingCycle` `sequences` landed in SC1 (the repository's
+  identical-bytes test needed it); SC2 adds the `FacingSequences` facings' lines.

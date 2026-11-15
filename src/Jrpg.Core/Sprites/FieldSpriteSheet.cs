@@ -1,4 +1,5 @@
 using Jrpg.Core.Geometry;
+using Jrpg.Core.Maps;
 
 namespace Jrpg.Core.Sprites;
 
@@ -31,13 +32,16 @@ public sealed record FieldSpriteSheet
 
     public required FacingCycle Walk { get; init; }
 
-    /// <summary>The frame shown standing: the walk's first on the facing's row (decision 564).</summary>
-    public SpriteCell StandingCell(Facing facing) => new(0, Walk.Rows.RowOf(facing));
+    /// <summary>
+    /// The frame shown standing: the facing's first, its sequence's first cell or column 0 of its row (decision 764).
+    /// </summary>
+    public SpriteCell StandingCell(Facing facing) => CellOf(facing, 0);
 
-    /// <summary>The walk's frame after <paramref name="walked"/> on the facing's row.</summary>
-    /// <param name="facing">Picks the row.</param>
+    /// <summary>The walk's frame after <paramref name="walked"/>: the facing's sequence or row, looped.</summary>
+    /// <param name="facing">Picks the sequence or the row.</param>
     /// <param name="walked">The time walked since last standing; the shells carry it, Core never reads a clock.</param>
-    public SpriteCell WalkCellAt(Facing facing, TimeSpan walked) => new(Walk.Frames.FrameAt(walked), Walk.Rows.RowOf(facing));
+    public SpriteCell WalkCellAt(Facing facing, TimeSpan walked) =>
+        CellOf(facing, TileAnimation.LoopFrameAt(walked, Walk.Frames.FrameDuration, FrameCountOf(facing)));
 
     /// <summary>A frame's left edge in sheet pixels.</summary>
     public int FrameLeft(SpriteCell cell) => cell.Column * FrameWidth;
@@ -57,14 +61,27 @@ public sealed record FieldSpriteSheet
         return new SpriteArea((cellPixels - width) / 2, cellPixels - ((FrameHeight - FeetPixels) * Scale), width, height);
     }
 
-    /// <summary>The whole frames the image must hold across: the walk's frames, from column 0.</summary>
-    public int ColumnsNeeded => Walk.Frames.FrameCount;
+    /// <summary>
+    /// The whole frames the image must hold across: through the farthest column read, the frame count while a facing
+    /// reads its row and every sequence's cells. In long, so a cell at the int limit never wraps.
+    /// </summary>
+    public long ColumnsNeeded => Enum.GetValues<Facing>().Max(facing => SequenceOf(facing) is { } sequence
+        ? sequence.Cells.Select(cell => (long)cell.Column + 1).DefaultIfEmpty(0).Max()
+        : Walk.Frames.FrameCount);
 
     /// <summary>
-    /// The whole frames the image must hold down: through the highest row a facing reads. In long, since a typed row at
-    /// the int limit plus one would wrap and pass every size check.
+    /// The whole frames the image must hold down: through the highest row read, a facing's row when it has no sequence
+    /// and every sequence's cells. In long, since a typed row at the int limit plus one would otherwise wrap and pass
+    /// every size check.
     /// </summary>
-    public long RowsNeeded => (long)HighestRow + 1;
+    public long RowsNeeded => Enum.GetValues<Facing>().Max(facing => SequenceOf(facing) is { } sequence
+        ? sequence.Cells.Select(cell => (long)cell.Row + 1).DefaultIfEmpty(0).Max()
+        : (long)Walk.Rows.RowOf(facing) + 1);
 
-    private int HighestRow => Math.Max(Math.Max(Walk.Rows.Down, Walk.Rows.Up), Math.Max(Walk.Rows.Left, Walk.Rows.Right));
+    private FacingSequence? SequenceOf(Facing facing) => Walk.Sequences?.Of(facing);
+
+    private int FrameCountOf(Facing facing) => SequenceOf(facing) is { } sequence ? sequence.Cells.Count : Walk.Frames.FrameCount;
+
+    private SpriteCell CellOf(Facing facing, int index) =>
+        SequenceOf(facing) is { } sequence ? sequence.Cells[index] : new SpriteCell(index, Walk.Rows.RowOf(facing));
 }

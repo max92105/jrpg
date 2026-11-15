@@ -30,4 +30,9 @@ public sealed class TileAnimationTests
     [Fact]
     public void FrameAt_NegativeTime_Throws() =>
         Assert.Throws<ArgumentOutOfRangeException>(() => _waterfall.FrameAt(TimeSpan.FromMilliseconds(-1)));
+
+    // A sequence of three cells at the waterfall's pace: at 420 ms it is back at its first, where the record is at 3.
+    [Fact]
+    public void LoopFrameAt_CountOtherThanTheRecords_LoopsOverIt() =>
+        Assert.Equal(0, TileAnimation.LoopFrameAt(TimeSpan.FromMilliseconds(420), _waterfall.FrameDuration, 3));
 }

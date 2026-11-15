@@ -1,6 +1,7 @@
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Battle;
+using Jrpg.Core.Maps;
 using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Battle;
@@ -32,7 +33,7 @@ internal sealed partial class EffectStripViewModel : ObservableObject
     public string File { get; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(LengthText), nameof(IsListed), nameof(Problem))]
+    [NotifyPropertyChangedFor(nameof(LengthText), nameof(IsListed), nameof(Problem), nameof(PreviewLoop))]
     public partial string FrameMillisecondsText { get; set; }
 
     [ObservableProperty]
@@ -46,6 +47,15 @@ internal sealed partial class EffectStripViewModel : ObservableObject
 
     /// <summary>The image's width over its height; null while the image is missing.</summary>
     public int? FrameCount { get; }
+
+    /// <summary>
+    /// The strip's frames at its typed frame time, which the window's preview plays; null while the image is missing or
+    /// the frame time isn't a whole number from 1.
+    /// </summary>
+    public TileAnimation? PreviewLoop =>
+        FrameCount is > 0 and var frames && TypedNumber.Parse(FrameMillisecondsText) is > 0 and var milliseconds
+            ? new TileAnimation { FrameCount = frames, FrameMilliseconds = milliseconds }
+            : null;
 
     /// <summary>"12 frames, 0.96 s; hit at 0.16 s", or what keeps it from being worked out.</summary>
     public string LengthText
@@ -95,6 +105,14 @@ internal sealed partial class EffectStripViewModel : ObservableObject
     /// <summary>An effects image no record lists: the unlisted pace's boxes.</summary>
     public static EffectStripViewModel Unlisted(string file, Func<string, (int Width, int Height)?> imageSizeOf) =>
         new(file, imageSizeOf(file));
+
+    /// <summary>The preview's line under a frame: "frame 3 of 8", and "the hit" on the typed hit frame.</summary>
+    /// <param name="frame">From 0, as <see cref="PreviewLoop"/> plays it.</param>
+    public string FrameLineAt(int frame)
+    {
+        var line = $"frame {frame + 1} of {FrameCount}";
+        return TypedNumber.Parse(HitFrameText) == frame ? $"{line}, the hit" : line;
+    }
 
     /// <summary>Puts the unlisted pace's boxes back and forgets its loaded record, so it needs no record.</summary>
     public void ResetToUnlisted()

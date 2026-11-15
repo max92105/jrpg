@@ -5,7 +5,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Effect strips"
         Width="720"
-        Height="480"
+        Height="720"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False">
   <DockPanel Margin="12">
@@ -67,6 +67,13 @@
               Margin="110,12,0,0"
               Command="{Binding DataContext.ResetToUnlistedCommand, RelativeSource={RelativeSource AncestorType=Window}}"
               ToolTip="Back to the default pace, hit frame 0 and no swing: OK then writes no record for it" />
+
+      <!-- The chosen strip looping at its typed frame time, one frame at a time over black, as an enemy's attack shows it
+           (a party member's is mirrored in battle); its line says which frame shows and marks the hit. -->
+      <Border Width="320" Height="320" HorizontalAlignment="Left" Margin="110,16,0,0" Background="Black" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
+        <Image x:Name="StripPreview" Stretch="Uniform" />
+      </Border>
+      <TextBlock x:Name="FrameText" Foreground="{StaticResource MutedTextBrush}" Margin="110,4,0,0" />
     </StackPanel>
   </DockPanel>
 </Window>

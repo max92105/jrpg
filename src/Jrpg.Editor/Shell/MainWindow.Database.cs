@@ -103,13 +103,17 @@ internal sealed partial class MainWindow
 
     private void OnEditEffectStripsClicked(object sender, RoutedEventArgs e)
     {
-        if (_viewModel.EffectStripEditing is not { } effectStripEditing)
+        if (_viewModel.EffectStripEditing is not { } effectStripEditing || _viewModel.AnimationTime is not { } animationTime)
         {
             return;
         }
 
         var edited = effectStripEditing.Start();
-        if (new EffectStripCatalogWindow(edited) { Owner = this }.ShowDialog() == true)
+        var artRoot = _viewModel.ArtRoot;
+        var window = new EffectStripCatalogWindow(
+            edited, file => SpriteImageFile.LoadFrom(artRoot, ArtFolders.Effects, file), animationTime)
+        { Owner = this };
+        if (window.ShowDialog() == true)
         {
             effectStripEditing.Apply(edited);
         }

@@ -83,6 +83,12 @@ internal static partial class UiTheme
     /// </summary>
     public static Color ImpactWarmth { get; } = FromStraightArgb(0xFFFFC890);
 
+    /// <summary>The impact's floor glow at the target's feet (decision 660), warmer than the flash.</summary>
+    public static Color ImpactFloor { get; } = FromStraightArgb(0xFFFFB060);
+
+    /// <summary>The warm halo lingering on the target after the flash (decision 660).</summary>
+    public static Color ImpactHalo { get; } = FromStraightArgb(0xFFFFD8A0);
+
     /// <summary>The battle banner's dark band, fading out at both ends.</summary>
     public static ImmutableArray<GradientStop> Banner { get; } =
         [new(0, FromStraightArgb(0x00101320)), new(0.25f, FromStraightArgb(0xE6101320)), new(0.75f, FromStraightArgb(0xE6101320)), new(1, FromStraightArgb(0x00101320))];

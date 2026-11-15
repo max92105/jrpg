@@ -154,7 +154,7 @@ slice is done and write its deviations in the slice file. Tunables, the timeline
   (decisions 660, 661). Written: [0049](../../decisions/0049-battle-screen-effects-as-additive-sprites.md).
 - [x] **IL1. The impact's warm flash and the white wash on nearby battlers** (Game, about 140 lines raw, about 220 at
   the 1.6x) → [slices/IL1.md](slices/IL1.md)
-- [ ] **IL2. The floor glow around the target and its lingering halo** (Game, about 200 lines) →
+- [x] **IL2. The floor glow around the target and its lingering halo** (Game, about 200 lines) →
   [slices/IL2.md](slices/IL2.md)
 - [ ] **IL3. Red and green fringes on the impact's bright parts** (Game, about 180 lines) → [slices/IL3.md](slices/IL3.md)
 

@@ -70,7 +70,7 @@ internal sealed class BattleScene : IScene
         _numbers = new FloatingNumbersView(_sequence, _battlers, _enemyTags, text);
         _impactEffects = new ImpactEffectsView(_sequence, _battlers, session.Catalog.EffectStrips, text);
         _swing = new SwingView(_sequence, _battlers, session.Catalog.EffectStrips);
-        _impactLight = new ImpactLightView(_sequence);
+        _impactLight = new ImpactLightView(_sequence, _battlers, ui);
     }
 
     public IReadOnlyList<string> Sounds => _sounds.Files;
@@ -129,6 +129,7 @@ internal sealed class BattleScene : IScene
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
         DrawBackdrop(batch, textures);
+        _impactLight.DrawUnderTheBattlers(batch, textures);
         _battlers.Draw(batch, textures);
         if (_outcome.CoversTheHud)
         {
@@ -136,11 +137,12 @@ internal sealed class BattleScene : IScene
             return;
         }
 
-        // Before the enemy tags, so the flash lights the battlefield and never the HUD over it (ADR 0049).
+        // The enemy tags draw after the light, so it lights the battlefield and never the HUD over it (ADR 0049).
         _impactLight.DrawOverTheBattlers(batch, textures);
-        _enemyTags.Draw(batch, textures);
         _impactEffects.Draw(batch, textures);
         _swing.Draw(batch, textures);
+        _impactLight.DrawOverTheEffects(batch, textures);
+        _enemyTags.Draw(batch, textures);
         _numbers.Draw(batch, textures);
         _turnOrder.Draw(batch, textures);
         _bannerView.Draw(batch, textures);

@@ -32,6 +32,7 @@ internal sealed class UiTextures
     private Texture2D? _commandHeader;
     private Texture2D? _rewardBar;
     private Texture2D? _cardHeader;
+    private Texture2D? _radialGlow;
     private readonly Dictionary<(string File, int Size), Texture2D> _diamondPortraits = [];
     private readonly Dictionary<(string Folder, string File, int Size), Texture2D> _shrunk = [];
     private readonly Dictionary<DiamondShape, Texture2D> _diamonds = [];
@@ -82,6 +83,12 @@ internal sealed class UiTextures
     /// <summary>One column, stretched over the top of the battle, <see cref="TopShadeHeight"/> pixels down.</summary>
     public Texture2D TopShade(TextureLibrary textures) =>
         _topShade ??= textures.Create(1, TopShadeHeight, GradientStrip.Colors(UiTheme.BattleTopShade, TopShadeHeight));
+
+    /// <summary>
+    /// The impact's soft disc (<see cref="RadialGlowShape"/>), stretched to its floor ellipse and halo.
+    /// </summary>
+    public Texture2D RadialGlow(TextureLibrary textures) =>
+        _radialGlow ??= textures.Create(RadialGlowShape.Size, RadialGlowShape.Size, RadialGlowShape.Pixels());
 
     /// <summary>The battle command panel's header tab, in the selection gradient with its bright outline.</summary>
     public Texture2D CommandHeader(TextureLibrary textures) =>

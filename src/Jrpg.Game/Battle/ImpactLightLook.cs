@@ -5,4 +5,6 @@ namespace Jrpg.Game.Battle;
 /// <param name="Wash">
 /// The white over the hit target; nearer battlers get a share (<see cref="ImpactLight.WashAt"/>).
 /// </param>
-internal readonly record struct ImpactLightLook(float SceneFlash, float Wash);
+/// <param name="FloorGlow">The warm ellipse's opacity on the floor at each hit target's feet.</param>
+/// <param name="Halo">The warm disc's opacity on each hit target, after the flash.</param>
+internal readonly record struct ImpactLightLook(float SceneFlash, float Wash, float FloorGlow, float Halo);

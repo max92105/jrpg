@@ -37,3 +37,12 @@ gone by 0.5 s, around the impact strip's crescent glow (the clip's frames #83-#9
 2. A party member hit by a goblin: the same at the member's feet on the right.
 3. An attack on all goblins (a skill that takes all): each target's floor lights.
 4. F12 at the lingering halo and compare with the clip's frames #84-#90.
+
+- **Done, with deviations:** the halo draws in its own light batch, `DrawOverTheEffects` after the swing, not in
+  `DrawOverTheBattlers` with the flash: IL1's review moved the flash before the enemy tags, under the impact strip, and
+  the halo goes around the strip's crescent. `RadialGlowShape.Pixels()` takes no size (`Size`, 128, a constant: its
+  one user). The floor and halo tints are placeholders (`ImpactFloor` `#FFB060`, `ImpactHalo` `#FFD8A0`). No captures
+  in the unattended run. `ImpactLight` 71 lines, the view 95, the shape 39, `UiTextures` 267; tests 130 + 52.
+- **Review:** the enemy tags draw after the impact strip, the swing and the halo (they drew before the strip), so the
+  halo never lights a hit enemy's name and HP bar; ADR 0049's "the HUD draws after the effects" now holds for them.
+  `Pixels_HalfwayOut_IsNineSixteenths` renamed.

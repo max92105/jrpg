@@ -16,7 +16,7 @@ internal static class ItemCatalogValidator
 
     public static void Validate(string fileName, IReadOnlyList<ItemDefinition> items) =>
         new ContentListValidator<ItemDefinition>(fileName, "item", item => item.Id)
-            .Validate(items, item => FindProblem(item));
+            .Validate(items, item => FindProblem(item) ?? OwnEffectStripValidator.FindProblem(item.EffectFile, item.Effect));
 
     private static string? FindProblem(ItemDefinition item)
     {

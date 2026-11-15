@@ -61,7 +61,7 @@ developer was away; his to overturn)" are listed under [Defaults to confirm](#de
   `docs/decisions/0048-battle-effect-strips-as-records.md` and its line in `docs/decisions/README.md`.
 
 ### Phase 1: a skill's own strip
-- [ ] **SE1. A skill or item names its strip, checked at load and at startup** (Core, Data, about 220 lines) →
+- [x] **SE1. A skill or item names its strip, checked at load and at startup** (Core, Data, about 220 lines) →
   [slices/SE1.md](slices/SE1.md)
 - [ ] **SE2. The action plays its own strip and its swing** (Game, about 240 lines) → [slices/SE2.md](slices/SE2.md)
 - [ ] **SE3. Fireball's and the bomb's explosion** (content, about 25 lines; a throwaway import test, deleted) →

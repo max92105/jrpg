@@ -7,8 +7,8 @@ namespace Jrpg.Data.Art;
 
 /// <summary>
 /// The battle art the startup check reads: party members' and enemies' battle sprites, an animated enemy's strip split
-/// into its frames (ADR 0047), enemies' portraits, attack effects and their strips, and the strips and swings
-/// <c>effect-strips.json</c> lists, each hit frame within its strip (ADR 0048).
+/// into its frames (ADR 0047), enemies' portraits, attack effects, skills' and items' own strips (decision 709), and
+/// the strips and swings <c>effect-strips.json</c> lists, each hit frame within its strip (ADR 0048).
 /// </summary>
 public static partial class ArtReferenceCheck
 {
@@ -23,13 +23,25 @@ public static partial class ArtReferenceCheck
         AddPartialBattlerStrips(problems, artRoot, enemies);
         var enemyPortraits = enemies.Select(enemy => (enemy.PortraitFile, $"enemy '{enemy.Id}'"));
         AddMissingByExactName(problems, artRoot, ArtFolders.Portraits, enemyPortraits);
-        var attackEffects = members.Select(member => (File: member.AttackEffectFile, NamedBy: $"party member '{member.Id}'"))
+        var impactStrips = members.Select(member => (File: member.AttackEffectFile, NamedBy: $"party member '{member.Id}'"))
             .Concat(enemies.Select(enemy => (File: enemy.AttackEffectFile, NamedBy: $"enemy '{enemy.Id}'")))
+            .Concat(OwnStripsOf(catalog))
             .ToList();
-        AddMissingByExactName(problems, artRoot, ArtFolders.Effects, attackEffects);
-        AddPartialFrameStrips(problems, artRoot, attackEffects.Select(effect => effect.File));
+        AddMissingByExactName(problems, artRoot, ArtFolders.Effects, impactStrips);
+        AddPartialFrameStrips(problems, artRoot, impactStrips.Select(effect => effect.File));
         AddEffectStripRecordProblems(problems, artRoot, catalog.EffectStrips);
     }
+
+    // Decision 709: the strips skills and items name for themselves, by id, checked as the attackers' strips are.
+    private static IEnumerable<(string File, string NamedBy)> OwnStripsOf(ContentCatalog catalog) =>
+        catalog.Skills.Values
+            .Where(skill => skill.EffectFile is not null)
+            .OrderBy(skill => skill.Id, StringComparer.Ordinal)
+            .Select(skill => (File: skill.EffectFile!, NamedBy: $"skill '{skill.Id}'"))
+            .Concat(catalog.Items.Values
+                .Where(item => item.EffectFile is not null)
+                .OrderBy(item => item.Id, StringComparer.Ordinal)
+                .Select(item => (File: item.EffectFile!, NamedBy: $"item '{item.Id}'")));
 
     // ADR 0048: a listed strip and its swing are in effects/ by exact name, the swing is whole square frames, as every
     // strip is, and the hit lands on one of the strip's frames. A missing strip is named once, by the exact-name line.

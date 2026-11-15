@@ -68,3 +68,7 @@ and one on an effect that doesn't damage, and the game's startup art check refus
 2. Change it to `"effectFile": "GoldenSlashImpact.png",` and move it onto `heal` instead: the start stops naming
    `skills.json`, `skill 'heal'` and "only for a damaging effect".
 3. Revert: `git checkout content/skills.json`.
+
+- **Done:** as planned (the two art-check summaries and the Items row of the map named after the review). The art check's strips come from a small `OwnStripsOf(catalog)` beside the attackers';
+  `ContentCatalogLoaderEffectFileTests` also checks a skill without the field has none. The hand check (a missing strip
+  stops the game's start) is covered by the art check's tests and left to the developer.

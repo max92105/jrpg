@@ -29,4 +29,10 @@ public sealed record ItemDefinition
 
     /// <summary>What it costs in a shop (ADR 0031); null is never bought nor sold.</summary>
     public int? Price { get; init; }
+
+    /// <summary>
+    /// The strip in the effects folder an item used in battle plays instead of its user's attack strip, paced by its
+    /// <c>effect-strips.json</c> record (decision 678); null plays the user's.
+    /// </summary>
+    public string? EffectFile { get; init; }
 }

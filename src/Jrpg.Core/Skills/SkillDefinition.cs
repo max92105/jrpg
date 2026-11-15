@@ -20,6 +20,12 @@ public sealed record SkillDefinition
     /// </summary>
     public string SoundFile { get; init; } = "";
 
+    /// <summary>
+    /// The strip in the effects folder its action plays instead of its user's attack strip, paced by its
+    /// <c>effect-strips.json</c> record (decision 678); null plays the user's.
+    /// </summary>
+    public string? EffectFile { get; init; }
+
     /// <summary>Applied in order when the skill is used; empty when absent.</summary>
     public IReadOnlyList<ResourceChange> ResourceChanges { get; init; } = [];
 

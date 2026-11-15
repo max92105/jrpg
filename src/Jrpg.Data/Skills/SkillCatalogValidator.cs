@@ -10,7 +10,7 @@ internal static class SkillCatalogValidator
 {
     public static void Validate(string fileName, IReadOnlyList<SkillDefinition> skills) =>
         new ContentListValidator<SkillDefinition>(fileName, "skill", skill => skill.Id)
-            .Validate(skills, FindProblem);
+            .Validate(skills, skill => FindProblem(skill) ?? OwnEffectStripValidator.FindProblem(skill.EffectFile, skill.Effect));
 
     private static string? FindProblem(SkillDefinition skill)
     {

@@ -1,6 +1,7 @@
 using Jrpg.Core.Effects;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
+using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
 using Jrpg.Data.Skills;
 
@@ -20,8 +21,15 @@ public sealed class SkillCatalogValidatorTests
         Effect = new Effect(EffectKind.RestoreHp, Power: 15, Targeting.SingleAlly),
     };
 
+    private static readonly SkillDefinition _blast = _heal with
+    {
+        Effect = new Effect(EffectKind.Damage, Power: 10, Targeting.SingleEnemy, DamageType: DamageType.Fire),
+    };
+
     public static TheoryData<SkillDefinition, string> InvalidSkills => new()
     {
+        { _blast with { EffectFile = " " }, "effectFile must name a strip in effects/ when present." },
+        { _heal with { EffectFile = "Burst.png" }, "effectFile is only for a damaging effect (decision 707)." },
         { _heal with { Name = "" }, "name must not be empty." },
         { _heal with { SoundFile = "" }, "soundFile must name a sound." },
         { _heal with { SoundFile = "  " }, "soundFile must name a sound." },
@@ -35,6 +43,16 @@ public sealed class SkillCatalogValidatorTests
     public void Validate_ValidSkill_DoesNotThrow()
     {
         var exception = Record.Exception(() => SkillCatalogValidator.Validate(FileName, [_heal]));
+
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void Validate_DamagingSkillNamingAStrip_DoesNotThrow()
+    {
+        var skill = _blast with { EffectFile = "Burst.png" };
+
+        var exception = Record.Exception(() => SkillCatalogValidator.Validate(FileName, [skill]));
 
         Assert.Null(exception);
     }

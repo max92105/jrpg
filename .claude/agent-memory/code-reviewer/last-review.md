@@ -5,11 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-13-drop-table-editor, slice DT6 (Enemies window Edit... beside Drop table box; TakeDropTables,
-RefreshDropTables, ChooseTable, MainWindow.Database EditDropTables). 2026-11-13. Round 1.
-Verdict: ready to commit. No Critical/Warning.
+Plan 2026-11-14-battle-turn-presentation, slice NU3 (DigitStrip, DigitStripTests, FloatingNumbersView strips,
+ArtFolders.Fonts, UiArtFiles.Fonts, SizeOf removed). 2026-11-14. Round 1. Verdict: ready to commit. Deviations accepted
+by the Done note: strips measured on the first draw, private DigitStripImage, ArtFolders.Fonts constant only, SizeOf
+tests removed.
 
-- Suggestion (open): EnemyDropTableRefreshTests adds one table only; two new ids given out of order (zeta, aardvark)
-  would pin the repeated insert.
-- Follow-up carried from DT5 (catalog list skeleton shared across Shop/Enemy/DropTable view models): declined, the
-  plan's decision 604 keeps the glue lines per window on purpose. Do not raise again.
+- NU2 Criticals (Min(1.0), gradient spanning the heavy stroke) and Suggestions (line length, $glyphScale): fixed
+- Warning: DigitRow.cs:4 and :20 still say "at the font's own size" / "width in the font"; advances now come from the
+  digit strip. open
+- Suggestion: FloatingNumbersView.cs:123 `Enumerable.Range(0, 10)` repeats DigitStrip's private DigitCount; let
+  DigitStrip expose its advances. open
+- Suggestion: DigitStripImage is a record holding a float[] (reference equality, never compared); a private sealed
+  class says what it is. open

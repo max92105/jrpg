@@ -20,7 +20,9 @@ call or a rename. These cases slipped past it:
   Same when tests switch their data source (mana-seed T2a: content -> test-world left `EveryRepositoryTile`,
   `RepositoryTree`, `RepositoryIntroSkipped`): grep test names for the old source's word, not only comments. A shared
   fixture switching source (T2c: `SaveGameFixtures.Catalog` -> test-world) leaves its users' unchanged summaries saying
-  "against the repository content": grep the fixture's users, not only the diff.
+  "against the repository content": grep the fixture's users, not only the diff. A test fixture's step type swapped
+  (cinematics CR2: still -> cinematic) left ExplorationArrivalTests' `IntroOfOnlyStills`, `stillsOnly` and "plays two
+  stills"; grep the old type's noun in the edited test files' names, locals and fixture comments.
 - A record gaining a field (M2b-2: StatSheet.AttackDamage; AL2: MapSettings.ShowsBanner left MainViewModel.
   TryApplySettings's "the name, the track, the area level and the random battles", and docs/map.md's Content line naming
   only the null and zero filters) is missed by every "X, Y and Z" summary of it; grep the last listed field. A mechanic no
@@ -32,6 +34,9 @@ call or a rename. These cases slipped past it:
 - A file split (cleanup S3: MainViewModelTests 260 -> 194) leaves a sibling's "X is over 300 lines, so this is tested
   here" comment (`MainViewModelMusicTests`); grep the split file's name across its test folder.
 - A removed member leaves its noun in the type's own param docs (G1b-2: "the take hint and the refusal").
+- A switch case gaining a value (battle turns TN3: AttackCommand null -> "Attack") leaves a consumer's unchanged
+  comment naming the old null case (ActionPlayback.AddLanding "An action without one, an attack"); grep the old case's
+  noun near every caller.
 - A child's spacing change (ST1a) leaves the parent's reserved-height arithmetic on the old rows; grep the parent for the
   child's old numbers. Sizes and file counts a doc states (C3: "split in two files" with four present) need rechecking.
 - A docs/map.md entry edited by inserting a new parenthetical keeps the old one beside it (gold S2: `AffixDefinition`
@@ -55,7 +60,8 @@ call or a rename. These cases slipped past it:
   `.claude/scripts/` too, not only comments and docs.
 
 - A guard widened (map flows PO3: key guards `is TextBox` -> `is TextBox or ComboBox or ComboBoxItem`) leaves the
-  method's comment "Anywhere but a text box"; reread the comment above every changed condition.
+  method's comment "Anywhere but a text box"; reread the comment above every changed condition. Cinematics CE2: a
+  refusal chained into `RefusalOfCatalogUndo` left its "In the order checked" list without it.
 
 - A Done note saying "every count matches its file" (game cleanup GR1) checked design.md, not the backlog
   line it corrects: EventPresenter stayed 293 vs 294. wc -l each file a changed backlog group names. DT1 (drop
@@ -63,6 +69,14 @@ call or a rename. These cases slipped past it:
 
 - A write made conditional (CW1: only changed catalogs, a stamped one refused) leaves an unchanged helper comment
   promising the old recovery (WriteAll: "the next save writes them all again"); reread comments in the callees.
+
+- A retuned timing constant (battle turns TN2: ImpactHold 1.0 -> 0.85 s, a new 0.7 s wind-up) re-pinned to
+  `BattlePacing.X` in the asserts left the seconds in the test's own comment and the class header's turn timeline; grep
+  the old seconds ("1.0 s") in every re-pinned test file.
+
+- A caller switching what it feeds a helper (NU3: font advances -> digit strip advances into `DigitRow.Of`) leaves the
+  helper's summary and param doc naming the old source ("at the font's own size", "width in the font"); reread the
+  docs of every callee whose argument changed origin.
 
 **Why:** a comment or doc stating a wrong rule, name or number misleads the next reader.
 

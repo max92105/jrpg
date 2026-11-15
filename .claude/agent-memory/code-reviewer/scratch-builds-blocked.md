@@ -26,5 +26,19 @@ project in the scratchpad (csproj + a UserControl/Window XAML pair + `[STAThread
 containers (TreeView events, context menu bindings, verified MF3 2026-11-10): `XamlReader.Parse` the XAML, `Show()` a
 Window at Left=-2000, then `Dispatcher.CurrentDispatcher.Invoke(() => {}, DispatcherPriority.ApplicationIdle)`.
 
+Editor internals without WPF (verified 2026-11-14, MB4 review): fsi `Assembly.LoadFrom` the built
+`src/Jrpg.Editor/bin/Debug/net10.0-windows/Jrpg.Editor.dll`, `GetType("Jrpg.Editor.GifImport.FrameScaler")`, Invoke a
+static method over a grid of sizes; works for any internal static type that touches no WPF type. Found the area
+average's `(x + 1) * step` passing the source edge (53x100 to 192 throws).
+
 WPF binding fact (probed 2026-11-13, NP1 review, PowerShell -STA + XamlReader): a non-editable ComboBox whose bound
 SelectedItem ("" or any value) is not in its ItemsSource leaves the source alone on load and close: no null write-back.
+
+WPF layout fact (probed 2026-11-14, CE6 review, PowerShell 5.1 -STA, Measure/Arrange + VisualTreeHelper.GetOffset): an
+Image with Stretch="UniformToFill" and default Stretch alignment that overflows its slot is pinned top-left (offset
+0,0); only Center alignment centers the crop (offset 0,-45 for 4:3 in 480x270).
+
+Generated PNG probes (verified 2026-11-14, NU2 review): a PowerShell 5.1 script in the scratchpad, `Add-Type
+System.Drawing`, `[System.Drawing.Bitmap]::FromFile(...)` and `GetPixel` per column/row prints alpha and colors; a copy of
+an art-src script without its last calls (sed) plus Write-Host lines prints its intermediate values. Found PowerShell's
+`[Math]::Min(1, 0.92)` picks the Int32 overload (returns 1) and LinearGradientBrush tiles past its rectangle.

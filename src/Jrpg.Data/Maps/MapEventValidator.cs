@@ -1,4 +1,3 @@
-using System.Globalization;
 using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
@@ -200,9 +199,10 @@ internal static class MapEventValidator
         WarpStep warp when !references.Layouts.TryGetValue(warp.MapId, out _) => $"warp has unknown map id '{warp.MapId}'.",
         WarpStep warp when !references.Layouts[warp.MapId].Contains(warp.Cell) =>
             $"warp cell ({warp.Cell.X}, {warp.Cell.Y}) is outside map '{warp.MapId}'.",
-        StillStep still => FindStillProblem(still),
         VoiceStep voice when string.IsNullOrWhiteSpace(voice.File) => "voice must name its file.",
         OpenShopStep shop => FindOpenShopProblem(shop, references),
+        CinematicStep cinematic when !references.Content.CinematicIds.Contains(cinematic.CinematicId) =>
+            $"cinematic has unknown cinematic id '{cinematic.CinematicId}'.",
         RestStep { Price: { } price } => FindRestPriceProblem(price),
         StartQuestStep or AdvanceQuestStep or CompleteQuestStep => FindQuestStepProblem(step, references),
         _ => null,
@@ -233,11 +233,4 @@ internal static class MapEventValidator
 
     private static string? FindOpenShopProblem(OpenShopStep shop, MapReferences references) =>
         references.Content.ShopIds.Contains(shop.ShopId) ? null : $"openShop has unknown shop id '{shop.ShopId}'.";
-
-    private static string? FindStillProblem(StillStep still) =>
-        string.IsNullOrWhiteSpace(still.ImageFile) ? "still must name its imageFile."
-        : !(still.Seconds > 0 && still.Seconds < TimeSpan.MaxValue.TotalSeconds)
-            ? $"still seconds must be above 0 and a time the game can count (was {still.Seconds.ToString(CultureInfo.InvariantCulture)})."
-        : still.Caption is not null && string.IsNullOrWhiteSpace(still.Caption) ? "still caption must be null or have text."
-        : null;
 }

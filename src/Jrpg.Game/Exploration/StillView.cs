@@ -1,5 +1,3 @@
-using FontStashSharp;
-using Jrpg.Core.Events;
 using Jrpg.Data.Art;
 using Jrpg.Game.Input;
 using Jrpg.Game.Rendering;
@@ -10,8 +8,8 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Exploration;
 
 /// <summary>
-/// Draws a cutscene still (ADR 0016) over black: the picture, its subtitle in a dark band that fades out upward, and a
-/// small skip hint at the bottom right naming the device's Confirm button (decisions 171, 172).
+/// Draws a cinematic's still (ADR 0046) over black: the picture, its subtitle in a dark band that fades out upward, and
+/// the skip hint at the bottom right (<see cref="SkipHintView"/>).
 /// </summary>
 internal sealed class StillView
 {
@@ -19,63 +17,63 @@ internal sealed class StillView
     private const int CaptionTextPixels = 32;
     private const int CaptionMiddleAbove = 80;
     private const int CaptionBandHeight = 160;
-    private const int HintTextPixels = 20;
-    private const int HintMargin = 32;
 
     private static readonly Rectangle _screen = new(0, 0, VirtualScreen.Width, VirtualScreen.Height);
     private static readonly Rectangle _band = new(0, VirtualScreen.Height - CaptionBandHeight, VirtualScreen.Width, CaptionBandHeight);
 
     private readonly OutlinedFont _captionFont;
-    private readonly SpriteFontBase _hintFont;
-    private readonly UiMessages _messages;
+    private readonly SkipHintView _hint;
     private Texture2D? _bandTexture;
     private MeasuredText? _caption;
-    private MeasuredText _hint;
-    private InputDevice? _hintDevice;
 
-    public StillView(ScreenText text)
+    public StillView(ScreenText text, UiTextures ui)
     {
         _captionFont = new OutlinedFont(text.Fonts.FontAt(CaptionTextPixels));
-        _hintFont = text.Fonts.FontAt(HintTextPixels);
-        _messages = text.Messages;
-        _hint = MeasuredText.Of(_hintFont, string.Empty);
+        _hint = new SkipHintView(text, ui);
     }
 
-    /// <summary>Measures the still's subtitle once, when it starts.</summary>
-    public void Begin(StillStep still) =>
-        _caption = still.Caption is { } caption ? MeasuredText.Of(_captionFont.Font, caption) : null;
+    /// <summary>Measures the still's subtitle once, when it starts; null shows none.</summary>
+    public void Begin(string? caption) =>
+        _caption = caption is null ? null : MeasuredText.Of(_captionFont.Font, caption);
 
-    /// <summary>Names the button of the device last used; measured again only when the device changes.</summary>
-    public void Follow(InputDevice device)
-    {
-        if (device == _hintDevice)
-        {
-            return;
-        }
+    /// <summary>The skip hint for the device last used.</summary>
+    public void Follow(InputDevice device) => _hint.Follow(device);
 
-        _hintDevice = device;
-        var button = new MessageArgument("button", ButtonLabels.Of(GameButton.Confirm, device));
-        _hint = MeasuredText.Of(_hintFont, _messages.Format(MessageIds.CinematicSkip, button));
-    }
+    /// <summary>The skip hint as one line, as a test reads it.</summary>
+    internal string SkipHint => _hint.Text;
 
-    /// <param name="batch">Already begun.</param>
+    /// <summary>
+    /// Draws the still: black, then its picture in a batch of its own with linear sampling (decision 627), so a picture
+    /// scaled to the screen, or drifting by fractions of a pixel, stays smooth; then its subtitle and the hint, sharp,
+    /// in the scene's batch again.
+    /// </summary>
+    /// <param name="batch">Begun with <see cref="VirtualScreen.BeginBatch"/>; ended, then begun again with it.</param>
     /// <param name="textures">The still's picture, and where the band is made once.</param>
-    /// <param name="still">The still on screen; the picture and its subtitle fade with it.</param>
-    public void Draw(SpriteBatch batch, TextureLibrary textures, StillPlayback still)
+    /// <param name="frame">The still as it shows this frame.</param>
+    public void Draw(SpriteBatch batch, TextureLibrary textures, StillFrame frame)
     {
-        var tint = Color.White * still.Opacity;
+        var tint = Color.White * frame.Opacity;
+        batch.End();
+        batch.Begin(samplerState: SamplerState.LinearClamp);
         batch.Draw(textures.Pixel, _screen, Color.Black);
-        CoverFit.DrawOverScreen(batch, textures.Get(ArtFolders.Cinematics, still.Step.ImageFile), tint);
+        CoverFit.DrawZoomedOverScreen(batch, textures.Get(ArtFolders.Cinematics, frame.ImageFile), tint, frame.Scale);
+        batch.End();
+        VirtualScreen.BeginBatch(batch);
         if (_caption is { } caption)
         {
             _bandTexture ??= textures.Create(1, CaptionBandHeight, GradientStrip.Colors(UiTheme.CaptionBand, CaptionBandHeight));
             batch.Draw(_bandTexture, _band, tint);
             var position = new Vector2((VirtualScreen.Width - caption.Width) / 2, VirtualScreen.Height - CaptionMiddleAbove - (_captionFont.Font.LineHeight / 2f));
-            _captionFont.Draw(batch, caption.Text, position, UiTheme.TextPrimary * still.Opacity);
+            _captionFont.Draw(batch, caption.Text, position, UiTheme.TextPrimary * frame.Opacity);
         }
 
         // The hint stays while the stills run, so the player can skip at any time.
-        var hintPosition = new Vector2(VirtualScreen.Width - HintMargin - _hint.Width, VirtualScreen.Height - HintMargin - _hintFont.LineHeight);
-        batch.DrawString(_hintFont, _hint.Text, hintPosition, UiTheme.TextSecondary);
+        _hint.Draw(batch);
     }
+
+    /// <summary>The hold to skip's ring around the hint's key, over a cinematic's still (decision 626).</summary>
+    /// <param name="batch">Already begun.</param>
+    /// <param name="textures">Where the ring's segment is made once.</param>
+    /// <param name="share">0 to 1: how far the hold has come.</param>
+    public void DrawSkipRing(SpriteBatch batch, TextureLibrary textures, float share) => _hint.DrawRing(batch, textures, share);
 }

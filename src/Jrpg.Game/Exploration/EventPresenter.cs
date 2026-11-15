@@ -18,13 +18,11 @@ namespace Jrpg.Game.Exploration;
 /// player while the screen is black, and fades back in; a dialogue shows its lines one page per Confirm, and a found
 /// item its message as one page, as does a quest step that changed the log (decision 387). A rest plays through
 /// <see cref="RestPlayback"/>: an inn's rest asks first, with its price, then the beat before its message (decisions
-/// 257, 382). A cutscene still covers the screen for its seconds, and Confirm or Cancel skips the cutscene's stills
-/// (ADR 0016). A Forge or shop step asks the scene to open its screen, once (decision 353). The event's voice-over
-/// plays through the voice channel until the event ends or is skipped (ADR 0018). The pages show through a
-/// <see cref="MessageReading"/>, whose typing ticks the presenter asks; a found item, a recruit and a quest's change
-/// sound as their line shows, a found item only when something was carried (decisions 421, 433); a warp from the map
-/// sounds as its fade starts, never one out of a cutscene's black (decision 434), and a rest as
-/// <see cref="RestPlayback"/> asks.
+/// 257, 382). A cinematic step and the event's voice-over show through <see cref="CutscenePresenter"/>. A Forge or shop
+/// step asks the scene to open its screen, once (decision 353). The pages show through a <see cref="MessageReading"/>,
+/// whose typing ticks the presenter asks; a found item, a recruit and a quest's change sound as their line shows, a
+/// found item only when something was carried (decisions 421, 433); a warp from the map sounds as its fade starts,
+/// never one out of a cutscene's black (decision 434), and a rest as <see cref="RestPlayback"/> asks.
 /// </summary>
 internal sealed class EventPresenter
 {
@@ -32,10 +30,9 @@ internal sealed class EventPresenter
     private readonly PlayerSettings _settings;
     private readonly UiMessages _messages;
     private readonly MessageReading _reading;
-    private readonly StillRun _stills;
+    private readonly CutscenePresenter _cutscene;
     private readonly RestPlayback _rest;
     private readonly ConfirmPromptView _questionView;
-    private readonly VoiceChannel _voice;
     private readonly AskedSounds _sounds = new();
 
     // The fade for warps (placeholder timing).
@@ -57,19 +54,24 @@ internal sealed class EventPresenter
         _settings = settings;
         _messages = look.Text.Messages;
         _reading = new MessageReading(look.Text.Fonts, voice);
-        _stills = new StillRun(exploration, new StillView(look.Text));
+        _cutscene = new CutscenePresenter(exploration, new StillView(look.Text, look.Ui), voice);
         _rest = new RestPlayback(look.Text.Messages);
         _questionView = new ConfirmPromptView(look.Text, look.Ui);
-        _voice = voice;
     }
 
     /// <summary>True while an event runs or its fade plays: the player can't walk, interact or open the menu.</summary>
-    public bool IsBusy => _exploration.IsEventRunning || _warpFade.Phase != FadePhase.Idle || _stills.IsLeadingOut;
+    public bool IsBusy => _exploration.IsEventRunning || _warpFade.Phase != FadePhase.Idle || _cutscene.IsLeadingOut;
 
     public IReadOnlyList<string> Sounds => _sounds.Files;
 
     /// <summary>Whether a cutscene still covers the screen.</summary>
-    internal bool IsShowingStill => _stills.IsShowing;
+    internal bool IsShowingStill => _cutscene.IsShowingStill;
+
+    /// <summary>The cinematic's picture on screen, as a test reads it; null while none shows.</summary>
+    internal string? ShownCinematicImage => _cutscene.ShownCinematicImage;
+
+    /// <summary>The cutscene's skip hint, as a test reads it.</summary>
+    internal string SkipHint => _cutscene.SkipHint;
 
     /// <summary>Whether a message (a dialogue page, a found item, a rest, a quest line) is on screen.</summary>
     internal bool IsShowingMessage => _reading.IsShowing;
@@ -87,7 +89,7 @@ internal sealed class EventPresenter
     public EventStep? OpeningStep { get; private set; }
 
     /// <summary>How black to draw over the map, 0..1.</summary>
-    public float Blackness => Math.Max(_stills.Blackness, Math.Max(_warpFade.Blackness, _rest.Blackness));
+    public float Blackness => Math.Max(_cutscene.Blackness, Math.Max(_warpFade.Blackness, _rest.Blackness));
 
     /// <exception cref="InvalidOperationException">The current step is of a type the game can't show yet.</exception>
     public void Update(TimeSpan delta, InputFrame input)
@@ -95,12 +97,11 @@ internal sealed class EventPresenter
         _sounds.Clear();
         _warpFade.Update(delta);
         _rest.Advance(delta);
-        if (_stills.IsLeadingOut)
+        if (_cutscene.IsLeadingOut)
         {
-            _stills.AdvanceLeadOut(delta);
-            if (_stills.IsLeadingOut)
+            if (_cutscene.AdvanceLeadOut(delta))
             {
-                FollowStartedVoice();
+                _cutscene.FollowStartedVoice();
                 return;
             }
 
@@ -120,8 +121,8 @@ internal sealed class EventPresenter
             case DialogueStep or GiveItemStep or RecruitStep or StartQuestStep or AdvanceQuestStep or CompleteQuestStep:
                 ShowPages(step, delta, input);
                 break;
-            case StillStep still:
-                ShowStill(still, delta, input);
+            case CinematicStep:
+                ShowCinematic(delta, input);
                 break;
             case RestStep:
                 ShowRest(step, delta, input);
@@ -130,7 +131,7 @@ internal sealed class EventPresenter
                 throw new InvalidOperationException($"The game can't show a {step.GetType().Name} yet.");
         }
 
-        FollowStartedVoice();
+        _cutscene.FollowStartedVoice();
     }
 
     /// <summary>
@@ -139,7 +140,7 @@ internal sealed class EventPresenter
     /// </summary>
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
-        _stills.Draw(batch, textures);
+        _cutscene.Draw(batch, textures);
 
         _reading.Draw(batch, textures);
 
@@ -155,11 +156,13 @@ internal sealed class EventPresenter
         }
     }
 
+    /// <summary>Counts the cinematic's pictures as loaded, for a headless test that never draws.</summary>
+    internal void MarkStillsLoaded() => _cutscene.MarkStillsLoaded();
+
     // A skip ends the run at once: what follows shows this same update, already black if it's a warp.
-    private void ShowStill(StillStep still, TimeSpan delta, InputFrame input)
+    private void ShowCinematic(TimeSpan delta, InputFrame input)
     {
-        _stills.Show(still, delta, input);
-        if (!_stills.IsRunning)
+        if (!_cutscene.Show(delta, input))
         {
             StayBlackIntoAWarp();
         }
@@ -228,19 +231,6 @@ internal sealed class EventPresenter
         else if (_warpFade.Phase == FadePhase.Holding)
         {
             _exploration.ContinueEvent();
-        }
-    }
-
-    // After the step: a skip or the event's end this update silences the voice at once.
-    private void FollowStartedVoice()
-    {
-        if (_exploration.StartedVoice is { } voice)
-        {
-            _voice.Play(voice.File);
-        }
-        else
-        {
-            _voice.Stop();
         }
     }
 

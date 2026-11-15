@@ -1,12 +1,13 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Cinematics;
 using Jrpg.Core.Loot;
 using Jrpg.Core.Trade;
 
 namespace Jrpg.Editor.Catalogs;
 
 /// <summary>
-/// The catalogs the Database windows edit (ADR 0045): the shops, the enemies and the drop tables, the whole session of
-/// each window recorded as one undo step.
+/// The catalogs the Database windows edit (ADR 0045): the shops, the enemies, the drop tables and the cinematics, the
+/// whole session of each window recorded as one undo step.
 /// </summary>
 internal sealed partial class CatalogDraft
 {
@@ -25,6 +26,22 @@ internal sealed partial class CatalogDraft
         }
 
         Do(new CatalogEdit(catalog => catalog with { DropTables = after }, catalog => catalog with { DropTables = before }));
+    }
+
+    /// <summary>
+    /// Replaces the cinematics as one undo step (ADR 0045); nothing when they are the same by content, stills in order
+    /// included. An undo removing one a map's event plays is refused, as for shops.
+    /// </summary>
+    public void SetCinematics(IReadOnlyList<CinematicDefinition> cinematics)
+    {
+        var before = Current.Cinematics;
+        var after = cinematics.ToDictionary(cinematic => cinematic.Id, StringComparer.Ordinal);
+        if (HasSameRecords(before, after, EqualityComparer<CinematicDefinition>.Default.Equals))
+        {
+            return;
+        }
+
+        Do(new CatalogEdit(catalog => catalog with { Cinematics = after }, catalog => catalog with { Cinematics = before }));
     }
 
     /// <summary>
@@ -76,8 +93,10 @@ internal sealed partial class CatalogDraft
             pair.First.BelowHpPercent == pair.Second.BelowHpPercent && pair.First.Tactics.SequenceEqual(pair.Second.Tactics));
 
     /// <summary>The shops the next undo would remove, so it can be refused while a map's event opens one.</summary>
-    public IReadOnlyList<string> ShopsRemovedByUndo() =>
-        _history.NextUndo is { } edit
-            ? [.. Current.Shops.Keys.Except(edit.Revert(Current).Shops.Keys).Order(StringComparer.Ordinal)]
-            : [];
+    public IReadOnlyList<string> ShopsRemovedByUndo() => KeysRemovedByUndo(catalog => catalog.Shops);
+
+    /// <summary>
+    /// The cinematics the next undo would remove, so it can be refused while a map's event plays one.
+    /// </summary>
+    public IReadOnlyList<string> CinematicsRemovedByUndo() => KeysRemovedByUndo(catalog => catalog.Cinematics);
 }

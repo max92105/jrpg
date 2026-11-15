@@ -40,6 +40,15 @@ public sealed class TestWorldTests
         Assert.Equal(named.Distinct().Order(), catalog.FieldSprites.Keys.Order());
     }
 
+    // The frozen cinematics.json (ADR 0046), never the developer's: Ragnir's intro shows the placeholder stills.
+    [Fact]
+    public void Load_TestWorld_PlaysItsOwnFrozenCinematics()
+    {
+        var catalog = ContentCatalogLoader.Load(_testWorldRoot);
+
+        Assert.Equal("Placeholder1.png", catalog.Cinematics["ragnir_intro"].Stills[0].ImageFile);
+    }
+
     [Fact]
     public void TestWorld_TilesheetFolder_HoldsTheUnsetUpImage()
     {

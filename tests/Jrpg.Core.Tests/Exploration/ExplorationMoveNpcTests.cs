@@ -30,7 +30,7 @@ public sealed class ExplorationMoveNpcTests
 
     private static readonly DialogueStep _greeting = new(new Speech(["Come in."]));
     private static readonly MoveNpcStep _walkOver = new("villager_1", [Facing.Left, Facing.Left, Facing.Down]);
-    private static readonly StillStep _still = new("Placeholder1.png", 4, Caption: null);
+    private static readonly CinematicStep _cinematic = new("intro");
 
     [Fact]
     public void AdvanceNpcWalks_UntilArrived_ContinuesTheEvent()
@@ -95,11 +95,11 @@ public sealed class ExplorationMoveNpcTests
     }
 
     [Fact]
-    public void SkipEventPresentation_StillThenMove_PlacesNpcAtPathEnd()
+    public void SkipEventPresentation_CinematicThenMove_PlacesNpcAtPathEnd()
     {
-        var exploration = Start(new MapEventBuilder().WithId("villager_0").WithSteps(_still, _walkOver, _greeting).Build());
+        var exploration = Start(new MapEventBuilder().WithId("villager_0").WithSteps(_cinematic, _walkOver, _greeting).Build());
         exploration.TryInteract();
-        Assert.Same(_still, exploration.CurrentEventStep);
+        Assert.Same(_cinematic, exploration.CurrentEventStep);
 
         exploration.SkipEventPresentation();
 
@@ -109,11 +109,11 @@ public sealed class ExplorationMoveNpcTests
 
     // Nothing advances the walks during a skip: the second move must still start from the first's end (decision 578).
     [Fact]
-    public void SkipEventPresentation_StillThenTwoMovesOfOneNpc_PlacesNpcAtSecondPathEnd()
+    public void SkipEventPresentation_CinematicThenTwoMovesOfOneNpc_PlacesNpcAtSecondPathEnd()
     {
         var stepLeft = new MoveNpcStep("villager_1", [Facing.Left]);
         var stepDown = new MoveNpcStep("villager_1", [Facing.Down]);
-        var twoMoves = new MapEventBuilder().WithId("villager_0").WithSteps(_still, stepLeft, stepDown, _greeting).Build();
+        var twoMoves = new MapEventBuilder().WithId("villager_0").WithSteps(_cinematic, stepLeft, stepDown, _greeting).Build();
         var exploration = Start(twoMoves);
         exploration.TryInteract();
 

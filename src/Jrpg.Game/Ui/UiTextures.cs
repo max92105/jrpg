@@ -35,6 +35,7 @@ internal sealed class UiTextures
     private readonly Dictionary<(string File, int Size), Texture2D> _diamondPortraits = [];
     private readonly Dictionary<(string Folder, string File, int Size), Texture2D> _shrunk = [];
     private readonly Dictionary<DiamondShape, Texture2D> _diamonds = [];
+    private readonly Dictionary<RingSegmentShape, Texture2D> _ringSegments = [];
     private readonly Dictionary<TabGlyph, Texture2D> _tabIcons = [];
     private readonly Dictionary<Texture2D, Texture2D> _silhouettes = [];
     private readonly Dictionary<ImmutableArray<GradientStop>, Texture2D> _gradients = [];
@@ -121,6 +122,18 @@ internal sealed class UiTextures
 
             baked = textures.Create(source.Width, source.Height, pixels);
             _silhouettes.Add(source, baked);
+        }
+
+        return baked;
+    }
+
+    /// <summary>A progress ring's segment (decision 626), baked once per shape.</summary>
+    public Texture2D RingSegment(TextureLibrary textures, RingSegmentShape shape)
+    {
+        if (!_ringSegments.TryGetValue(shape, out var baked))
+        {
+            baked = textures.Create(shape.Width, shape.Height, shape.Pixels());
+            _ringSegments.Add(shape, baked);
         }
 
         return baked;

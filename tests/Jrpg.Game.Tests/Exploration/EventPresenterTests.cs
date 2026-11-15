@@ -6,6 +6,7 @@ using Jrpg.Game.Audio;
 using Jrpg.Game.Exploration;
 using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
+using Jrpg.Game.Tests.Input;
 using Jrpg.Game.Tests.Ui;
 
 namespace Jrpg.Game.Tests.Exploration;
@@ -125,12 +126,12 @@ public sealed class EventPresenterTests
     }
 
     [Fact]
-    public void Update_SkipDuringStills_StopsTheVoice()
+    public void Update_HeldSkipDuringTheCinematic_StopsTheVoice()
     {
         var (_, presenter, voice) = StartIntro();
         presenter.Update(StartMapScenarios.OneUpdate, default);
 
-        presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+        HoldConfirmToSkip(presenter);
 
         Assert.Null(voice.VoiceFile);
     }
@@ -140,6 +141,7 @@ public sealed class EventPresenterTests
     {
         var (exploration, presenter, voice) = StartIntro();
         presenter.Update(StartMapScenarios.OneUpdate, default);
+        presenter.MarkStillsLoaded();
         Assert.NotNull(voice.VoiceFile);
 
         // Bounded: the stills' seconds, then the warp's fade, at the game's 60 updates a second.
@@ -153,17 +155,18 @@ public sealed class EventPresenterTests
     }
 
     [Fact]
-    public void Update_AfterLastStillsLeadOut_ContinuesToTheWarp()
+    public void Update_AfterTheCinematicsLeadOut_ContinuesToTheWarp()
     {
         var (exploration, presenter, _) = StartIntro();
         presenter.Update(StartMapScenarios.OneUpdate, default);
-        presenter.Update(StillRun.LeadIn, default);
-        for (var still = 0; still < 3; still++)
+        presenter.MarkStillsLoaded();
+        // Bounded: the lead-in and the three stills' 12 s, at the game's 60 updates a second.
+        for (var update = 0; update < 60 * 15 && exploration.CurrentEventStep is CinematicStep; update++)
         {
-            presenter.Update(TimeSpan.FromSeconds(4), default);
+            presenter.Update(StartMapScenarios.OneUpdate, default);
         }
 
-        // Black from the last still's end until the warp has moved the player: the intro map never shows again.
+        // Black from the lead-out's end until the warp has moved the player: the intro map never shows again.
         for (var update = 0; update < 120 && exploration.CurrentMap.Id == "intro"; update++)
         {
             Assert.Equal(1f, presenter.Blackness);
@@ -179,15 +182,26 @@ public sealed class EventPresenterTests
     {
         var (exploration, presenter, _) = StartIntro();
         presenter.Update(StartMapScenarios.OneUpdate, default);
-        presenter.Update(StillRun.LeadIn, default);
+        presenter.MarkStillsLoaded();
 
-        presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+        HoldConfirmToSkip(presenter);
 
         Assert.IsType<WarpStep>(exploration.CurrentEventStep);
         Assert.Equal(1f, presenter.Blackness);
     }
 
-    // A new game on the test world's content: Ragnir's intro opens with the voice, then three stills, then a warp.
+    // A press, then Confirm held for the hold time at the game's fixed step (decision 623).
+    private static void HoldConfirmToSkip(EventPresenter presenter)
+    {
+        presenter.Update(StartMapScenarios.OneUpdate, _confirmPressed);
+        for (var held = TimeSpan.Zero; held < SkipHold.HoldTime; held += StartMapScenarios.OneUpdate)
+        {
+            presenter.Update(StartMapScenarios.OneUpdate, InputFrames.Holding(GameButton.Confirm));
+        }
+    }
+
+    // A new game on the test world's content: Ragnir's intro opens with the voice, then its cinematic of three stills,
+    // then a warp.
     private static (ExplorationState Exploration, EventPresenter Presenter, VoiceChannel Voice) StartIntro()
     {
         var exploration = GameSession.StartNew(StartMapScenarios.TestWorld, "ragnir", new SeededRandom(1)).Exploration;

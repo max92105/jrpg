@@ -31,4 +31,23 @@ internal static class CoverFit
         var source = SourceIn(new Point(image.Width, image.Height), new Point(VirtualScreen.Width, VirtualScreen.Height));
         batch.Draw(image, new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height), source, tint);
     }
+
+    /// <summary>
+    /// Draws the image covering the whole virtual screen at a scale of that fit, about the screen's center, with a
+    /// float size so a slow zoom moves by fractions of a pixel (decision 617).
+    /// </summary>
+    /// <param name="batch">
+    /// Already begun, best with linear sampling: a scale between whole pixels shimmers point-sampled.
+    /// </param>
+    /// <param name="image">The picture.</param>
+    /// <param name="tint">White, faded to fade the picture.</param>
+    /// <param name="scale">1 covers the screen exactly; above 1 crops more of the picture's edges.</param>
+    public static void DrawZoomedOverScreen(SpriteBatch batch, Texture2D image, Color tint, float scale)
+    {
+        var source = SourceIn(new Point(image.Width, image.Height), new Point(VirtualScreen.Width, VirtualScreen.Height));
+        var fit = new Vector2((float)VirtualScreen.Width / source.Width, (float)VirtualScreen.Height / source.Height) * scale;
+        var screenCenter = new Vector2(VirtualScreen.Width / 2f, VirtualScreen.Height / 2f);
+        var sourceCenter = new Vector2(source.Width / 2f, source.Height / 2f);
+        batch.Draw(image, screenCenter, source, tint, 0, sourceCenter, fit, SpriteEffects.None, 0);
+    }
 }

@@ -4,9 +4,21 @@ using Microsoft.Xna.Framework;
 namespace Jrpg.Game.Ui;
 
 // The dialogue's colors and sizes: the message box, the interaction prompt and its key cap, the speaker strip, the
-// caption band and the entry banner.
+// caption band, the hold-to-skip ring and the entry banner.
 internal static partial class UiTheme
 {
+    /// <summary>The hold-to-skip ring's outer radius around the key's name, in virtual pixels (placeholder).</summary>
+    public const int SkipRingRadius = 16;
+
+    /// <summary>The hold-to-skip ring's width (placeholder).</summary>
+    public const int SkipRingThickness = 3;
+
+    /// <summary>The ring's filled part: the bright text color, a step above the hint's words.</summary>
+    public static Color SkipRingLit => TextPrimary;
+
+    /// <summary>The ring's unfilled track, faint, so the player sees where it will fill (placeholder).</summary>
+    public static Color SkipRingTrack { get; } = Color.White * 0.2f;
+
     /// <summary>The entry banner's name, in the title serif, like the reference's "Victory!" (placeholder).</summary>
     public const int MapBannerTitlePixels = 52;
 

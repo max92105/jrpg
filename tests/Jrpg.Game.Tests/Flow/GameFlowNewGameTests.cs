@@ -1,3 +1,4 @@
+using Jrpg.Game.Exploration;
 using Jrpg.Game.Flow;
 using Jrpg.Game.Hosting;
 using Jrpg.Game.Input;
@@ -86,7 +87,7 @@ public sealed class GameFlowNewGameTests
         flow.Update(OneUpdate, default);
         Assert.Equal("intro", SessionOf(flow).Exploration.CurrentMap.Id);
 
-        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        HoldConfirmToSkip(flow);
         for (var update = 0; update < 60; update++)
         {
             flow.Update(OneUpdate, default);
@@ -112,8 +113,18 @@ public sealed class GameFlowNewGameTests
         flow.Update(OneUpdate, default);
         Assert.Equal("Placeholder.wav", flow.Audio.Voice.VoiceFile);
 
-        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        HoldConfirmToSkip(flow);
 
         Assert.Null(flow.Audio.Voice.VoiceFile);
+    }
+
+    // The intro's cinematic skips on Confirm held for the hold time after a press (decision 623).
+    private static void HoldConfirmToSkip(GameFlow flow)
+    {
+        flow.Update(OneUpdate, InputFrames.Pressing(GameButton.Confirm));
+        for (var held = TimeSpan.Zero; held < SkipHold.HoldTime; held += OneUpdate)
+        {
+            flow.Update(OneUpdate, InputFrames.Holding(GameButton.Confirm));
+        }
     }
 }

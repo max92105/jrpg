@@ -24,3 +24,4 @@ paths:
 - A list view model relaying its items' `PropertyChanged` to its `Problem` reacts to their typed fields only, never their own `Label` or `Problem` notices: each read runs Data's check over the whole list (SH3, EN2).
 - A dialog's OK greys through `CanApply` with a problem line for every input its apply step refuses (the top for a new folder, the unchanged path for a rename); an apply returning false on an input the dialog accepted leaves a lit button that does nothing (MF5 review).
 - A note or label a view model sets at an action (a pick's count, the lock's note) is cleared or recomputed when any input it reads changes (the selection, the layer, the lock); its test changes the input with the note shown (UO1, UO2 reviews).
+- A command greyed on a problem (Play, Apply, Add) reads the same problem as the window's line, Data's included: a value the boxes read but Data refuses still throws downstream (the cinematics plan's CP1 Critical).

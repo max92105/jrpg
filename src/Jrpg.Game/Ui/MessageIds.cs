@@ -39,8 +39,10 @@ internal static partial class MessageIds
     /// <summary>The leader choice's footer hint.</summary>
     public const string LeaderChoiceHint = "leader_choice_hint";
 
-    /// <summary>Placeholder <c>{button}</c>: the Confirm button's name; shown while cutscene stills play.</summary>
-    public const string CinematicSkip = "cinematic_skip";
+    /// <summary>
+    /// Placeholder <c>{button}</c>: the Confirm button's name; shown while a cinematic plays (decision 623).
+    /// </summary>
+    public const string CinematicHoldSkip = "cinematic_hold_skip";
 
     /// <summary>The menu header's title while no page is open.</summary>
     public const string MenuTitle = "menu_title";

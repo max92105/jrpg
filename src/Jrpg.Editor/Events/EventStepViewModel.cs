@@ -36,8 +36,6 @@ internal sealed partial class EventStepViewModel : ObservableObject
 
     public bool IsMoveNpc => Kind == EventStepKind.MoveNpc;
 
-    public bool IsStill => Kind == EventStepKind.Still;
-
     public bool IsRecruit => Kind == EventStepKind.Recruit;
 
     public bool IsVoice => Kind == EventStepKind.Voice;
@@ -45,6 +43,8 @@ internal sealed partial class EventStepViewModel : ObservableObject
     public bool IsOpenShop => Kind == EventStepKind.OpenShop;
 
     public bool IsRest => Kind == EventStepKind.Rest;
+
+    public bool IsCinematic => Kind == EventStepKind.Cinematic;
 
     /// <summary>The steps that pick a quest: start and complete (ADR 0032).</summary>
     public bool IsQuestPick => Kind is EventStepKind.StartQuest or EventStepKind.CompleteQuest;
@@ -112,24 +112,15 @@ internal sealed partial class EventStepViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
     public partial string CellYText { get; set; } = "0";
 
-    /// <summary>The still's file in the cinematics folder.</summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
-    public partial string ImageFile { get; set; } = "";
-
-    /// <summary>How long the still shows, in seconds, as typed.</summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
-    public partial string SecondsText { get; set; } = "4";
-
-    /// <summary>The subtitle under the still; empty for none.</summary>
-    [ObservableProperty]
-    public partial string Caption { get; set; } = "";
-
     /// <summary>The voice-over's file in the voices audio folder.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
     public partial string VoiceFile { get; set; } = "";
+
+    /// <summary>The cinematic the step plays, picked from the draft's (ADR 0046).</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
+    public partial string CinematicId { get; set; } = "";
 
     /// <summary>The party member who joins.</summary>
     [ObservableProperty]
@@ -143,7 +134,6 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.SwapObject => $"Swap object to: {ObjectId}",
         EventStepKind.Warp => $"Warp to: {MapId} ({CellXText}, {CellYText})",
         EventStepKind.MoveNpc => MoveNpcLabel(),
-        EventStepKind.Still => $"Still: {ImageFile}, {SecondsText} s",
         EventStepKind.Recruit => $"Recruit: {MemberId}",
         EventStepKind.Voice => $"Voice: {VoiceFile}",
         EventStepKind.Rest => IsFreeRest ? "Rest" : $"Rest for {PriceText.Trim()} gold",
@@ -152,6 +142,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.StartQuest => $"Start quest: {QuestId}",
         EventStepKind.AdvanceQuest => $"Advance quest: {QuestStage?.QuestId} to {QuestStage?.StageId}",
         EventStepKind.CompleteQuest => $"Complete quest: {QuestId}",
+        EventStepKind.Cinematic => $"Cinematic: {CinematicId}",
         _ => throw new UnreachableException(),
     };
 
@@ -164,10 +155,9 @@ internal sealed partial class EventStepViewModel : ObservableObject
         EventStepKind.SwapObject when string.IsNullOrEmpty(ObjectId) => "Choose the object it becomes.",
         EventStepKind.Warp when string.IsNullOrEmpty(MapId) => "Choose the map to warp to.",
         EventStepKind.MoveNpc => MoveNpcProblem,
-        EventStepKind.Still when string.IsNullOrWhiteSpace(ImageFile) => "Write the still's image file.",
-        EventStepKind.Still when Seconds(SecondsText) is null => "The seconds must be a number above 0.",
         EventStepKind.Recruit when string.IsNullOrEmpty(MemberId) => "Choose the member who joins.",
         EventStepKind.OpenShop when string.IsNullOrEmpty(ShopId) => "Choose the shop.",
+        EventStepKind.Cinematic when string.IsNullOrEmpty(CinematicId) => "Choose the cinematic.",
         EventStepKind.StartQuest or EventStepKind.CompleteQuest when string.IsNullOrEmpty(QuestId) => "Choose the quest.",
         EventStepKind.AdvanceQuest when QuestStage is null => "Choose the quest's stage.",
         EventStepKind.Rest when !IsFreeRest && ValidPrice() is null => $"The price must be empty or a whole number from 1 to {Purse.MaxGold}.",
@@ -190,7 +180,6 @@ internal sealed partial class EventStepViewModel : ObservableObject
         SwapObjectStep swap => new(EventStepKind.SwapObject) { ObjectId = swap.ObjectId },
         WarpStep warp => new(EventStepKind.Warp) { MapId = warp.MapId, CellXText = Text(warp.Cell.X), CellYText = Text(warp.Cell.Y) },
         MoveNpcStep move => FromMove(move),
-        StillStep still => new(EventStepKind.Still) { ImageFile = still.ImageFile, SecondsText = Text(still.Seconds), Caption = still.Caption ?? "" },
         RecruitStep recruit => new(EventStepKind.Recruit) { MemberId = recruit.MemberId },
         VoiceStep voice => new(EventStepKind.Voice) { VoiceFile = voice.File },
         RestStep rest => new(EventStepKind.Rest) { PriceText = rest.Price is { } price ? Text(price) : "" },
@@ -199,6 +188,7 @@ internal sealed partial class EventStepViewModel : ObservableObject
         StartQuestStep start => new(EventStepKind.StartQuest) { QuestId = start.QuestId },
         AdvanceQuestStep advance => new(EventStepKind.AdvanceQuest) { QuestStage = new QuestStageChoice(advance.QuestId, advance.StageId) },
         CompleteQuestStep complete => new(EventStepKind.CompleteQuest) { QuestId = complete.QuestId },
+        CinematicStep cinematic => new(EventStepKind.Cinematic) { CinematicId = cinematic.CinematicId },
         _ => throw new ArgumentException($"Unknown step type {step.GetType().Name}.", nameof(step)),
     };
 
@@ -215,14 +205,12 @@ internal sealed partial class EventStepViewModel : ObservableObject
             WholeNumber(CellXText, minimum: 0) ?? throw InvalidFields(),
             WholeNumber(CellYText, minimum: 0) ?? throw InvalidFields())),
         EventStepKind.MoveNpc => ToMoveNpcStep(),
-        EventStepKind.Still => new StillStep(
-            ImageFile.Trim(), Seconds(SecondsText) ?? throw InvalidFields(), string.IsNullOrWhiteSpace(Caption) ? null : Caption.Trim()),
         EventStepKind.Recruit => new RecruitStep(MemberId),
-        EventStepKind.Voice => new VoiceStep(VoiceFile.Trim()),
         EventStepKind.Rest => new RestStep { Price = IsFreeRest ? null : ValidPrice() ?? throw InvalidFields() },
         EventStepKind.OpenForge => new OpenForgeStep(),
         EventStepKind.OpenShop => string.IsNullOrEmpty(ShopId) ? throw InvalidFields() : new OpenShopStep(ShopId),
         EventStepKind.StartQuest or EventStepKind.AdvanceQuest or EventStepKind.CompleteQuest => QuestStep(),
+        EventStepKind.Voice or EventStepKind.Cinematic => PresentationStep(),
         _ => throw new UnreachableException(),
     };
 
@@ -240,6 +228,14 @@ internal sealed partial class EventStepViewModel : ObservableObject
         _ => throw new UnreachableException(),
     };
 
+    // Apart from ToStep so that switch stays under the complexity limit (CA1502).
+    private EventStep PresentationStep() => Kind switch
+    {
+        EventStepKind.Voice => new VoiceStep(VoiceFile.Trim()),
+        EventStepKind.Cinematic => string.IsNullOrEmpty(CinematicId) ? throw InvalidFields() : new CinematicStep(CinematicId),
+        _ => throw new UnreachableException(),
+    };
+
     private Speech Speech() => new(
         [.. LinesText.Split('\n').Select(line => line.Trim()).Where(line => line.Length > 0)],
         string.IsNullOrWhiteSpace(Speaker) ? null : Speaker.Trim(),
@@ -248,14 +244,6 @@ internal sealed partial class EventStepViewModel : ObservableObject
     private InvalidOperationException InvalidFields() => new(Problem);
 
     private static string Text(int number) => number.ToString(CultureInfo.InvariantCulture);
-
-    private static string Text(double number) => number.ToString(CultureInfo.InvariantCulture);
-
-    // A decimal number with a dot, as content writes it; TryParse also reads "Infinity", which content can't hold.
-    private static double? Seconds(string text) =>
-        double.TryParse(text.Trim(), NumberStyles.AllowDecimalPoint, CultureInfo.InvariantCulture, out var seconds) && seconds > 0 && double.IsFinite(seconds)
-            ? seconds
-            : null;
 
     // Digits only.
     private static int? WholeNumber(string text, int minimum) =>

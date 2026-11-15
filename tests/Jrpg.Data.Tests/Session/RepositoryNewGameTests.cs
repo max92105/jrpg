@@ -59,18 +59,21 @@ public sealed class RepositoryNewGameTests
         var exploration = GameSession.StartNew(catalog, "zanyr", new SeededRandom(0)).Exploration;
 
         Assert.Equal("intro", exploration.CurrentMap.Id);
-        var still = Assert.IsType<StillStep>(exploration.CurrentEventStep);
-        Assert.Contains("Zanyr", still.Caption, StringComparison.Ordinal);
+        var step = Assert.IsType<CinematicStep>(exploration.CurrentEventStep);
+        Assert.Contains("Zanyr", catalog.Cinematics[step.CinematicId].Stills[0].Caption, StringComparison.Ordinal);
     }
 
     [Fact]
-    public void StartNew_RepositoryContent_EveryIntroStartsWithTheVoice()
+    public void StartNew_RepositoryContent_EveryIntroPlaysItsCinematic()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
-        var firstSteps = catalog.NewGame.LeaderChoices.Select(choice => IntrosOf(catalog, choice.MemberId).Single().Steps[0]);
+        var intros = catalog.NewGame.LeaderChoices
+            .Select(choice => (choice.MemberId, Intro: IntrosOf(catalog, choice.MemberId).Single()));
 
-        Assert.All(firstSteps, step => Assert.Equal(new VoiceStep("Placeholder.wav"), step));
+        // Each leader's own record, by the content's naming: a cell naming another leader's would play the wrong intro.
+        Assert.All(intros, leader => Assert.Contains(new CinematicStep($"{leader.MemberId}_intro"), leader.Intro.Steps));
+        Assert.All(intros, leader => Assert.True(catalog.Cinematics.ContainsKey($"{leader.MemberId}_intro")));
     }
 
     [Fact]
@@ -85,7 +88,7 @@ public sealed class RepositoryNewGameTests
 
         var restored = GameSession.Restore(save, catalog, new SeededRandom(0));
 
-        Assert.IsType<StillStep>(restored.Exploration.CurrentEventStep);
+        Assert.IsType<CinematicStep>(restored.Exploration.CurrentEventStep);
     }
 
     // What the rebuilt world must keep (decision 441), read by what its events do, never by a cell (decision 447).

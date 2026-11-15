@@ -48,4 +48,33 @@ public sealed class ArtFoldersTests
             ["City.png", "FG_Forest_Fall.png", "Grass1.png", "Grass2.png", "Grass3.png", "Ground.png", "RA_Ground_Tiles.png", "RA_Jungle.png", "Water1.png", "Water2.png", "tree01_s_01_animation.png"],
             images);
     }
+
+    // The cinematics' pictures (ADR 0046): one folder per cinematic, named with it; PNGs only, sorted.
+    [Fact]
+    public void ImagesUnder_PictureInSubfolder_NamesItWithItsFolder()
+    {
+        var artRoot = Path.Combine(Path.GetTempPath(), $"jrpg-art-{Guid.NewGuid():N}");
+        var intro = Path.Combine(artRoot, ArtFolders.Cinematics, "intro");
+        Directory.CreateDirectory(intro);
+        try
+        {
+            File.WriteAllBytes(Path.Combine(intro, "2_road.png"), []);
+            File.WriteAllBytes(Path.Combine(intro, "1_home.png"), []);
+            File.WriteAllText(Path.Combine(intro, "notes.txt"), "not a picture");
+
+            Assert.Equal(["intro/1_home.png", "intro/2_road.png"], ArtFolders.ImagesUnder(artRoot, ArtFolders.Cinematics));
+        }
+        finally
+        {
+            Directory.Delete(artRoot, recursive: true);
+        }
+    }
+
+    [Fact]
+    public void ImagesUnder_NoFolder_IsEmpty()
+    {
+        var artRoot = Path.Combine(Path.GetTempPath(), $"jrpg-art-{Guid.NewGuid():N}");
+
+        Assert.Empty(ArtFolders.ImagesUnder(artRoot, ArtFolders.Cinematics));
+    }
 }

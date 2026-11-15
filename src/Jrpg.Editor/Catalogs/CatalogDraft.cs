@@ -167,16 +167,19 @@ internal sealed partial class CatalogDraft : ObservableObject
         _history.NextUndo is { } edit ? [.. Current.Tiles.Keys.Except(edit.Revert(Current).Tiles.Keys).Order()] : [];
 
     /// <summary>The objects the next undo would remove, so it can be refused while a map places one.</summary>
-    public IReadOnlyList<string> ObjectsRemovedByUndo() =>
-        _history.NextUndo is { } edit ? [.. Current.Objects.Keys.Except(edit.Revert(Current).Objects.Keys).Order(StringComparer.Ordinal)] : [];
+    public IReadOnlyList<string> ObjectsRemovedByUndo() => KeysRemovedByUndo(catalog => catalog.Objects);
 
     /// <summary>The sheets the next undo would remove, so it can be refused while tiles are cut from one.</summary>
-    public IReadOnlyList<string> SheetsRemovedByUndo() =>
-        _history.NextUndo is { } edit ? [.. Current.Tilesheets.Keys.Except(edit.Revert(Current).Tilesheets.Keys).Order(StringComparer.Ordinal)] : [];
+    public IReadOnlyList<string> SheetsRemovedByUndo() => KeysRemovedByUndo(catalog => catalog.Tilesheets);
 
     /// <summary>The quests the next undo would remove, so it can be refused while a map's event names one.</summary>
-    public IReadOnlyList<string> QuestsRemovedByUndo() =>
-        _history.NextUndo is { } edit ? [.. Current.Quests.Keys.Except(edit.Revert(Current).Quests.Keys).Order(StringComparer.Ordinal)] : [];
+    public IReadOnlyList<string> QuestsRemovedByUndo() => KeysRemovedByUndo(catalog => catalog.Quests);
+
+    // The ids of one catalog the next undo would remove, sorted: what the undo refusals check against the maps.
+    private IReadOnlyList<string> KeysRemovedByUndo<T>(Func<ContentCatalog, IReadOnlyDictionary<string, T>> records) =>
+        _history.NextUndo is { } edit
+            ? [.. records(Current).Keys.Except(records(edit.Revert(Current)).Keys).Order(StringComparer.Ordinal)]
+            : [];
 
     /// <summary>
     /// The stages the next undo would take from quests it keeps, so it can be refused while a map's event names one.

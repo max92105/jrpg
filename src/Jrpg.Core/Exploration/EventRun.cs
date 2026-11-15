@@ -1,3 +1,4 @@
+using Jrpg.Core.Cinematics;
 using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
@@ -63,6 +64,13 @@ internal sealed class EventRun
     /// player skips, since skipping silences the cutscene.
     /// </summary>
     public VoiceStep? StartedVoice { get; private set; }
+
+    /// <summary>
+    /// The cinematic the current step plays (ADR 0046); null on any other step. Data checks the id, so a missing one is
+    /// a content bug and throws.
+    /// </summary>
+    public CinematicDefinition? CurrentCinematic =>
+        Current is CinematicStep step ? _context.Catalog.Cinematics[step.CinematicId] : null;
 
     public bool IsFinished => _index >= Steps.Count;
 
@@ -132,7 +140,7 @@ internal sealed class EventRun
                 return true;
             case StartQuestStep or AdvanceQuestStep or CompleteQuestStep:
                 return ApplyQuestStep(step);
-            case DialogueStep or WarpStep or StillStep or OpenForgeStep or OpenShopStep:
+            case DialogueStep or WarpStep or CinematicStep or OpenForgeStep or OpenShopStep:
                 return true;
             default:
                 throw new InvalidOperationException($"Step {step.GetType().Name} has no rule in EventRun.");

@@ -1,3 +1,4 @@
+using Jrpg.Core.Cinematics;
 using Jrpg.Core.Content;
 using Jrpg.Core.Dialogue;
 using Jrpg.Core.Events;
@@ -77,13 +78,19 @@ internal static class StartMapScenarios
         WithChestSaying(BelowChest, new DialogueStep(new Speech(["A voice from the chest.", "It falls silent."])));
 
     /// <summary>
-    /// Below the chest, which now plays a short cutscene every time: two stills of 4 s with subtitles, then a line to read.
+    /// Below the chest, which now plays the cinematic <c>test_cinematic</c> every time (ADR 0046): <c>a.png</c> then
+    /// <c>b.png</c>, 4 s each, subtitled "Long ago." and "Far away.", then a line to read.
     /// </summary>
-    public static ContentCatalog BelowChestShowingStills { get; } = WithChestSaying(
-        BelowChest,
-        new StillStep("Placeholder1.png", 4, "Long ago."),
-        new StillStep("Placeholder2.png", 4, "Far away."),
+    public static ContentCatalog BelowChestPlayingCinematic { get; } = WithChestSaying(
+        WithTestCinematic(BelowChest),
+        new CinematicStep("test_cinematic"),
         new DialogueStep(new Speech(["The chest falls silent."])));
+
+    /// <summary>Below the chest, whose cinematic leads straight into a warp to the forest.</summary>
+    public static ContentCatalog BelowChestPlayingCinematicIntoAWarp { get; } = WithChestSaying(
+        WithTestCinematic(BelowChest),
+        new CinematicStep("test_cinematic"),
+        new WarpStep("forest", new GridCell(1, 1)));
 
     /// <summary>Just below the villager at (12, 4), whose interact event talks, facing it.</summary>
     public static ContentCatalog BelowVillager { get; } = StartingAt(new Point2D(12.5, 5.6), Facing.Up);
@@ -176,6 +183,22 @@ internal static class StartMapScenarios
         };
         return catalog with { Maps = maps };
     }
+
+    private static ContentCatalog WithTestCinematic(ContentCatalog catalog) => catalog with
+    {
+        Cinematics = new Dictionary<string, CinematicDefinition>
+        {
+            ["test_cinematic"] = new()
+            {
+                Id = "test_cinematic",
+                Stills =
+                [
+                    new CinematicStill { ImageFile = "a.png", Seconds = 4, Caption = "Long ago." },
+                    new CinematicStill { ImageFile = "b.png", Seconds = 4, Caption = "Far away." },
+                ],
+            },
+        },
+    };
 
     // The chest's interact event, made repeatable, runs only this step, so the chest never swaps open.
     public static ContentCatalog WithChestSaying(ContentCatalog catalog, params EventStep[] steps) =>

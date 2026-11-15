@@ -56,7 +56,7 @@ public sealed class EventListViewModelTests
             Activation = EventActivation.Arrive,
             IsOnce = true,
             OnlyWhenLeaderId = "omer",
-            Steps = [new StillStep("Placeholder1.png", 4, Caption: null)],
+            Steps = [new CinematicStep("omer_intro")],
         }, _choices);
 
         Assert.Equal("On arrival while omer leads: 1 step(s), once", intro.Label);

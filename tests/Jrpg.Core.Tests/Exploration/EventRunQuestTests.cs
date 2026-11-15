@@ -77,9 +77,9 @@ public sealed class EventRunQuestTests
     }
 
     [Fact]
-    public void SkipPresentation_ChangingQuestStepBetweenStills_StopsAtIt()
+    public void SkipPresentation_ChangingQuestStepBetweenCinematics_StopsAtIt()
     {
-        var run = Start(new StillStep("One.png", 4, Caption: null), new CompleteQuestStep("errand"), new StillStep("Two.png", 4, Caption: null));
+        var run = Start(new CinematicStep("one"), new CompleteQuestStep("errand"), new CinematicStep("two"));
         Assert.False(_world.Quests.IsCompleted("errand"));
 
         run.SkipPresentation();

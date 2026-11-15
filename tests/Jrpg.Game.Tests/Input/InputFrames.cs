@@ -10,6 +10,10 @@ internal static class InputFrames
     public static InputFrame Pressing(GameButton button) =>
         new(MoveIntent.None, ButtonSet.Empty.With(button), ButtonSet.Empty.With(button));
 
+    /// <summary>The button stays down from an earlier update: held, not pressed.</summary>
+    public static InputFrame Holding(GameButton button) =>
+        new(MoveIntent.None, ButtonSet.Empty.With(button), ButtonSet.Empty);
+
     /// <summary>Esc goes down: Cancel and Menu at once, as <see cref="InputBindings"/> maps it.</summary>
     public static InputFrame PressingEscape { get; } = new(
         MoveIntent.None,

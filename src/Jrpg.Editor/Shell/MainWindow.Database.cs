@@ -1,6 +1,8 @@
 using System.Windows;
+using System.Windows.Media.Imaging;
 using Jrpg.Data.Art;
 using Jrpg.Editor.Battle;
+using Jrpg.Editor.Cinematics;
 using Jrpg.Editor.Loot;
 using Jrpg.Editor.Sprites;
 using Jrpg.Editor.Trade;
@@ -8,8 +10,8 @@ using Jrpg.Editor.Trade;
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// Database > Shops..., Drop tables... and Enemies...: each window edits its catalog of the draft, and OK applies the
-/// whole session as one undo step (ADR 0045, decision 591), as the Quests window does.
+/// Database > Shops..., Drop tables..., Enemies... and Cinematics...: each window edits its catalog of the draft, and
+/// OK applies the whole session as one undo step (ADR 0045, decision 591), as the Quests window does.
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -75,5 +77,25 @@ internal sealed partial class MainWindow
         {
             enemyEditing.Apply(edited);
         }
+    }
+
+    // The preview decodes each still at the preview's width, a sixteenth of the pixels of a 1920 px picture.
+    private void OnEditCinematicsClicked(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel.CinematicEditing is not { } cinematicEditing)
+        {
+            return;
+        }
+
+        var edited = cinematicEditing.Start();
+        var artRoot = _viewModel.ArtRoot;
+        var window = new CinematicCatalogWindow(edited, LoadPicture) { Owner = this };
+        if (window.ShowDialog() == true)
+        {
+            cinematicEditing.Apply(edited);
+        }
+
+        BitmapSource? LoadPicture(string file) =>
+            SpriteImageFile.LoadAtWidth(artRoot, ArtFolders.Cinematics, file, CinematicCatalogWindow.PreviewWidth);
     }
 }

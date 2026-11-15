@@ -10,7 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="$(LiveContentDir)**"
-          Exclude="$(LiveContentDir)maps\**;$(LiveContentDir)map-layouts\**;$(LiveContentDir)tiles.json;$(LiveContentDir)tilesheets.json;$(LiveContentDir)objects.json;$(LiveContentDir)new-game.json;$(LiveContentDir)field-sprites.json;$(LiveContentDir)art\tilesheets\**"
+          Exclude="$(LiveContentDir)maps\**;$(LiveContentDir)map-layouts\**;$(LiveContentDir)tiles.json;$(LiveContentDir)tilesheets.json;$(LiveContentDir)objects.json;$(LiveContentDir)new-game.json;$(LiveContentDir)field-sprites.json;$(LiveContentDir)cinematics.json;$(LiveContentDir)art\tilesheets\**"
           LinkBase="test-world"
           CopyToOutputDirectory="PreserveNewest" />
     <None Include="$(MSBuildThisFileDirectory)**"

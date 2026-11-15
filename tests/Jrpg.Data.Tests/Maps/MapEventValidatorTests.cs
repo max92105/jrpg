@@ -29,6 +29,7 @@ public sealed class MapEventValidatorTests
         MemberIds: new HashSet<string> { "omer" })
         {
             ShopIds = new HashSet<string> { "general_store" },
+            CinematicIds = new HashSet<string> { "ragnir_intro" },
         },
         Layouts: new Dictionary<string, MapLayout> { ["cave"] = _cave });
 
@@ -71,11 +72,6 @@ public sealed class MapEventValidatorTests
         { WithChestEvent(_openChest with { Activation = EventActivation.Arrive }), "event 'chest@1,1_0': an arrive event has no prompt: nothing is pressed to start it." },
         { WithChestEvent(_openChest with { Steps = [new WarpStep("castle", new GridCell(0, 0))] }), "event 'chest@1,1_0': step 0: warp has unknown map id 'castle'." },
         { WithChestEvent(_openChest with { Steps = [null!] }), "event 'chest@1,1_0': steps holds a null entry." },
-        { WithChestEvent(_openChest with { Steps = [new StillStep(" ", 4, Caption: null)] }), "event 'chest@1,1_0': step 0: still must name its imageFile." },
-        { WithChestEvent(_openChest with { Steps = [new StillStep("Still.png", 0, Caption: null)] }), "event 'chest@1,1_0': step 0: still seconds must be above 0 and a time the game can count (was 0)." },
-        { WithChestEvent(_openChest with { Steps = [new StillStep("Still.png", -1.5, Caption: null)] }), "event 'chest@1,1_0': step 0: still seconds must be above 0 and a time the game can count (was -1.5)." },
-        { WithChestEvent(_openChest with { Steps = [new StillStep("Still.png", 1e20, Caption: null)] }), "event 'chest@1,1_0': step 0: still seconds must be above 0 and a time the game can count (was 1E+20)." },
-        { WithChestEvent(_openChest with { Steps = [new StillStep("Still.png", 4, " ")] }), "event 'chest@1,1_0': step 0: still caption must be null or have text." },
         { WithChestEvent(_openChest with { Steps = [new VoiceStep(" ")] }), "event 'chest@1,1_0': step 0: voice must name its file." },
         { WithChestEvent(_openChest with { Steps = [new RestStep { Price = 0 }] }), "event 'chest@1,1_0': step 0: rest price must be 1 to 9999999 (was 0)." },
         { WithChestEvent(_openChest with { Steps = [new RestStep { Price = Purse.MaxGold + 1 }] }), "event 'chest@1,1_0': step 0: rest price must be 1 to 9999999 (was 10000000)." },
@@ -117,6 +113,24 @@ public sealed class MapEventValidatorTests
     public void FindProblem_OpenShopKnownShop_ReturnsNull()
     {
         var layout = WithChestEvent(_openChest with { Steps = [new OpenShopStep("general_store")] });
+
+        Assert.Null(MapEventValidator.FindProblem(layout, _references));
+    }
+
+    [Fact]
+    public void FindProblem_CinematicUnknownId_NamesTheEventAndStep()
+    {
+        var layout = WithChestEvent(_openChest with { Steps = [new CinematicStep("nope")] });
+
+        var problem = MapEventValidator.FindProblem(layout, _references);
+
+        Assert.Equal("event 'chest@1,1_0': step 0: cinematic has unknown cinematic id 'nope'.", problem);
+    }
+
+    [Fact]
+    public void FindProblem_KnownCinematic_ReturnsNull()
+    {
+        var layout = WithChestEvent(_openChest with { Steps = [new CinematicStep("ragnir_intro")] });
 
         Assert.Null(MapEventValidator.FindProblem(layout, _references));
     }

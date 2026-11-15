@@ -25,8 +25,8 @@ public sealed class EventRunTests
     private static readonly DialogueStep _foundSomething = new(new Speech(["Something glints inside."]));
     private static readonly GiveItemStep _givePotions = new("potion", 3);
     private static readonly SwapObjectStep _openChest = new("chest_opened");
-    private static readonly StillStep _firstStill = new("Placeholder1.png", 4, "Still one.");
-    private static readonly StillStep _secondStill = new("Placeholder2.png", 4, Caption: null);
+    private static readonly CinematicStep _firstCinematic = new("first");
+    private static readonly CinematicStep _secondCinematic = new("second");
     private static readonly WarpStep _warpAway = new("elsewhere", new GridCell(0, 0));
 
     private readonly ActiveMap _map = new ActiveMapBuilder().WithRows("11")
@@ -51,19 +51,19 @@ public sealed class EventRunTests
     }
 
     [Fact]
-    public void Continue_OnStillStep_MovesToTheNextStep()
+    public void Continue_OnCinematicStep_MovesToTheNextStep()
     {
-        var run = Start(new MapEventBuilder().WithSteps(_firstStill, _secondStill).Build());
+        var run = Start(new MapEventBuilder().WithSteps(_firstCinematic, _secondCinematic).Build());
 
         run.Continue();
 
-        Assert.Equal(_secondStill, run.Current);
+        Assert.Equal(_secondCinematic, run.Current);
     }
 
     [Fact]
-    public void SkipPresentation_StillsThenWarp_StopsOnTheWarp()
+    public void SkipPresentation_CinematicsThenWarp_StopsOnTheWarp()
     {
-        var run = Start(new MapEventBuilder().WithSteps(_firstStill, _secondStill, _warpAway).Build());
+        var run = Start(new MapEventBuilder().WithSteps(_firstCinematic, _secondCinematic, _warpAway).Build());
 
         run.SkipPresentation();
 
@@ -71,20 +71,22 @@ public sealed class EventRunTests
     }
 
     [Fact]
-    public void Start_VoiceThenStill_RunsOnToTheStillWithTheVoiceStarted()
+    public void Start_VoiceThenCinematic_RunsOnToTheCinematicWithTheVoiceStarted()
     {
         var voice = new VoiceStep("Placeholder.wav");
 
-        var run = Start(new MapEventBuilder().WithSteps(voice, _firstStill).Build());
+        var run = Start(new MapEventBuilder().WithSteps(voice, _firstCinematic).Build());
 
-        Assert.Equal(_firstStill, run.Current);
+        Assert.Equal(_firstCinematic, run.Current);
         Assert.Equal(voice, run.StartedVoice);
     }
 
     [Fact]
-    public void SkipPresentation_VoiceAndStills_StopsOnTheWarp()
+    public void SkipPresentation_VoiceAndCinematics_StopsOnTheWarp()
     {
-        var run = Start(new MapEventBuilder().WithSteps(new VoiceStep("Placeholder.wav"), _firstStill, _secondStill, _warpAway).Build());
+        var steps = new MapEventBuilder()
+            .WithSteps(new VoiceStep("Placeholder.wav"), _firstCinematic, _secondCinematic, _warpAway);
+        var run = Start(steps.Build());
 
         run.SkipPresentation();
 
@@ -93,9 +95,9 @@ public sealed class EventRunTests
     }
 
     [Fact]
-    public void SkipPresentation_StillThenSwapThenStill_AppliesTheSwapAndFinishes()
+    public void SkipPresentation_CinematicThenSwapThenCinematic_AppliesTheSwapAndFinishes()
     {
-        var run = Start(new MapEventBuilder().WithSteps(_firstStill, _openChest, _secondStill).Build());
+        var run = Start(new MapEventBuilder().WithSteps(_firstCinematic, _openChest, _secondCinematic).Build());
 
         run.SkipPresentation();
 
@@ -106,7 +108,7 @@ public sealed class EventRunTests
     [Fact]
     public void SkipPresentation_OnDialogue_ChangesNothing()
     {
-        var run = Start(new MapEventBuilder().WithSteps(_foundSomething, _firstStill).Build());
+        var run = Start(new MapEventBuilder().WithSteps(_foundSomething, _firstCinematic).Build());
 
         run.SkipPresentation();
 

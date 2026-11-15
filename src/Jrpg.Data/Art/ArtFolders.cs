@@ -1,3 +1,5 @@
+using Jrpg.Data.Content;
+
 namespace Jrpg.Data.Art;
 
 /// <summary>Where art lives: <c>{content}/art/</c>, one folder per kind (ADR 0009).</summary>
@@ -43,4 +45,23 @@ public static class ArtFolders
         [.. Directory.EnumerateFiles(Path.Combine(artRoot, folder), "*.png")
             .Select(path => Path.GetFileName(path))
             .Order(StringComparer.Ordinal)];
+
+    /// <summary>
+    /// For a picker over a folder of folders, such as the cinematics' pictures, one folder per cinematic (ADR 0046).
+    /// </summary>
+    /// <param name="artRoot">The <c>art</c> folder, from <see cref="RootIn"/>.</param>
+    /// <param name="folder">One of the folder names above, such as <see cref="Cinematics"/>.</param>
+    /// <returns>
+    /// The PNG names in the folder and its subfolders, by exact name under the folder with <c>/</c>, sorted ordinally;
+    /// empty when the folder is missing.
+    /// </returns>
+    public static IReadOnlyList<string> ImagesUnder(string artRoot, string folder)
+    {
+        var path = Path.Combine(artRoot, folder);
+        return Directory.Exists(path)
+            ? [.. Directory.EnumerateFiles(path, "*.png", SearchOption.AllDirectories)
+                .Select(file => ExactFileName.NameUnder(path, file))
+                .Order(StringComparer.Ordinal)]
+            : [];
+    }
 }

@@ -90,6 +90,7 @@ internal sealed class EventEditingViewModel(CatalogDraft catalog, OpenMaps openM
         ShopIds = [.. catalog.Current.Shops.Keys.Order(StringComparer.Ordinal)],
         QuestIds = [.. catalog.Current.Quests.Keys.Order(StringComparer.Ordinal)],
         QuestStages = QuestStageChoices(),
+        CinematicIds = [.. catalog.Current.Cinematics.Keys.Order(StringComparer.Ordinal)],
         WarpMaps = new(openMaps.EntriesWith(catalog.Current), openMaps.LayoutsWith(catalog.Current), catalog.Current),
         NpcChoices = NpcChoices(),
         PortraitFiles = PortraitFilesLookup(),

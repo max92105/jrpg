@@ -2,6 +2,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Sprites;
+using Jrpg.Data.Cinematics;
 using Jrpg.Data.Content;
 using Jrpg.Data.Maps;
 
@@ -14,7 +15,7 @@ namespace Jrpg.Data.Art;
 public static class ArtReferenceCheck
 {
     /// <summary>
-    /// Every tilesheet, the player's and every NPC object's field sprite, every dialogue portrait, every cutscene
+    /// Every tilesheet, the player's and every NPC object's field sprite, every dialogue portrait, every cinematic's
     /// still, every party member's portrait, every item's icon, every skill icon named (a skill may have none), every
     /// battle sprite, every enemy's portrait, every attack effect and every encounter's background exist as PNGs, every
     /// tile's cell and its animation's last frame lie inside its sheet, every effect strip is whole square frames, and
@@ -49,8 +50,8 @@ public static class ArtReferenceCheck
                                 where named.Step.Speech.PortraitFile is not null
                                 select (named.Step.Speech.PortraitFile!, named.NamedBy);
         AddMissing(problems, artRoot, ArtFolders.Portraits, dialoguePortraits);
-        var stills = MapEventSteps.Of<StillStep>(catalog).Select(named => (named.Step.ImageFile, named.NamedBy));
-        AddMissingByExactName(problems, artRoot, ArtFolders.Cinematics, stills);
+        var cinematicStills = CinematicStills.Of(catalog).Select(named => (named.Still.ImageFile, named.NamedBy));
+        AddMissingByExactName(problems, artRoot, ArtFolders.Cinematics, cinematicStills);
         var members = catalog.PartyMembers.Values.OrderBy(member => member.Id, StringComparer.Ordinal);
         var memberPortraits = members.Select(member => (member.PortraitFile, $"party member '{member.Id}'"));
         AddMissing(problems, artRoot, ArtFolders.Portraits, memberPortraits);

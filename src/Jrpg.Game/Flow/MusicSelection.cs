@@ -5,7 +5,8 @@ using Jrpg.Game.Ui;
 namespace Jrpg.Game.Flow;
 
 /// <summary>
-/// The track the flow's state calls for (ADR 0035); null is silence, as on a map without one (decision 419).
+/// The track the flow's state calls for (ADR 0035): on the field, the playing cinematic's when it has one, else the
+/// map's; null is silence, as on a map without one (decision 419).
 /// </summary>
 internal static class MusicSelection
 {
@@ -25,12 +26,16 @@ internal static class MusicSelection
 
         if (battleCue == BattleMusicCue.Field)
         {
-            return session.Exploration.CurrentMap.Settings.MusicFile;
+            return FieldTrack(session);
         }
 
         // Pending from the encounter's flash until the session finishes the battle (decision 416).
         return session.Exploration.PendingEncounter is { } encounter
             ? encounter.MusicFile ?? UiSoundFiles.Music.Battle
-            : session.Exploration.CurrentMap.Settings.MusicFile;
+            : FieldTrack(session);
     }
+
+    // A cinematic step with a track plays it to its last still (decision 614); a map without a track is silent.
+    private static string? FieldTrack(GameSession session) =>
+        session.Exploration.CurrentCinematic?.MusicFile ?? session.Exploration.CurrentMap.Settings.MusicFile;
 }

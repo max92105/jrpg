@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Cinematics;
 using Jrpg.Core.Content;
 using Jrpg.Core.Loot;
 using Jrpg.Core.Trade;
@@ -104,6 +105,35 @@ public sealed class CatalogProblemsTests
 
         Assert.Null(CatalogProblems.OfFieldSprites([_catalog.FieldSprites["player.png"]], content));
     }
+
+    [Fact]
+    public void OfCinematics_Valid_IsNull() => Assert.Null(CatalogProblems.OfCinematics([IntroZoomingTo(120)]));
+
+    [Fact]
+    public void OfCinematics_ZoomAt150_IsNull() => Assert.Null(CatalogProblems.OfCinematics([IntroZoomingTo(150)]));
+
+    [Fact]
+    public void OfCinematics_ZoomPast150_NamesCinematicAndStill()
+    {
+        var problem = CatalogProblems.OfCinematics([IntroZoomingTo(151)]);
+
+        Assert.Equal(
+            "cinematics.json: cinematic 'intro': stills[0]: zoom endPercent must be within 100..150 (was 151).", problem);
+    }
+
+    private static CinematicDefinition IntroZoomingTo(int endPercent) => new()
+    {
+        Id = "intro",
+        Stills =
+        [
+            new CinematicStill
+            {
+                ImageFile = "intro/1.png",
+                Seconds = 4,
+                Zoom = new StillZoom { StartPercent = 100, EndPercent = endPercent },
+            },
+        ],
+    };
 
     private static List<ShopDefinition> WithGeneralStore(Func<ShopDefinition, ShopDefinition> change) =>
         [.. _catalog.Shops.Values.Select(shop => shop.Id == "general_store" ? change(shop) : shop)];

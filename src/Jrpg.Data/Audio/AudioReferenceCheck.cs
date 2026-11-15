@@ -1,5 +1,6 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Events;
+using Jrpg.Data.Cinematics;
 using Jrpg.Data.Content;
 using Jrpg.Data.Maps;
 
@@ -12,20 +13,27 @@ namespace Jrpg.Data.Audio;
 public static class AudioReferenceCheck
 {
     /// <summary>
-    /// Every voice step's file is in the voices folder, every map's track and encounter's theme in the music folder,
-    /// and every skill's sound in the effects folder, under exactly the name given.
+    /// Under exactly the name given: every voice step's and cinematic still's voice line is in the voices folder, every
+    /// map's, encounter's and cinematic's track in the music folder, and every skill's sound in the effects folder.
     /// </summary>
     /// <returns>One line per problem, naming the file and what names it; empty when the sound is complete.</returns>
     public static IReadOnlyList<string> FindProblems(ContentCatalog catalog, string audioRoot) =>
     [
         .. MissingByExactName(audioRoot, AudioFolders.Voices, VoiceFiles(catalog)),
+        .. MissingByExactName(audioRoot, AudioFolders.Voices, CinematicVoices(catalog)),
         .. MissingByExactName(audioRoot, AudioFolders.Music, MapTracks(catalog)),
         .. MissingByExactName(audioRoot, AudioFolders.Music, EncounterThemes(catalog)),
+        .. MissingByExactName(audioRoot, AudioFolders.Music, CinematicTracks(catalog)),
         .. MissingByExactName(audioRoot, AudioFolders.Effects, SkillSounds(catalog)),
     ];
 
     private static IEnumerable<(string File, string NamedBy)> VoiceFiles(ContentCatalog catalog) =>
         MapEventSteps.Of<VoiceStep>(catalog).Select(found => (found.Step.File, found.NamedBy));
+
+    private static IEnumerable<(string File, string NamedBy)> CinematicVoices(ContentCatalog catalog) =>
+        from named in CinematicStills.Of(catalog)
+        where named.Still.VoiceFile is not null
+        select (named.Still.VoiceFile!, named.NamedBy);
 
     private static IEnumerable<(string File, string NamedBy)> MapTracks(ContentCatalog catalog) =>
         catalog.Maps.Values
@@ -38,6 +46,12 @@ public static class AudioReferenceCheck
             .Where(encounter => encounter.MusicFile is not null)
             .OrderBy(encounter => encounter.Id, StringComparer.Ordinal)
             .Select(encounter => (encounter.MusicFile!, $"encounter '{encounter.Id}'"));
+
+    private static IEnumerable<(string File, string NamedBy)> CinematicTracks(ContentCatalog catalog) =>
+        catalog.Cinematics.Values
+            .Where(cinematic => cinematic.MusicFile is not null)
+            .OrderBy(cinematic => cinematic.Id, StringComparer.Ordinal)
+            .Select(cinematic => (cinematic.MusicFile!, $"cinematic '{cinematic.Id}'"));
 
     private static IEnumerable<(string File, string NamedBy)> SkillSounds(ContentCatalog catalog) =>
         catalog.Skills.Values

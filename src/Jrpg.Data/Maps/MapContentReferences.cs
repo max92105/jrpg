@@ -14,6 +14,9 @@ internal sealed record MapContentReferences(
     /// <summary>The shops an <c>openShop</c> step may name (ADR 0031); empty where no shop is loaded.</summary>
     public IReadOnlySet<string> ShopIds { get; init; } = new HashSet<string>();
 
+    /// <summary>The cinematics a <c>cinematic</c> step may name (ADR 0046); empty where none is loaded.</summary>
+    public IReadOnlySet<string> CinematicIds { get; init; } = new HashSet<string>();
+
     /// <summary>
     /// The quests the quest steps may name, with their stages (ADR 0032); empty where no quest is loaded.
     /// </summary>

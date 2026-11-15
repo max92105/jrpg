@@ -8,7 +8,6 @@ internal enum EventStepKind
     SwapObject,
     Warp,
     MoveNpc,
-    Still,
     Recruit,
     Voice,
     Rest,
@@ -17,4 +16,5 @@ internal enum EventStepKind
     StartQuest,
     AdvanceQuest,
     CompleteQuest,
+    Cinematic,
 }

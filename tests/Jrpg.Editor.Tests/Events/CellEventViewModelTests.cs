@@ -48,18 +48,18 @@ public sealed class CellEventViewModelTests
     }
 
     [Fact]
-    public void ToEdit_ArriveForOneLeaderWithAStill_KeepsAll()
+    public void ToEdit_ArriveForOneLeaderWithACinematic_KeepsAll()
     {
         var cellEvent = new CellEventViewModel(new GridCell(3, 4), null, _choices);
         cellEvent.Event.Activation = EventActivation.Arrive;
         cellEvent.Event.OnlyWhenLeaderId = "omer";
-        cellEvent.Event.AddStillCommand.Execute(null);
-        cellEvent.Event.SelectedStep!.ImageFile = "Placeholder1.png";
+        cellEvent.Event.AddCinematicCommand.Execute(null);
+        cellEvent.Event.SelectedStep!.CinematicId = "omer_intro";
 
         var mapEvent = cellEvent.ToEdit([_exit])!.After!.Event;
 
         Assert.Equal((EventActivation.Arrive, "omer"), (mapEvent.Activation, mapEvent.OnlyWhenLeaderId));
-        Assert.Equal(new StillStep("Placeholder1.png", 4, Caption: null), Assert.Single(mapEvent.Steps));
+        Assert.Equal(new CinematicStep("omer_intro"), Assert.Single(mapEvent.Steps));
     }
 
     [Fact]

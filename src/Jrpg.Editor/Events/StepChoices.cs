@@ -2,8 +2,8 @@ namespace Jrpg.Editor.Events;
 
 /// <summary>
 /// The ids the event dialog offers: items to give, objects to swap to or wait for, maps to warp to, the members an
-/// event can wait to be led by, the shops an openShop step opens, the quests and stages the quest steps name, and the
-/// map's NPCs a move step walks.
+/// event can wait to be led by, the shops an openShop step opens, the quests and stages the quest steps name, the
+/// cinematics a cinematic step plays, and the map's NPCs a move step walks.
 /// </summary>
 internal sealed record StepChoices(IReadOnlyList<string> ItemIds, IReadOnlyList<string> ObjectIds, IReadOnlyList<string> MapIds, IReadOnlyList<string> MemberIds)
 {
@@ -18,6 +18,11 @@ internal sealed record StepChoices(IReadOnlyList<string> ItemIds, IReadOnlyList<
     public IReadOnlyList<string> QuestIds { get; init; } = [];
 
     public IReadOnlyList<QuestStageChoice> QuestStages { get; init; } = [];
+
+    /// <summary>
+    /// The cinematics a cinematic step plays, sorted (ADR 0046); an init member as <see cref="ShopIds"/>.
+    /// </summary>
+    public IReadOnlyList<string> CinematicIds { get; init; } = [];
 
     /// <summary>
     /// The placed NPCs of the event's map a move step can walk (ADR 0044), as the map is now; an init member as

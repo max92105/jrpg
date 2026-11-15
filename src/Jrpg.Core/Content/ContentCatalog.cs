@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Cinematics;
 using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
 using Jrpg.Core.Maps;
@@ -54,6 +55,10 @@ public sealed record ContentCatalog
     /// </summary>
     public IReadOnlyDictionary<string, FieldSpriteSheet> FieldSprites { get; init; } =
         new Dictionary<string, FieldSpriteSheet>(StringComparer.Ordinal);
+
+    /// <summary>The cinematics an event's <c>cinematic</c> step plays, by id (ADR 0046).</summary>
+    public IReadOnlyDictionary<string, CinematicDefinition> Cinematics { get; init; } =
+        new Dictionary<string, CinematicDefinition>(StringComparer.Ordinal);
 
     /// <summary>The class that gives a member their numbers at their level (ADR 0017).</summary>
     public ClassDefinition ClassOf(PartyMemberDefinition member) => Classes[member.ClassId];

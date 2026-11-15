@@ -50,14 +50,25 @@ public sealed class EventPresenterFadeSoundTests
         Assert.DoesNotContain(UiSoundFiles.Field.Warp, SoundsThroughTheIntro(_ => default));
     }
 
-    // A skip while a still shows ends the stills at once and goes black into the warp another way, through the still's
-    // own update.
+    // A held skip while a still shows ends the cinematic at once and goes black into the warp another way, through the
+    // cinematic's own update.
     [Fact]
     public void Update_WarpAfterASkippedCutscene_AsksNothing()
     {
-        var skip = Pressing(GameButton.Confirm);
+        var isPressed = false;
+        InputFrame HoldOnceAStillShows(EventPresenter presenter)
+        {
+            if (!presenter.IsShowingStill)
+            {
+                return default;
+            }
 
-        Assert.DoesNotContain(UiSoundFiles.Field.Warp, SoundsThroughTheIntro(presenter => presenter.IsShowingStill ? skip : default));
+            var input = isPressed ? Holding(GameButton.Confirm) : Pressing(GameButton.Confirm);
+            isPressed = true;
+            return input;
+        }
+
+        Assert.DoesNotContain(UiSoundFiles.Field.Warp, SoundsThroughTheIntro(HoldOnceAStillShows));
     }
 
     [Fact]
@@ -129,6 +140,8 @@ public sealed class EventPresenterFadeSoundTests
         var asked = new List<string>();
         for (var update = 0; update < 5000 && exploration.CurrentMap.Id == "intro"; update++)
         {
+            // A headless test never draws, which loads the cinematic's pictures.
+            presenter.MarkStillsLoaded();
             presenter.Update(StartMapScenarios.OneUpdate, inputFor(presenter));
             asked.AddRange(presenter.Sounds);
         }

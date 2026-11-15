@@ -1,9 +1,11 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Cinematics;
 using Jrpg.Core.Content;
 using Jrpg.Core.Loot;
 using Jrpg.Core.Sprites;
 using Jrpg.Core.Trade;
 using Jrpg.Data.Battle;
+using Jrpg.Data.Cinematics;
 using Jrpg.Data.Loot;
 using Jrpg.Data.Sprites;
 using Jrpg.Data.Trade;
@@ -25,6 +27,14 @@ public static class CatalogProblems
     /// <param name="content">The objects and the new game that name sprites.</param>
     public static string? OfFieldSprites(IReadOnlyList<FieldSpriteSheet> sheets, ContentCatalog content) =>
         FirstProblem(() => CheckFieldSprites(sheets, content));
+
+    /// <summary>
+    /// The first problem in the cinematics (ADR 0046): a cinematic's own rule, naming it and the still; null when the
+    /// loader would take them.
+    /// </summary>
+    /// <param name="cinematics">The cinematics as edited.</param>
+    public static string? OfCinematics(IReadOnlyList<CinematicDefinition> cinematics) =>
+        FirstProblem(() => CheckCinematics(cinematics));
 
     /// <summary>
     /// The first problem in the shops (ADR 0031, ADR 0045): a shop's own rule, or an item it sells that the content
@@ -63,6 +73,13 @@ public static class CatalogProblems
         var byFile = sheets.ToDictionary(sheet => sheet.File, StringComparer.Ordinal);
         FieldSpriteReferenceCheck.Check(ContentCatalogLoader.FieldSpritesFile, byFile, content.Objects.Values, content.NewGame);
     }
+
+    /// <summary>
+    /// The checks the loader makes on <c>cinematics.json</c>, for the writer and the problem line alike.
+    /// </summary>
+    /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
+    internal static void CheckCinematics(IReadOnlyList<CinematicDefinition> cinematics) =>
+        CinematicCatalogValidator.Validate(ContentCatalogLoader.CinematicsFile, cinematics);
 
     /// <summary>The checks the loader makes on <c>shops.json</c>, for the writer and the problem line alike.</summary>
     /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>

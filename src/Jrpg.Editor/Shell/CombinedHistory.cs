@@ -111,12 +111,12 @@ internal sealed partial class CombinedHistory : ObservableObject
     }
 
     // In the order checked: the first map whose event names a quest or a stage the undo would remove (decision 394), or
-    // opens a shop it would remove (decision 581); the first map placing or swapping to an object it would remove; the
-    // first tile cut from a sheet it would remove; the first tile it would remove that something still uses, named with
-    // its first user (decision 117).
+    // opens a shop it would remove (decision 581), or plays a cinematic it would remove (decision 630); the first map
+    // placing or swapping to an object it would remove; the first tile cut from a sheet it would remove; the first tile
+    // it would remove that something still uses, named with its first user (decision 117).
     private string? RefusalOfCatalogUndo()
     {
-        if ((RefusalOfQuestUndo() ?? RefusalOfShopUndo()) is { } named)
+        if ((RefusalOfQuestUndo() ?? RefusalOfShopUndo() ?? RefusalOfCinematicUndo()) is { } named)
         {
             return named;
         }
@@ -178,6 +178,20 @@ internal sealed partial class CombinedHistory : ObservableObject
             if (CatalogUsage.UsersOfShop(_catalog.Current, shopId, _openMaps.Layouts) is [var map, ..])
             {
                 return $"Can't undo: shop {shopId} is opened on {map}.";
+            }
+        }
+
+        return null;
+    }
+
+    // A saved cinematic is never removed by its window (decision 630), so only an added one can be undone away.
+    private string? RefusalOfCinematicUndo()
+    {
+        foreach (var cinematicId in _catalog.CinematicsRemovedByUndo())
+        {
+            if (CatalogUsage.UsersOfCinematic(_catalog.Current, cinematicId, _openMaps.Layouts) is [var map, ..])
+            {
+                return $"Can't undo: cinematic {cinematicId} is played on {map}.";
             }
         }
 

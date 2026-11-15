@@ -1,5 +1,6 @@
 using System.Collections.Frozen;
 using Jrpg.Core.Battle;
+using Jrpg.Core.Cinematics;
 using Jrpg.Core.Content;
 using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
@@ -10,6 +11,7 @@ using Jrpg.Core.Skills;
 using Jrpg.Core.Sprites;
 using Jrpg.Core.Trade;
 using Jrpg.Data.Battle;
+using Jrpg.Data.Cinematics;
 using Jrpg.Data.Crafting;
 using Jrpg.Data.Items;
 using Jrpg.Data.Loot;
@@ -35,6 +37,7 @@ public static class ContentCatalogLoader
     private const string AffixesFile = "affixes.json";
     internal const string ShopsFile = "shops.json";
     internal const string QuestsFile = "quests.json";
+    internal const string CinematicsFile = "cinematics.json";
     internal const string NewGameFile = "new-game.json";
 
     internal const string TilesheetsFile = "tilesheets.json";
@@ -63,6 +66,8 @@ public static class ContentCatalogLoader
             contentRoot, ShopsFile, (file, list) => ShopCatalogValidator.Validate(file, list, itemsById));
         var quests = ReadValidated<IReadOnlyList<QuestDefinition>>(contentRoot, QuestsFile, QuestCatalogValidator.Validate);
         var questsById = quests.ToFrozenDictionary(quest => quest.Id);
+        var cinematics = ReadValidated<IReadOnlyList<CinematicDefinition>>(
+            contentRoot, CinematicsFile, CinematicCatalogValidator.Validate);
         var affixes = ReadValidated<IReadOnlyList<AffixDefinition>>(contentRoot, AffixesFile, AffixCatalogValidator.Validate);
         var dropTables = ReadValidated<IReadOnlyList<DropTable>>(
             contentRoot, DropTablesFile, (file, list) => DropTableCatalogValidator.Validate(file, list, itemsById));
@@ -94,6 +99,7 @@ public static class ContentCatalogLoader
             members.Select(member => member.Id).ToFrozenSet())
         {
             ShopIds = shops.Select(shop => shop.Id).ToFrozenSet(),
+            CinematicIds = cinematics.Select(cinematic => cinematic.Id).ToFrozenSet(),
             Quests = questsById,
         };
         var maps = MapFolderReader.Read(contentRoot, mapContent);
@@ -125,6 +131,7 @@ public static class ContentCatalogLoader
             Shops = shops.ToFrozenDictionary(shop => shop.Id),
             Quests = questsById,
             FieldSprites = fieldSpritesByFile,
+            Cinematics = cinematics.ToFrozenDictionary(cinematic => cinematic.Id),
         };
     }
 

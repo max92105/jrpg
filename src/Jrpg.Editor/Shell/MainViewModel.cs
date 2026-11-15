@@ -10,6 +10,7 @@ using Jrpg.Data.Audio;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Battle;
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Cinematics;
 using Jrpg.Editor.Events;
 using Jrpg.Editor.Loot;
 using Jrpg.Editor.Maps;
@@ -94,6 +95,7 @@ internal sealed partial class MainViewModel : ObservableObject
             QuestEditing = new QuestEditingViewModel(Content);
             ShopEditing = new ShopEditingViewModel(Content);
             DropTableEditing = new DropTableEditingViewModel(Content);
+            CinematicEditing = new CinematicEditingViewModel(Content, ReadCinematicMedia);
             EnemyEditing = new EnemyEditingViewModel(Content, folder => ArtFolders.ImagesIn(ArtRoot, folder));
             FieldSpriteEditing = CreateFieldSpriteEditing();
             NpcSpriteChange = new NpcSpriteChange(Content, Placing.Browser);

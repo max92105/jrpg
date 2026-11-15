@@ -53,22 +53,8 @@
             "file": "Placeholder.wav"
           },
           {
-            "type": "still",
-            "imageFile": "Placeholder1.png",
-            "seconds": 4,
-            "caption": "Intro of Sarxian, still 1 (placeholder)."
-          },
-          {
-            "type": "still",
-            "imageFile": "Placeholder2.png",
-            "seconds": 4,
-            "caption": "Intro of Sarxian, still 2 (placeholder)."
-          },
-          {
-            "type": "still",
-            "imageFile": "Placeholder3.png",
-            "seconds": 4,
-            "caption": "Intro of Sarxian, still 3 (placeholder)."
+            "type": "cinematic",
+            "cinematicId": "sarxian_intro"
           },
           {
             "type": "warp",
@@ -99,22 +85,8 @@
             "file": "Placeholder.wav"
           },
           {
-            "type": "still",
-            "imageFile": "Placeholder1.png",
-            "seconds": 4,
-            "caption": "Intro of Jazog, still 1 (placeholder)."
-          },
-          {
-            "type": "still",
-            "imageFile": "Placeholder2.png",
-            "seconds": 4,
-            "caption": "Intro of Jazog, still 2 (placeholder)."
-          },
-          {
-            "type": "still",
-            "imageFile": "Placeholder3.png",
-            "seconds": 4,
-            "caption": "Intro of Jazog, still 3 (placeholder)."
+            "type": "cinematic",
+            "cinematicId": "jazog_intro"
           },
           {
             "type": "warp",
@@ -145,22 +117,8 @@
             "file": "Placeholder.wav"
           },
           {
-            "type": "still",
-            "imageFile": "Placeholder1.png",
-            "seconds": 4,
-            "caption": "Intro of Teelle, still 1 (placeholder)."
-          },
-          {
-            "type": "still",
-            "imageFile": "Placeholder2.png",
-            "seconds": 4,
-            "caption": "Intro of Teelle, still 2 (placeholder)."
-          },
-          {
-            "type": "still",
-            "imageFile": "Placeholder3.png",
-            "seconds": 4,
-            "caption": "Intro of Teelle, still 3 (placeholder)."
+            "type": "cinematic",
+            "cinematicId": "teelle_intro"
           },
           {
             "type": "warp",
@@ -191,22 +149,8 @@
             "file": "Placeholder.wav"
           },
           {
-            "type": "still",
-            "imageFile": "Placeholder1.png",
-            "seconds": 4,
-            "caption": "Intro of Zaruk, still 1 (placeholder)."
-          },
-          {
-            "type": "still",
-            "imageFile": "Placeholder2.png",
-            "seconds": 4,
-            "caption": "Intro of Zaruk, still 2 (placeholder)."
-          },
-          {
-            "type": "still",
-            "imageFile": "Placeholder3.png",
-            "seconds": 4,
-            "caption": "Intro of Zaruk, still 3 (placeholder)."
+            "type": "cinematic",
+            "cinematicId": "zaruk_intro"
           },
           {
             "type": "warp",
@@ -237,22 +181,8 @@
             "file": "Placeholder.wav"
           },
           {
-            "type": "still",
-            "imageFile": "Placeholder1.png",
-            "seconds": 4,
-            "caption": "Intro of Zanyr, still 1 (placeholder)."
-          },
-          {
-            "type": "still",
-            "imageFile": "Placeholder2.png",
-            "seconds": 4,
-            "caption": "Intro of Zanyr, still 2 (placeholder)."
-          },
-          {
-            "type": "still",
-            "imageFile": "Placeholder3.png",
-            "seconds": 4,
-            "caption": "Intro of Zanyr, still 3 (placeholder)."
+            "type": "cinematic",
+            "cinematicId": "zanyr_intro"
           },
           {
             "type": "warp",
@@ -283,22 +213,8 @@
             "file": "Placeholder.wav"
           },
           {
-            "type": "still",
-            "imageFile": "Placeholder1.png",
-            "seconds": 4,
-            "caption": "Intro of Thaali, still 1 (placeholder)."
-          },
-          {
-            "type": "still",
-            "imageFile": "Placeholder2.png",
-            "seconds": 4,
-            "caption": "Intro of Thaali, still 2 (placeholder)."
-          },
-          {
-            "type": "still",
-            "imageFile": "Placeholder3.png",
-            "seconds": 4,
-            "caption": "Intro of Thaali, still 3 (placeholder)."
+            "type": "cinematic",
+            "cinematicId": "thaali_intro"
           },
           {
             "type": "warp",
@@ -329,22 +245,8 @@
             "file": "Placeholder.wav"
           },
           {
-            "type": "still",
-            "imageFile": "Placeholder1.png",
-            "seconds": 4,
-            "caption": "Intro of Ragnir, still 1 (placeholder)."
-          },
-          {
-            "type": "still",
-            "imageFile": "Placeholder2.png",
-            "seconds": 4,
-            "caption": "Intro of Ragnir, still 2 (placeholder)."
-          },
-          {
-            "type": "still",
-            "imageFile": "Placeholder3.png",
-            "seconds": 4,
-            "caption": "Intro of Ragnir, still 3 (placeholder)."
+            "type": "cinematic",
+            "cinematicId": "ragnir_intro"
           },
           {
             "type": "warp",
@@ -375,22 +277,8 @@
             "file": "Placeholder.wav"
           },
           {
-            "type": "still",
-            "imageFile": "Placeholder1.png",
-            "seconds": 4,
-            "caption": "Intro of Omer, still 1 (placeholder)."
-          },
-          {
-            "type": "still",
-            "imageFile": "Placeholder2.png",
-            "seconds": 4,
-            "caption": "Intro of Omer, still 2 (placeholder)."
-          },
-          {
-            "type": "still",
-            "imageFile": "Placeholder3.png",
-            "seconds": 4,
-            "caption": "Intro of Omer, still 3 (placeholder)."
+            "type": "cinematic",
+            "cinematicId": "omer_intro"
           },
           {
             "type": "warp",
@@ -421,22 +309,8 @@
             "file": "Placeholder.wav"
           },
           {
-            "type": "still",
-            "imageFile": "Placeholder1.png",
-            "seconds": 4,
-            "caption": "Intro of Lazarus, still 1 (placeholder)."
-          },
-          {
-            "type": "still",
-            "imageFile": "Placeholder2.png",
-            "seconds": 4,
-            "caption": "Intro of Lazarus, still 2 (placeholder)."
-          },
-          {
-            "type": "still",
-            "imageFile": "Placeholder3.png",
-            "seconds": 4,
-            "caption": "Intro of Lazarus, still 3 (placeholder)."
+            "type": "cinematic",
+            "cinematicId": "lazarus_intro"
           },
           {
             "type": "warp",

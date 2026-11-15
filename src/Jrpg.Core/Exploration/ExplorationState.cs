@@ -1,5 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 using Jrpg.Core.Battle;
+using Jrpg.Core.Cinematics;
 using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
@@ -72,6 +73,9 @@ public sealed class ExplorationState
 
     /// <summary>The voice-over the running event started, for the Game to play; null when none speaks.</summary>
     public VoiceStep? StartedVoice => _events.Run?.StartedVoice;
+
+    /// <summary>The cinematic the running event's current step plays (ADR 0046); null on any other step.</summary>
+    public CinematicDefinition? CurrentCinematic => _events.Run?.CurrentCinematic;
 
     /// <summary>
     /// What a placed object on the current map is now, after any swap (an opened chest or door), so the Game draws it

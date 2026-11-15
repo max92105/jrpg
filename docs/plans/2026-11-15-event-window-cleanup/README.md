@@ -75,7 +75,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 a slice is done and write its deviations in the slice file. Tunables, design and risks: [design.md](design.md).
 
 ### Phase 1: checking, the shared view and the drop-downs
-- [ ] **EW0. Binding errors on the editor's error output in Debug; `open-editor-windows.ps1 -EventWindows` opens both
+- [x] **EW0. Binding errors on the editor's error output in Debug; `open-editor-windows.ps1 -EventWindows` opens both
   event windows by map clicks** (Editor + script, about 70 lines) → [slices/EW0.md](slices/EW0.md)
 - [ ] **EW1. One event view for both windows: the chosen event's conditions, steps and fields in `EventView`; the cell
   window offers Give item** (Editor, about 210 lines, most of them moved) → [slices/EW1.md](slices/EW1.md)

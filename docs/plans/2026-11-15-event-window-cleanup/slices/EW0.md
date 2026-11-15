@@ -52,3 +52,9 @@ None: window and script code. The check is the run below, recorded in the Done n
    later slices compare against (none expected; any found is a backlog line, not fixed here).
 4. Run the script with no switch: the menu windows still open as before (the menu loop unchanged).
 5. `git status` shows no change under `content/` (each window closed as Cancel, and the script never saves).
+
+- **Done, with deviations:** the map shown at start (`intro`) holds no object with events, so the script gained
+  `-Map <id>`, which opens a map from the map list first (a row's label is the text inside it, its own automation name
+  being its view model's type): `-EventWindows -Map milestone` opens "Events of tree_1_2 (tree_1)" and "Event of cell
+  (14, 8)". The map's area is taken from the map list's right to the side panel's left. Captures are cut 12 px inside
+  the window's box: its rounded corners showed slivers of the map behind, which is Mana Seed art. Baseline, after the review's fix (`PresentationTraceSources.Refresh()` first: without a debugger WPF traced nothing, so the first baseline was a false negative): no binding-error line in either run (the eight menu windows and the two event windows); `content/` unchanged. The map's left edge is the map list's right.

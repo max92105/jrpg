@@ -48,8 +48,13 @@ internal static class AbsentWhenNullFilter
         // ADR 0044: only a turned NPC has a facing.
         (typeof(PlacedObject), "facing"),
 
-        // ADR 0054: a walk whose facings all read their rows has no sequences.
+        // ADR 0054: a walk whose facings all read their rows has no sequences, and a facing that reads its row has no
+        // sequence of its own.
         (typeof(FacingCycle), "sequences"),
+        (typeof(FacingSequences), "down"),
+        (typeof(FacingSequences), "up"),
+        (typeof(FacingSequences), "left"),
+        (typeof(FacingSequences), "right"),
 
         // Decision 586: an enemy the editor writes reads like a hand-written one; null drops nothing, no gold.
         (typeof(EnemyDefinition), "dropTableId"),

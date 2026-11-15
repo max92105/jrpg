@@ -100,7 +100,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   facing; D, repainting sheets). ADR 0043 gets an "Amended by 0054" line; `docs/decisions/README.md` a row.
 - [x] **SC1. A facing reads a sequence of cells: the record and its arithmetic** (Core, about 220 lines) →
   [slices/SC1.md](slices/SC1.md)
-- [ ] **SC2. Sequences checked on load and written back** (Data, about 150 lines) → [slices/SC2.md](slices/SC2.md)
+- [x] **SC2. Sequences checked on load and written back** (Data, about 150 lines) → [slices/SC2.md](slices/SC2.md)
 - [ ] **SC3. A facing mirrors another: the record, the check and both shells' flip** (Core, Data, Game, Editor, about
   260 lines) → [slices/SC3.md](slices/SC3.md)
 

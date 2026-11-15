@@ -30,6 +30,23 @@ public sealed class ArtReferenceCheckFieldSpriteTests : IDisposable
         Assert.DoesNotContain(problems, problem => problem.Contains(Sprite, StringComparison.Ordinal));
     }
 
+    // Four columns hold the rows' walk; Up's cell at column 5 needs six (ADR 0054).
+    [Fact]
+    public void Check_SequenceCellPastTheImage_NamesTheSprite()
+    {
+        PngHeaderFile.Write(Path.Combine(_artRoot, ArtFolders.FieldSprites, Sprite), width: 128, height: 224);
+        var bought = BoughtSheet(frames: 4);
+        var up = new FacingSequence { Cells = [new SpriteCell(0, 3), new SpriteCell(5, 3)] };
+
+        var problems = ArtReferenceCheck.FindProblems(
+            NewGameWith(bought with { Walk = bought.Walk with { Sequences = new FacingSequences { Up = up } } }), _artRoot);
+
+        Assert.Contains(
+            $"field-sprites/{Sprite}: "
+            + "a 128x224 sprite doesn't hold 6 x 4 frames of 32 x 32 px (192x128). Named by the new game.",
+            problems);
+    }
+
     [Fact]
     public void FindProblems_SheetTooNarrowForItsWalk_NamesFileAndFrames()
     {

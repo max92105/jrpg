@@ -44,7 +44,20 @@ public sealed class FieldSpriteCatalogValidatorTests
         { WithRows(new FacingRows { Down = 0, Left = -1, Right = 2, Up = 3 }), "walk.rows.left must be at least 0 (was -1)." },
         { WithFrames(1, 150), "walk.frames.frameCount must be at least 2 (was 1)." },
         { WithFrames(4, 0), "walk.frames.frameMilliseconds must be at least 1 (was 0)." },
+        { WithUp(Sequence()), "walk.sequences.up.cells must hold at least 1 cell." },
+        { WithUp(Sequence((0, 2), (1, 2), (-1, 2))), "walk.sequences.up.cells[2].column must be at least 0 (was -1)." },
+        { WithUp(Sequence((0, -1))), "walk.sequences.up.cells[0].row must be at least 0 (was -1)." },
     };
+
+    [Fact]
+    public void Validate_FacingOnASequence_Passes() =>
+        Assert.Null(Record.Exception(
+            () => FieldSpriteCatalogValidator.Validate(FileName, [WithUp(Sequence((0, 2), (1, 2), (0, 2)))])));
+
+    // The bound: a single cell stands still while walking (decision 763).
+    [Fact]
+    public void Validate_SingleCellSequence_Passes() =>
+        Assert.Null(Record.Exception(() => FieldSpriteCatalogValidator.Validate(FileName, [WithUp(Sequence((0, 0)))])));
 
     [Theory]
     [MemberData(nameof(InvalidSheets))]
@@ -76,6 +89,12 @@ public sealed class FieldSpriteCatalogValidatorTests
 
         Assert.EndsWith("field sprite id 'villager.png' is used more than once.", exception.Message, StringComparison.Ordinal);
     }
+
+    private static FieldSpriteSheet WithUp(FacingSequence up) =>
+        _villager with { Walk = _villager.Walk with { Sequences = new FacingSequences { Up = up } } };
+
+    private static FacingSequence Sequence(params (int Column, int Row)[] cells) =>
+        new() { Cells = [.. cells.Select(cell => new SpriteCell(cell.Column, cell.Row))] };
 
     private static FieldSpriteSheet WithRows(FacingRows rows) => _villager with { Walk = _villager.Walk with { Rows = rows } };
 

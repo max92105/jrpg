@@ -53,3 +53,8 @@ record built in the test with `with` over the test world's player record).
 
 - **Note from SC1:** the `AbsentWhenNullFilter` line for `FacingCycle` `sequences` landed in SC1 (the repository's
   identical-bytes test needed it); SC2 adds the `FacingSequences` facings' lines.
+
+- **Done, with deviations:** as planned, plus `WriteFieldSprites_SequenceForOneFacing_LeavesTheOthersOut` (the
+  facings' filter lines). The validator checks the facings in the enum's order, each through one helper. Hand check
+  step 1 (the game starts) is the developer's to see; step 2 is left to the validator's test rows, which assert the
+  same message.

@@ -57,6 +57,41 @@ public sealed class ContentWriterFieldSpriteTests : IDisposable
             "field-sprites.json: object 'villager' names field sprite 'ghost.png', which has no record.", exception.Message);
     }
 
+    [Fact]
+    public void WriteFieldSprites_RecordWithSequence_ReadsBackEqual()
+    {
+        var up = new FacingSequence { Cells = [new SpriteCell(2, 5), new SpriteCell(0, 5), new SpriteCell(2, 5)] };
+        var catalog = WithPlaceholder(sheet => WithUp(sheet, up));
+
+        _writer.WriteMapCatalogs(catalog);
+
+        Assert.Equal(catalog.FieldSprites[Placeholder], ContentCatalogLoader.Load(_content.Path).FieldSprites[Placeholder]);
+    }
+
+    [Fact]
+    public void WriteFieldSprites_RowRecord_WritesNoSequences()
+    {
+        _writer.WriteMapCatalogs(WithPlaceholder(sheet => sheet with { Scale = 2 }));
+
+        Assert.DoesNotContain("sequences", File.ReadAllText(_content.PathOf("field-sprites.json")), StringComparison.Ordinal);
+    }
+
+    // A sequence for one facing writes that facing alone.
+    [Fact]
+    public void WriteFieldSprites_SequenceForOneFacing_LeavesTheOthersOut()
+    {
+        var up = new FacingSequence { Cells = [new SpriteCell(1, 1)] };
+        _writer.WriteMapCatalogs(WithPlaceholder(sheet => WithUp(sheet, up)));
+
+        var written = File.ReadAllText(_content.PathOf("field-sprites.json"));
+
+        Assert.Contains("\"up\": {", written, StringComparison.Ordinal);
+        Assert.DoesNotContain("\"down\": null", written, StringComparison.Ordinal);
+    }
+
+    private static FieldSpriteSheet WithUp(FieldSpriteSheet sheet, FacingSequence up) =>
+        sheet with { Walk = sheet.Walk with { Sequences = new FacingSequences { Up = up } } };
+
     private ContentCatalog WithPlaceholder(Func<FieldSpriteSheet, FieldSpriteSheet> change)
     {
         var sheets = new Dictionary<string, FieldSpriteSheet>(_catalog.FieldSprites, StringComparer.Ordinal);

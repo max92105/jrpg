@@ -40,6 +40,7 @@ internal static class ContentJsonOptions
                     ContentTypeDiscriminators.Register,
                     ComputedPropertyFilter.RemoveComputedProperties,
                     AbsentWhenNullFilter.SkipNullOptionalFields,
+                    RequiredStructMembers.MarkRequired,
                     AbsentWhenZeroFilter.SkipZeroOptionalFields,
                     AbsentWhenOneFilter.SkipOneOptionalFields,
                     AbsentWhenTrueFilter.SkipTrueOptionalFields,

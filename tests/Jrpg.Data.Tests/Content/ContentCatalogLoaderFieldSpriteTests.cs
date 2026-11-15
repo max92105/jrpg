@@ -1,4 +1,5 @@
 using Jrpg.Core.Geometry;
+using Jrpg.Core.Sprites;
 using Jrpg.Data.Content;
 
 namespace Jrpg.Data.Tests.Content;
@@ -89,5 +90,22 @@ public sealed class ContentCatalogLoaderFieldSpriteTests : IDisposable
         var exception = Assert.Throws<ContentValidationException>(() => ContentCatalogLoader.Load(_content.Path));
 
         Assert.Equal("field-sprites.json: the file is missing.", exception.Message);
+    }
+
+    // Both test-world records gain the sequence: the frames block reads the same in each.
+    [Fact]
+    public void Load_RecordWithSequence_ReadsItsCellsInOrder()
+    {
+        _content.Replace(
+            "field-sprites.json",
+            "\"frames\": {",
+            """
+            "sequences": { "up": { "cells": [ { "column": 2, "row": 5 }, { "column": 0, "row": 5 } ] } }, "frames": {
+            """);
+
+        var placeholder = ContentCatalogLoader.Load(_content.Path).FieldSprites[PlaceholderSprite];
+
+        Assert.Equal([new SpriteCell(2, 5), new SpriteCell(0, 5)], placeholder.Walk.Sequences!.Up!.Cells);
+        Assert.Null(placeholder.Walk.Sequences.Down);
     }
 }

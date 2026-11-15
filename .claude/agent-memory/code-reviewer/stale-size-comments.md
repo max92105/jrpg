@@ -83,6 +83,10 @@ call or a rename. These cases slipped past it:
   helper's summary and param doc naming the old source ("at the font's own size", "width in the font"); reread the
   docs of every callee whose argument changed origin.
 
+- A check reading a new source through a private member (SE1: the art check's skill and item strips) left the partial's
+  class summary and the public entry point's "Every ..." list without it, though the slice asked for the summary edit and
+  the Done note said "as planned"; reread the entry point's list when a check gains what it reads.
+
 **Why:** a comment or doc stating a wrong rule, name or number misleads the next reader.
 
 **How to apply:** after the rule's grep, run the list above against the diff's renames, moves, new members and removed

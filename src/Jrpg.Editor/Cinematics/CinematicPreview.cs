@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Windows;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Cinematics;
 
@@ -6,8 +7,8 @@ namespace Jrpg.Editor.Cinematics;
 
 /// <summary>
 /// The Cinematics window's Play (decision 620): a cinematic on the preview's own clock, the still at each moment faded,
-/// zoomed and subtitled by Core's rules (decision 629), as the game shows it; silent, the editor plays no audio.
-/// Stopped, it shows nothing of its own, and the window shows the chosen still.
+/// zoomed about its focus and subtitled by Core's rules (decisions 629, 751), as the game shows it; silent, the editor
+/// plays no audio. Stopped, it shows nothing of its own, and the window shows the chosen still.
 /// </summary>
 internal sealed partial class CinematicPreview : ObservableObject
 {
@@ -28,6 +29,13 @@ internal sealed partial class CinematicPreview : ObservableObject
     /// <summary>The picture's size as a factor of its fitted size, by Core's zoom; 1 while stopped.</summary>
     [ObservableProperty]
     public partial double Scale { get; private set; } = 1;
+
+    /// <summary>
+    /// The point of the frame, as shares of its width and height, that Play's picture zooms about, by Core's
+    /// <see cref="CinematicStill.ZoomOrigin"/>; the center while stopped.
+    /// </summary>
+    [ObservableProperty]
+    public partial Point ZoomOrigin { get; private set; } = new(0.5, 0.5);
 
     /// <summary>The shown still's subtitle; null while stopped or when it has none.</summary>
     [ObservableProperty]
@@ -72,6 +80,7 @@ internal sealed partial class CinematicPreview : ObservableObject
         ShownImage = null;
         Opacity = 1;
         Scale = 1;
+        ZoomOrigin = new Point(0.5, 0.5);
         Caption = null;
         TimeLine = "";
     }
@@ -88,6 +97,7 @@ internal sealed partial class CinematicPreview : ObservableObject
         ShownImage = still.ImageFile;
         Opacity = StillFade.OpacityAt(moment.IntoStill, still.Duration);
         Scale = still.ScaleAt(moment.IntoStill);
+        ZoomOrigin = new Point(still.ZoomOrigin.X, still.ZoomOrigin.Y);
         Caption = still.Caption;
         TimeLine = string.Create(
             CultureInfo.InvariantCulture,

@@ -74,7 +74,7 @@ Today a still zooms from a start to an end percent about its picture's center (d
 - [x] **FP2. The game zooms about the focus** (Game, about 170 lines) → [slices/FP2.md](slices/FP2.md)
 
 ### Phase 3: the editor
-- [ ] **FP3. The still's focus as the window edits it** (Editor, about 210 lines) → [slices/FP3.md](slices/FP3.md)
+- [x] **FP3. The still's focus as the window edits it** (Editor, about 210 lines) → [slices/FP3.md](slices/FP3.md)
 - [ ] **FP4. Click to set, marker, Clear focus, Play about it** (Editor, about 140 lines) →
   [slices/FP4.md](slices/FP4.md)
 

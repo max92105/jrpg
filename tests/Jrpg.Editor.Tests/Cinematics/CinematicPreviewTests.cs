@@ -1,10 +1,11 @@
+using System.Windows;
 using Jrpg.Core.Cinematics;
 using Jrpg.Editor.Cinematics;
 
 namespace Jrpg.Editor.Tests.Cinematics;
 
-// Play in the Cinematics window (decision 620), on a 2 s still zooming 100 to 110 %, then a 3 s one, each subtitled:
-// what shows at each moment of the preview's clock, by Core's fade and zoom.
+// Play in the Cinematics window (decision 620), on a 2 s still zooming 100 to 110 % toward 25 %, 75 %, then a 3 s one,
+// each subtitled: what shows at each moment of the preview's clock, by Core's fade, zoom and zoom origin.
 public sealed class CinematicPreviewTests
 {
     private static readonly CinematicDefinition _intro = new()
@@ -18,6 +19,7 @@ public sealed class CinematicPreviewTests
                 Seconds = 2,
                 Caption = "Long ago.",
                 Zoom = new StillZoom { StartPercent = 100, EndPercent = 110 },
+                Focus = new StillFocus { XPercent = 25, YPercent = 75 },
             },
             new CinematicStill { ImageFile = "intro/2.png", Seconds = 3, Caption = "Far away." },
         ],
@@ -53,6 +55,38 @@ public sealed class CinematicPreviewTests
         _preview.Advance(TimeSpan.FromSeconds(1));
 
         Assert.Equal(1.05, _preview.Scale, precision: 6);
+    }
+
+    [Fact]
+    public void Advance_IntoTheFocusedStill_ZoomsAboutItsFocus()
+    {
+        _preview.Play(_intro, fromStill: 0);
+
+        _preview.Advance(TimeSpan.FromSeconds(1));
+
+        Assert.Equal(new Point(0.25, 0.75), _preview.ZoomOrigin);
+    }
+
+    [Fact]
+    public void Advance_IntoTheNextStillWithoutFocus_ZoomsAboutTheCenter()
+    {
+        _preview.Play(_intro, fromStill: 0);
+        _preview.Advance(TimeSpan.FromSeconds(1));
+
+        _preview.Advance(TimeSpan.FromSeconds(2));
+
+        Assert.Equal(new Point(0.5, 0.5), _preview.ZoomOrigin);
+    }
+
+    [Fact]
+    public void Stop_AfterTheFocusedStill_ZoomOriginIsTheCenterAgain()
+    {
+        _preview.Play(_intro, fromStill: 0);
+        _preview.Advance(TimeSpan.FromSeconds(1));
+
+        _preview.Stop();
+
+        Assert.Equal(new Point(0.5, 0.5), _preview.ZoomOrigin);
     }
 
     [Fact]

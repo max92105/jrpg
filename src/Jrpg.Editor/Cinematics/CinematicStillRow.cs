@@ -1,5 +1,6 @@
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Jrpg.Core.Cinematics;
 using Jrpg.Editor.Catalogs;
 
@@ -7,8 +8,8 @@ namespace Jrpg.Editor.Cinematics;
 
 /// <summary>
 /// One still as the Cinematics window edits it (ADR 0046): its picture, seconds, subtitle, voice and zoom boxes kept as
-/// typed. <see cref="Problem"/> is only a box that can't be read; the ranges are Data's rules, which the window's
-/// problem line shows for the whole list.
+/// typed, and the point its zoom heads to, set by a click on the picture. <see cref="Problem"/> is only a box that
+/// can't be read; the ranges are Data's rules, which the window's problem line shows for the whole list.
 /// </summary>
 internal sealed partial class CinematicStillRow : ObservableObject
 {
@@ -67,6 +68,22 @@ internal sealed partial class CinematicStillRow : ObservableObject
     public partial string ZoomEndText { get; set; } = "";
 
     /// <summary>
+    /// Where the zoom heads, null for the center (decision 746): set by a click, never typed, so never a problem; kept
+    /// without a zoom (decision 750).
+    /// </summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasFocus), nameof(FocusText))]
+    [NotifyCanExecuteChangedFor(nameof(ClearFocusCommand))]
+    public partial StillFocus? Focus { get; private set; }
+
+    public bool HasFocus => Focus is not null;
+
+    /// <summary>The line under the zoom boxes (decision 753): the point's percents, or how to choose one.</summary>
+    public string FocusText => Focus is { } focus
+        ? $"Zoom heads to {focus.XPercent} %, {focus.YPercent} %"
+        : "Zoom heads to the center: click the picture to choose a point";
+
+    /// <summary>
     /// "voice 5.3 s" beside the Seconds box, so the still can be timed to its voice without audio in the editor
     /// (decision 620); "voice not found" when the folder lacks it; empty without a voice.
     /// </summary>
@@ -104,6 +121,7 @@ internal sealed partial class CinematicStillRow : ObservableObject
         VoiceFile = still.VoiceFile ?? "",
         ZoomStartText = TypedNumber.Text(still.Zoom?.StartPercent ?? StillZoom.MinPercent),
         ZoomEndText = TypedNumber.Text(still.Zoom?.EndPercent ?? StillZoom.MinPercent),
+        Focus = still.Focus,
     };
 
     /// <summary>A still just added on a picture: four seconds, no subtitle, voice or zoom (decision 616).</summary>
@@ -125,8 +143,17 @@ internal sealed partial class CinematicStillRow : ObservableObject
             Caption = TextOrNull(Caption),
             VoiceFile = TextOrNull(VoiceFile),
             Zoom = ZoomOrNull(TypedNumber.Parse(ZoomStartText)!.Value, TypedNumber.Parse(ZoomEndText)!.Value),
+            Focus = Focus,
         };
     }
+
+    /// <summary>
+    /// Sets the point where a click landed, as shares of the preview frame, which is the picture as the screen shows it
+    /// (decision 747): each rounded to a whole percent and clamped to the picture, so a click a pixel past an edge is
+    /// that edge (decision 749).
+    /// </summary>
+    public void SetFocusAt(double xShare, double yShare) =>
+        Focus = new StillFocus { XPercent = PercentOf(xShare), YPercent = PercentOf(yShare) };
 
     partial void OnImageFileChanged(string value) => Changed?.Invoke(this, EventArgs.Empty);
 
@@ -139,6 +166,15 @@ internal sealed partial class CinematicStillRow : ObservableObject
     partial void OnZoomStartTextChanged(string value) => Changed?.Invoke(this, EventArgs.Empty);
 
     partial void OnZoomEndTextChanged(string value) => Changed?.Invoke(this, EventArgs.Empty);
+
+    // A typed change too (decision 754): the list's relay stops Play and refreshes the problem line.
+    partial void OnFocusChanged(StillFocus? value) => Changed?.Invoke(this, EventArgs.Empty);
+
+    [RelayCommand(CanExecute = nameof(HasFocus))]
+    private void ClearFocus() => Focus = null;
+
+    private static int PercentOf(double share) =>
+        Math.Clamp((int)Math.Round(share * 100, MidpointRounding.AwayFromZero), StillFocus.MinPercent, StillFocus.MaxPercent);
 
     // 100 at both ends draws the still at its fitted size, which content writes as no zoom (decision 617).
     private static StillZoom? ZoomOrNull(int startPercent, int endPercent) =>

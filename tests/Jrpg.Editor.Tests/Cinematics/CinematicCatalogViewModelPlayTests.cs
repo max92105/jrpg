@@ -61,6 +61,30 @@ public sealed class CinematicCatalogViewModelPlayTests
         Assert.False(_window.Preview.IsPlaying);
     }
 
+    // A click on the picture is a typed change (decision 754).
+    [Fact]
+    public void SetFocusAt_WhilePlaying_StopsThePreview()
+    {
+        _window.PlayCommand.Execute(null);
+
+        _window.Cinematics[0].Stills[0].SetFocusAt(0.25, 0.75);
+
+        Assert.False(_window.Preview.IsPlaying);
+    }
+
+    [Fact]
+    public void ClearFocus_RaisesTheProblemLine()
+    {
+        var still = _window.Cinematics[0].Stills[0];
+        still.SetFocusAt(0.25, 0.75);
+        var raised = new List<string?>();
+        _window.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        still.ClearFocusCommand.Execute(null);
+
+        Assert.Contains(nameof(CinematicCatalogViewModel.Problem), raised);
+    }
+
     [Fact]
     public void ChoosingAnotherCinematic_WhilePlaying_StopsThePreview()
     {

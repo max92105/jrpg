@@ -70,3 +70,5 @@ still zooming 100 to 110 % toward 25 %, 75 %".
 
 ## Verify by hand
 None: no window change. `verify.ps1` passes.
+
+- **Done:** as planned.

@@ -269,3 +269,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `MainViewModel.UnsavedChanges` doesn't count a stroke still being dragged: the close question ends the stroke first,
   the unexpected-error box doesn't, so a throw mid-drag on a clean map reads "Nothing is unsaved." (NET1's review;
   nothing is lost, closing still asks).
+- For the editor push's row 7 (the shared animation preview): per-facing frame counters ("2/4") in the Character
+  sprites window and the playing cell outlined on the sheet (cut from the sprite cells plan at its review).
+- `ObjectTile`'s and `GridCell`'s members aren't required when read: a missing `x` reads as 0 (the serializer builds a
+  struct through its parameterless constructor); add them to the sprite cells plan's `RequiredStructMembers` list.

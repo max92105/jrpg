@@ -165,6 +165,23 @@ public sealed class ArtImageImportGifTests : IDisposable
         });
     }
 
+    // The pace typed on the Effect strips page, told from the fixture's 100 ms and the unlisted 80 ms.
+    [Fact]
+    public void Import_EffectGifWithAPace_ReportsItsLoop()
+    {
+        var gif = WideGif("Burst.gif", 3);
+
+        StaThread.Run(() =>
+        {
+            var options = new GifImportOptions(8, false) { FrameMilliseconds = 110 };
+            var result = _import.Import(ArtFolders.Effects, [gif], options, Ask(answer: true));
+
+            Assert.Equal(new TileAnimation { FrameCount = 3, FrameMilliseconds = 110 }, result.Animations["Burst.png"]);
+            var note = "3 frames, 0.33 s, paced at the typed 110 ms; the Effect strips page's OK writes its record";
+            Assert.Equal($"Imported Burst.png ({note}).", result.Summary);
+        });
+    }
+
     private static FixtureFrame Frame(int centiseconds) =>
         FixtureFrame.Filled(0, 0, 4, 4, 1) with { DelayCentiseconds = centiseconds };
 

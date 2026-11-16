@@ -5,10 +5,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Jrpg.Core.Sprites;
+using Jrpg.Data.Art;
+using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Hosting;
 using Jrpg.Editor.Tiles;
 using Jrpg.Editor.Viewport;
-using Microsoft.Win32;
 
 namespace Jrpg.Editor.Sprites;
 
@@ -155,18 +156,13 @@ internal sealed partial class FieldSpritePage : UserControl
     // The dialog hosting the page owns the file dialog (the mode bar plan's page recipe).
     private void OnImportClicked(object sender, RoutedEventArgs e)
     {
-        var dialog = new OpenFileDialog
-        {
-            Title = "Import character sheets",
-            Filter = "PNG images (*.png)|*.png",
-            Multiselect = true,
-        };
-        if (dialog.ShowDialog(Window.GetWindow(this)) != true)
+        var paths = ArtImageFileDialog.Choose(Window.GetWindow(this), "Import character sheets", ArtFolders.FieldSprites);
+        if (paths is null)
         {
             return;
         }
 
-        var result = _import(dialog.FileNames);
+        var result = _import(paths);
         ImportStatusText.Text = result.Summary;
         _sprites.RefreshAfterImport(result.Imported);
     }

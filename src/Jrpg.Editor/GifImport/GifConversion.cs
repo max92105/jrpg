@@ -9,7 +9,8 @@ namespace Jrpg.Editor.GifImport;
 /// One GIF into a strip (ADR 0047): read, made whole, its background cleared when asked, scaled to the chosen height,
 /// and written as a PNG of the GIF's name into a fresh temporary folder. A battle sprite's strip carries its loop, at
 /// the pace typed in the dialog or the GIF's most common delay; an attack effect's frames are each padded to a square
-/// and play at the effects' own pace, the GIF's time dropped (decision 639). WPF imaging needs an STA thread.
+/// and play at the effects' own pace, the GIF's time dropped (decision 639), or carry the pace typed on the Effect
+/// strips page as a loop (decision 988). WPF imaging needs an STA thread.
 /// </summary>
 internal static class GifConversion
 {
@@ -37,7 +38,13 @@ internal static class GifConversion
         var gif = Prepared(gifPath, options);
         var stripPath = Written(
             gifPath, path => FrameStrip.WriteSquarePng(gif.Frames, gif.FrameWidth, options.BattleHeight, path));
-        return new ConvertedGif(stripPath, null, EffectNoteOf(gif.Frames.Count, gif.Stored));
+        if (options.FrameMilliseconds is not { } typed)
+        {
+            return new ConvertedGif(stripPath, null, EffectNoteOf(gif.Frames.Count, gif.Stored));
+        }
+
+        var loop = new TileAnimation { FrameCount = gif.Frames.Count, FrameMilliseconds = typed };
+        return new ConvertedGif(stripPath, loop, PacedEffectNoteOf(loop));
     }
 
     private static PreparedGif Prepared(string gifPath, GifImportOptions options)
@@ -95,6 +102,15 @@ internal static class GifConversion
         var pace = frameTime.TotalMilliseconds.ToString(CultureInfo.InvariantCulture);
         return $"{frameCount} frames, {length} s; effects play at {pace} ms a frame unless effect-strips.json lists "
             + $"them, the GIF's {GifFrameTiming.FrameMilliseconds(stored)} ms dropped";
+    }
+
+    // "3 frames, 0.33 s, paced at the typed 110 ms; the Effect strips page's OK writes its record": the pace typed on
+    // that page becomes the strip's row there, a record only once the page applies (decision 988).
+    private static string PacedEffectNoteOf(TileAnimation loop)
+    {
+        var length = (loop.FrameCount * loop.FrameDuration).TotalSeconds.ToString("0.##", CultureInfo.InvariantCulture);
+        return $"{loop.FrameCount} frames, {length} s, paced at the typed {loop.FrameMilliseconds} ms; the Effect strips "
+            + "page's OK writes its record";
     }
 
     // The frames as scaled, each frame's width, and the frames as stored, whose delays give the time.

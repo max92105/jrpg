@@ -155,7 +155,9 @@ internal sealed partial class MainWindow
 
         var artRoot = _viewModel.ArtRoot;
         OpenInDialog("Effect strips", effectStripEditing.Start, effectStripEditing.Apply, edited => new EffectStripCatalogPage(
-            edited, file => SpriteImageFile.LoadFrom(artRoot, ArtFolders.Effects, file)));
+            edited,
+            file => SpriteImageFile.LoadFrom(artRoot, ArtFolders.Effects, file),
+            (paths, options) => _viewModel.ImportArtImages(ArtFolders.Effects, paths, options)));
     }
 
     private void OpenSkills()

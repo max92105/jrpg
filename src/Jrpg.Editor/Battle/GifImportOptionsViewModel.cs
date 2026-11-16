@@ -46,7 +46,10 @@ internal sealed partial class GifImportOptionsViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(Problem), nameof(CanApply), nameof(FrameMilliseconds))]
     public partial string FrameMillisecondsText { get; set; }
 
-    /// <summary>Whether the typed pace is the imported loop's: a battle sprite's, one GIF at a time.</summary>
+    /// <summary>
+    /// Whether the typed pace is the imported loop's: a battle sprite's, or an effect strip's on its own page, one GIF
+    /// at a time.
+    /// </summary>
     public bool IsPaceTyped { get; private init; }
 
     /// <summary>Why the pace box is greyed; empty while it is typed.</summary>
@@ -89,6 +92,15 @@ internal sealed partial class GifImportOptionsViewModel : ObservableObject
     /// <param name="gifCount">How many GIFs were chosen, at least one.</param>
     public static GifImportOptionsViewModel ForEnemyEffects(ComposedGif? first, int gifCount) =>
         new(first) { PaceNote = gifCount == 1 ? "set its pace in Effect strips" : "set their pace in Effect strips" };
+
+    /// <summary>
+    /// Attack effects from the Effect strips page: one GIF's typed pace becomes its row's frame time (decision 988);
+    /// several are paced in the page's list afterwards.
+    /// </summary>
+    /// <param name="first">The first chosen GIF; null when it can't be read.</param>
+    /// <param name="gifCount">How many GIFs were chosen, at least one.</param>
+    public static GifImportOptionsViewModel ForEffectStrips(ComposedGif? first, int gifCount) =>
+        gifCount == 1 ? new(first) { IsPaceTyped = true } : new(first) { PaceNote = "set each one's pace in the list" };
 
     /// <summary>The typed pace is carried only while <see cref="IsPaceTyped"/>.</summary>
     /// <exception cref="InvalidOperationException">There is a <see cref="Problem"/>; OK is greyed then.</exception>

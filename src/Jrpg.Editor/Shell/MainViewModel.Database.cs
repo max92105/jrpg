@@ -17,8 +17,8 @@ namespace Jrpg.Editor.Shell;
 /// <summary>
 /// The Database menu's pages over the draft (ADR 0045, decision 583): the shops, the drop tables, the enemies, the
 /// cinematics (ADR 0046), the effect strips (decision 659), the skills, the tiered effects and the statuses (decision
-/// 976), beside the quests; and the image import the Enemies page and the Character sprites page share, through Data,
-/// asking first before it replaces any image of the art folder.
+/// 976), beside the quests; and the image import the Enemies, Effect strips and Character sprites pages share, through
+/// Data, asking first before it replaces any image of the art folder.
 /// </summary>
 internal sealed partial class MainViewModel
 {
@@ -44,7 +44,7 @@ internal sealed partial class MainViewModel
     /// </summary>
     /// <param name="artFolder">The field sprites, battlers, portraits or effects folder.</param>
     /// <param name="paths">The images chosen in the file dialog.</param>
-    /// <param name="gifOptions">How a GIF chosen for the battlers becomes a strip (ADR 0047).</param>
+    /// <param name="gifOptions">How a GIF chosen for the battlers or the effects becomes a strip (ADR 0047).</param>
     public SheetImportResult ImportArtImages(string artFolder, IReadOnlyList<string> paths, GifImportOptions gifOptions)
     {
         var result = new ArtImageImport(_writer, Content!)

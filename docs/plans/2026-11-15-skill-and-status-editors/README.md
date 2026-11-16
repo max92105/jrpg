@@ -142,7 +142,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/AN1b.md](slices/AN1b.md)
 - [x] **AN2. The GIF import plays the GIF before it writes, its pace editable for a battle sprite** (Editor, about 220
   lines) → [slices/AN2.md](slices/AN2.md)
-- [ ] **AN4. The Effect strips page imports PNGs and GIFs, an effect GIF's pace becoming its row's** (Editor, about
+- [x] **AN4. The Effect strips page imports PNGs and GIFs, an effect GIF's pace becoming its row's** (Editor, about
   200 lines) → [slices/AN4.md](slices/AN4.md)
 - [ ] **AN5. Strip from sheet cells: the cut and the picks as typed** (Editor, about 210 lines) →
   [slices/AN5.md](slices/AN5.md)

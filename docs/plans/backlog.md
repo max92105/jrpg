@@ -309,3 +309,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   hold the numbers (skill and status editors plan, AN1b review).
 - `Editor/GifImport/GifConversion.Prepared` divides by a 0 height in `FrameScaler.WidthAt` when a GIF's screen
   descriptor says 0 x 0: refuse it as `ComposedGif.Read` does since AN2 (AN2 review).
+- An effect image replaced with fewer frames, then the Effect strips page cancelled, leaves the draft's record with a
+  hit frame past the new strip, which the game's start refuses (`ArtReferenceCheck.AddHitFramesPastTheirStrip`; the
+  art warning shows it): say so on the import line when a replaced strip's record no longer fits (AN4 review).

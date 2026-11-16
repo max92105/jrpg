@@ -16,8 +16,9 @@ internal sealed record GifImportOptions(int BattleHeight, bool RemovesBackground
     public static GifImportOptions Default { get; } = new(DefaultBattleHeight, false);
 
     /// <summary>
-    /// The pace typed in the dialog, in whole milliseconds, at least 1, for a battle sprite's loop; null for each GIF's
-    /// most common delay (decision 632).
+    /// The pace typed in the dialog, in whole milliseconds, at least 1, for a battle sprite's loop or an effect strip's
+    /// row on the Effect strips page (decision 988); null for each GIF's most common delay (decision 632), or an
+    /// effect's unlisted pace.
     /// </summary>
     public int? FrameMilliseconds { get; init; }
 }

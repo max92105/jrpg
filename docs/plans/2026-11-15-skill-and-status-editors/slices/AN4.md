@@ -52,3 +52,6 @@ time (a replaced row keeps its swing and its hit frame below the new frames, els
 - **Note from AN2:** `ForEffectStrips` goes beside `ForBattleSprites`: the constructor is private, the factories set
   `IsPaceTyped` or `PaceNote` by `init`; pick its several-GIF note (`ForBattleSprites` says "each keeps its own pace").
   `GifConversion.PaceNoteOf` already words "the typed 110 ms"; `EffectNoteOf` can follow it.
+- **Done, with deviations:** `TakeImport(result)` alone (the view model keeps the catalog and size lookup it opened
+  with); `ArtImageImport` changed in its summary only; the file dialog shared as `Catalogs/ArtImageFileDialog` (third
+  copy); several effect GIFs say "set each one's pace in the list"; the no-pace import test already existed.

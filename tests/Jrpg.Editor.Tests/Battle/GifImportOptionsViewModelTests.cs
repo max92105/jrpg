@@ -153,6 +153,24 @@ public sealed class GifImportOptionsViewModelTests
         Assert.Equal("set their pace in Effect strips", options.PaceNote);
     }
 
+    [Fact]
+    public void ToOptions_OneEffectStripTypedPace_Carried()
+    {
+        var options = GifImportOptionsViewModel.ForEffectStrips(GifOf(height: 64), 1);
+        options.FrameMillisecondsText = "70";
+
+        Assert.Equal(70, options.ToOptions().FrameMilliseconds);
+    }
+
+    [Fact]
+    public void ToOptions_SeveralEffectStrips_CarriesNoPaceAndSaysSo()
+    {
+        var options = GifImportOptionsViewModel.ForEffectStrips(GifOf(height: 64), 2);
+
+        Assert.Null(options.ToOptions().FrameMilliseconds);
+        Assert.Equal((false, "set each one's pace in the list"), (options.IsPaceTyped, options.PaceNote));
+    }
+
     // The greyed box plays the first GIF at its own pace, as each GIF keeps its own.
     [Fact]
     public void FrameMilliseconds_SeveralGifs_TheFirstOnesPace()

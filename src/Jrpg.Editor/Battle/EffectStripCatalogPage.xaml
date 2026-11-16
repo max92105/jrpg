@@ -5,9 +5,18 @@
              xmlns:animation="clr-namespace:Jrpg.Editor.Animation"
              xmlns:battle="clr-namespace:Jrpg.Editor.Battle">
   <DockPanel>
-    <!-- The effects images in name order, then the records whose image is missing; an unlisted one is greyed. -->
+    <!-- The effects images in name order, then the records whose image is missing; an unlisted one is greyed. Import...
+         under the list copies images in at once and hands them to the list as typed rows (decision 988). -->
     <DockPanel DockPanel.Dock="Left" Width="240">
       <TextBlock DockPanel.Dock="Top" Text="Effects images" FontWeight="Bold" />
+      <StackPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
+        <Button Content="Import..."
+                Width="70"
+                HorizontalAlignment="Left"
+                Click="OnImportClicked"
+                ToolTip="PNG strips of square frames, or GIFs made into strips; a GIF plays first so its pace can be set" />
+        <TextBlock x:Name="ImportStatusText" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap" Margin="0,4,0,0" />
+      </StackPanel>
       <ListBox ItemsSource="{Binding Strips}" SelectedItem="{Binding SelectedStrip}" Margin="0,4,0,0">
         <ListBox.ItemTemplate>
           <DataTemplate>

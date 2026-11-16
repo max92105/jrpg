@@ -8,7 +8,6 @@ using Jrpg.Data.Art;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.GifImport;
 using Jrpg.Editor.Hosting;
-using Microsoft.Win32;
 
 namespace Jrpg.Editor.Battle;
 
@@ -151,23 +150,13 @@ internal sealed partial class EnemyCatalogPage : UserControl
             return;
         }
 
-        var dialog = new OpenFileDialog
-        {
-            Title = $"Import into the {artFolder} art",
-            Filter = ArtImageImport.TakesGifs(artFolder) ? "Images (*.png;*.gif)|*.png;*.gif" : "PNG images (*.png)|*.png",
-            Multiselect = true,
-        };
-        if (dialog.ShowDialog(HostWindow) != true)
+        if (ArtImageFileDialog.Choose(HostWindow, $"Import into the {artFolder} art", artFolder) is not { } paths
+            || GifOptionsFor(artFolder, paths) is not { } options)
         {
             return;
         }
 
-        if (GifOptionsFor(artFolder, dialog.FileNames) is not { } options)
-        {
-            return;
-        }
-
-        var result = _art.Import(artFolder, dialog.FileNames, options);
+        var result = _art.Import(artFolder, paths, options);
         ImportStatusText.Text = result.Summary;
         _enemies.TakeImport(artFolder, result);
     }

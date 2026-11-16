@@ -1,3 +1,4 @@
+using Jrpg.Core.Maps;
 using Jrpg.Editor.GifImport;
 
 namespace Jrpg.Editor.Tests.GifImport;
@@ -52,13 +53,30 @@ public sealed class GifConversionTests : IDisposable
         });
     }
 
+    [Fact]
+    public void ConvertToEffect_TypedPace_LoopTakesIt()
+    {
+        StaThread.Run(() =>
+        {
+            var converted = Kept(GifConversion.ConvertToEffect(
+                Fixture(), new GifImportOptions(2, RemovesBackground: false) { FrameMilliseconds = 110 }));
+
+            Assert.Equal(new TileAnimation { FrameCount = 2, FrameMilliseconds = 110 }, converted.Loop);
+        });
+    }
+
     private string Converted(GifImportOptions options) => Conversion(options).StripPath;
 
-    private ConvertedGif Conversion(GifImportOptions options)
+    private ConvertedGif Conversion(GifImportOptions options) => Kept(GifConversion.Convert(Fixture(), options));
+
+    private string Fixture()
     {
         var frame = new FixtureFrame(0, 0, 2, 2, [1, 2, 2, 1]);
-        var gif = GifFixtures.Write(Path.Combine(_folder, "Gnoll.gif"), 2, 2, frame, frame);
-        var converted = GifConversion.Convert(gif, options);
+        return GifFixtures.Write(Path.Combine(_folder, "Gnoll.gif"), 2, 2, frame, frame);
+    }
+
+    private ConvertedGif Kept(ConvertedGif converted)
+    {
         _strips.Add(converted.StripPath);
         return converted;
     }

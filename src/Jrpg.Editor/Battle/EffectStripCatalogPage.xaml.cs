@@ -1,7 +1,12 @@
 using System.ComponentModel;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using Jrpg.Data.Art;
 using Jrpg.Editor.Animation;
+using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.GifImport;
+using Jrpg.Editor.Tiles;
 
 namespace Jrpg.Editor.Battle;
 
@@ -9,21 +14,30 @@ namespace Jrpg.Editor.Battle;
 /// The Effect strips page (decision 659, ADR 0045): the effects images on the left, the chosen strip's boxes and
 /// preview on the right. Its host shows the problem line and keeps or drops the session. The chosen strip plays in the
 /// shared preview (<see cref="FramePreview"/>, decision 986) at its typed frame time, its hit frame marked, while the
-/// page is shown, so its pace is tuned by eye; an image is read once per page.
+/// page is shown, so its pace is tuned by eye; an image is read once per page, again once an import replaced it.
+/// Import... under the list copies PNGs and GIFs into the folder, a GIF's pace typed while it plays (decision 989).
 /// </summary>
 internal sealed partial class EffectStripCatalogPage : UserControl
 {
     private readonly EffectStripCatalogViewModel _strips;
     private readonly Func<string, BitmapSource?> _loadImage;
     private readonly Dictionary<string, BitmapSource?> _images = new(StringComparer.Ordinal);
+    private readonly Func<IReadOnlyList<string>, GifImportOptions, SheetImportResult> _import;
 
     /// <param name="strips">The page's state, from <see cref="EffectStripEditingViewModel.Start"/>.</param>
     /// <param name="loadImage">Decodes an effects image at its own size; null when it can't.</param>
-    public EffectStripCatalogPage(EffectStripCatalogViewModel strips, Func<string, BitmapSource?> loadImage)
+    /// <param name="import">
+    /// The shell's import: copies the chosen images into the effects folder, a GIF as a strip by the options, and says
+    /// what it did.
+    /// </param>
+    public EffectStripCatalogPage(
+        EffectStripCatalogViewModel strips,
+        Func<string, BitmapSource?> loadImage,
+        Func<IReadOnlyList<string>, GifImportOptions, SheetImportResult> import)
     {
         InitializeComponent();
         DataContext = _strips = strips;
-        _loadImage = loadImage;
+        (_loadImage, _import) = (loadImage, import);
         strips.PropertyChanged += OnStripsChanged;
         ShowChosenStrip();
     }
@@ -42,6 +56,26 @@ internal sealed partial class EffectStripCatalogPage : UserControl
         StripPreview.Frames = _strips.SelectedStrip is { FrameCount: { } frameCount } strip && ImageOf(strip.File) is { } image
             ? PreviewFrames.OfStrip(image, frameCount)
             : null;
+
+    // A replaced image is read again before its row is chosen, so the preview plays the new frames.
+    private void OnImportClicked(object sender, RoutedEventArgs e)
+    {
+        var owner = Window.GetWindow(this);
+        if (ArtImageFileDialog.Choose(owner, "Import effect strips", ArtFolders.Effects) is not { } paths
+            || GifImportWindow.AskFor(owner, paths, GifImportOptionsViewModel.ForEffectStrips) is not { } options)
+        {
+            return;
+        }
+
+        var result = _import(paths, options);
+        ImportStatusText.Text = EffectStripCatalogViewModel.ImportLineOf(result);
+        foreach (var file in result.Imported)
+        {
+            _images.Remove(file);
+        }
+
+        _strips.TakeImport(result);
+    }
 
     private BitmapSource? ImageOf(string file)
     {

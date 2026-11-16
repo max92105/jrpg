@@ -5,17 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-enemy-behavior, slice EB12 (TacticTarget.UnafflictedFoe, TacticTargetCandidates.For takes the skill,
-EnemyTactics.SkillOf, EnemyTargeting.ForRule one draw after the taunt, TacticTargetFit.GrantsHarm, Data
-FindTargetProblem harmful-grant message, editor words). The plan's last slice. 2026-11-16. Round 1. Verdict: Ready to
-commit (no Critical, no Warning).
+Plan 2026-11-15-items-uniques-affixes, slice IU1 (writer writes items.json and affixes.json; CatalogProblems.CheckItems
+and CheckAffixes; item/equipment filter rows; StatBonusesConverter.Write in StatKind order; both files relaid).
+2026-11-16. Round 1. Verdict: Ready to commit (no Critical, no Warning).
 
-- Suggestion (open, optional): EnemyTacticRuleValidatorTests.PoisonSkill builds Skill(id, SingleEnemy) then replaces
-  its whole Effect; build the record once (a grants parameter on Skill).
-- Suggestion (open, optional): no Data test pins the attack with unafflictedFoe ("(attack).on: unafflictedFoe needs a
-  skill that grants a harmful status.").
-- EB11 Warnings (EveryThirdTurnOnItsFourthTurn test, TacticRuleRow "Every N turns of its own") fixed: both in the tree.
-- Checked, no finding: fallen foes never legal (TargetRules.CanTarget SingleEnemy needs IsAlive); poison_2 held vs
-  poison_1 granted matches by FamilyKey; boon grant ignored; draws exact (FixedSequenceRandom throws on an extra draw):
-  no taunt 1 draw, taunt 1 roll + 1 draw; Data's singleEnemy branch equals Core's !GrantsHarm today (only reached when
-  Fits is false); content has no family mixing harmful and boon tiers.
+- Suggestion (open, optional): CheckItems validates `[.. content.Shops.Values]` and `[.. content.DropTables.Values]` in
+  dictionary order; the loader reports the first problem in file (id) order. Sort them by id, or note why not.
+- Checked, no finding: CheckItems order = loader (items, rules crafting, shops, drop tables, new game); layouts check
+  item ids via ContentWriter.cs CheckLayouts; relay is layout only (PowerShell semantic compare of HEAD vs tree: 23/23
+  items, 23/23 affixes, no value differs, ids ordinal-sorted); reference converters only touch TieredEffect and
+  StatusDefinition values, so an item with no tier/grants writes as before.
+- EB12 suggestions: the unafflictedFoe Data test now exists (fixed); PoisonSkill suggestion dropped (other plan,
+  optional).

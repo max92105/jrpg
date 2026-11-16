@@ -5,19 +5,20 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-skill-and-status-editors, slice AN6 (Animation/StripFromCellsWindow, PreviewFrames.OfCells,
-SpriteSheetMarks.RowAt, the Effect strips page's button, the script's nested entry). 2026-11-16. Round 1.
-Verdict: Ready to commit (no Critical).
+Plan 2026-11-15-skill-and-status-editors, slice AN7 (SheetCells.Cut, Catalogs/CellStripImport,
+MainViewModel.ImportCellStrip + ConfirmsReplacing/ReportArtImport, the tool's OK and RefusalText, the page's
+makeStripFromCells + TakeImport). 2026-11-16. Round 1. Verdict: Ready to commit (no Critical).
 
-- Warning (open): StripFromCellsWindow.Decoded (xaml.cs:42-57) copies SpriteImageFile.Decode line for line (IsReadable,
-  BitmapImage OnLoad + IgnoreImageCache + Freeze); TileImages.LoadImage is the third copy of the block. Fix: a public
-  path-taking SpriteImageFile read returning null, the window turning null into "not a PNG image.".
-- Warning (open): open-editor-windows.ps1 grew 290 -> 318 lines (verify's 300-line check covers .cs and .xaml only).
-  Fix: Open-EventWindows (or Open-Nested) into a dot-sourced file.
-- Suggestion (open): RowAt's partial-row guard and the X side of the number box (a point right of the number at its
-  height) have no test.
-- Follow-up: TileImages.LoadImage onto the shared read once it exists.
-- Checked, no finding: decode runs in EndInit inside the try (OnLoad closes the file); catch list = GifReader's plus IO;
-  Pick off guarded in the VM (PickCellAt:132, PickRow:145) and tested; no-button path returns and the loop closes the
-  owner dialog; ControlsHelpWindow 129 lines; FieldLabel without BasedOn harmless (the theme has no TextBlock style).
-- AN5 carried: its two suggestions dropped (committed slice).
+- Warning (open): the strip's width (picks x max(cell side)) and height against TextureLimit.MaxSide aren't on the
+  tool's Problem line, so OK stays lit for a strip Data refuses; the refusal arrives after the cut, pad and encode
+  (editor rule: OK greys for every input the apply refuses). Fix: a StripFromCellsViewModel problem reading
+  TextureLimit.MaxSide, tested at MaxSide and MaxSide + 1.
+- Suggestion (open): SheetCellsTests only use a Bgra32 sheet; a Bgr24 or Indexed8 sheet would pin the conversion.
+- Suggestion (open): SheetCells.AreaOf and PreviewFrames.OfCells compute the cell rectangle and its bound two ways.
+- Follow-up: MainViewModel.SheetImport.cs:35-48 keeps its own replace question ("tilesheet art") and report.
+- Checked, no finding: 988 on every path (write at once, Written only on Imported > 0, record through TakeImport);
+  RefusalText cleared only by user-driven VM changes (window only reads _strip; no timer raises); declined replace
+  gives Summary "" so the line stays empty; bindings are UpdateSourceTrigger=PropertyChanged so Enter on IsDefault
+  sees the typed text; catch list matches ArtImageImport's minus InvalidDataException (no decode here).
+- AN6 carried: Decoded copy fixed (SpriteImageFile.Read), script split (172 lines) fixed, TileImages on the shared
+  read fixed, RowAt suggestion dropped (committed slice).

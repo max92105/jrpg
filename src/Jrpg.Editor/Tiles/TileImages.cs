@@ -8,6 +8,7 @@ using Jrpg.Core.Maps;
 using Jrpg.Core.Sprites;
 using Jrpg.Data.Art;
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Sprites;
 
 namespace Jrpg.Editor.Tiles;
 
@@ -173,16 +174,9 @@ internal sealed class TileImages(CatalogDraft catalog, string artRoot, Func<Miss
         return sheet;
     }
 
-    private BitmapImage LoadImage(string folder, string file)
-    {
-        var bitmap = new BitmapImage();
-        bitmap.BeginInit();
-        bitmap.UriSource = new Uri(Path.Combine(artRoot, folder, file));
-        bitmap.CacheOption = BitmapCacheOption.OnLoad;
-        // WPF keeps decoded images by path; a file replaced by an import must be read again.
-        bitmap.CreateOptions = BitmapCreateOptions.IgnoreImageCache;
-        bitmap.EndInit();
-        bitmap.Freeze();
-        return bitmap;
-    }
+    // Asked only for a file its caller found readable (the art status, the browser's missing mark), so an unreadable
+    // one is a bug, never a missing image.
+    private BitmapImage LoadImage(string folder, string file) =>
+        SpriteImageFile.Read(Path.Combine(artRoot, folder, file))
+            ?? throw new InvalidOperationException($"{file} isn't a readable PNG, though it was found readable.");
 }

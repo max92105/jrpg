@@ -38,6 +38,30 @@ public sealed class PreviewFramesTests
         StaThread.Run(() => Assert.Empty(PreviewFrames.OfStrip(StripOf([Red, Green], Side), 0)));
     }
 
+    // A cell picked again plays again, as the strip tool lets a cell repeat (decision 990).
+    [Fact]
+    public void OfCells_TwoPicksOfOneCell_CutsItTwice()
+    {
+        StaThread.Run(() =>
+        {
+            var frames = PreviewFrames.OfCells(StripOf([Red, Green], Side), (Side, Side), [new(1, 0), new(0, 0), new(1, 0)]);
+
+            Assert.Equal([Green, Red, Green], frames.Select(FirstPixel));
+        });
+    }
+
+    // Column 2 and row 1 lie past a two-cell sheet's edges, where a crop would throw.
+    [Fact]
+    public void OfCells_CellOutsideTheSheet_Skipped()
+    {
+        StaThread.Run(() =>
+        {
+            var frames = PreviewFrames.OfCells(StripOf([Red, Green], Side), (Side, Side), [new(2, 0), new(0, 1), new(1, 0)]);
+
+            Assert.Equal([Green], frames.Select(FirstPixel));
+        });
+    }
+
     // Two 3 x 2 frames of pixels, one red and one green, as a GIF is composed for the import dialog.
     [Fact]
     public void OfPixels_TwoFrames_ImagesOfTheirSize()

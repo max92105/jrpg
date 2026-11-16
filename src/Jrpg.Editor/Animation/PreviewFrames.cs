@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Jrpg.Core.Sprites;
 
 namespace Jrpg.Editor.Animation;
 
@@ -31,6 +32,23 @@ internal static class PreviewFrames
                 .Select(frame => new CroppedBitmap(strip, new Int32Rect(frame * width, 0, width, strip.PixelHeight))),
         ];
     }
+
+    /// <summary>
+    /// A sheet's picked cells in pick order (decision 990), a cell picked twice cut twice; a cell past the sheet's edge
+    /// is skipped, as its crop would throw.
+    /// </summary>
+    /// <param name="sheet">The sheet in its own pixels.</param>
+    /// <param name="cell">A cell's size in the sheet's pixels.</param>
+    /// <param name="cells">The cells in play order, column and row from 0.</param>
+    public static IReadOnlyList<BitmapSource> OfCells(
+        BitmapSource sheet, (int Width, int Height) cell, IReadOnlyList<SpriteCell> cells) =>
+    [
+        .. cells
+            .Select(picked => new Int32Rect(picked.Column * cell.Width, picked.Row * cell.Height, cell.Width, cell.Height))
+            .Where(area => area is { X: >= 0, Y: >= 0 }
+                && area.Width <= sheet.PixelWidth - area.X && area.Height <= sheet.PixelHeight - area.Y)
+            .Select(area => new CroppedBitmap(sheet, area)),
+    ];
 
     /// <summary>Whole frames of pixels, as a GIF is composed for its import (decision 987), each one image.</summary>
     /// <param name="frames">Frames of one size, row by row, BGRA packed little-endian (alpha in the top byte).</param>

@@ -1,0 +1,102 @@
+<Window x:Class="Jrpg.Editor.Animation.StripFromCellsWindow"
+        x:ClassModifier="internal"
+        Style="{StaticResource EditorWindow}"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:animation="clr-namespace:Jrpg.Editor.Animation"
+        xmlns:viewport="clr-namespace:Jrpg.Editor.Viewport"
+        Title="Strip from sheet cells"
+        Width="1000"
+        Height="680"
+        WindowStartupLocation="CenterOwner"
+        ShowInTaskbar="False">
+  <Window.Resources>
+    <Style x:Key="FieldLabel" TargetType="TextBlock">
+      <Setter Property="Width" Value="110" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="FieldBox" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+      <Setter Property="Width" Value="70" />
+    </Style>
+  </Window.Resources>
+  <DockPanel Margin="12">
+    <DockPanel DockPanel.Dock="Bottom" Margin="0,12,0,0">
+      <Button DockPanel.Dock="Right" Content="Cancel" Width="80" IsCancel="True" />
+      <TextBlock Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" VerticalAlignment="Center" Text="{Binding Problem}" />
+    </DockPanel>
+
+    <!-- The cut, the picks and the strip they make, played at the typed pace: the preview has no pace box of its own,
+         so what plays is what OK writes. -->
+    <StackPanel DockPanel.Dock="Right" Width="330" Margin="12,0,0,0">
+      <StackPanel Orientation="Horizontal">
+        <TextBlock Text="Columns" Style="{StaticResource FieldLabel}" />
+        <TextBox Style="{StaticResource FieldBox}" Text="{Binding ColumnsText, UpdateSourceTrigger=PropertyChanged}" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+        <TextBlock Text="Rows" Style="{StaticResource FieldLabel}" />
+        <TextBox Style="{StaticResource FieldBox}" Text="{Binding RowsText, UpdateSourceTrigger=PropertyChanged}" />
+      </StackPanel>
+      <TextBlock Text="{Binding CutLine}" Foreground="{StaticResource MutedTextBrush}" Margin="110,4,0,0" />
+      <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+        <CheckBox Content="Pick"
+                  VerticalAlignment="Center"
+                  IsChecked="{Binding IsPicking}"
+                  ToolTip="While on, a click on the sheet adds the cell under it, and a click on a row's number the whole row" />
+        <Button Content="Remove last" Margin="12,0,0,0" Command="{Binding RemoveLastCommand}" />
+        <Button Content="Clear" Margin="4,0,0,0" Command="{Binding ClearCommand}" />
+      </StackPanel>
+      <TextBlock Text="{Binding PicksLine}"
+                 ToolTip="{Binding PicksLine}"
+                 Foreground="{StaticResource MutedTextBrush}"
+                 TextWrapping="Wrap"
+                 TextTrimming="CharacterEllipsis"
+                 MaxHeight="34"
+                 Margin="0,4,0,0" />
+      <animation:FramePreview x:Name="PicksPreview"
+                              Width="320"
+                              Height="360"
+                              HorizontalAlignment="Left"
+                              Margin="0,8,0,0"
+                              FrameMilliseconds="{Binding FrameMilliseconds, Mode=OneWay}" />
+      <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+        <TextBlock Text="Frame time (ms)" Style="{StaticResource FieldLabel}" />
+        <TextBox Style="{StaticResource FieldBox}"
+                 Text="{Binding FrameMillisecondsText, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="How long each frame shows, at least 1 ms" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+        <TextBlock Text="Strip name" Style="{StaticResource FieldLabel}" />
+        <TextBox Width="210"
+                 Text="{Binding StripNameText, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="The strip's file name in the effects folder; .png is added when it is typed without one" />
+      </StackPanel>
+    </StackPanel>
+
+    <!-- The sheet in its own pixels under the zoom, its grid with rows and columns numbered from 1, the picks numbered
+         in pick order; with Pick on, a click adds the cell under it, a click on a row's number the whole row. -->
+    <DockPanel DockPanel.Dock="Top" Margin="0,0,0,6">
+      <Button Content="Open sheet..." Click="OnOpenSheetClicked" ToolTip="A PNG sheet from any folder; nothing is copied" />
+      <TextBlock x:Name="FileText"
+                 Text="No sheet open."
+                 Foreground="{StaticResource MutedTextBrush}"
+                 TextTrimming="CharacterEllipsis"
+                 VerticalAlignment="Center"
+                 Margin="8,0,0,0" />
+    </DockPanel>
+    <viewport:CellZoomBar x:Name="ZoomBar" DockPanel.Dock="Top" Margin="0,0,0,4" HorizontalAlignment="Left" />
+    <ScrollViewer x:Name="SheetScroller"
+                  HorizontalScrollBarVisibility="Auto"
+                  VerticalScrollBarVisibility="Auto"
+                  Background="{StaticResource ViewportBackgroundBrush}">
+      <Grid x:Name="SheetView"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            RenderOptions.BitmapScalingMode="NearestNeighbor"
+            MouseLeftButtonDown="OnSheetClicked">
+        <Image x:Name="SheetImage" Stretch="Fill" />
+        <Image x:Name="SheetMarks" Stretch="Fill" />
+        <Image x:Name="PickMarks" Stretch="Fill" />
+      </Grid>
+    </ScrollViewer>
+  </DockPanel>
+</Window>

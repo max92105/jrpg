@@ -146,7 +146,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   200 lines) → [slices/AN4.md](slices/AN4.md)
 - [x] **AN5. Strip from sheet cells: the cut and the picks as typed** (Editor, about 210 lines) →
   [slices/AN5.md](slices/AN5.md)
-- [ ] **AN6. Strip from sheet cells: the window, picking and the preview, opened from the Effect strips page** (Editor
+- [x] **AN6. Strip from sheet cells: the window, picking and the preview, opened from the Effect strips page** (Editor
   + script, about 220 lines) → [slices/AN6.md](slices/AN6.md)
 - [ ] **AN7. Strip from sheet cells writes the strip into the Effect strips session** (Editor, about 200 lines) →
   [slices/AN7.md](slices/AN7.md)

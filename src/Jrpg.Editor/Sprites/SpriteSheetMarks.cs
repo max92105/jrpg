@@ -5,9 +5,10 @@ using System.Windows.Media;
 namespace Jrpg.Editor.Sprites;
 
 /// <summary>
-/// Drawn over a sprite sheet in the Character sprites page: its frame grid, each row's number from 1 on the left edge
-/// (decision 568) and each column's from 1 centered on the top edge (decision 773), so rows and picked cells are read
-/// off the image. Line widths are set in screen pixels at the shown scale, as the tile browser's marks are.
+/// Drawn over a sprite sheet in the Character sprites page and the strip tool (decision 990): its frame grid, each
+/// row's number from 1 on the left edge (decision 568) and each column's from 1 centered on the top edge (decision
+/// 773), so rows and picked cells are read off the image. Line widths are set in screen pixels at the shown scale, as
+/// the tile browser's marks are.
 /// </summary>
 internal static class SpriteSheetMarks
 {
@@ -43,6 +44,37 @@ internal static class SpriteSheetMarks
         return image;
     }
 
+    /// <summary>
+    /// The row whose number <see cref="Draw"/> writes under a point, from 0, for a click picking the whole row (the
+    /// strip tool, decision 990): the number's own box, null elsewhere and for a partial row, which has no number.
+    /// </summary>
+    /// <param name="point">The point in image pixels.</param>
+    /// <param name="imageHeight">The image's height in its own pixels.</param>
+    /// <param name="frameHeight">A frame's height in image pixels; no row when below 1.</param>
+    /// <param name="scale">How much the view scales the image, as the marks were drawn at.</param>
+    public static int? RowAt(Point point, int imageHeight, int frameHeight, double scale)
+    {
+        if (frameHeight < 1 || point.Y < 0)
+        {
+            return null;
+        }
+
+        var row = (int)Math.Floor(point.Y / frameHeight);
+        if (row >= imageHeight / frameHeight)
+        {
+            return null;
+        }
+
+        var screenPixel = 1 / scale;
+        var number = NumberText(row + 1, screenPixel);
+        var box = new Rect(RowNumberOrigin(row, frameHeight, screenPixel), new Size(number.Width, number.Height));
+        return box.Contains(point) ? row : null;
+    }
+
+    // 2 px in from the left edge and 1 px down from the row's top, in screen pixels.
+    private static Point RowNumberOrigin(int row, int frameHeight, double screenPixel) =>
+        new(2 * screenPixel, (row * frameHeight) + screenPixel);
+
     private static void DrawGrid(
         DrawingContext context, (int Width, int Height) imageSize, (int Width, int Height) frame, double screenPixel)
     {
@@ -55,8 +87,7 @@ internal static class SpriteSheetMarks
                 context.DrawRectangle(null, gridPen, cell);
             }
 
-            var number = NumberText(row + 1, screenPixel);
-            context.DrawText(number, new Point(2 * screenPixel, (row * frame.Height) + screenPixel));
+            context.DrawText(NumberText(row + 1, screenPixel), RowNumberOrigin(row, frame.Height, screenPixel));
         }
     }
 

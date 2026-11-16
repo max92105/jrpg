@@ -55,3 +55,6 @@ record lands with that page's OK (decision 988). A refusal stays on the tool's p
    page and Save all: the record holds 90 ms; Ctrl+Z, Save all.
 3. The tool again with the same name: Replace? No: nothing written, the tool stays open; Cancel.
 4. Delete `content/art/effects/FireStart.png`.
+- **Note from AN6:** the window builds its own `StripFromCellsViewModel` (no constructor parameter yet: `write` is the
+  first); OK goes in the bottom bar beside Cancel, the problem line on its left; the opener is one lambda in
+  `MainWindow.Database.cs`.

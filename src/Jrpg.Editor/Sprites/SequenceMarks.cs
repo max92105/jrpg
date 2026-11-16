@@ -6,9 +6,10 @@ using Jrpg.Core.Sprites;
 namespace Jrpg.Editor.Sprites;
 
 /// <summary>
-/// Drawn over a sprite sheet in the Character sprites page (decision 773): the picking facing's cells, each outlined
-/// and numbered in pick order at its frame's bottom-right, a repeated cell showing each of its numbers ("2, 4"). Lines
-/// and numbers keep their screen size at the shown scale, as <see cref="SpriteSheetMarks"/> does.
+/// Drawn over a sprite sheet in the Character sprites page (decision 773) and the strip tool (decision 990): the cells
+/// picked, each outlined and numbered in pick order at its frame's bottom-right, a repeated cell showing each of its
+/// numbers ("2, 4"). Lines and numbers keep their screen size at the shown scale, as <see cref="SpriteSheetMarks"/>'
+/// grid and numbers do.
 /// </summary>
 internal static class SequenceMarks
 {
@@ -21,7 +22,7 @@ internal static class SequenceMarks
 
     /// <param name="imageSize">The image's size in its own pixels.</param>
     /// <param name="frame">A frame's size in image pixels, both at least 1.</param>
-    /// <param name="cells">The picking facing's cells in pick order.</param>
+    /// <param name="cells">The picked cells in pick order: the picking facing's, or the strip tool's.</param>
     /// <param name="scale">How much the view scales the image, so lines and numbers keep their screen size.</param>
     public static DrawingImage Draw(
         (int Width, int Height) imageSize, (int Width, int Height) frame, IReadOnlyList<SpriteCell> cells, double scale)

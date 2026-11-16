@@ -105,6 +105,11 @@
         Click the chosen still's picture: its zoom heads to that point (a gold ring marks it). Clear focus: back to the center. Play shows the zoom as the game does.
       </TextBlock>
 
+      <TextBlock Style="{StaticResource Heading}" Text="Effect strips page" />
+      <TextBlock Style="{StaticResource Lines}">
+        Database &gt; Effect strips..., Strip from sheet cells...: Open sheet, set columns and rows, then with Pick on click cells in the order they play, or a row's number for the whole row; the preview plays them.
+      </TextBlock>
+
       <TextBlock Style="{StaticResource Heading}" Text="Events" />
       <TextBlock Style="{StaticResource Lines}">
         Click an object: edit its events.<LineBreak />

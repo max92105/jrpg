@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Jrpg.Data.Art;
+using Jrpg.Editor.Animation;
 using Jrpg.Editor.Battle;
 using Jrpg.Editor.Cinematics;
 using Jrpg.Editor.Effects;
@@ -157,7 +158,8 @@ internal sealed partial class MainWindow
         OpenInDialog("Effect strips", effectStripEditing.Start, effectStripEditing.Apply, edited => new EffectStripCatalogPage(
             edited,
             file => SpriteImageFile.LoadFrom(artRoot, ArtFolders.Effects, file),
-            (paths, options) => _viewModel.ImportArtImages(ArtFolders.Effects, paths, options)));
+            (paths, options) => _viewModel.ImportArtImages(ArtFolders.Effects, paths, options),
+            owner => new StripFromCellsWindow { Owner = owner }.ShowDialog()));
     }
 
     private void OpenSkills()

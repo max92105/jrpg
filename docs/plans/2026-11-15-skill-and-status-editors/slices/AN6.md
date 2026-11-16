@@ -61,3 +61,6 @@ as the sheet.
 4. Open a file that isn't a PNG (a text file renamed `.png`): the file line names the refusal; the window stays open.
 5. Run `.claude/scripts/open-editor-windows.ps1`: "Database>Effect strips...>Strip from sheet cells...: opened", no
    `ERROR` or binding-error line.
+- **Done, with deviations:** code 287 lines (window 214; `SpriteImageFile.Read` the one PNG read, TileImages too); tests
+  72; the event-window run moved to `open-event-windows.ps1`. `RowAt` also takes the heights; Pick is a CheckBox (no
+  ToggleButton style can base on Button's); help line under a new heading; window 1000 x 680.

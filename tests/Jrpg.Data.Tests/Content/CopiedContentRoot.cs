@@ -27,9 +27,20 @@ internal sealed class CopiedContentRoot : IDisposable
 
     public string PathOf(string fileName) => System.IO.Path.Combine(Path, fileName);
 
-    /// <summary>Rewrites one copied file with <paramref name="oldText"/> replaced, to break it on purpose.</summary>
-    public void Replace(string fileName, string oldText, string newText) =>
-        File.WriteAllText(PathOf(fileName), File.ReadAllText(PathOf(fileName)).Replace(oldText, newText, StringComparison.Ordinal));
+    /// <summary>
+    /// Rewrites one copied file with <paramref name="oldText"/> replaced, to break it on purpose. Throws when the text
+    /// isn't there: after a relayout a missed replace would leave the file valid and the test proving nothing.
+    /// </summary>
+    public void Replace(string fileName, string oldText, string newText)
+    {
+        var text = File.ReadAllText(PathOf(fileName));
+        if (!text.Contains(oldText, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException($"{fileName} holds no '{oldText}' to replace.");
+        }
+
+        File.WriteAllText(PathOf(fileName), text.Replace(oldText, newText, StringComparison.Ordinal));
+    }
 
     public void Dispose() => Directory.Delete(Path, recursive: true);
 }

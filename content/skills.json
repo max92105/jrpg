@@ -1,14 +1,251 @@
 [
   {
+    "id": "aura_of_protection",
+    "name": "Aura of Protection",
+    "description": "Guards you and the allies beside you for three turns. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillWard.wav",
+    "resourceChanges": [
+      {
+        "resourceId": "conviction",
+        "amount": -4
+      }
+    ],
+    "effect": {
+      "kind": "grantStatus",
+      "power": 0,
+      "targeting": "alliesInRange",
+      "range": 1,
+      "statuses": [
+        {
+          "status": "guard_2",
+          "turns": 3,
+          "chance": 100
+        }
+      ]
+    }
+  },
+  {
+    "id": "chaos_lance",
+    "name": "Chaos Lance",
+    "description": "A lance of chaos at one enemy. Needs a lot of instability, and builds more. Placeholder: the developer writes the real spell.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillDark.wav",
+    "resourceChanges": [
+      {
+        "resourceId": "instability",
+        "amount": 4
+      }
+    ],
+    "requirements": [
+      {
+        "resourceId": "instability",
+        "atLeast": 7
+      }
+    ],
+    "effect": {
+      "kind": "damage",
+      "power": 0,
+      "targeting": "singleEnemy",
+      "damageType": "dark",
+      "tier": "dark_3"
+    }
+  },
+  {
+    "id": "cleave",
+    "name": "Cleave",
+    "description": "A wide swing that hits the whole party. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillSlash.wav",
+    "effect": {
+      "kind": "damage",
+      "power": 0,
+      "targeting": "allEnemies",
+      "damageType": "slashing",
+      "tier": "slashing_1"
+    }
+  },
+  {
+    "id": "cone_of_cold",
+    "name": "Cone of Cold",
+    "description": "A blast of frost at one enemy that slows it for two of its turns. Placeholder: the developer writes the real spell.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillHex.wav",
+    "resourceChanges": [
+      {
+        "resourceId": "mana",
+        "amount": -4
+      }
+    ],
+    "effect": {
+      "kind": "damage",
+      "power": 0,
+      "targeting": "singleEnemy",
+      "damageType": "ice",
+      "tier": "ice_1",
+      "statuses": [
+        {
+          "status": "slowed_1",
+          "turns": 2,
+          "chance": 100
+        }
+      ]
+    }
+  },
+  {
+    "id": "crushing_blow",
+    "name": "Crushing Blow",
+    "description": "A heavy blow that may stun. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillBlunt.wav",
+    "effect": {
+      "kind": "damage",
+      "power": 0,
+      "targeting": "singleEnemy",
+      "damageType": "blunt",
+      "tier": "blunt_2",
+      "statuses": [
+        {
+          "status": "stun",
+          "turns": 1,
+          "chance": 40
+        }
+      ]
+    }
+  },
+  {
+    "id": "eldritch_bolt",
+    "name": "Eldritch Bolt",
+    "description": "A bolt of raw force at one enemy that opens its guard for two of its turns. Builds instability. Placeholder: the developer writes the real spell.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillDark.wav",
+    "resourceChanges": [
+      {
+        "resourceId": "instability",
+        "amount": 2
+      }
+    ],
+    "effect": {
+      "kind": "damage",
+      "power": 0,
+      "targeting": "singleEnemy",
+      "damageType": "dark",
+      "tier": "dark_1",
+      "statuses": [
+        {
+          "status": "exposed_1",
+          "turns": 2,
+          "chance": 100
+        }
+      ]
+    }
+  },
+  {
+    "id": "enfeeble",
+    "name": "Enfeeble",
+    "description": "Saps one enemy\u0027s strength for three of its turns. Feeds instability. Placeholder: the developer writes the real spell.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillDark.wav",
+    "resourceChanges": [
+      {
+        "resourceId": "instability",
+        "amount": 2
+      }
+    ],
+    "effect": {
+      "kind": "grantStatus",
+      "power": 0,
+      "targeting": "singleEnemy",
+      "statuses": [
+        {
+          "status": "weakened_1",
+          "turns": 3,
+          "chance": 100
+        }
+      ]
+    }
+  },
+  {
+    "id": "equilibrium",
+    "name": "Equilibrium",
+    "description": "Spends Growth and Decay in balance to strike every enemy. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillSlash.wav",
+    "resourceChanges": [
+      {
+        "resourceId": "growth",
+        "amount": -3
+      },
+      {
+        "resourceId": "decay",
+        "amount": -3
+      }
+    ],
+    "effect": {
+      "kind": "damage",
+      "power": 0,
+      "targeting": "allEnemies",
+      "damageType": "piercing",
+      "tier": "piercing_2"
+    }
+  },
+  {
+    "id": "expose",
+    "name": "Expose",
+    "description": "Opens one enemy\u0027s guard: every hit on it lands half again as hard for three of its turns. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillHex.wav",
+    "effect": {
+      "kind": "grantStatus",
+      "power": 0,
+      "targeting": "singleEnemy",
+      "statuses": [
+        {
+          "status": "exposed_2",
+          "turns": 3,
+          "chance": 100
+        }
+      ]
+    }
+  },
+  {
+    "id": "field_dressing",
+    "name": "Field Dressing",
+    "description": "Binds one ally\u0027s wounds. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillMend.wav",
+    "effect": {
+      "kind": "restoreHp",
+      "power": 0,
+      "targeting": "singleAlly",
+      "tier": "heal_2"
+    }
+  },
+  {
     "id": "fire_blast",
     "name": "Fire Blast",
     "description": "Strikes one enemy with fire and leaves it burning for two of its turns.",
     "iconFile": "Attack.png",
     "soundFile": "PlaceholderSkillFire.wav",
-    "resourceChanges": [ { "resourceId": "mana", "amount": -2 } ],
+    "resourceChanges": [
+      {
+        "resourceId": "mana",
+        "amount": -2
+      }
+    ],
     "effect": {
-      "kind": "damage", "damageType": "fire", "power": 0, "tier": "fire_1", "targeting": "singleEnemy",
-      "statuses": [ { "status": "burning_1", "turns": 2 } ]
+      "kind": "damage",
+      "power": 0,
+      "targeting": "singleEnemy",
+      "damageType": "fire",
+      "tier": "fire_1",
+      "statuses": [
+        {
+          "status": "burning_1",
+          "turns": 2,
+          "chance": 100
+        }
+      ]
     }
   },
   {
@@ -18,241 +255,18 @@
     "iconFile": "Attack.png",
     "soundFile": "PlaceholderSkillFire.wav",
     "effectFile": "FireExplosion.png",
-    "resourceChanges": [ { "resourceId": "mana", "amount": -5 } ],
-    "effect": { "kind": "damage", "damageType": "fire", "power": 0, "tier": "fire_1", "targeting": "allEnemies" }
-  },
-  {
-    "id": "meteor",
-    "name": "Meteor",
-    "description": "Calls down a falling star on one enemy. Placeholder: the developer writes the real spell.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillFire.wav",
-    "resourceChanges": [ { "resourceId": "mana", "amount": -9 } ],
-    "effect": { "kind": "damage", "damageType": "fire", "power": 0, "tier": "fire_2", "targeting": "singleEnemy" }
-  },
-  {
-    "id": "cone_of_cold",
-    "name": "Cone of Cold",
-    "description": "A blast of frost at one enemy that slows it for two of its turns. Placeholder: the developer writes the real spell.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillHex.wav",
-    "resourceChanges": [ { "resourceId": "mana", "amount": -4 } ],
+    "resourceChanges": [
+      {
+        "resourceId": "mana",
+        "amount": -5
+      }
+    ],
     "effect": {
-      "kind": "damage", "damageType": "ice", "power": 0, "tier": "ice_1", "targeting": "singleEnemy",
-      "statuses": [ { "status": "slowed_1", "turns": 2 } ]
-    }
-  },
-  {
-    "id": "heal",
-    "name": "Heal",
-    "description": "Restores HP to one ally.",
-    "iconFile": "",
-    "soundFile": "PlaceholderSkillMend.wav",
-    "requirements": [ { "resourceId": "faith", "atLeast": 1 } ],
-    "effect": { "kind": "restoreHp", "power": 0, "tier": "heal_1", "targeting": "singleAlly" }
-  },
-  {
-    "id": "recovery",
-    "name": "Recovery",
-    "description": "Restores its user's HP, then keeps mending them for two turns.",
-    "iconFile": "",
-    "soundFile": "PlaceholderSkillMend.wav",
-    "requirements": [ { "resourceId": "faith", "atLeast": 2 } ],
-    "effect": {
-      "kind": "restoreHp", "power": 0, "tier": "heal_1", "targeting": "self",
-      "statuses": [ { "status": "regen_1", "turns": 2 } ]
-    }
-  },
-  {
-    "id": "heal_all",
-    "name": "Heal All",
-    "description": "Restores HP to every ally.",
-    "iconFile": "",
-    "soundFile": "PlaceholderSkillMend.wav",
-    "requirements": [ { "resourceId": "faith", "atLeast": 4 } ],
-    "effect": { "kind": "restoreHp", "power": 0, "tier": "heal_2", "targeting": "allAllies" }
-  },
-  {
-    "id": "power_strike",
-    "name": "Power Strike",
-    "description": "A heavy blow on one enemy. Placeholder: the developer writes the real skill.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillSlash.wav",
-    "resourceChanges": [ { "resourceId": "stamina", "amount": -2 } ],
-    "effect": { "kind": "damage", "damageType": "slashing", "power": 0, "tier": "slashing_1", "targeting": "singleEnemy" }
-  },
-  {
-    "id": "shield_bash",
-    "name": "Shield Bash",
-    "description": "Strikes one enemy with the shield and stuns it for a turn. Placeholder: the developer writes the real skill.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillBlunt.wav",
-    "resourceChanges": [ { "resourceId": "stamina", "amount": -3 } ],
-    "effect": {
-      "kind": "damage", "damageType": "blunt", "power": 0, "tier": "blunt_1", "targeting": "singleEnemy",
-      "statuses": [ { "status": "stun", "turns": 1, "chance": 60 } ]
-    }
-  },
-  {
-    "id": "taunt",
-    "name": "Taunt",
-    "description": "Draws every enemy's attacks for two turns. Placeholder: the developer writes the real skill.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillShout.wav",
-    "effect": {
-      "kind": "grantStatus", "power": 0, "targeting": "self",
-      "statuses": [ { "status": "taunt", "turns": 2 } ]
-    }
-  },
-  {
-    "id": "rampage",
-    "name": "Rampage",
-    "description": "A crushing blow on one enemy. Placeholder: the developer writes the real skill.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillBlunt.wav",
-    "resourceChanges": [ { "resourceId": "ferocity", "amount": -6 } ],
-    "effect": { "kind": "damage", "damageType": "blunt", "power": 0, "tier": "blunt_2", "targeting": "singleEnemy" }
-  },
-  {
-    "id": "smite",
-    "name": "Smite",
-    "description": "A holy blow on one enemy. Placeholder: the developer writes the real skill.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillLight.wav",
-    "resourceChanges": [ { "resourceId": "conviction", "amount": -3 } ],
-    "effect": { "kind": "damage", "damageType": "light", "power": 0, "tier": "light_2", "targeting": "singleEnemy" }
-  },
-  {
-    "id": "aura_of_protection",
-    "name": "Aura of Protection",
-    "description": "Guards you and the allies beside you for three turns. Placeholder: the developer writes the real skill.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillWard.wav",
-    "resourceChanges": [ { "resourceId": "conviction", "amount": -4 } ],
-    "effect": {
-      "kind": "grantStatus", "power": 0, "targeting": "alliesInRange", "range": 1,
-      "statuses": [ { "status": "guard_2", "turns": 3 } ]
-    }
-  },
-  {
-    "id": "wide_aura",
-    "name": "Wide Aura",
-    "description": "Guards everyone up to two places away for three turns. Placeholder: the developer writes the real skill.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillWard.wav",
-    "resourceChanges": [ { "resourceId": "conviction", "amount": -6 } ],
-    "effect": {
-      "kind": "grantStatus", "power": 0, "targeting": "alliesInRange", "range": 2,
-      "statuses": [ { "status": "guard_1", "turns": 3 } ]
-    }
-  },
-  {
-    "id": "ready",
-    "name": "Ready",
-    "description": "Take an extra turn right after someone else's next one. Keeps your turn. Placeholder: the developer writes the real skill.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillWard.wav",
-    "isQuick": true,
-    "resourceChanges": [ { "resourceId": "readiness", "amount": -1 } ],
-    "effect": { "kind": "readyExtraTurn", "power": 0, "targeting": "otherCombatant" }
-  },
-  {
-    "id": "expose",
-    "name": "Expose",
-    "description": "Opens one enemy's guard: every hit on it lands half again as hard for three of its turns. Placeholder: the developer writes the real skill.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillHex.wav",
-    "effect": {
-      "kind": "grantStatus", "power": 0, "targeting": "singleEnemy",
-      "statuses": [ { "status": "exposed_2", "turns": 3 } ]
-    }
-  },
-  {
-    "id": "eldritch_bolt",
-    "name": "Eldritch Bolt",
-    "description": "A bolt of raw force at one enemy that opens its guard for two of its turns. Builds instability. Placeholder: the developer writes the real spell.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillDark.wav",
-    "resourceChanges": [ { "resourceId": "instability", "amount": 2 } ],
-    "effect": {
-      "kind": "damage", "damageType": "dark", "power": 0, "tier": "dark_1", "targeting": "singleEnemy",
-      "statuses": [ { "status": "exposed_1", "turns": 2 } ]
-    }
-  },
-  {
-    "id": "void_rift",
-    "name": "Void Rift",
-    "description": "Tears the air around every enemy. Needs some instability, and builds more. Placeholder: the developer writes the real spell.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillDark.wav",
-    "resourceChanges": [ { "resourceId": "instability", "amount": 3 } ],
-    "requirements": [ { "resourceId": "instability", "atLeast": 4 } ],
-    "effect": { "kind": "damage", "damageType": "dark", "power": 0, "tier": "dark_1", "targeting": "allEnemies" }
-  },
-  {
-    "id": "chaos_lance",
-    "name": "Chaos Lance",
-    "description": "A lance of chaos at one enemy. Needs a lot of instability, and builds more. Placeholder: the developer writes the real spell.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillDark.wav",
-    "resourceChanges": [ { "resourceId": "instability", "amount": 4 } ],
-    "requirements": [ { "resourceId": "instability", "atLeast": 7 } ],
-    "effect": { "kind": "damage", "damageType": "dark", "power": 0, "tier": "dark_3", "targeting": "singleEnemy" }
-  },
-  {
-    "id": "enfeeble",
-    "name": "Enfeeble",
-    "description": "Saps one enemy's strength for three of its turns. Feeds instability. Placeholder: the developer writes the real spell.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillDark.wav",
-    "resourceChanges": [ { "resourceId": "instability", "amount": 2 } ],
-    "effect": {
-      "kind": "grantStatus", "power": 0, "targeting": "singleEnemy",
-      "statuses": [ { "status": "weakened_1", "turns": 3 } ]
-    }
-  },
-  {
-    "id": "rejuvenate",
-    "name": "Rejuvenate",
-    "description": "Wakes the life in one ally, mending wounds for three of their turns. Feeds Growth. Placeholder: the developer writes the real skill.",
-    "iconFile": "",
-    "soundFile": "PlaceholderSkillMend.wav",
-    "resourceChanges": [ { "resourceId": "growth", "amount": 2 } ],
-    "effect": {
-      "kind": "grantStatus", "power": 0, "targeting": "singleAlly",
-      "statuses": [ { "status": "regen_2", "turns": 3 } ]
-    }
-  },
-  {
-    "id": "rot",
-    "name": "Rot",
-    "description": "Sets a creeping rot in one enemy for three of its turns. Feeds Decay. Placeholder: the developer writes the real skill.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillHex.wav",
-    "resourceChanges": [ { "resourceId": "decay", "amount": 2 } ],
-    "effect": {
-      "kind": "grantStatus", "power": 0, "targeting": "singleEnemy",
-      "statuses": [ { "status": "poison_1", "turns": 3 } ]
-    }
-  },
-  {
-    "id": "equilibrium",
-    "name": "Equilibrium",
-    "description": "Spends Growth and Decay in balance to strike every enemy. Placeholder: the developer writes the real skill.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillSlash.wav",
-    "resourceChanges": [ { "resourceId": "growth", "amount": -3 }, { "resourceId": "decay", "amount": -3 } ],
-    "effect": { "kind": "damage", "damageType": "piercing", "power": 0, "tier": "piercing_2", "targeting": "allEnemies" }
-  },
-  {
-    "id": "palm_strike",
-    "name": "Palm Strike",
-    "description": "Two quick palm blows at one enemy that may leave it reeling for a turn. Placeholder: the developer writes the real skill.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillBlunt.wav",
-    "effect": {
-      "kind": "damage", "damageType": "blunt", "power": 0, "tier": "blunt_1", "targeting": "singleEnemy", "hits": 2,
-      "statuses": [ { "status": "stun", "turns": 1, "chance": 30 } ]
+      "kind": "damage",
+      "power": 0,
+      "targeting": "allEnemies",
+      "damageType": "fire",
+      "tier": "fire_1"
     }
   },
   {
@@ -261,34 +275,326 @@
     "description": "Four blows in a blur at one enemy. Spends chakra. Placeholder: the developer writes the real skill.",
     "iconFile": "Attack.png",
     "soundFile": "PlaceholderSkillBlunt.wav",
-    "resourceChanges": [ { "resourceId": "chakra", "amount": -3 } ],
-    "effect": { "kind": "damage", "damageType": "blunt", "power": 0, "tier": "blunt_1", "targeting": "singleEnemy", "hits": 4 }
+    "resourceChanges": [
+      {
+        "resourceId": "chakra",
+        "amount": -3
+      }
+    ],
+    "effect": {
+      "kind": "damage",
+      "power": 0,
+      "targeting": "singleEnemy",
+      "hits": 4,
+      "damageType": "blunt",
+      "tier": "blunt_1"
+    }
   },
   {
-    "id": "cleave",
-    "name": "Cleave",
-    "description": "A wide swing that hits the whole party. Placeholder: the developer writes the real skill.",
-    "iconFile": "Attack.png",
-    "soundFile": "PlaceholderSkillSlash.wav",
-    "effect": { "kind": "damage", "damageType": "slashing", "power": 0, "tier": "slashing_1", "targeting": "allEnemies" }
-  },
-  {
-    "id": "field_dressing",
-    "name": "Field Dressing",
-    "description": "Binds one ally's wounds. Placeholder: the developer writes the real skill.",
-    "iconFile": "Attack.png",
+    "id": "heal",
+    "name": "Heal",
+    "description": "Restores HP to one ally.",
+    "iconFile": "",
     "soundFile": "PlaceholderSkillMend.wav",
-    "effect": { "kind": "restoreHp", "power": 0, "tier": "heal_2", "targeting": "singleAlly" }
+    "requirements": [
+      {
+        "resourceId": "faith",
+        "atLeast": 1
+      }
+    ],
+    "effect": {
+      "kind": "restoreHp",
+      "power": 0,
+      "targeting": "singleAlly",
+      "tier": "heal_1"
+    }
   },
   {
-    "id": "crushing_blow",
-    "name": "Crushing Blow",
-    "description": "A heavy blow that may stun. Placeholder: the developer writes the real skill.",
+    "id": "heal_all",
+    "name": "Heal All",
+    "description": "Restores HP to every ally.",
+    "iconFile": "",
+    "soundFile": "PlaceholderSkillMend.wav",
+    "requirements": [
+      {
+        "resourceId": "faith",
+        "atLeast": 4
+      }
+    ],
+    "effect": {
+      "kind": "restoreHp",
+      "power": 0,
+      "targeting": "allAllies",
+      "tier": "heal_2"
+    }
+  },
+  {
+    "id": "meteor",
+    "name": "Meteor",
+    "description": "Calls down a falling star on one enemy. Placeholder: the developer writes the real spell.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillFire.wav",
+    "resourceChanges": [
+      {
+        "resourceId": "mana",
+        "amount": -9
+      }
+    ],
+    "effect": {
+      "kind": "damage",
+      "power": 0,
+      "targeting": "singleEnemy",
+      "damageType": "fire",
+      "tier": "fire_2"
+    }
+  },
+  {
+    "id": "palm_strike",
+    "name": "Palm Strike",
+    "description": "Two quick palm blows at one enemy that may leave it reeling for a turn. Placeholder: the developer writes the real skill.",
     "iconFile": "Attack.png",
     "soundFile": "PlaceholderSkillBlunt.wav",
     "effect": {
-      "kind": "damage", "damageType": "blunt", "power": 0, "tier": "blunt_2", "targeting": "singleEnemy",
-      "statuses": [ { "status": "stun", "turns": 1, "chance": 40 } ]
+      "kind": "damage",
+      "power": 0,
+      "targeting": "singleEnemy",
+      "hits": 2,
+      "damageType": "blunt",
+      "tier": "blunt_1",
+      "statuses": [
+        {
+          "status": "stun",
+          "turns": 1,
+          "chance": 30
+        }
+      ]
+    }
+  },
+  {
+    "id": "power_strike",
+    "name": "Power Strike",
+    "description": "A heavy blow on one enemy. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillSlash.wav",
+    "resourceChanges": [
+      {
+        "resourceId": "stamina",
+        "amount": -2
+      }
+    ],
+    "effect": {
+      "kind": "damage",
+      "power": 0,
+      "targeting": "singleEnemy",
+      "damageType": "slashing",
+      "tier": "slashing_1"
+    }
+  },
+  {
+    "id": "rampage",
+    "name": "Rampage",
+    "description": "A crushing blow on one enemy. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillBlunt.wav",
+    "resourceChanges": [
+      {
+        "resourceId": "ferocity",
+        "amount": -6
+      }
+    ],
+    "effect": {
+      "kind": "damage",
+      "power": 0,
+      "targeting": "singleEnemy",
+      "damageType": "blunt",
+      "tier": "blunt_2"
+    }
+  },
+  {
+    "id": "ready",
+    "name": "Ready",
+    "description": "Take an extra turn right after someone else\u0027s next one. Keeps your turn. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillWard.wav",
+    "resourceChanges": [
+      {
+        "resourceId": "readiness",
+        "amount": -1
+      }
+    ],
+    "isQuick": true,
+    "effect": {
+      "kind": "readyExtraTurn",
+      "power": 0,
+      "targeting": "otherCombatant"
+    }
+  },
+  {
+    "id": "recovery",
+    "name": "Recovery",
+    "description": "Restores its user\u0027s HP, then keeps mending them for two turns.",
+    "iconFile": "",
+    "soundFile": "PlaceholderSkillMend.wav",
+    "requirements": [
+      {
+        "resourceId": "faith",
+        "atLeast": 2
+      }
+    ],
+    "effect": {
+      "kind": "restoreHp",
+      "power": 0,
+      "targeting": "self",
+      "tier": "heal_1",
+      "statuses": [
+        {
+          "status": "regen_1",
+          "turns": 2,
+          "chance": 100
+        }
+      ]
+    }
+  },
+  {
+    "id": "rejuvenate",
+    "name": "Rejuvenate",
+    "description": "Wakes the life in one ally, mending wounds for three of their turns. Feeds Growth. Placeholder: the developer writes the real skill.",
+    "iconFile": "",
+    "soundFile": "PlaceholderSkillMend.wav",
+    "resourceChanges": [
+      {
+        "resourceId": "growth",
+        "amount": 2
+      }
+    ],
+    "effect": {
+      "kind": "grantStatus",
+      "power": 0,
+      "targeting": "singleAlly",
+      "statuses": [
+        {
+          "status": "regen_2",
+          "turns": 3,
+          "chance": 100
+        }
+      ]
+    }
+  },
+  {
+    "id": "rot",
+    "name": "Rot",
+    "description": "Sets a creeping rot in one enemy for three of its turns. Feeds Decay. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillHex.wav",
+    "resourceChanges": [
+      {
+        "resourceId": "decay",
+        "amount": 2
+      }
+    ],
+    "effect": {
+      "kind": "grantStatus",
+      "power": 0,
+      "targeting": "singleEnemy",
+      "statuses": [
+        {
+          "status": "poison_1",
+          "turns": 3,
+          "chance": 100
+        }
+      ]
+    }
+  },
+  {
+    "id": "shield_bash",
+    "name": "Shield Bash",
+    "description": "Strikes one enemy with the shield and stuns it for a turn. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillBlunt.wav",
+    "resourceChanges": [
+      {
+        "resourceId": "stamina",
+        "amount": -3
+      }
+    ],
+    "effect": {
+      "kind": "damage",
+      "power": 0,
+      "targeting": "singleEnemy",
+      "damageType": "blunt",
+      "tier": "blunt_1",
+      "statuses": [
+        {
+          "status": "stun",
+          "turns": 1,
+          "chance": 60
+        }
+      ]
+    }
+  },
+  {
+    "id": "smite",
+    "name": "Smite",
+    "description": "A holy blow on one enemy. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillLight.wav",
+    "resourceChanges": [
+      {
+        "resourceId": "conviction",
+        "amount": -3
+      }
+    ],
+    "effect": {
+      "kind": "damage",
+      "power": 0,
+      "targeting": "singleEnemy",
+      "damageType": "light",
+      "tier": "light_2"
+    }
+  },
+  {
+    "id": "taunt",
+    "name": "Taunt",
+    "description": "Draws every enemy\u0027s attacks for two turns. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillShout.wav",
+    "effect": {
+      "kind": "grantStatus",
+      "power": 0,
+      "targeting": "self",
+      "statuses": [
+        {
+          "status": "taunt",
+          "turns": 2,
+          "chance": 100
+        }
+      ]
+    }
+  },
+  {
+    "id": "void_rift",
+    "name": "Void Rift",
+    "description": "Tears the air around every enemy. Needs some instability, and builds more. Placeholder: the developer writes the real spell.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillDark.wav",
+    "resourceChanges": [
+      {
+        "resourceId": "instability",
+        "amount": 3
+      }
+    ],
+    "requirements": [
+      {
+        "resourceId": "instability",
+        "atLeast": 4
+      }
+    ],
+    "effect": {
+      "kind": "damage",
+      "power": 0,
+      "targeting": "allEnemies",
+      "damageType": "dark",
+      "tier": "dark_1"
     }
   },
   {
@@ -298,8 +604,42 @@
     "iconFile": "Attack.png",
     "soundFile": "PlaceholderSkillShout.wav",
     "effect": {
-      "kind": "grantStatus", "power": 0, "targeting": "allAllies",
-      "statuses": [ { "status": "guard_2", "turns": 2 } ]
+      "kind": "grantStatus",
+      "power": 0,
+      "targeting": "allAllies",
+      "statuses": [
+        {
+          "status": "guard_2",
+          "turns": 2,
+          "chance": 100
+        }
+      ]
+    }
+  },
+  {
+    "id": "wide_aura",
+    "name": "Wide Aura",
+    "description": "Guards everyone up to two places away for three turns. Placeholder: the developer writes the real skill.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillWard.wav",
+    "resourceChanges": [
+      {
+        "resourceId": "conviction",
+        "amount": -6
+      }
+    ],
+    "effect": {
+      "kind": "grantStatus",
+      "power": 0,
+      "targeting": "alliesInRange",
+      "range": 2,
+      "statuses": [
+        {
+          "status": "guard_1",
+          "turns": 3,
+          "chance": 100
+        }
+      ]
     }
   }
 ]

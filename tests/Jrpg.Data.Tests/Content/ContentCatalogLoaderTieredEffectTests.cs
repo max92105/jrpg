@@ -5,10 +5,11 @@ using Jrpg.Data.Content;
 namespace Jrpg.Data.Tests.Content;
 
 // effects.json loads first and a skill's effect names a record by id, resolved as skills.json is read (decision 789),
-// on a copy of the repository's content with Fire Blast's tier changed here.
+// on a copy of the repository's content with Fire Blast's tier changed here: the one skill naming fire_1 and granting a
+// status after it.
 public sealed class ContentCatalogLoaderTieredEffectTests : IDisposable
 {
-    private const string FireBlastTier = "\"power\": 0, \"tier\": \"fire_1\", \"targeting\": \"singleEnemy\",";
+    private const string FireBlastTier = "\"tier\": \"fire_1\",\r\n      \"statuses\"";
 
     private readonly CopiedContentRoot _content = new("tiered-effects", "content");
 
@@ -67,5 +68,5 @@ public sealed class ContentCatalogLoaderTieredEffectTests : IDisposable
     }
 
     private void NameTier(string id) =>
-        _content.Replace("skills.json", FireBlastTier, $"\"power\": 0, \"tier\": \"{id}\", \"targeting\": \"singleEnemy\",");
+        _content.Replace("skills.json", FireBlastTier, $"\"tier\": \"{id}\",\r\n      \"statuses\"");
 }

@@ -3,6 +3,7 @@ using Jrpg.Core.Battle;
 using Jrpg.Core.Cinematics;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Events;
+using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Quests;
 using Jrpg.Core.Skills;
@@ -59,6 +60,19 @@ internal static class AbsentWhenNullFilter
 
         // Decision 710: a skill without its own strip plays its user's.
         (typeof(SkillDefinition), "effectFile"),
+
+        // A consumable has an effect, gear its equipment, a material neither (decision 339).
+        (typeof(ItemDefinition), "effect"),
+        (typeof(ItemDefinition), "equipment"),
+
+        // ADR 0031: an item nobody trades has no price.
+        (typeof(ItemDefinition), "price"),
+
+        // Decision 678: an item without its own strip plays its user's.
+        (typeof(ItemDefinition), "effectFile"),
+
+        // ADR 0027: only a weapon has a type.
+        (typeof(EquipmentStats), "damageType"),
 
         // ADR 0027: only a damage effect has a type.
         (typeof(Effect), "damageType"),

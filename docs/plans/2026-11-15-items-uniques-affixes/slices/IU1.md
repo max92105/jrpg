@@ -59,3 +59,6 @@ no item or affix change writes them byte for byte. No page yet: the writer's tes
 ## Verify by hand
 - Run the editor, change nothing, Save all: `git status` shows no content change.
 - Database > Shops..., change nothing that touches items, Save all: `items.json` and `affixes.json` unchanged.
+- **Done, with deviations:** `RulesFile` became `internal` too (`CheckItems` names it); `items.json` is written with
+  row 7's reference converters, as an item's effect may grant a status (`..._ItemGrantingAStatus_WritesTheStatusId`);
+  the relay escapes a description's plus sign, as `skills.json` has it.

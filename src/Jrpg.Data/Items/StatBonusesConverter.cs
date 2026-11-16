@@ -9,6 +9,8 @@ namespace Jrpg.Data.Items;
 /// <summary>
 /// Reads an item's <c>"bonuses": { "power": 5, "fireResistance": 10 }</c> into Core's <see cref="StatBonuses"/>, which
 /// carries no JSON attributes (ADR 0002): each stat by its camelCase name, an unknown or repeated one refused by name.
+/// Writes them back in <see cref="StatKind"/> order, since a frozen dictionary keeps none and a save must lay out an
+/// unchanged item byte for byte (decision 862).
 /// </summary>
 internal sealed class StatBonusesConverter : JsonConverter<StatBonuses>
 {
@@ -49,7 +51,7 @@ internal sealed class StatBonusesConverter : JsonConverter<StatBonuses>
     public override void Write(Utf8JsonWriter writer, StatBonuses value, JsonSerializerOptions options)
     {
         writer.WriteStartObject();
-        foreach (var (kind, bonus) in value.Values)
+        foreach (var (kind, bonus) in value.Values.OrderBy(entry => entry.Key))
         {
             writer.WriteNumber(_names[kind], bonus);
         }

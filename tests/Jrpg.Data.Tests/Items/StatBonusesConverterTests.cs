@@ -43,6 +43,17 @@ public sealed class StatBonusesConverterTests
         Assert.Equal(bonuses, JsonSerializer.Deserialize<StatBonuses>(json, ContentJsonOptions.Strict));
     }
 
+    // A frozen dictionary keeps no order, so the written order must come from the converter (decision 862).
+    [Fact]
+    public void Write_BonusesBuiltOutOfKindOrder_WritesThemInKindOrder()
+    {
+        var outOfOrder = new Dictionary<StatKind, int> { [StatKind.FireResistance] = 10, [StatKind.Constitution] = 3 };
+
+        var json = JsonSerializer.Serialize(new StatBonuses(outOfOrder), ContentJsonOptions.Strict);
+
+        Assert.Equal("""{"constitution":3,"fireResistance":10}""", json);
+    }
+
     [Fact]
     public void Read_NotAnObject_Throws()
     {

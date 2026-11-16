@@ -1,12 +1,13 @@
 using System.Text.Json.Serialization.Metadata;
 using Jrpg.Core.Battle;
+using Jrpg.Core.Items;
 using Jrpg.Core.Skills;
 
 namespace Jrpg.Data.Content;
 
 /// <summary>
-/// Leaves a flag off by default out of a file while it is false, so an enemy or a skill the editor writes reads like a
-/// hand-written one (decisions 586, 973) and only the records the developer turned it on in carry it.
+/// Leaves a flag off by default out of a file while it is false, so an enemy, a skill or an item the editor writes
+/// reads like a hand-written one (decisions 586, 973, 862) and only the records the developer turned it on in carry it.
 /// </summary>
 internal static class AbsentWhenFalseFilter
 {
@@ -23,6 +24,9 @@ internal static class AbsentWhenFalseFilter
 
         // Decision 202: only a few skills keep their user's turn.
         (typeof(SkillDefinition), "isQuick"),
+
+        // Decision 339: only a crafting material is one.
+        (typeof(ItemDefinition), "isMaterial"),
     ];
 
     public static void SkipFalseOptionalFields(JsonTypeInfo typeInfo) =>

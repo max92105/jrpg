@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization.Metadata;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
+using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Sprites;
 using Jrpg.Core.Statuses;
@@ -32,6 +33,8 @@ internal static class AbsentWhenZeroFilter
         (typeof(EffectStripDefinition), "hitFrame"),
         // Decision 973: only an effect on the allies in range reads its range.
         (typeof(Effect), "range"),
+        // Decision 330: only a weapon swings.
+        (typeof(EquipmentStats), "damage"),
     ];
 
     public static void SkipZeroOptionalFields(JsonTypeInfo typeInfo) =>

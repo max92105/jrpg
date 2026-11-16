@@ -1,43 +1,19 @@
 [
   {
-    "id": "potion",
-    "name": "Potion",
-    "description": "Restores a small amount of HP.",
-    "iconFile": "Consumable.png",
+    "id": "amber_amulet",
+    "name": "Amber Amulet",
+    "description": "Warm amber on a cord: \u002B5 Will, \u002B10 % Fire resistance.",
+    "iconFile": "Armor.png",
     "maxStack": 99,
-    "price": 20,
-    "isUsableFromMenu": true,
-    "effect": { "kind": "restoreHp", "power": 15, "targeting": "singleAlly" }
-  },
-  {
-    "id": "camp_kit",
-    "name": "Camp Kit",
-    "description": "Rests the party.",
-    "iconFile": "Consumable.png",
-    "maxStack": 9,
-    "price": 100,
-    "isUsableFromMenu": true,
-    "effect": { "kind": "rest", "power": 0, "targeting": "allAllies" }
-  },
-  {
-    "id": "hi_potion",
-    "name": "Hi-Potion",
-    "description": "Restores a medium amount of HP.",
-    "iconFile": "Consumable.png",
-    "maxStack": 99,
-    "price": 60,
-    "isUsableFromMenu": true,
-    "effect": { "kind": "restoreHp", "power": 50, "targeting": "singleAlly" }
-  },
-  {
-    "id": "elixir",
-    "name": "Elixir",
-    "description": "Restores 100 HP.",
-    "iconFile": "Consumable.png",
-    "maxStack": 99,
-    "price": 200,
-    "isUsableFromMenu": true,
-    "effect": { "kind": "restoreHp", "power": 100, "targeting": "singleAlly" }
+    "isUsableFromMenu": false,
+    "equipment": {
+      "kind": "amulet",
+      "bonuses": {
+        "will": 5,
+        "fireResistance": 10
+      }
+    },
+    "price": 200
   },
   {
     "id": "bomb",
@@ -45,10 +21,15 @@
     "description": "Damage an enemy.",
     "iconFile": "Consumable.png",
     "maxStack": 99,
-    "price": 40,
-    "effectFile": "FireExplosion.png",
     "isUsableFromMenu": false,
-    "effect": { "kind": "damage", "damageType": "fire", "power": 15, "targeting": "singleEnemy" }
+    "effect": {
+      "kind": "damage",
+      "power": 15,
+      "targeting": "singleEnemy",
+      "damageType": "fire"
+    },
+    "price": 40,
+    "effectFile": "FireExplosion.png"
   },
   {
     "id": "bomb_all",
@@ -56,19 +37,14 @@
     "description": "Damage all enemies.",
     "iconFile": "Consumable.png",
     "maxStack": 99,
-    "price": 90,
     "isUsableFromMenu": false,
-    "effect": { "kind": "damage", "damageType": "fire", "power": 30, "targeting": "allEnemies" }
-  },
-  {
-    "id": "revive_feather",
-    "name": "Revive Feather",
-    "description": "Revives all fallen allies.",
-    "iconFile": "Consumable.png",
-    "maxStack": 99,
-    "price": 150,
-    "isUsableFromMenu": true,
-    "effect": { "kind": "revive", "power": 15, "targeting": "allFallenAllies" }
+    "effect": {
+      "kind": "damage",
+      "power": 30,
+      "targeting": "allEnemies",
+      "damageType": "fire"
+    },
+    "price": 90
   },
   {
     "id": "bronze_sword",
@@ -76,39 +52,27 @@
     "description": "Sword made of bronze",
     "iconFile": "Weapon.png",
     "maxStack": 99,
-    "price": 100,
     "isUsableFromMenu": false,
-    "equipment": { "kind": "weapon", "damage": 24, "damageType": "slashing" }
+    "equipment": {
+      "kind": "weapon",
+      "damage": 24,
+      "damageType": "slashing"
+    },
+    "price": 100
   },
   {
-    "id": "iron_sword",
-    "name": "Iron Sword",
-    "description": "Sword made of iron",
-    "iconFile": "Weapon.png",
-    "maxStack": 99,
-    "price": 250,
-    "isUsableFromMenu": false,
-    "equipment": { "kind": "weapon", "damage": 30, "damageType": "slashing" }
-  },
-  {
-    "id": "magic_staff",
-    "name": "Magic Staff",
-    "description": "",
-    "iconFile": "Weapon.png",
-    "maxStack": 99,
-    "price": 220,
-    "isUsableFromMenu": false,
-    "equipment": { "kind": "weapon", "damage": 20, "damageType": "blunt", "bonuses": { "intelligence": 3 } }
-  },
-  {
-    "id": "leather_armor",
-    "name": "Leather Armor",
-    "description": "",
-    "iconFile": "Armor.png",
-    "maxStack": 99,
-    "price": 120,
-    "isUsableFromMenu": false,
-    "equipment": { "kind": "chest", "bonuses": { "constitution": 2, "bluntResistance": 5, "piercingResistance": 5, "slashingResistance": 5 } }
+    "id": "camp_kit",
+    "name": "Camp Kit",
+    "description": "Rests the party.",
+    "iconFile": "Consumable.png",
+    "maxStack": 9,
+    "isUsableFromMenu": true,
+    "effect": {
+      "kind": "rest",
+      "power": 0,
+      "targeting": "allAllies"
+    },
+    "price": 100
   },
   {
     "id": "chain_mail",
@@ -116,99 +80,207 @@
     "description": "",
     "iconFile": "Armor.png",
     "maxStack": 99,
-    "price": 300,
     "isUsableFromMenu": false,
-    "equipment": { "kind": "chest", "bonuses": { "constitution": 3, "bluntResistance": 5, "piercingResistance": 10, "slashingResistance": 15 } }
+    "equipment": {
+      "kind": "chest",
+      "bonuses": {
+        "constitution": 3,
+        "bluntResistance": 5,
+        "piercingResistance": 10,
+        "slashingResistance": 15
+      }
+    },
+    "price": 300
   },
   {
-    "id": "wizard_robe",
-    "name": "Wizard Robe",
+    "id": "elixir",
+    "name": "Elixir",
+    "description": "Restores 100 HP.",
+    "iconFile": "Consumable.png",
+    "maxStack": 99,
+    "isUsableFromMenu": true,
+    "effect": {
+      "kind": "restoreHp",
+      "power": 100,
+      "targeting": "singleAlly"
+    },
+    "price": 200
+  },
+  {
+    "id": "essence",
+    "name": "Essence",
+    "description": "A shimmer drawn out of enchanted gear.",
+    "iconFile": "Item.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "isMaterial": true
+  },
+  {
+    "id": "hi_potion",
+    "name": "Hi-Potion",
+    "description": "Restores a medium amount of HP.",
+    "iconFile": "Consumable.png",
+    "maxStack": 99,
+    "isUsableFromMenu": true,
+    "effect": {
+      "kind": "restoreHp",
+      "power": 50,
+      "targeting": "singleAlly"
+    },
+    "price": 60
+  },
+  {
+    "id": "iron_sword",
+    "name": "Iron Sword",
+    "description": "Sword made of iron",
+    "iconFile": "Weapon.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": {
+      "kind": "weapon",
+      "damage": 30,
+      "damageType": "slashing"
+    },
+    "price": 250
+  },
+  {
+    "id": "leather_armor",
+    "name": "Leather Armor",
     "description": "",
     "iconFile": "Armor.png",
     "maxStack": 99,
-    "price": 180,
     "isUsableFromMenu": false,
-    "equipment": { "kind": "chest", "bonuses": { "will": 3, "fireResistance": 10, "iceResistance": 10, "lightningResistance": 10 } }
-  },
-  {
-    "id": "wooden_shield",
-    "name": "Wooden Shield",
-    "description": "A round shield that turns a little of every blow: +8 % to the three physical resistances.",
-    "iconFile": "Armor.png",
-    "maxStack": 99,
-    "price": 80,
-    "isUsableFromMenu": false,
-    "equipment": { "kind": "offHand", "bonuses": { "bluntResistance": 8, "piercingResistance": 8, "slashingResistance": 8 } }
-  },
-  {
-    "id": "leather_cap",
-    "name": "Leather Cap",
-    "description": "A stiff leather cap: +5 Constitution.",
-    "iconFile": "Armor.png",
-    "maxStack": 99,
-    "price": 60,
-    "isUsableFromMenu": false,
-    "equipment": { "kind": "head", "bonuses": { "constitution": 5 } }
-  },
-  {
-    "id": "leather_gloves",
-    "name": "Leather Gloves",
-    "description": "Supple gloves for a surer grip: +5 % accuracy.",
-    "iconFile": "Armor.png",
-    "maxStack": 99,
-    "price": 60,
-    "isUsableFromMenu": false,
-    "equipment": { "kind": "hands", "bonuses": { "accuracy": 5 } }
+    "equipment": {
+      "kind": "chest",
+      "bonuses": {
+        "constitution": 2,
+        "bluntResistance": 5,
+        "piercingResistance": 5,
+        "slashingResistance": 5
+      }
+    },
+    "price": 120
   },
   {
     "id": "leather_boots",
     "name": "Leather Boots",
-    "description": "Light boots for quick feet: +5 speed, +5 % dodge.",
+    "description": "Light boots for quick feet: \u002B5 speed, \u002B5 % dodge.",
     "iconFile": "Armor.png",
     "maxStack": 99,
-    "price": 60,
     "isUsableFromMenu": false,
-    "equipment": { "kind": "feet", "bonuses": { "speed": 5, "dodge": 5 } }
+    "equipment": {
+      "kind": "feet",
+      "bonuses": {
+        "speed": 5,
+        "dodge": 5
+      }
+    },
+    "price": 60
   },
   {
-    "id": "amber_amulet",
-    "name": "Amber Amulet",
-    "description": "Warm amber on a cord: +5 Will, +10 % Fire resistance.",
+    "id": "leather_cap",
+    "name": "Leather Cap",
+    "description": "A stiff leather cap: \u002B5 Constitution.",
     "iconFile": "Armor.png",
     "maxStack": 99,
-    "price": 200,
     "isUsableFromMenu": false,
-    "equipment": { "kind": "amulet", "bonuses": { "will": 5, "fireResistance": 10 } }
+    "equipment": {
+      "kind": "head",
+      "bonuses": {
+        "constitution": 5
+      }
+    },
+    "price": 60
+  },
+  {
+    "id": "leather_gloves",
+    "name": "Leather Gloves",
+    "description": "Supple gloves for a surer grip: \u002B5 % accuracy.",
+    "iconFile": "Armor.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": {
+      "kind": "hands",
+      "bonuses": {
+        "accuracy": 5
+      }
+    },
+    "price": 60
+  },
+  {
+    "id": "magic_staff",
+    "name": "Magic Staff",
+    "description": "",
+    "iconFile": "Weapon.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": {
+      "kind": "weapon",
+      "damage": 20,
+      "bonuses": {
+        "intelligence": 3
+      },
+      "damageType": "blunt"
+    },
+    "price": 220
+  },
+  {
+    "id": "potion",
+    "name": "Potion",
+    "description": "Restores a small amount of HP.",
+    "iconFile": "Consumable.png",
+    "maxStack": 99,
+    "isUsableFromMenu": true,
+    "effect": {
+      "kind": "restoreHp",
+      "power": 15,
+      "targeting": "singleAlly"
+    },
+    "price": 20
   },
   {
     "id": "power_ring",
     "name": "Power Ring",
-    "description": "A heavy iron band: +5 Power.",
+    "description": "A heavy iron band: \u002B5 Power.",
     "iconFile": "Armor.png",
     "maxStack": 99,
-    "price": 250,
     "isUsableFromMenu": false,
-    "equipment": { "kind": "ring", "bonuses": { "power": 5 } }
+    "equipment": {
+      "kind": "ring",
+      "bonuses": {
+        "power": 5
+      }
+    },
+    "price": 250
+  },
+  {
+    "id": "revive_feather",
+    "name": "Revive Feather",
+    "description": "Revives all fallen allies.",
+    "iconFile": "Consumable.png",
+    "maxStack": 99,
+    "isUsableFromMenu": true,
+    "effect": {
+      "kind": "revive",
+      "power": 15,
+      "targeting": "allFallenAllies"
+    },
+    "price": 150
   },
   {
     "id": "sage_ring",
     "name": "Sage Ring",
-    "description": "A ring etched with old script: +5 Intelligence.",
+    "description": "A ring etched with old script: \u002B5 Intelligence.",
     "iconFile": "Armor.png",
     "maxStack": 99,
-    "price": 250,
     "isUsableFromMenu": false,
-    "equipment": { "kind": "ring", "bonuses": { "intelligence": 5 } }
-  },
-  {
-    "id": "swift_ring",
-    "name": "Swift Ring",
-    "description": "A thin silver ring, light as air: +5 Agility.",
-    "iconFile": "Armor.png",
-    "maxStack": 99,
-    "price": 250,
-    "isUsableFromMenu": false,
-    "equipment": { "kind": "ring", "bonuses": { "agility": 5 } }
+    "equipment": {
+      "kind": "ring",
+      "bonuses": {
+        "intelligence": 5
+      }
+    },
+    "price": 250
   },
   {
     "id": "scrap",
@@ -220,12 +292,53 @@
     "isMaterial": true
   },
   {
-    "id": "essence",
-    "name": "Essence",
-    "description": "A shimmer drawn out of enchanted gear.",
-    "iconFile": "Item.png",
+    "id": "swift_ring",
+    "name": "Swift Ring",
+    "description": "A thin silver ring, light as air: \u002B5 Agility.",
+    "iconFile": "Armor.png",
     "maxStack": 99,
     "isUsableFromMenu": false,
-    "isMaterial": true
+    "equipment": {
+      "kind": "ring",
+      "bonuses": {
+        "agility": 5
+      }
+    },
+    "price": 250
+  },
+  {
+    "id": "wizard_robe",
+    "name": "Wizard Robe",
+    "description": "",
+    "iconFile": "Armor.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": {
+      "kind": "chest",
+      "bonuses": {
+        "will": 3,
+        "fireResistance": 10,
+        "iceResistance": 10,
+        "lightningResistance": 10
+      }
+    },
+    "price": 180
+  },
+  {
+    "id": "wooden_shield",
+    "name": "Wooden Shield",
+    "description": "A round shield that turns a little of every blow: \u002B8 % to the three physical resistances.",
+    "iconFile": "Armor.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": {
+      "kind": "offHand",
+      "bonuses": {
+        "bluntResistance": 8,
+        "piercingResistance": 8,
+        "slashingResistance": 8
+      }
+    },
+    "price": 80
   }
 ]

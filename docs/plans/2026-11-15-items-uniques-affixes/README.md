@@ -1,5 +1,5 @@
 # Items, uniques and affixes (editor push, roadmap row 9)
-Status: approved
+Status: approved, in progress
 
 Drafted on 2026-11-15 from roadmap row 9 of [the editor push](../2026-11-15-editor-push/README.md), its design.md
 section 3.9, and the developer's words: "for item I want to be able to create base item. Item will have base stats then
@@ -98,7 +98,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 slices run; IU5 is optional and IU16 merged into IU15.
 
 ### Phase 1: the writer takes over the files
-- [ ] **IU1. The writer writes `items.json` and `affixes.json`, relaid once in its layout** (Data + content, about 200
+- [x] **IU1. The writer writes `items.json` and `affixes.json`, relaid once in its layout** (Data + content, about 200
   lines plus the two relaid files) → [slices/IU1.md](slices/IU1.md)
 
 ### Phase 2: uniques in the game

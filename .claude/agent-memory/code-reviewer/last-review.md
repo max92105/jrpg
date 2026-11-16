@@ -5,17 +5,20 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-enemy-behavior, slice EB9 (reactions: WasHit/WasCriticallyHit/WasHitOnWeakness, TacticMemory,
-TacticMemoryNotes at the end of Execute, HealCandidates narrowing per decision 835). 2026-11-16. Round 1.
-Verdict: Ready to commit (no Critical, no Warning).
+Plan 2026-11-15-enemy-behavior, slice EB10 (once per battle: TacticMemory.HasUsed/NoteUsed,
+TacticMemoryNotes.NoteOwnTurn, EnemyAction.IsOncePerBattle, EnemyTactics.IsUsedUp, Data validator + AbsentWhenFalse
+row, editor check box; TacticRuleRowTests split). 2026-11-16. Round 1. Verdict: Ready to commit (no Critical, no
+Warning).
 
-- Suggestion (open, optional): TacticConditionShape.cs:3 summary still says only "names ... and which number it
-  reads"; add "and whether it answers what was done to the enemy" (IsReaction).
-- Suggestion (open, optional): TacticMemoryNotes.Note could return right after ForgetReactions for an enemy actor
-  (no foe hit can land in an enemy's call); the Target.Side != actor.Side filter then reads as "a member's action".
-- Dropped (in backlog.md): TacticRuleRowTests at 280 lines (EB8's follow-up).
-- Checked, no finding: a Stun-skipped turn never reaches Execute (TurnFlow advances past it), so it keeps the
-  reactions (test covers); EffectLanding.cs:102 is the only EffectApplied producer, so status ticks/lifesteal never
-  note; a fallen hitter is dropped by legal.Intersect in TacticTargetCandidates.SubjectsAmong; the taunt replaces the
-  Subject candidates in EnemyTargeting.ForRule (decision 838, tested with a failed shrug-off roll); TacticMemory never
-  iterates its dictionary (determinism); BattleState.cs 285 lines recorded in the slice note.
+- Suggestion (open, optional): EnemyOncePerBattleTests ChooseCommand_OnceRuleInAPhaseAfterUseBeforeThePhase - assert
+  the member's Execute returned an EnemyPhaseEntered for the actor; without it the test also passes if the phase is
+  never entered (the base list's once cleave is used up too).
+- Suggestion (open, optional): TacticMemory.HasUsed/NoteUsed have no summary while NoteReaction/ForgetReactions do;
+  one line "by skill id, through any rule (decision 842)" on HasUsed.
+- EB9 carried: TacticConditionShape summary now names IsReaction (fixed); early-return suggestion in
+  TacticMemoryNotes.Note dropped (declined, NoteOwnTurn now holds the enemy's part).
+- Checked, no finding: every SkillCommand that reaches Execute is noted, a miss, a backfire and a ReadyExtraTurn skill
+  included (UseSkill throws before any event on an unusable skill, so Execute never notes a refused one); a quick
+  skill notes before the same turn's next pick; the split moved all 11 sentence/notice tests + the theory unchanged;
+  writer fixture Power 5 is decision 787's rule (EnemyCatalogValidator:33) and touches no other assertion; the
+  AbsentWhenFalse row is covered by ContentWriterRepositoryTests' identical-bytes test.

@@ -28,3 +28,6 @@ changed this window and its code-behind since 2026-11-15).
 ## Verify by hand
 Agents may run it (the stills are generated art). The script: "Database>Cinematics...: opened". In the editor: Play,
 then Esc while it plays: no error box, no `RenderTick` report; the focus point still picks on the picture (row 4).
+- **Done, with deviations:** `CanApply` removed (the window was its only reader): its test renamed
+  `Problem_PictureEmptied_NamesTheCinematicAndStill`, two `PropertyChanged_CanApply_...` tests now assert `Problem`; the
+  tests' `_window` and `window` renamed `catalog`; the F1 heading reads "Cinematics page"; the test file is 165 lines.

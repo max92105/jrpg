@@ -15,8 +15,7 @@ namespace Jrpg.Editor.Shell;
 /// <summary>
 /// The Database menu's dispatch: an entry's title runs its opener (decision 938), which edits its catalog of the draft
 /// at the main window's size (decision 930); OK applies the whole session as one undo step (ADR 0045, decision 591).
-/// Quests..., Shops..., Drop tables..., Effect strips... and Enemies... open a page in the catalog dialog;
-/// Cinematics... still opens its own window.
+/// Each entry opens a page in the catalog dialog.
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -130,17 +129,15 @@ internal sealed partial class MainWindow
             return;
         }
 
-        var edited = cinematicEditing.Start();
         var artRoot = _viewModel.ArtRoot;
-        var window = new CinematicCatalogWindow(edited, LoadPicture) { Owner = this };
-        DialogBounds.FitTo(window, this);
-        if (window.ShowDialog() == true)
-        {
-            cinematicEditing.Apply(edited);
-        }
+        OpenInDialog(
+            "Cinematics",
+            cinematicEditing.Start,
+            cinematicEditing.Apply,
+            edited => new CinematicCatalogPage(edited, LoadPicture));
 
         BitmapSource? LoadPicture(string file) =>
-            SpriteImageFile.LoadAtWidth(artRoot, ArtFolders.Cinematics, file, (int)CinematicCatalogWindow.PreviewWidth);
+            SpriteImageFile.LoadAtWidth(artRoot, ArtFolders.Cinematics, file, (int)CinematicCatalogPage.PreviewWidth);
     }
 
     private void OpenEffectStrips()

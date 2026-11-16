@@ -1,15 +1,9 @@
-<Window x:Class="Jrpg.Editor.Cinematics.CinematicCatalogWindow"
-        x:ClassModifier="internal"
-        Style="{StaticResource EditorWindow}"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:Jrpg.Editor.Cinematics"
-        Title="Cinematics"
-        Width="1100"
-        Height="720"
-        WindowStartupLocation="CenterOwner"
-        ShowInTaskbar="False">
-  <Window.Resources>
+<UserControl x:Class="Jrpg.Editor.Cinematics.CinematicCatalogPage"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Jrpg.Editor.Cinematics">
+  <UserControl.Resources>
     <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
     <local:FocusMarkerMarginConverter x:Key="FocusMarkerMargin" />
     <Style x:Key="FieldLabel" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
@@ -20,13 +14,8 @@
       <Setter Property="Orientation" Value="Horizontal" />
       <Setter Property="Margin" Value="0,4,0,0" />
     </Style>
-  </Window.Resources>
-  <DockPanel Margin="12">
-    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
-      <Button Content="OK" Width="80" IsDefault="True" Click="OnOkClicked" IsEnabled="{Binding CanApply}" />
-      <Button Content="Cancel" Width="80" Margin="8,0,0,0" IsCancel="True" />
-    </StackPanel>
-    <TextBlock DockPanel.Dock="Bottom" Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Margin="0,8,0,0" Text="{Binding Problem}" />
+  </UserControl.Resources>
+  <DockPanel>
     <TextBlock DockPanel.Dock="Bottom" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap" Margin="0,8,0,0" Text="{Binding MissingNote}"
                ToolTip="Saved as named; the game won't start until the files are there" />
 
@@ -55,7 +44,7 @@
         <StackPanel Style="{StaticResource FieldRow}">
           <TextBlock Text="Music" Style="{StaticResource FieldLabel}" />
           <ComboBox Width="240"
-                    ItemsSource="{Binding DataContext.Choices.Tracks, RelativeSource={RelativeSource AncestorType=Window}}"
+                    ItemsSource="{Binding DataContext.Choices.Tracks, RelativeSource={RelativeSource AncestorType=local:CinematicCatalogPage}}"
                     SelectedItem="{Binding MusicFile}"
                     ToolTip="The track under the whole cinematic; the empty entry keeps the map's" />
         </StackPanel>
@@ -67,7 +56,7 @@
         <StackPanel DockPanel.Dock="Bottom" Margin="0,4,0,0">
           <StackPanel Orientation="Horizontal">
             <ComboBox Width="230"
-                      ItemsSource="{Binding DataContext.Choices.Pictures, RelativeSource={RelativeSource AncestorType=Window}}"
+                      ItemsSource="{Binding DataContext.Choices.Pictures, RelativeSource={RelativeSource AncestorType=local:CinematicCatalogPage}}"
                       SelectedItem="{Binding ImageToAdd}" />
             <Button Content="Add still" Width="80" Margin="4,0,0,0" Command="{Binding AddStillCommand}" ToolTip="After the chosen still" />
           </StackPanel>
@@ -87,7 +76,7 @@
           <StackPanel Style="{StaticResource FieldRow}">
             <TextBlock Text="Picture" Style="{StaticResource FieldLabel}" />
             <ComboBox Width="300" IsEditable="True"
-                      ItemsSource="{Binding DataContext.Choices.Pictures, RelativeSource={RelativeSource AncestorType=Window}}"
+                      ItemsSource="{Binding DataContext.Choices.Pictures, RelativeSource={RelativeSource AncestorType=local:CinematicCatalogPage}}"
                       Text="{Binding ImageFile, UpdateSourceTrigger=PropertyChanged}" />
           </StackPanel>
           <StackPanel Style="{StaticResource FieldRow}">
@@ -115,7 +104,7 @@
           <StackPanel Style="{StaticResource FieldRow}">
             <TextBlock Text="Voice" Style="{StaticResource FieldLabel}" />
             <ComboBox Width="300" IsEditable="True"
-                      ItemsSource="{Binding DataContext.Choices.Voices, RelativeSource={RelativeSource AncestorType=Window}}"
+                      ItemsSource="{Binding DataContext.Choices.Voices, RelativeSource={RelativeSource AncestorType=local:CinematicCatalogPage}}"
                       Text="{Binding VoiceFile, UpdateSourceTrigger=PropertyChanged}"
                       ToolTip="Starts with the still and speaks on until the next voice; empty for none" />
           </StackPanel>
@@ -130,7 +119,7 @@
             <TextBlock Text="{Binding FocusText}" Foreground="{StaticResource MutedTextBrush}" VerticalAlignment="Center" />
             <Button Content="Clear focus" Margin="12,0,0,0" Command="{Binding ClearFocusCommand}" ToolTip="The zoom heads to the center again" />
           </StackPanel>
-          <Grid Width="{x:Static local:CinematicCatalogWindow.PreviewWidth}" Height="{x:Static local:CinematicCatalogWindow.PreviewHeight}" HorizontalAlignment="Left" Margin="0,12,0,0" Background="Black" ClipToBounds="True">
+          <Grid Width="{x:Static local:CinematicCatalogPage.PreviewWidth}" Height="{x:Static local:CinematicCatalogPage.PreviewHeight}" HorizontalAlignment="Left" Margin="0,12,0,0" Background="Black" ClipToBounds="True">
             <!-- The chosen still: a click sets where its zoom heads (decision 753); transparent, so an empty frame takes it. -->
             <Grid Background="Transparent" Cursor="Cross" MouseLeftButtonDown="OnStillPictureClicked" ToolTip="Click to choose where the zoom heads">
               <TextBlock Text="No picture to show" Foreground="{StaticResource MutedTextBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -153,7 +142,7 @@
                  is on this frame-filling grid, not the image, which UniformToFill can make larger than the frame; at
                  100 % or more it still covers the frame, and it takes any click while it shows (decision 753). -->
             <Grid Background="Black"
-                  DataContext="{Binding DataContext.Preview, RelativeSource={RelativeSource AncestorType=Window}}"
+                  DataContext="{Binding DataContext.Preview, RelativeSource={RelativeSource AncestorType=local:CinematicCatalogPage}}"
                   Visibility="{Binding IsPlaying, Converter={StaticResource VisibleWhenTrue}}"
                   RenderTransformOrigin="{Binding ZoomOrigin}">
               <Grid.RenderTransform>
@@ -164,16 +153,16 @@
             </Grid>
           </Grid>
         </StackPanel>
-        <StackPanel DataContext="{Binding DataContext.Preview, RelativeSource={RelativeSource AncestorType=Window}}" Margin="0,4,0,0">
-          <TextBlock Text="{Binding Caption}" TextWrapping="Wrap" Width="{x:Static local:CinematicCatalogWindow.PreviewWidth}" HorizontalAlignment="Left" TextAlignment="Center" />
+        <StackPanel DataContext="{Binding DataContext.Preview, RelativeSource={RelativeSource AncestorType=local:CinematicCatalogPage}}" Margin="0,4,0,0">
+          <TextBlock Text="{Binding Caption}" TextWrapping="Wrap" Width="{x:Static local:CinematicCatalogPage.PreviewWidth}" HorizontalAlignment="Left" TextAlignment="Center" />
           <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-            <Button Content="Play" Width="60" Command="{Binding DataContext.PlayCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+            <Button Content="Play" Width="60" Command="{Binding DataContext.PlayCommand, RelativeSource={RelativeSource AncestorType=local:CinematicCatalogPage}}"
                     ToolTip="From the chosen still, silent; any box typed stops it" />
-            <Button Content="Stop" Width="60" Margin="4,0,0,0" Command="{Binding DataContext.StopCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+            <Button Content="Stop" Width="60" Margin="4,0,0,0" Command="{Binding DataContext.StopCommand, RelativeSource={RelativeSource AncestorType=local:CinematicCatalogPage}}" />
             <TextBlock Text="{Binding TimeLine}" Foreground="{StaticResource MutedTextBrush}" VerticalAlignment="Center" Margin="12,0,0,0" />
           </StackPanel>
         </StackPanel>
       </StackPanel>
     </DockPanel>
   </DockPanel>
-</Window>
+</UserControl>

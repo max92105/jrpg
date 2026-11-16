@@ -1,9 +1,9 @@
 namespace Jrpg.Editor.Cinematics;
 
 /// <summary>
-/// The pictures, voice lines and tracks the Cinematics window's boxes offer (ADR 0046) and the voice lines' lengths,
-/// read through the shell's lookups when the window opens. A name the folders lack is kept and saved (decision 442):
-/// <see cref="MissingOf"/> says which, for the window's note; the game's startup refuses it.
+/// The pictures, voice lines and tracks the Cinematics page's boxes offer (ADR 0046) and the voice lines' lengths, read
+/// through the shell's lookups when the page opens. A name the folders lack is kept and saved (decision 442):
+/// <see cref="MissingOf"/> says which, for the page's note; the game's startup refuses it.
 /// </summary>
 internal sealed class CinematicMediaChoices
 {

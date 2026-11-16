@@ -3,7 +3,7 @@ using Jrpg.Editor.Cinematics;
 
 namespace Jrpg.Editor.Tests.Cinematics;
 
-// One still as the Cinematics window types it (ADR 0046): the boxes from a record and back, and the box that can't be
+// One still as the Cinematics page types it (ADR 0046): the boxes from a record and back, and the box that can't be
 // read, named by the still's number.
 public sealed class CinematicStillRowTests
 {

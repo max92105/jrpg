@@ -7,15 +7,16 @@ using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Events;
 using Jrpg.Editor.Objects;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Cinematics;
 
 /// <summary>
-/// Every cinematic as the Cinematics window edits it (ADR 0046): the draft's cinematics in id order, the ones added
-/// this session after them, each added under the id typed in the box; only an added one can be removed (as decision 581
+/// Every cinematic as the Cinematics page edits it (ADR 0046): the draft's cinematics in id order, the ones added this
+/// session after them, each added under the id typed in the box; only an added one can be removed (as decision 581
 /// keeps a shop). <see cref="Problem"/> is a cinematic's own problem first, then Data's message for the whole list.
 /// </summary>
-internal sealed partial class CinematicCatalogViewModel : ObservableObject
+internal sealed partial class CinematicCatalogViewModel : ObservableObject, IEditedCatalog
 {
     /// <param name="cinematics">The draft's cinematics as they are.</param>
     /// <param name="choices">The pictures, voices and tracks the boxes offer.</param>
@@ -71,11 +72,13 @@ internal sealed partial class CinematicCatalogViewModel : ObservableObject
             ? $"Not in the folders: {string.Join(", ", missing)}."
             : "";
 
-    /// <summary>Whether OK may apply the session: no problem shows.</summary>
-    public bool CanApply => Problem is null;
+    public string? ChosenKey => SelectedCinematic?.Id;
+
+    public void Choose(string key) =>
+        SelectedCinematic = Cinematics.FirstOrDefault(cinematic => cinematic.Id == key) ?? SelectedCinematic;
 
     /// <exception cref="InvalidOperationException">
-    /// There is a <see cref="Problem"/>; the window applies only without one.
+    /// There is a <see cref="Problem"/>; the page's host applies only without one.
     /// </exception>
     public IReadOnlyList<CinematicDefinition> ToCinematics() =>
         Problem is { } problem
@@ -151,14 +154,13 @@ internal sealed partial class CinematicCatalogViewModel : ObservableObject
 
     private void OnCinematicStillsChanged(object? sender, EventArgs e) => RaiseProblemChanged();
 
-    // The problem line and OK's state read the same thing; the taken ids change with the list and its typed ids. A
+    // The taken ids change with the list and its typed ids, so the new id's problem is read again with the line's. A
     // preview playing what was typed before stops.
     private void RaiseProblemChanged()
     {
         Preview.Stop();
         PlayCommand.NotifyCanExecuteChanged();
         OnPropertyChanged(nameof(Problem));
-        OnPropertyChanged(nameof(CanApply));
         OnPropertyChanged(nameof(NewIdProblem));
         OnPropertyChanged(nameof(MissingNote));
         AddCinematicCommand.NotifyCanExecuteChanged();

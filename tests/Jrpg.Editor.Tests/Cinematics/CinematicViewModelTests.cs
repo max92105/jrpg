@@ -3,7 +3,7 @@ using Jrpg.Editor.Cinematics;
 
 namespace Jrpg.Editor.Tests.Cinematics;
 
-// One cinematic as the Cinematics window edits it (ADR 0046): its stills added, removed and moved, numbered from 1, and
+// One cinematic as the Cinematics page edits it (ADR 0046): its stills added, removed and moved, numbered from 1, and
 // the first thing that keeps it from being built.
 public sealed class CinematicViewModelTests
 {

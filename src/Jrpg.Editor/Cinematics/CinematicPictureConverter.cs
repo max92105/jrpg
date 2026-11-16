@@ -5,9 +5,9 @@ using System.Windows.Media.Imaging;
 namespace Jrpg.Editor.Cinematics;
 
 /// <summary>
-/// The chosen still's picture for the Cinematics window's preview (ADR 0046): decoded once per file through the shell's
-/// lookup while the window is open, null when the folder lacks it or it can't be read, so the window shows its note
-/// instead (decision 442).
+/// The chosen still's picture for the Cinematics page's preview (ADR 0046): decoded once per file through the shell's
+/// lookup while the page is shown, null when the folder lacks it or it can't be read, so the page shows its note in its
+/// place (decision 442).
 /// </summary>
 /// <param name="load">Decodes a picture under the cinematics folder by its name there; null when it can't.</param>
 internal sealed class CinematicPictureConverter(Func<string, BitmapSource?> load) : IValueConverter

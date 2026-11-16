@@ -4,7 +4,7 @@ using System.Text;
 namespace Jrpg.Data.Audio;
 
 /// <summary>
-/// A WAV file's playing length from its header, for the Cinematics window's timing line (decision 620); the game never
+/// A WAV file's playing length from its header, for the Cinematics page's timing line (decision 620); the game never
 /// reads it. The RIFF chunks are walked, others skipped, until the <c>fmt </c> chunk's byte rate and the <c>data</c>
 /// chunk's size are both known.
 /// </summary>

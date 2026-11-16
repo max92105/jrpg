@@ -75,3 +75,5 @@ Agents may run steps 1-5 (Shops, Quests, Enemies, Drop tables, Effect strips and
 5. Enemies: the idle loop plays; switch to Effect strips: it plays; World and back: the same page and record, focus in
    the page.
 6. **The developer's:** the Character sprites page (Mana Seed art), through NPCs > Character sprites and the list.
+- **Note from WD7:** the Cinematics page's `Unloaded` stops the clock but leaves `Preview.IsPlaying` true; once a page
+  is hidden and shown again, it comes back frozen mid-play: `Unloaded` should also call `Preview.Stop()` (WD7 review).

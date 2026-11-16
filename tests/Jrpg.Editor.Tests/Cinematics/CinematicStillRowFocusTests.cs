@@ -3,7 +3,7 @@ using Jrpg.Editor.Cinematics;
 
 namespace Jrpg.Editor.Tests.Cinematics;
 
-// A still's focus as the Cinematics window edits it (decisions 749, 750, 753, 754): kept from the record and written
+// A still's focus as the Cinematics page edits it (decisions 749, 750, 753, 754): kept from the record and written
 // back, set from shares of the preview frame as whole percents clamped to the picture, cleared, named in a line, and
 // counted as a typed change. On a still zooming 100 to 120 % toward 30 %, 62 %, built here.
 public sealed class CinematicStillRowFocusTests

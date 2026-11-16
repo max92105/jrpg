@@ -6,9 +6,9 @@ using Jrpg.Core.Cinematics;
 namespace Jrpg.Editor.Cinematics;
 
 /// <summary>
-/// The Cinematics window's Play (decision 620): a cinematic on the preview's own clock, the still at each moment faded,
+/// The Cinematics page's Play (decision 620): a cinematic on the preview's own clock, the still at each moment faded,
 /// zoomed about its focus and subtitled by Core's rules (decisions 629, 751), as the game shows it; silent, the editor
-/// plays no audio. Stopped, it shows nothing of its own, and the window shows the chosen still.
+/// plays no audio. Stopped, it shows nothing of its own, and the page shows the chosen still.
 /// </summary>
 internal sealed partial class CinematicPreview : ObservableObject
 {

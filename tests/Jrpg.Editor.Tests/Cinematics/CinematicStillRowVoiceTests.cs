@@ -64,14 +64,14 @@ public sealed class CinematicStillRowVoiceTests
         Assert.Contains(nameof(CinematicStillRow.IsShorterThanVoice), raised);
     }
 
-    // The window's choices reach a row the list already holds and one added later.
+    // The page's choices reach a row the list already holds and one added later.
     [Fact]
     public void VoiceLengthOf_FromTheWindowsChoices_ReachesEveryRow()
     {
-        var window = new CinematicCatalogViewModel(
+        var catalog = new CinematicCatalogViewModel(
             [new CinematicDefinition { Id = "intro", Stills = [_voiced] }],
             new CinematicMediaChoices(() => ["intro/1.png"], () => ["intro_1.wav", "short.wav"], () => [], LengthOf));
-        var intro = window.Cinematics[0];
+        var intro = catalog.Cinematics[0];
         intro.ImageToAdd = "intro/1.png";
         intro.AddStillCommand.Execute(null);
         intro.Stills[1].VoiceFile = "short.wav";

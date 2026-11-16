@@ -3,8 +3,8 @@ using Jrpg.Editor.Cinematics;
 
 namespace Jrpg.Editor.Tests.Cinematics;
 
-// What the Cinematics window's boxes offer, from lookups the test gives, and the names a cinematic gives that the
-// folders lack (decision 442: kept and saved, the game's start refuses them).
+// What the Cinematics page's boxes offer, from lookups the test gives, and the names a cinematic gives that the folders
+// lack (decision 442: kept and saved, the game's start refuses them).
 public sealed class CinematicMediaChoicesTests
 {
     private static readonly CinematicMediaChoices _choices = new(
@@ -59,7 +59,7 @@ public sealed class CinematicMediaChoicesTests
         Assert.Equal(TimeSpan.FromSeconds(3), _choices.VoiceLengthOf("intro_1.wav"));
     }
 
-    // Windows would open Intro_1.wav as intro_1.wav; the game's start refuses it, so the window says it isn't there.
+    // Windows would open Intro_1.wav as intro_1.wav; the game's start refuses it, so the page says it isn't there.
     [Fact]
     public void VoiceLengthOf_NameInAnotherCase_IsNull()
     {

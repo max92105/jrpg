@@ -10,7 +10,7 @@ using Jrpg.Editor.Objects;
 namespace Jrpg.Editor.Cinematics;
 
 /// <summary>
-/// One cinematic as the Cinematics window edits it (ADR 0046): its id (typed while the cinematic is new, fixed once the
+/// One cinematic as the Cinematics page edits it (ADR 0046): its id (typed while the cinematic is new, fixed once the
 /// draft holds it), its track and its still rows in the order they show, numbered from 1, added after the chosen one
 /// from the picture box, removed and moved. <see cref="Problem"/> is the typed id's, a missing still or a row's box
 /// that can't be read; the rest is Data's, shown by the list. <see cref="StillsChanged"/> tells the list of each change
@@ -60,7 +60,7 @@ internal sealed partial class CinematicViewModel : ObservableObject
 
     /// <summary>
     /// A voice line's playing length by its name (decision 620), handed to every row for its timing line; the list sets
-    /// it from the window's choices.
+    /// it from the page's choices.
     /// </summary>
     [ObservableProperty]
     public partial Func<string, TimeSpan?> VoiceLengthOf { get; set; } = _ => null;

@@ -7,9 +7,9 @@ using Jrpg.Editor.Catalogs;
 namespace Jrpg.Editor.Cinematics;
 
 /// <summary>
-/// One still as the Cinematics window edits it (ADR 0046): its picture, seconds, subtitle, voice and zoom boxes kept as
+/// One still as the Cinematics page edits it (ADR 0046): its picture, seconds, subtitle, voice and zoom boxes kept as
 /// typed, and the point its zoom heads to, set by a click on the picture. <see cref="Problem"/> is only a box that
-/// can't be read; the ranges are Data's rules, which the window's problem line shows for the whole list.
+/// can't be read; the ranges are Data's rules, which the page's problem line shows for the whole list.
 /// </summary>
 internal sealed partial class CinematicStillRow : ObservableObject
 {
@@ -26,7 +26,7 @@ internal sealed partial class CinematicStillRow : ObservableObject
     /// <summary>A typed box changed: what the list's problem line listens to, never the row's own label.</summary>
     public event EventHandler? Changed;
 
-    /// <summary>The still's place from 1, as the window numbers the rows; the list sets it.</summary>
+    /// <summary>The still's place from 1, as the page numbers the rows; the list sets it.</summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
     public partial int Number { get; set; }
@@ -52,7 +52,7 @@ internal sealed partial class CinematicStillRow : ObservableObject
 
     /// <summary>
     /// A voice line's playing length by its name in the voices folder, null when it can't be read (decision 620); the
-    /// list sets it from the window's choices, as it sets <see cref="Number"/>. No length is known until then.
+    /// list sets it from the page's choices, as it sets <see cref="Number"/>. No length is known until then.
     /// </summary>
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(VoiceLengthText), nameof(IsShorterThanVoice))]
@@ -93,8 +93,8 @@ internal sealed partial class CinematicStillRow : ObservableObject
         : "voice not found";
 
     /// <summary>
-    /// The still ends before its voice does, which the window shows in the warning color: the voice runs on over the
-    /// next still by design (decision 613), the color only says so.
+    /// The still ends before its voice does, which the page shows in the warning color: the voice runs on over the next
+    /// still by design (decision 613), the color only says so.
     /// </summary>
     public bool IsShorterThanVoice =>
         VoiceFile.Trim() is { Length: > 0 } voice

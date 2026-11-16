@@ -100,7 +100,7 @@
         OK: apply, as one change Ctrl+Z undoes in the main window. Esc or Cancel: leave the object as it was.
       </TextBlock>
 
-      <TextBlock Style="{StaticResource Heading}" Text="Cinematics window" />
+      <TextBlock Style="{StaticResource Heading}" Text="Cinematics page" />
       <TextBlock Style="{StaticResource Lines}">
         Click the chosen still's picture: its zoom heads to that point (a gold ring marks it). Clear focus: back to the center. Play shows the zoom as the game does.
       </TextBlock>

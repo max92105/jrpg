@@ -4,7 +4,7 @@ using Jrpg.Editor.Cinematics;
 
 namespace Jrpg.Editor.Tests.Cinematics;
 
-// Play in the Cinematics window (decision 620), on a 2 s still zooming 100 to 110 % toward 25 %, 75 %, then a 3 s one,
+// Play in the Cinematics page (decision 620), on a 2 s still zooming 100 to 110 % toward 25 %, 75 %, then a 3 s one,
 // each subtitled: what shows at each moment of the preview's clock, by Core's fade, zoom and zoom origin.
 public sealed class CinematicPreviewTests
 {

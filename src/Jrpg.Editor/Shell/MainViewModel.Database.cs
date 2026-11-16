@@ -12,9 +12,9 @@ using Jrpg.Editor.Trade;
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// The Database menu's windows over the draft (ADR 0045, decision 583): the shops, the drop tables, the enemies, the
-/// cinematics (ADR 0046) and the effect strips (decision 659), beside the quests; and the image import the Enemies and
-/// Character sprites windows share, through Data, asking first when it would replace an image.
+/// The Database menu's pages over the draft (ADR 0045, decision 583): the shops, the drop tables, the enemies, the
+/// cinematics (ADR 0046) and the effect strips (decision 659), beside the quests; and the image import the Enemies page
+/// and the Character sprites window share, through Data, asking first when it would replace an image.
 /// </summary>
 internal sealed partial class MainViewModel
 {
@@ -25,9 +25,6 @@ internal sealed partial class MainViewModel
     public DropTableEditingViewModel? DropTableEditing { get; }
 
     public CinematicEditingViewModel? CinematicEditing { get; }
-
-    /// <summary>Whether Database > Cinematics... can open its window: false while the content didn't load.</summary>
-    public bool HasCinematicEditing => CinematicEditing is not null;
 
     public EffectStripEditingViewModel? EffectStripEditing { get; }
 
@@ -51,8 +48,8 @@ internal sealed partial class MainViewModel
         return result;
     }
 
-    // Read when the window opens, so a picture or voice line dropped in since the editor started is offered; each
-    // voice's length is read once per window, not on every key typed in the Voice box.
+    // Read when the page opens, so a picture or voice line dropped in since the editor started is offered; each voice's
+    // length is read once per page, not on every key typed in the Voice box.
     private CinematicMediaChoices ReadCinematicMedia()
     {
         var lengths = new Dictionary<string, TimeSpan?>(StringComparer.Ordinal);

@@ -4,7 +4,6 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
-using Jrpg.Core.Statuses;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -15,13 +14,14 @@ namespace Jrpg.Core.Tests.Battle;
 public sealed class BattleStatusScalingTests
 {
     private static readonly SkillDefinition _rot =
-        Skill("rot", new Effect(EffectKind.GrantStatus, 0, Targeting.SingleEnemy, new StatusGrant(StatusKind.Poison, Power: 10, Turns: 3)));
+        Skill("rot", TestStatuses.Granting(
+            new Effect(EffectKind.GrantStatus, 0, Targeting.SingleEnemy), TestStatuses.Poison(10, 3)));
 
     private static readonly SkillDefinition _bash =
-        Skill("bash", new Effect(EffectKind.Damage, 13, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 60, Turns: 1)));
+        Skill("bash", TestStatuses.Granting(new Effect(EffectKind.Damage, 13, Targeting.SingleEnemy), TestStatuses.Stun(60, 1)));
 
     private static readonly SkillDefinition _brace =
-        Skill("brace", new Effect(EffectKind.GrantStatus, 0, Targeting.Self, new StatusGrant(StatusKind.Stun, Power: 100, Turns: 1)));
+        Skill("brace", TestStatuses.Granting(new Effect(EffectKind.GrantStatus, 0, Targeting.Self), TestStatuses.Stun(100, 1)));
 
     // 20 Intelligence at 100 % per 100 points: the rot's 10 becomes 12.
     [Fact]
@@ -33,7 +33,7 @@ public sealed class BattleStatusScalingTests
 
         battle.Execute(new SkillCommand(_rot, [goblin]));
 
-        Assert.Equal(12, goblin.Statuses.Active.Single().Power);
+        Assert.Equal(12, TestStatuses.AmountOf(goblin.Statuses.Active.Single()));
     }
 
     // 25 Intelligence at one extra turn per 25: the rot lasts 4 turns.
@@ -46,7 +46,9 @@ public sealed class BattleStatusScalingTests
 
         var events = battle.Execute(new SkillCommand(_rot, [goblin]));
 
-        Assert.Contains(new StatusApplied(goblin, StatusKind.Poison, 4), events);
+        Assert.Contains(
+            events.OfType<StatusApplied>(),
+            applied => (applied.Target, TestStatuses.IdOf(applied.Status), applied.Turns) == (goblin, TestStatuses.PoisonId, 4));
     }
 
     // The same Intelligence adds nothing to a stun's turn (decision 317); at 200 % the chance passes 100, so it draws
@@ -60,7 +62,9 @@ public sealed class BattleStatusScalingTests
 
         var events = battle.Execute(new SkillCommand(_bash, [goblin]));
 
-        Assert.Contains(new StatusApplied(goblin, StatusKind.Stun, 1), events);
+        Assert.Contains(
+            events.OfType<StatusApplied>(),
+            applied => (applied.Target, TestStatuses.IdOf(applied.Status), applied.Turns) == (goblin, TestStatuses.StunId, 1));
     }
 
     // 60 % less the goblin's 30 % is a 30 % chance: a draw of 999 loses it.
@@ -73,9 +77,11 @@ public sealed class BattleStatusScalingTests
 
         var events = battle.Execute(new SkillCommand(_bash, [goblin]));
 
-        Assert.Contains(new StatusResisted(goblin, StatusKind.Stun), events);
+        Assert.Contains(
+            events.OfType<StatusResisted>(),
+            resisted => (resisted.Target, TestStatuses.IdOf(resisted.Status)) == (goblin, TestStatuses.StunId));
         Assert.DoesNotContain(events, battleEvent => battleEvent is StatusApplied);
-        Assert.False(goblin.Statuses.Has(StatusKind.Stun));
+        Assert.False(goblin.Statuses.Has(TestStatuses.StunId));
     }
 
     [Fact]
@@ -87,7 +93,9 @@ public sealed class BattleStatusScalingTests
 
         var events = battle.Execute(new SkillCommand(_bash, [goblin]));
 
-        Assert.Contains(new StatusApplied(goblin, StatusKind.Stun, 1), events);
+        Assert.Contains(
+            events.OfType<StatusApplied>(),
+            applied => (applied.Target, TestStatuses.IdOf(applied.Status), applied.Turns) == (goblin, TestStatuses.StunId, 1));
     }
 
     // A member's own crowd control resistance counts too: at 100 % the brace's sure stun has no chance, and no draw.
@@ -100,7 +108,9 @@ public sealed class BattleStatusScalingTests
 
         var events = battle.Execute(new SkillCommand(_brace, [monk]));
 
-        Assert.Contains(new StatusResisted(monk, StatusKind.Stun), events);
+        Assert.Contains(
+            events.OfType<StatusResisted>(),
+            resisted => (resisted.Target, TestStatuses.IdOf(resisted.Status)) == (monk, TestStatuses.StunId));
     }
 
     private static Combatant Member(PrimaryStats primaries, StatRules rules, SkillDefinition skill) =>

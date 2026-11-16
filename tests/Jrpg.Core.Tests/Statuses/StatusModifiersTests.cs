@@ -1,5 +1,6 @@
 using Jrpg.Core.Stats;
 using Jrpg.Core.Statuses;
+using Jrpg.Core.Tests.Builders;
 
 namespace Jrpg.Core.Tests.Statuses;
 
@@ -11,7 +12,7 @@ public sealed class StatusModifiersTests
     public void Apply_Guarded_RaisesEveryResistance()
     {
         var statuses = new StatusSet();
-        statuses.Apply(new StatusGrant(StatusKind.Guarded, Power: 20, Turns: 3));
+        statuses.Apply(TestStatuses.Guard(20, 3));
 
         var current = StatusModifiers.Apply(_stats with { Resistances = Resistances.None with { Fire = 100 } }, statuses);
 
@@ -23,7 +24,7 @@ public sealed class StatusModifiersTests
     public void Apply_GuardedPastCap_StopsAtCap()
     {
         var statuses = new StatusSet();
-        statuses.Apply(new StatusGrant(StatusKind.Guarded, Power: 20, Turns: 3));
+        statuses.Apply(TestStatuses.Guard(20, 3));
 
         var current = StatusModifiers.Apply(_stats with { Resistances = Resistances.None with { Fire = 700 } }, statuses);
 
@@ -42,7 +43,7 @@ public sealed class StatusModifiersTests
     public void ExtraDamageTakenPercent_Exposed_IsItsPower()
     {
         var statuses = new StatusSet();
-        statuses.Apply(new StatusGrant(StatusKind.Exposed, Power: 50, Turns: 3));
+        statuses.Apply(TestStatuses.Exposed(50, 3));
 
         var extra = StatusModifiers.ExtraDamageTakenPercent(statuses);
 

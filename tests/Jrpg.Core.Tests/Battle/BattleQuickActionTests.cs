@@ -4,7 +4,6 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
-using Jrpg.Core.Statuses;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -49,7 +48,7 @@ public sealed class BattleQuickActionTests
     public void Execute_QuickSkill_NoUpkeepRuns()
     {
         var (battle, goblin) = Battle(goblinHp: 25);
-        _rogue.Statuses.Apply(new StatusGrant(StatusKind.Guarded, Power: 5, Turns: 2));
+        _rogue.Statuses.Apply(TestStatuses.Guard(5, 2));
         _rogue.Statuses.ClearFreshMarks();
 
         var events = battle.Execute(new SkillCommand(_dash, [goblin]));

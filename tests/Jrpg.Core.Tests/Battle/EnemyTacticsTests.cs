@@ -1,7 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Items;
 using Jrpg.Core.Skills;
-using Jrpg.Core.Statuses;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -130,7 +129,7 @@ public sealed class EnemyTacticsTests
     private static Combatant StubbornGoblin() =>
         Combatant.FromEnemy(new EnemyDefinitionBuilder().WithCrowdControlResistance(50).Build());
 
-    private static void Taunt(Combatant member) => member.Statuses.Apply(new StatusGrant(StatusKind.Taunt, Power: 0, Turns: 2));
+    private static void Taunt(Combatant member) => member.Statuses.Apply(TestStatuses.Taunt(2));
 
     private static EnemyTactics Tactics(params int[] draws) => new(new FixedSequenceRandom(draws), new Dictionary<string, SkillDefinition>());
 

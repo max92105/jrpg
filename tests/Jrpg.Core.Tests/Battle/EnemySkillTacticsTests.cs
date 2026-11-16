@@ -2,7 +2,6 @@ using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
 using Jrpg.Core.Skills;
-using Jrpg.Core.Statuses;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -13,9 +12,11 @@ public sealed class EnemySkillTacticsTests
 {
     private static readonly SkillDefinition _cleave = Skill("cleave", new Effect(EffectKind.Damage, 10, Targeting.AllEnemies));
     private static readonly SkillDefinition _strike = Skill("strike", new Effect(EffectKind.Damage, 7, Targeting.SingleEnemy));
-    private static readonly SkillDefinition _rally = Skill("rally", new Effect(EffectKind.GrantStatus, 0, Targeting.SingleAlly, new StatusGrant(StatusKind.Guarded, Power: 20, Turns: 2)));
+    private static readonly SkillDefinition _rally = Skill(
+        "rally", TestStatuses.Granting(new Effect(EffectKind.GrantStatus, 0, Targeting.SingleAlly), TestStatuses.Guard(20, 2)));
     private static readonly SkillDefinition _revive = Skill("revive", new Effect(EffectKind.Revive, 10, Targeting.SingleFallenAlly));
-    private static readonly SkillDefinition _brace = Skill("brace", new Effect(EffectKind.GrantStatus, 0, Targeting.Self, new StatusGrant(StatusKind.Guarded, Power: 20, Turns: 2)));
+    private static readonly SkillDefinition _brace = Skill(
+        "brace", TestStatuses.Granting(new Effect(EffectKind.GrantStatus, 0, Targeting.Self), TestStatuses.Guard(20, 2)));
     private static readonly Dictionary<string, SkillDefinition> _skills = new[] { _cleave, _strike, _rally, _revive, _brace }.ToDictionary(skill => skill.Id);
 
     private static readonly EnemyAction _attack = new() { Weight = 1 };
@@ -175,7 +176,7 @@ public sealed class EnemySkillTacticsTests
 
     private static SkillDefinition Skill(string id, Effect effect) => new() { Id = id, Name = id, Description = "", IconFile = "", Effect = effect };
 
-    private static void Taunt(Combatant member) => member.Statuses.Apply(new StatusGrant(StatusKind.Taunt, Power: 0, Turns: 2));
+    private static void Taunt(Combatant member) => member.Statuses.Apply(TestStatuses.Taunt(2));
 
     private static Combatant PartyCombatant(string id) => Combatant.FromPartyMember(new PartyMemberBuilder().WithId(id).Build());
 }

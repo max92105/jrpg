@@ -4,7 +4,6 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
-using Jrpg.Core.Statuses;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -100,12 +99,14 @@ public sealed class BattleReadyTests
     {
         _battle.Execute(new SkillCommand(_ready, [_goblinA]));
         _battle.Execute(new DefendCommand());
-        _rogue.Statuses.Apply(new StatusGrant(StatusKind.Stun, Power: 0, Turns: 2));
+        _rogue.Statuses.Apply(TestStatuses.Stun(0, 2));
         _rogue.Statuses.ClearFreshMarks();
 
         var events = _battle.Execute(new DefendCommand());
 
-        Assert.Contains(new TurnSkipped(_rogue, StatusKind.Stun), events);
+        Assert.Contains(
+            events.OfType<TurnSkipped>(),
+            skip => (skip.Combatant, TestStatuses.IdOf(skip.Cause)) == (_rogue, TestStatuses.StunId));
         Assert.Same(_goblinB, _battle.CurrentActor);
         Assert.Equal(2, _rogue.Statuses.Active[0].TurnsLeft);
     }

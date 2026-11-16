@@ -43,3 +43,6 @@ kind twice and a bad grant, naming its index. `skills.json` writes `"statuses": 
 ## Verify by hand
 - Run the game, New game, choose Omer, fight the goblins: Fire Blast still leaves its two-turn mark on the goblin (the
   same behavior as before).
+
+- **Note from R1's review:** `EffectScalingTests`'s `Assert.Equal(poison, scaled)` compares whole `Effect` records;
+  once `Statuses` is a list it compares by reference, so compare the list's contents there.

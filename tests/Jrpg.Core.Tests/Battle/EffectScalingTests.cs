@@ -1,7 +1,7 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Stats;
-using Jrpg.Core.Statuses;
+using Jrpg.Core.Tests.Builders;
 
 namespace Jrpg.Core.Tests.Battle;
 
@@ -32,7 +32,8 @@ public sealed class EffectScalingTests
     [Fact]
     public void ScaledFor_GrantStatus_FollowsTheStatusPercentNotTheDamageOne()
     {
-        var poison = new Effect(EffectKind.GrantStatus, 0, Targeting.SingleEnemy, new StatusGrant(StatusKind.Poison, Power: 8, Turns: 3));
+        var poison = TestStatuses.Granting(
+            new Effect(EffectKind.GrantStatus, 0, Targeting.SingleEnemy), TestStatuses.Poison(8, 3));
 
         var scaled = EffectScaling.ScaledFor(poison, TwentyPercentMorePower);
 
@@ -42,11 +43,12 @@ public sealed class EffectScalingTests
     [Fact]
     public void ScaledFor_GrantByCleverUser_ShapesTheGrant()
     {
-        var poison = new Effect(EffectKind.GrantStatus, 0, Targeting.SingleEnemy, new StatusGrant(StatusKind.Poison, Power: 10, Turns: 3));
+        var poison = TestStatuses.Granting(
+            new Effect(EffectKind.GrantStatus, 0, Targeting.SingleEnemy), TestStatuses.Poison(10, 3));
 
         var scaled = EffectScaling.ScaledFor(poison, new CombatStats(0) { StatusPermille = 1500, ExtraStatusTurns = 1 });
 
-        Assert.Equal(new StatusGrant(StatusKind.Poison, Power: 15, Turns: 4), scaled.Status);
+        Assert.Equal(TestStatuses.Poison(15, 4), scaled.Status);
     }
 
     // Decision 784: Power 20 at 200 % damage and a tiered record of 4 per Power give 80; Power's percent would count

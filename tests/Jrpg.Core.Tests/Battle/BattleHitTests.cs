@@ -4,7 +4,6 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
-using Jrpg.Core.Statuses;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -22,7 +21,8 @@ public sealed class BattleHitTests
         Name = "Double Bash",
         Description = "",
         IconFile = "",
-        Effect = new Effect(EffectKind.Damage, 13, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 100, Turns: 2), Hits: 2),
+        Effect = TestStatuses.Granting(
+            new Effect(EffectKind.Damage, 13, Targeting.SingleEnemy, Hits: 2), TestStatuses.Stun(100, 2)),
     };
 
     private static readonly SkillDefinition _shieldBash = new()
@@ -31,7 +31,7 @@ public sealed class BattleHitTests
         Name = "Shield Bash",
         Description = "",
         IconFile = "",
-        Effect = new Effect(EffectKind.Damage, 13, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 100, Turns: 2)),
+        Effect = TestStatuses.Granting(new Effect(EffectKind.Damage, 13, Targeting.SingleEnemy), TestStatuses.Stun(100, 2)),
     };
 
     [Fact]
@@ -78,7 +78,7 @@ public sealed class BattleHitTests
 
         Assert.Contains(new HitMissed(goblin), events);
         Assert.DoesNotContain(events, battleEvent => battleEvent is StatusApplied);
-        Assert.False(goblin.Statuses.Has(StatusKind.Stun));
+        Assert.False(goblin.Statuses.Has(TestStatuses.StunId));
     }
 
     [Fact]
@@ -120,7 +120,9 @@ public sealed class BattleHitTests
         var events = battle.Execute(new SkillCommand(_doubleBash, [goblin]));
 
         Assert.Contains(new HitMissed(goblin), events);
-        Assert.Contains(new StatusApplied(goblin, StatusKind.Stun, 2), events);
+        Assert.Contains(
+            events.OfType<StatusApplied>(),
+            applied => (applied.Target, TestStatuses.IdOf(applied.Status), applied.Turns) == (goblin, TestStatuses.StunId, 2));
     }
 
     private static Combatant NimbleGoblin() => Combatant.FromEnemy(new EnemyDefinitionBuilder().WithDodge(50).Build());

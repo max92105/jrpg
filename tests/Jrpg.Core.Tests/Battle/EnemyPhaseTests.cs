@@ -2,7 +2,6 @@ using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
 using Jrpg.Core.Skills;
-using Jrpg.Core.Statuses;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -107,7 +106,7 @@ public sealed class EnemyPhaseTests
     {
         var boss = Boss(_below50);
         boss.Vitals.TakeDamage(45);
-        boss.Statuses.Apply(new StatusGrant(StatusKind.Poison, Power: 10, Turns: 2));
+        boss.Statuses.Apply(TestStatuses.Poison(10, 2));
         var battle = new BattleState([Member(attack: 10), boss], new Inventory(), new FixedSequenceRandom(0));
 
         var events = battle.Execute(new DefendCommand());
@@ -120,13 +119,14 @@ public sealed class EnemyPhaseTests
     {
         var boss = Boss(_below50);
         boss.Vitals.TakeDamage(45);
-        boss.Statuses.Apply(new StatusGrant(StatusKind.Poison, Power: 10, Turns: 2));
-        boss.Statuses.Apply(new StatusGrant(StatusKind.Stun, Power: 100, Turns: 2));
+        boss.Statuses.Apply(TestStatuses.Poison(10, 2));
+        boss.Statuses.Apply(TestStatuses.Stun(100, 2));
         var battle = MemberFirst(attack: 1, boss);
 
         var events = battle.Execute(new DefendCommand()).ToList();
 
-        var skipped = events.IndexOf(new TurnSkipped(boss, StatusKind.Stun));
+        var skipped = events.FindIndex(battleEvent =>
+            battleEvent is TurnSkipped skip && (skip.Combatant, TestStatuses.IdOf(skip.Cause)) == (boss, TestStatuses.StunId));
         var ticked = events.FindIndex(happened => happened is StatusTicked);
         Assert.InRange(skipped, 0, ticked);
         Assert.Equal(new EnemyPhaseEntered(boss, _below50), events[^1]);
@@ -151,7 +151,7 @@ public sealed class EnemyPhaseTests
     {
         var boss = Boss(_below50);
         var member = Combatant.FromPartyMember(new PartyMemberBuilder().WithAttack(51).WithVitals(hp: 5, maxHp: 100).Build());
-        member.Statuses.Apply(new StatusGrant(StatusKind.Poison, Power: 10, Turns: 2));
+        member.Statuses.Apply(TestStatuses.Poison(10, 2));
         var battle = new BattleState([member, boss], new Inventory(), new FixedSequenceRandom(1));
 
         var events = battle.Execute(new AttackCommand(boss));

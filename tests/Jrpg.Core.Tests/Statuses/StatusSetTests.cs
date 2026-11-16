@@ -1,4 +1,5 @@
 using Jrpg.Core.Statuses;
+using Jrpg.Core.Tests.Builders;
 
 namespace Jrpg.Core.Tests.Statuses;
 
@@ -9,55 +10,64 @@ public sealed class StatusSetTests
     [Fact]
     public void Apply_New_IsActiveAndFresh()
     {
-        _statuses.Apply(new StatusGrant(StatusKind.Stun, Power: 0, Turns: 2));
+        _statuses.Apply(TestStatuses.Stun(0, 2));
 
-        Assert.Equal([new ActiveStatus(StatusKind.Stun, 0, TurnsLeft: 2, IsFresh: true)], _statuses.Active);
-        Assert.True(_statuses.Has(StatusKind.Stun));
+        var status = Assert.Single(_statuses.Active);
+        Assert.Equal(
+            (TestStatuses.StunId, 0, 2, true),
+            (TestStatuses.IdOf(status), TestStatuses.AmountOf(status), status.TurnsLeft, status.IsFresh));
+        Assert.True(_statuses.Has(TestStatuses.StunId));
     }
 
     [Fact]
     public void Apply_SameKindAgain_RefreshesTurnsKeepsStrongerPower()
     {
-        _statuses.Apply(new StatusGrant(StatusKind.Stun, Power: 5, Turns: 3));
+        _statuses.Apply(TestStatuses.Stun(5, 3));
         _statuses.ClearFreshMarks();
         _statuses.CountDown();
 
-        _statuses.Apply(new StatusGrant(StatusKind.Stun, Power: 2, Turns: 3));
+        _statuses.Apply(TestStatuses.Stun(2, 3));
 
-        Assert.Equal([new ActiveStatus(StatusKind.Stun, 5, TurnsLeft: 3, IsFresh: true)], _statuses.Active);
+        var status = Assert.Single(_statuses.Active);
+        Assert.Equal(
+            (TestStatuses.StunId, 5, 3, true),
+            (TestStatuses.IdOf(status), TestStatuses.AmountOf(status), status.TurnsLeft, status.IsFresh));
     }
 
     [Fact]
     public void CountDown_Fresh_ClearsMarkKeepsTurns()
     {
-        _statuses.Apply(new StatusGrant(StatusKind.Stun, Power: 0, Turns: 2));
+        _statuses.Apply(TestStatuses.Stun(0, 2));
 
         var ended = _statuses.CountDown();
 
         Assert.Empty(ended);
-        Assert.Equal([new ActiveStatus(StatusKind.Stun, 0, TurnsLeft: 2, IsFresh: false)], _statuses.Active);
+        var status = Assert.Single(_statuses.Active);
+        Assert.Equal(
+            (TestStatuses.StunId, 0, 2, false),
+            (TestStatuses.IdOf(status), TestStatuses.AmountOf(status), status.TurnsLeft, status.IsFresh));
     }
 
     [Fact]
     public void CountDown_LastTurn_EndsAndReturnsKind()
     {
-        _statuses.Apply(new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1));
+        _statuses.Apply(TestStatuses.Stun(0, 1));
         _statuses.ClearFreshMarks();
 
         var ended = _statuses.CountDown();
 
-        Assert.Equal([StatusKind.Stun], ended);
+        Assert.Equal([TestStatuses.StunId], ended.Select(TestStatuses.IdOf));
         Assert.Empty(_statuses.Active);
     }
 
     [Fact]
     public void Clear_Active_ReturnsItAndEmpties()
     {
-        _statuses.Apply(new StatusGrant(StatusKind.Stun, Power: 0, Turns: 2));
+        _statuses.Apply(TestStatuses.Stun(0, 2));
 
         var cleared = _statuses.Clear();
 
-        Assert.Equal([StatusKind.Stun], cleared);
-        Assert.False(_statuses.Has(StatusKind.Stun));
+        Assert.Equal([TestStatuses.StunId], cleared.Select(TestStatuses.IdOf));
+        Assert.False(_statuses.Has(TestStatuses.StunId));
     }
 }

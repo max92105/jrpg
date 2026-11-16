@@ -4,7 +4,6 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
-using Jrpg.Core.Statuses;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -18,13 +17,15 @@ public sealed class BattleTickingStatusTests
     public void Execute_PoisonedActorEndsTurn_LosesPowerIgnoringResistancesAndExposed()
     {
         var (hero, _, battle) = Battle(goblinHp: 25);
-        hero.Statuses.Apply(new StatusGrant(StatusKind.Guarded, Power: 50, Turns: 3));
-        hero.Statuses.Apply(new StatusGrant(StatusKind.Exposed, Power: 50, Turns: 3));
-        hero.Statuses.Apply(new StatusGrant(StatusKind.Poison, Power: 7, Turns: 3));
+        hero.Statuses.Apply(TestStatuses.Guard(50, 3));
+        hero.Statuses.Apply(TestStatuses.Exposed(50, 3));
+        hero.Statuses.Apply(TestStatuses.Poison(7, 3));
 
         var events = battle.Execute(new DefendCommand());
 
-        Assert.Contains(new StatusTicked(hero, StatusKind.Poison, 7), events);
+        Assert.Contains(
+            events.OfType<StatusTicked>(),
+            ticked => (ticked.Holder, TestStatuses.IdOf(ticked.Status), ticked.Amount) == (hero, TestStatuses.PoisonId, 7));
         Assert.Equal(93, hero.Vitals.Hp);
     }
 
@@ -32,7 +33,7 @@ public sealed class BattleTickingStatusTests
     public void Execute_PoisonFellsLastEnemy_Victory()
     {
         var (hero, goblin, battle) = Battle(goblinHp: 5);
-        goblin.Statuses.Apply(new StatusGrant(StatusKind.Poison, Power: 10, Turns: 3));
+        goblin.Statuses.Apply(TestStatuses.Poison(10, 3));
         battle.Execute(new DefendCommand());
 
         var events = battle.Execute(new AttackCommand(hero));
@@ -53,15 +54,22 @@ public sealed class BattleTickingStatusTests
             new Dictionary<string, SkillDefinition>(),
             TestStatRules.Neutral));
         mage.Vitals.TakeDamage(95);
-        mage.Statuses.Apply(new StatusGrant(StatusKind.Poison, Power: 10, Turns: 3));
+        mage.Statuses.Apply(TestStatuses.Poison(10, 3));
         var battle = new BattleState([mage, Goblin(hp: 25)], new Inventory(), new FixedSequenceRandom(1));
 
         var events = battle.Execute(new DefendCommand()).ToList();
 
-        var tick = events.IndexOf(new StatusTicked(mage, StatusKind.Poison, 5));
-        Assert.Equal(
-            [new CombatantDefeated(mage), new StatusEnded(mage, StatusKind.Poison), new BattleEnded(BattlePhase.Defeat)],
-            events[(tick + 1)..]);
+        var tick = events.FindIndex(battleEvent => battleEvent is StatusTicked ticked
+            && (ticked.Holder, TestStatuses.IdOf(ticked.Status), ticked.Amount) == (mage, TestStatuses.PoisonId, 5));
+        Assert.Collection(
+            events[(tick + 1)..],
+            battleEvent => Assert.Equal(new CombatantDefeated(mage), battleEvent),
+            battleEvent =>
+            {
+                var ended = Assert.IsType<StatusEnded>(battleEvent);
+                Assert.Equal((mage, TestStatuses.PoisonId), (ended.Holder, TestStatuses.IdOf(ended.Status)));
+            },
+            battleEvent => Assert.Equal(new BattleEnded(BattlePhase.Defeat), battleEvent));
         Assert.Equal(3, mage.Resources.AmountOf("mana"));
     }
 
@@ -69,11 +77,13 @@ public sealed class BattleTickingStatusTests
     public void Execute_RegenAtFullHp_ReportsZero()
     {
         var (hero, _, battle) = Battle(goblinHp: 25);
-        hero.Statuses.Apply(new StatusGrant(StatusKind.Regen, Power: 5, Turns: 3));
+        hero.Statuses.Apply(TestStatuses.Regen(5, 3));
 
         var events = battle.Execute(new DefendCommand());
 
-        Assert.Contains(new StatusTicked(hero, StatusKind.Regen, 0), events);
+        Assert.Contains(
+            events.OfType<StatusTicked>(),
+            ticked => (ticked.Holder, TestStatuses.IdOf(ticked.Status), ticked.Amount) == (hero, TestStatuses.RegenId, 0));
     }
 
     [Fact]
@@ -81,11 +91,13 @@ public sealed class BattleTickingStatusTests
     {
         var (hero, _, battle) = Battle(goblinHp: 25);
         hero.Vitals.TakeDamage(20);
-        hero.Statuses.Apply(new StatusGrant(StatusKind.Regen, Power: 5, Turns: 3));
+        hero.Statuses.Apply(TestStatuses.Regen(5, 3));
 
         var events = battle.Execute(new DefendCommand());
 
-        Assert.Contains(new StatusTicked(hero, StatusKind.Regen, 5), events);
+        Assert.Contains(
+            events.OfType<StatusTicked>(),
+            ticked => (ticked.Holder, TestStatuses.IdOf(ticked.Status), ticked.Amount) == (hero, TestStatuses.RegenId, 5));
         Assert.Equal(85, hero.Vitals.Hp);
     }
 
@@ -93,14 +105,17 @@ public sealed class BattleTickingStatusTests
     [Fact]
     public void Execute_StunnedAndPoisoned_TicksOnSkippedTurn()
     {
-        var jab = Skill("jab", new Effect(EffectKind.Damage, 3, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 100, Turns: 1)));
+        var jab = Skill(
+            "jab", TestStatuses.Granting(new Effect(EffectKind.Damage, 3, Targeting.SingleEnemy), TestStatuses.Stun(100, 1)));
         var (_, goblin, battle) = Battle(goblinHp: 25, jab);
-        goblin.Statuses.Apply(new StatusGrant(StatusKind.Poison, Power: 4, Turns: 3));
+        goblin.Statuses.Apply(TestStatuses.Poison(4, 3));
 
         var events = battle.Execute(new SkillCommand(jab, [goblin])).ToList();
 
-        var skipped = events.IndexOf(new TurnSkipped(goblin, StatusKind.Stun));
-        Assert.Equal(new StatusTicked(goblin, StatusKind.Poison, 4), events[skipped + 1]);
+        var skipped = events.FindIndex(battleEvent =>
+            battleEvent is TurnSkipped skip && (skip.Combatant, TestStatuses.IdOf(skip.Cause)) == (goblin, TestStatuses.StunId));
+        var ticked = Assert.IsType<StatusTicked>(events[skipped + 1]);
+        Assert.Equal((goblin, TestStatuses.PoisonId, 4), (ticked.Holder, TestStatuses.IdOf(ticked.Status), ticked.Amount));
         Assert.Equal(18, goblin.Vitals.Hp);
     }
 
@@ -112,7 +127,7 @@ public sealed class BattleTickingStatusTests
         var (hero, goblin, battle) = Battle(goblinHp: 25, ready);
         battle.Execute(new SkillCommand(ready, [goblin]));
         battle.Execute(new DefendCommand());
-        hero.Statuses.Apply(new StatusGrant(StatusKind.Poison, Power: 7, Turns: 3));
+        hero.Statuses.Apply(TestStatuses.Poison(7, 3));
 
         var events = battle.Execute(new DefendCommand());
 
@@ -132,7 +147,7 @@ public sealed class BattleTickingStatusTests
             new Dictionary<string, SkillDefinition>(),
             TestStatRules.Neutral));
         var goblin = Goblin(hp: 5);
-        goblin.Statuses.Apply(new StatusGrant(StatusKind.Poison, Power: 10, Turns: 3));
+        goblin.Statuses.Apply(TestStatuses.Poison(10, 3));
         var battle = new BattleState([paladin, goblin], new Inventory(), new FixedSequenceRandom(1));
         battle.Execute(new DefendCommand());
 

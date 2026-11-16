@@ -1,17 +1,18 @@
 using Jrpg.Core.Statuses;
+using Jrpg.Core.Tests.Builders;
 
 namespace Jrpg.Core.Tests.Statuses;
 
 public sealed class GrantScalingTests
 {
-    private static readonly StatusGrant _poison = new(StatusKind.Poison, Power: 10, Turns: 3);
+    private static readonly StatusGrant _poison = TestStatuses.Poison(10, 3);
 
     [Fact]
     public void Scaled_HundredTwentyPercent_RaisesPower()
     {
         var scaled = GrantScaling.Scaled(_poison, statusPermille: 1200, extraTurns: 0);
 
-        Assert.Equal(12, scaled.Power);
+        Assert.Equal(12, TestStatuses.AmountOf(scaled));
     }
 
     [Fact]
@@ -26,9 +27,9 @@ public sealed class GrantScalingTests
     [Fact]
     public void Scaled_StunWithExtraTurns_KeepsItsTurns()
     {
-        var scaled = GrantScaling.Scaled(new StatusGrant(StatusKind.Stun, Power: 60, Turns: 1), statusPermille: 1200, extraTurns: 2);
+        var scaled = GrantScaling.Scaled(TestStatuses.Stun(60, 1), statusPermille: 1200, extraTurns: 2);
 
-        Assert.Equal(new StatusGrant(StatusKind.Stun, Power: 72, Turns: 1), scaled);
+        Assert.Equal(TestStatuses.Stun(72, 1), scaled);
     }
 
     [Fact]

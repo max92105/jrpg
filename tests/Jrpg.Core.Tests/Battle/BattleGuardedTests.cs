@@ -3,7 +3,6 @@ using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
-using Jrpg.Core.Statuses;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -46,7 +45,7 @@ public sealed class BattleGuardedTests
             Name = "Guard",
             Description = "",
             IconFile = "",
-            Effect = new Effect(EffectKind.GrantStatus, 0, Targeting.Self, new StatusGrant(StatusKind.Guarded, Power: 25, Turns: turns)),
+            Effect = TestStatuses.Granting(new Effect(EffectKind.GrantStatus, 0, Targeting.Self), TestStatuses.Guard(25, turns)),
         };
         var hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithSkills(guard).Build());
         var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 25, damage: 20).Build());

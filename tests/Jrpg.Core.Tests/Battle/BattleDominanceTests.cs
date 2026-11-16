@@ -4,7 +4,6 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
-using Jrpg.Core.Statuses;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -16,10 +15,14 @@ namespace Jrpg.Core.Tests.Battle;
 public sealed class BattleDominanceTests
 {
     private static readonly SkillDefinition _rot = Skill(
-        "rot", new Effect(EffectKind.GrantStatus, 0, Targeting.SingleEnemy, new StatusGrant(StatusKind.Poison, Power: 8, Turns: 3)), new ResourceChange("decay", 2));
+        "rot",
+        TestStatuses.Granting(new Effect(EffectKind.GrantStatus, 0, Targeting.SingleEnemy), TestStatuses.Poison(8, 3)),
+        new ResourceChange("decay", 2));
 
     private static readonly SkillDefinition _rejuvenate = Skill(
-        "rejuvenate", new Effect(EffectKind.GrantStatus, 0, Targeting.SingleAlly, new StatusGrant(StatusKind.Regen, Power: 10, Turns: 3)), new ResourceChange("growth", 2));
+        "rejuvenate",
+        TestStatuses.Granting(new Effect(EffectKind.GrantStatus, 0, Targeting.SingleAlly), TestStatuses.Regen(10, 3)),
+        new ResourceChange("growth", 2));
 
     private static readonly SkillDefinition _thorns = Skill("thorns", new Effect(EffectKind.Damage, 20, Targeting.SingleEnemy), new ResourceChange("decay", 1));
 
@@ -33,7 +36,8 @@ public sealed class BattleDominanceTests
 
         battle.Execute(new SkillCommand(_rot, [goblin]));
 
-        Assert.Equal(12, goblin.Statuses.Active.Single(status => status.Kind == StatusKind.Poison).Power);
+        var poison = goblin.Statuses.Active.Single(status => TestStatuses.IdOf(status) == TestStatuses.PoisonId);
+        Assert.Equal(12, TestStatuses.AmountOf(poison));
         Assert.Equal(4, druid.Resources.AmountOf("decay"));
     }
 
@@ -45,7 +49,7 @@ public sealed class BattleDominanceTests
 
         battle.Execute(new SkillCommand(_rot, [goblin]));
 
-        Assert.Equal(8, goblin.Statuses.Active.Single().Power);
+        Assert.Equal(8, TestStatuses.AmountOf(goblin.Statuses.Active.Single()));
     }
 
     [Fact]
@@ -55,7 +59,7 @@ public sealed class BattleDominanceTests
 
         battle.Execute(new SkillCommand(_rejuvenate, [druid]));
 
-        Assert.Equal(10, druid.Statuses.Active.Single().Power);
+        Assert.Equal(10, TestStatuses.AmountOf(druid.Statuses.Active.Single()));
     }
 
     // Thorns hits for 20, raised to 30 while Decay dominates.

@@ -4,7 +4,6 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
-using Jrpg.Core.Statuses;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -16,16 +15,16 @@ namespace Jrpg.Core.Tests.Battle;
 public sealed class BattleStatusTests
 {
     private static readonly SkillDefinition _bash =
-        Skill("bash", new Effect(EffectKind.Damage, 13, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 100, Turns: 2)));
+        Skill("bash", TestStatuses.Granting(new Effect(EffectKind.Damage, 13, Targeting.SingleEnemy), TestStatuses.Stun(100, 2)));
 
     private static readonly SkillDefinition _jab =
-        Skill("jab", new Effect(EffectKind.Damage, 3, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 100, Turns: 1)));
+        Skill("jab", TestStatuses.Granting(new Effect(EffectKind.Damage, 3, Targeting.SingleEnemy), TestStatuses.Stun(100, 1)));
 
     private static readonly SkillDefinition _quake =
-        Skill("quake", new Effect(EffectKind.Damage, 3, Targeting.AllEnemies, new StatusGrant(StatusKind.Stun, Power: 100, Turns: 1)));
+        Skill("quake", TestStatuses.Granting(new Effect(EffectKind.Damage, 3, Targeting.AllEnemies), TestStatuses.Stun(100, 1)));
 
     private static readonly SkillDefinition _brace =
-        Skill("brace", new Effect(EffectKind.GrantStatus, 0, Targeting.Self, new StatusGrant(StatusKind.Stun, Power: 100, Turns: 2)));
+        Skill("brace", TestStatuses.Granting(new Effect(EffectKind.GrantStatus, 0, Targeting.Self), TestStatuses.Stun(100, 2)));
 
     private readonly Combatant _hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithSkills(_bash, _jab, _quake, _brace).Build());
 
@@ -38,8 +37,9 @@ public sealed class BattleStatusTests
         var events = battle.Execute(new SkillCommand(_bash, [goblin]));
 
         Assert.Equal(new EffectApplied(goblin, EffectKind.Damage, 13), events[1]);
-        Assert.Equal(new StatusApplied(goblin, StatusKind.Stun, 2), events[2]);
-        Assert.True(goblin.Statuses.Has(StatusKind.Stun));
+        var applied = Assert.IsType<StatusApplied>(events[2]);
+        Assert.Equal((goblin, TestStatuses.StunId, 2), (applied.Target, TestStatuses.IdOf(applied.Status), applied.Turns));
+        Assert.True(goblin.Statuses.Has(TestStatuses.StunId));
     }
 
     [Fact]
@@ -62,7 +62,9 @@ public sealed class BattleStatusTests
         var events = battle.Execute(new SkillCommand(_brace, [_hero]));
 
         Assert.DoesNotContain(events, battleEvent => battleEvent is EffectApplied);
-        Assert.Contains(new StatusApplied(_hero, StatusKind.Stun, 2), events);
+        Assert.Contains(
+            events.OfType<StatusApplied>(),
+            applied => (applied.Target, TestStatuses.IdOf(applied.Status), applied.Turns) == (_hero, TestStatuses.StunId, 2));
     }
 
     [Fact]
@@ -72,7 +74,10 @@ public sealed class BattleStatusTests
 
         battle.Execute(new SkillCommand(_brace, [_hero]));
 
-        Assert.Equal([new ActiveStatus(StatusKind.Stun, 100, TurnsLeft: 2, IsFresh: false)], _hero.Statuses.Active);
+        var status = Assert.Single(_hero.Statuses.Active);
+        Assert.Equal(
+            (TestStatuses.StunId, 100, 2, false),
+            (TestStatuses.IdOf(status), TestStatuses.AmountOf(status), status.TurnsLeft, status.IsFresh));
     }
 
     // The second goblin is stunned on the hero's turn; the first goblin's turn in between doesn't count it down.
@@ -87,8 +92,13 @@ public sealed class BattleStatusTests
         var events = battle.Execute(new DefendCommand());
 
         Assert.Equal(2, turnsBeforeHolderTurn);
-        Assert.Contains(new TurnSkipped(second, StatusKind.Stun), events);
-        Assert.Equal([new ActiveStatus(StatusKind.Stun, 100, TurnsLeft: 1, IsFresh: false)], second.Statuses.Active);
+        Assert.Contains(
+            events.OfType<TurnSkipped>(),
+            skip => (skip.Combatant, TestStatuses.IdOf(skip.Cause)) == (second, TestStatuses.StunId));
+        var status = Assert.Single(second.Statuses.Active);
+        Assert.Equal(
+            (TestStatuses.StunId, 100, 1, false),
+            (TestStatuses.IdOf(status), TestStatuses.AmountOf(status), status.TurnsLeft, status.IsFresh));
     }
 
     [Fact]
@@ -101,7 +111,8 @@ public sealed class BattleStatusTests
         var events = battle.Execute(new SkillCommand(_bash, [goblin]));
 
         var fall = events.ToList().IndexOf(new CombatantDefeated(goblin));
-        Assert.Equal(new StatusEnded(goblin, StatusKind.Stun), events[fall + 1]);
+        var ended = Assert.IsType<StatusEnded>(events[fall + 1]);
+        Assert.Equal((goblin, TestStatuses.StunId), (ended.Holder, TestStatuses.IdOf(ended.Status)));
         Assert.Empty(goblin.Statuses.Active);
     }
 
@@ -113,8 +124,13 @@ public sealed class BattleStatusTests
 
         var events = battle.Execute(new SkillCommand(_bash, [goblin]));
 
-        Assert.Contains(new TurnSkipped(goblin, StatusKind.Stun), events);
-        Assert.Equal([new ActiveStatus(StatusKind.Stun, 100, TurnsLeft: 1, IsFresh: false)], goblin.Statuses.Active);
+        Assert.Contains(
+            events.OfType<TurnSkipped>(),
+            skip => (skip.Combatant, TestStatuses.IdOf(skip.Cause)) == (goblin, TestStatuses.StunId));
+        var status = Assert.Single(goblin.Statuses.Active);
+        Assert.Equal(
+            (TestStatuses.StunId, 100, 1, false),
+            (TestStatuses.IdOf(status), TestStatuses.AmountOf(status), status.TurnsLeft, status.IsFresh));
     }
 
     [Fact]
@@ -125,8 +141,10 @@ public sealed class BattleStatusTests
 
         var events = battle.Execute(new SkillCommand(_jab, [goblin])).ToList();
 
-        var skipped = events.IndexOf(new TurnSkipped(goblin, StatusKind.Stun));
-        Assert.Equal(new StatusEnded(goblin, StatusKind.Stun), events[skipped + 1]);
+        var skipped = events.FindIndex(battleEvent =>
+            battleEvent is TurnSkipped skip && (skip.Combatant, TestStatuses.IdOf(skip.Cause)) == (goblin, TestStatuses.StunId));
+        var ended = Assert.IsType<StatusEnded>(events[skipped + 1]);
+        Assert.Equal((goblin, TestStatuses.StunId), (ended.Holder, TestStatuses.IdOf(ended.Status)));
         Assert.Empty(goblin.Statuses.Active);
     }
 
@@ -181,7 +199,9 @@ public sealed class BattleStatusTests
 
         var events = battle.Execute(new DefendCommand());
 
-        Assert.Contains(new TurnSkipped(mage, StatusKind.Stun), events);
+        Assert.Contains(
+            events.OfType<TurnSkipped>(),
+            skip => (skip.Combatant, TestStatuses.IdOf(skip.Cause)) == (mage, TestStatuses.StunId));
         Assert.Equal(7, mage.Resources.AmountOf("mana"));
     }
 
@@ -189,7 +209,8 @@ public sealed class BattleStatusTests
     [Fact]
     public void Execute_SelfTaunt_LastsTwoOwnTurnsAfterCast()
     {
-        var taunt = Skill("taunt", new Effect(EffectKind.GrantStatus, 0, Targeting.Self, new StatusGrant(StatusKind.Taunt, Power: 0, Turns: 2)));
+        var taunt = Skill(
+            "taunt", TestStatuses.Granting(new Effect(EffectKind.GrantStatus, 0, Targeting.Self), TestStatuses.Taunt(2)));
         var hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithSkills(taunt).Build());
         var battle = new BattleState([hero, Goblin(hp: 25)], new Inventory(), new FixedSequenceRandom(1));
         battle.Execute(new SkillCommand(taunt, [hero]));
@@ -199,7 +220,7 @@ public sealed class BattleStatusTests
         {
             battle.Execute(new DefendCommand());
             battle.Execute(new DefendCommand());
-            turnsLeft.Add(hero.Statuses.Has(StatusKind.Taunt));
+            turnsLeft.Add(hero.Statuses.Has(TestStatuses.TauntId));
         }
 
         Assert.Equal([true, false, false], turnsLeft);
@@ -210,7 +231,8 @@ public sealed class BattleStatusTests
     [Fact]
     public void ChooseCommand_AfterSelfTaunt_GoblinAttacksTheTaunter()
     {
-        var taunt = Skill("taunt", new Effect(EffectKind.GrantStatus, 0, Targeting.Self, new StatusGrant(StatusKind.Taunt, Power: 0, Turns: 2)));
+        var taunt = Skill(
+            "taunt", TestStatuses.Granting(new Effect(EffectKind.GrantStatus, 0, Targeting.Self), TestStatuses.Taunt(2)));
         var hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithId("jazog").WithSkills(taunt).Build());
         var ally = Combatant.FromPartyMember(new PartyMemberBuilder().WithId("teelle").Build());
         var battle = new BattleState([ally, hero, Goblin(hp: 25)], new Inventory(), new FixedSequenceRandom(2, 0));
@@ -227,7 +249,7 @@ public sealed class BattleStatusTests
     public void Execute_AttackOnExposed_DealsOneAndAHalf()
     {
         var goblin = Goblin(hp: 40);
-        goblin.Statuses.Apply(new StatusGrant(StatusKind.Exposed, Power: 50, Turns: 3));
+        goblin.Statuses.Apply(TestStatuses.Exposed(50, 3));
         var hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithAttack(13).Build());
         var battle = new BattleState([hero, goblin], new Inventory(), new FixedSequenceRandom(1));
 

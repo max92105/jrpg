@@ -2,7 +2,6 @@ using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
 using Jrpg.Core.Skills;
-using Jrpg.Core.Statuses;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -20,7 +19,8 @@ public sealed class BattleFormationTests
         Name = "Aura",
         Description = "",
         IconFile = "",
-        Effect = new Effect(EffectKind.GrantStatus, 0, Targeting.AlliesInRange, new StatusGrant(StatusKind.Guarded, Power: 5, Turns: 3), Range: 1),
+        Effect = TestStatuses.Granting(
+            new Effect(EffectKind.GrantStatus, 0, Targeting.AlliesInRange, Range: 1), TestStatuses.Guard(5, 3)),
     };
 
     private readonly Combatant _ragnir = Member("ragnir");
@@ -155,7 +155,7 @@ public sealed class BattleFormationTests
 
         battle.Execute(new SkillCommand(_aura, battle.TargetChoiceFor(_aura).Candidates));
 
-        Assert.Equal([true, true, true, false], line.Select(member => member.Statuses.Has(StatusKind.Guarded)));
+        Assert.Equal([true, true, true, false], line.Select(member => member.Statuses.Has(TestStatuses.GuardId)));
     }
 
     // Four members, each knowing the aura (range 1, Guarded +5), then a goblin. The shuffle (4, 3, 2, 1) keeps the

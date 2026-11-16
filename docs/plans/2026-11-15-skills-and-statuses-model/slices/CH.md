@@ -49,3 +49,5 @@ to confirm).
 ## Verify by hand
 - Run the game, Title > New game, choose Ragnir, fight the goblins: Shield Bash stuns sometimes and is resisted
   sometimes, as before.
+
+- **Note from R1:** `TestStatuses.ChanceOf(StatusGrant)` is CH's to add, with its first user.

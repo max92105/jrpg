@@ -5,20 +5,17 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-skill-and-status-editors, slice AN7 (SheetCells.Cut, Catalogs/CellStripImport,
-MainViewModel.ImportCellStrip + ConfirmsReplacing/ReportArtImport, the tool's OK and RefusalText, the page's
-makeStripFromCells + TakeImport). 2026-11-16. Round 1. Verdict: Ready to commit (no Critical).
+Plan 2026-11-15-enemy-behavior, slice EB1 (TacticTarget, TacticTargetCandidates, EnemyAction.On,
+EnemyTargeting.ForRule + TauntingOrAll + HighestShareOf, EnemyTactics HasTarget/CommandAimedBy, AbsentWhenNullFilter
+"on"). 2026-11-16. Round 1. Verdict: Ready to commit (no Critical, no Warning).
 
-- Warning (open): the strip's width (picks x max(cell side)) and height against TextureLimit.MaxSide aren't on the
-  tool's Problem line, so OK stays lit for a strip Data refuses; the refusal arrives after the cut, pad and encode
-  (editor rule: OK greys for every input the apply refuses). Fix: a StripFromCellsViewModel problem reading
-  TextureLimit.MaxSide, tested at MaxSide and MaxSide + 1.
-- Suggestion (open): SheetCellsTests only use a Bgra32 sheet; a Bgr24 or Indexed8 sheet would pin the conversion.
-- Suggestion (open): SheetCells.AreaOf and PreviewFrames.OfCells compute the cell rectangle and its bound two ways.
-- Follow-up: MainViewModel.SheetImport.cs:35-48 keeps its own replace question ("tilesheet art") and report.
-- Checked, no finding: 988 on every path (write at once, Written only on Imported > 0, record through TakeImport);
-  RefusalText cleared only by user-driven VM changes (window only reads _strip; no timer raises); declined replace
-  gives Summary "" so the line stays empty; bindings are UpdateSourceTrigger=PropertyChanged so Enter on IsDefault
-  sees the typed text; catch list matches ArtImageImport's minus InvalidDataException (no decode here).
-- AN6 carried: Decoded copy fixed (SpriteImageFile.Read), script split (172 lines) fixed, TileImages on the shared
-  read fixed, RowAt suggestion dropped (committed slice).
+- Suggestion (open): TauntingOrAll takes taunters from all of `legal`, not legal foes as its comment and decision 838
+  say; filtering `Side != enemy.Side` there would make ForRule's `candidates[0].Side` guess unnecessary. Only reachable
+  with an otherCombatant aim, which EB2's TacticTargetFit refuses.
+- Suggestion (open): LowestShareOf/HighestShareOf multiply int HP by int MaxHp; overflow past MaxHp 46 340 (no cap in
+  Data). HeavyHitRule already widens to long.
+- Checked, no finding: eligibility draws nothing (HasTarget -> TacticTargetCandidates.For -> CombatantsMeeting, pure);
+  ByTauntRule(candidates, candidates) keeps its draws; "among foes by side" correct for every fitting aim (conditions
+  today name only the enemy's side; foe targets fit singleEnemy/attack only); ties keep the first (strict < and >);
+  Combatant is a class so Intersect is by reference; replay test untouched.
+- AN7 items dropped (committed slice).

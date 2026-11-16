@@ -114,7 +114,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/EB3.md](slices/EB3.md)
 - [x] **EB4. One list of rules: add after the chosen one, remove, move; a phase's threshold** (Editor, about 200
   lines) → [slices/EB4.md](slices/EB4.md)
-- [ ] **EB5. An enemy's lists: from the start and each phase, phases added and removed** (Editor, about 170 lines) →
+- [x] **EB5. An enemy's lists: from the start and each phase, phases added and removed** (Editor, about 170 lines) →
   [slices/EB5.md](slices/EB5.md)
 - [ ] **EB6. The Enemies page keeps and applies an enemy's rules; Duplicate copies them** (Editor, about 150 lines) →
   [slices/EB6.md](slices/EB6.md)

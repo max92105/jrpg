@@ -1,68 +1,55 @@
 using System.ComponentModel;
-using Jrpg.Core.Maps;
 using Jrpg.Editor.Battle;
 
 namespace Jrpg.Editor.Tests.Battle;
 
-// What the Effect strips page's preview plays and says, on a four-frame image of 8 x 8 frames looked up by the test.
+// The typed boxes as the Effect strips page's preview reads them, on a four-frame image looked up by the test.
 public sealed class EffectStripPreviewTests
 {
     private const string Burst = "Burst.png";
 
     [Fact]
-    public void PreviewLoop_FourFramesTyped60_IsTheTypedPace()
+    public void FrameMilliseconds_Typed_IsIt()
     {
         var strip = EffectStripViewModel.Unlisted(Burst, SizeOf);
 
         strip.FrameMillisecondsText = "60";
 
-        Assert.Equal(new TileAnimation { FrameCount = 4, FrameMilliseconds = 60 }, strip.PreviewLoop);
+        Assert.Equal(60, strip.FrameMilliseconds);
     }
 
     [Fact]
-    public void PreviewLoop_FrameTimeOne_IsAPace()
-    {
-        var strip = EffectStripViewModel.Unlisted(Burst, SizeOf);
-
-        strip.FrameMillisecondsText = "1";
-
-        Assert.Equal(1, strip.PreviewLoop?.FrameMilliseconds);
-    }
-
-    [Fact]
-    public void PreviewLoop_FrameTimeZero_IsNone()
-    {
-        var strip = EffectStripViewModel.Unlisted(Burst, SizeOf);
-
-        strip.FrameMillisecondsText = "0";
-
-        Assert.Null(strip.PreviewLoop);
-    }
-
-    [Fact]
-    public void PreviewLoop_FrameTimeNotANumber_IsNone()
+    public void FrameMilliseconds_TypedNotANumber_IsNull()
     {
         var strip = EffectStripViewModel.Unlisted(Burst, SizeOf);
 
         strip.FrameMillisecondsText = "fast";
 
-        Assert.Null(strip.PreviewLoop);
+        Assert.Null(strip.FrameMilliseconds);
     }
 
     [Fact]
-    public void PreviewLoop_ImageMissing_IsNone()
+    public void HitFrame_Typed_IsIt()
     {
-        Assert.Null(EffectStripViewModel.Unlisted("Gone.png", SizeOf).PreviewLoop);
+        var strip = EffectStripViewModel.Unlisted(Burst, SizeOf);
+
+        strip.HitFrameText = "2";
+
+        Assert.Equal(2, strip.HitFrame);
     }
 
     [Fact]
-    public void PreviewLoop_ImageTallerThanWide_IsNone()
+    public void HitFrame_TypedNotANumber_IsNull()
     {
-        Assert.Null(EffectStripViewModel.Unlisted("Tall.png", SizeOf).PreviewLoop);
+        var strip = EffectStripViewModel.Unlisted(Burst, SizeOf);
+
+        strip.HitFrameText = "x";
+
+        Assert.Null(strip.HitFrame);
     }
 
     [Fact]
-    public void FrameMillisecondsText_Changed_RaisesPreviewLoop()
+    public void FrameMillisecondsText_Changed_RaisesFrameMilliseconds()
     {
         var strip = EffectStripViewModel.Unlisted(Burst, SizeOf);
         var notified = new List<string?>();
@@ -70,34 +57,21 @@ public sealed class EffectStripPreviewTests
 
         strip.FrameMillisecondsText = "60";
 
-        Assert.Contains(nameof(EffectStripViewModel.PreviewLoop), notified);
+        Assert.Contains(nameof(EffectStripViewModel.FrameMilliseconds), notified);
     }
 
     [Fact]
-    public void FrameLineAt_TheHitFrame_SaysTheHit()
+    public void HitFrameText_Changed_RaisesHitFrame()
     {
         var strip = EffectStripViewModel.Unlisted(Burst, SizeOf);
+        var notified = new List<string?>();
+        ((INotifyPropertyChanged)strip).PropertyChanged += (_, e) => notified.Add(e.PropertyName);
 
         strip.HitFrameText = "2";
 
-        Assert.Equal("frame 3 of 4, the hit", strip.FrameLineAt(2));
+        Assert.Contains(nameof(EffectStripViewModel.HitFrame), notified);
     }
 
-    [Fact]
-    public void FrameLineAt_AnotherFrame_IsTheFrameOnly()
-    {
-        var strip = EffectStripViewModel.Unlisted(Burst, SizeOf);
-
-        strip.HitFrameText = "2";
-
-        Assert.Equal("frame 2 of 4", strip.FrameLineAt(1));
-    }
-
-    // The test's effects folder: Burst.png is four 8 x 8 frames, Tall.png narrower than high, and the rest missing.
-    private static (int Width, int Height)? SizeOf(string file) => file switch
-    {
-        Burst => (32, 8),
-        "Tall.png" => (8, 16),
-        _ => null,
-    };
+    // The test's effects folder: Burst.png is four 8 x 8 frames.
+    private static (int Width, int Height)? SizeOf(string file) => file == Burst ? (32, 8) : null;
 }

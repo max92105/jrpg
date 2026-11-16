@@ -1,7 +1,6 @@
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Battle;
-using Jrpg.Core.Maps;
 using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Battle;
@@ -33,11 +32,11 @@ internal sealed partial class EffectStripViewModel : ObservableObject
     public string File { get; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(LengthText), nameof(IsListed), nameof(Problem), nameof(PreviewLoop))]
+    [NotifyPropertyChangedFor(nameof(LengthText), nameof(IsListed), nameof(Problem), nameof(FrameMilliseconds))]
     public partial string FrameMillisecondsText { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(LengthText), nameof(IsListed), nameof(Problem))]
+    [NotifyPropertyChangedFor(nameof(LengthText), nameof(IsListed), nameof(Problem), nameof(HitFrame))]
     public partial string HitFrameText { get; set; }
 
     /// <summary>The swing an Attack plays first, by file in the effects folder; empty for none.</summary>
@@ -49,13 +48,14 @@ internal sealed partial class EffectStripViewModel : ObservableObject
     public int? FrameCount { get; }
 
     /// <summary>
-    /// The strip's frames at its typed frame time, which the page's preview plays; null while the image is missing or
-    /// the frame time isn't a whole number from 1.
+    /// The Frame time box as a number, which the page's preview plays at; null while it isn't a whole number.
     /// </summary>
-    public TileAnimation? PreviewLoop =>
-        FrameCount is > 0 and var frames && TypedNumber.Parse(FrameMillisecondsText) is > 0 and var milliseconds
-            ? new TileAnimation { FrameCount = frames, FrameMilliseconds = milliseconds }
-            : null;
+    public int? FrameMilliseconds => TypedNumber.Parse(FrameMillisecondsText);
+
+    /// <summary>
+    /// The Hit frame box as a number, which the page's preview marks; null while it isn't a whole number.
+    /// </summary>
+    public int? HitFrame => TypedNumber.Parse(HitFrameText);
 
     /// <summary>"12 frames, 0.96 s; hit at 0.16 s", or what keeps it from being worked out.</summary>
     public string LengthText
@@ -105,14 +105,6 @@ internal sealed partial class EffectStripViewModel : ObservableObject
     /// <summary>An effects image no record lists: the unlisted pace's boxes.</summary>
     public static EffectStripViewModel Unlisted(string file, Func<string, (int Width, int Height)?> imageSizeOf) =>
         new(file, imageSizeOf(file));
-
-    /// <summary>The preview's line under a frame: "frame 3 of 8", and "the hit" on the typed hit frame.</summary>
-    /// <param name="frame">From 0, as <see cref="PreviewLoop"/> plays it.</param>
-    public string FrameLineAt(int frame)
-    {
-        var line = $"frame {frame + 1} of {FrameCount}";
-        return TypedNumber.Parse(HitFrameText) == frame ? $"{line}, the hit" : line;
-    }
 
     /// <summary>Puts the unlisted pace's boxes back and forgets its loaded record, so it needs no record.</summary>
     public void ResetToUnlisted()

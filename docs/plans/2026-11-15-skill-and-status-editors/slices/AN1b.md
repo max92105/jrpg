@@ -52,3 +52,6 @@ Agents may run it (effects are generated art).
 - **Note from AN1a:** `docs/map.md` already has the Editor `Animation` row (`FramePlayback`): add `FramePreview` and
   `PreviewFrames` to it. Null `Frames` is `Show(0)`; the three commands grey with no frames and the Steps' `Execute`
   divides by the count, so a key handler on the control checks `CanExecute` first.
+- **Done, with deviations:** the control is 134 lines (plan about 70: three dependency properties and the render
+  clock), `PreviewFramesTests` 48, `EffectStripPreviewTests` 77 with three more tests (`FrameMilliseconds` not a
+  number, both numbers raised with their texts); the control forgets its last render time on Unloaded; no key handler.

@@ -148,14 +148,14 @@ internal sealed partial class MainWindow
 
     private void OpenEffectStrips()
     {
-        if (_viewModel.EffectStripEditing is not { } effectStripEditing || _viewModel.AnimationTime is not { } animationTime)
+        if (_viewModel.EffectStripEditing is not { } effectStripEditing)
         {
             return;
         }
 
         var artRoot = _viewModel.ArtRoot;
         OpenInDialog("Effect strips", effectStripEditing.Start, effectStripEditing.Apply, edited => new EffectStripCatalogPage(
-            edited, file => SpriteImageFile.LoadFrom(artRoot, ArtFolders.Effects, file), animationTime));
+            edited, file => SpriteImageFile.LoadFrom(artRoot, ArtFolders.Effects, file)));
     }
 
     private void OpenSkills()

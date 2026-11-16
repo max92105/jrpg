@@ -1,0 +1,103 @@
+using System.ComponentModel;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using Jrpg.Editor.Hosting;
+
+namespace Jrpg.Editor.Animation;
+
+/// <summary>
+/// The shared preview of an animation the editor writes (decision 986): its frames over black, Play or Pause, Step back
+/// and Step forward, and the frame line. It reads its host's frame time and hit frame one-way, so the host's typed box
+/// is the only one and what plays is what is written. Its rules are <see cref="FramePlayback"/>'s, moved by the render
+/// clock from each Loaded to the next Unloaded.
+/// </summary>
+internal sealed partial class FramePreview : UserControl
+{
+    public static readonly DependencyProperty FramesProperty = DependencyProperty.Register(
+        nameof(Frames), typeof(IReadOnlyList<BitmapSource>), typeof(FramePreview), new PropertyMetadata(null, OnFramesChanged));
+
+    public static readonly DependencyProperty FrameMillisecondsProperty = DependencyProperty.Register(
+        nameof(FrameMilliseconds), typeof(int?), typeof(FramePreview), new PropertyMetadata(null, OnFrameMillisecondsChanged));
+
+    public static readonly DependencyProperty HitFrameProperty = DependencyProperty.Register(
+        nameof(HitFrame), typeof(int?), typeof(FramePreview), new PropertyMetadata(null, OnHitFrameChanged));
+
+    private readonly FramePlayback _playback = new();
+
+    // Forgotten on Unloaded, so a page shown again goes on from its frame rather than by the time it was hidden.
+    private TimeSpan? _lastRenderingTime;
+
+    public FramePreview()
+    {
+        InitializeComponent();
+        Root.DataContext = _playback;
+        _playback.PropertyChanged += OnPlaybackChanged;
+        new RenderTick(OnRendering).RunWhileLoaded(this);
+        Unloaded += (_, _) => _lastRenderingTime = null;
+    }
+
+    /// <summary>
+    /// The images it plays, from <see cref="PreviewFrames"/>; null or none shows nothing. A new list shows its first
+    /// frame, playing, so a host sets it only when what it previews changes.
+    /// </summary>
+    public IReadOnlyList<BitmapSource>? Frames
+    {
+        get => (IReadOnlyList<BitmapSource>?)GetValue(FramesProperty);
+        set => SetValue(FramesProperty, value);
+    }
+
+    /// <summary>The host's typed frame time, in whole milliseconds; null or below 1 holds the shown frame.</summary>
+    public int? FrameMilliseconds
+    {
+        get => (int?)GetValue(FrameMillisecondsProperty);
+        set => SetValue(FrameMillisecondsProperty, value);
+    }
+
+    /// <summary>
+    /// The host's typed hit frame, from 0, which the frame line marks; null while its box isn't a number.
+    /// </summary>
+    public int? HitFrame
+    {
+        get => (int?)GetValue(HitFrameProperty);
+        set => SetValue(HitFrameProperty, value);
+    }
+
+    // Shown at once, as the playback raises no frame change when the new list starts on the frame the old one showed.
+    private static void OnFramesChanged(DependencyObject target, DependencyPropertyChangedEventArgs e)
+    {
+        var preview = (FramePreview)target;
+        preview._playback.Show(preview.Frames?.Count ?? 0);
+        preview.ShowFrame();
+    }
+
+    private static void OnFrameMillisecondsChanged(DependencyObject target, DependencyPropertyChangedEventArgs e) =>
+        ((FramePreview)target)._playback.FrameMilliseconds = (int?)e.NewValue;
+
+    private static void OnHitFrameChanged(DependencyObject target, DependencyPropertyChangedEventArgs e) =>
+        ((FramePreview)target)._playback.HitFrame = (int?)e.NewValue;
+
+    private void OnPlaybackChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(FramePlayback.ShownFrame))
+        {
+            ShowFrame();
+        }
+    }
+
+    private void ShowFrame() => FrameImage.Source = Frames is { Count: > 0 } frames ? frames[_playback.ShownFrame] : null;
+
+    // WPF may raise Rendering more than once with one RenderingTime, so only a later time moves the preview; the first
+    // tick after a load only sets the clock's start.
+    private void OnRendering(object? sender, EventArgs e)
+    {
+        var now = ((RenderingEventArgs)e).RenderingTime;
+        if (_lastRenderingTime is { } last && now > last)
+        {
+            _playback.Advance(now - last);
+        }
+
+        _lastRenderingTime = now;
+    }
+}

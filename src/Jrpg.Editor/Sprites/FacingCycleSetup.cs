@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Sprites;
@@ -36,6 +37,16 @@ internal sealed partial class FacingCycleSetup : ObservableObject
     [ObservableProperty]
     public partial int FrameMilliseconds { get; set; }
 
+    /// <summary>
+    /// The facing a click on the image adds a cell to, at most one (decision 772): a facing switched to Cells picks,
+    /// its Pick toggles it, leaving Cells clears it.
+    /// </summary>
+    [ObservableProperty]
+    public partial FacingSetup? PickingFacing { get; private set; }
+
+    /// <summary>Whether some facing reads its row, so the frame count is read (decision 767).</summary>
+    public bool IsAnyFacingOnRow => AllFacings.Any(facing => facing.IsOnRow);
+
     // In the order the problem line checks them.
     private FacingSetup[] AllFacings => [Down, Up, Left, Right];
 
@@ -49,6 +60,7 @@ internal sealed partial class FacingCycleSetup : ObservableObject
 
         Frames = cycle.Frames.FrameCount;
         FrameMilliseconds = cycle.Frames.FrameMilliseconds;
+        PickingFacing = null;
     }
 
     /// <summary>
@@ -58,7 +70,7 @@ internal sealed partial class FacingCycleSetup : ObservableObject
     /// </summary>
     public string? ProblemWithin(int columns, int rows) =>
         AllFacings.Select(facing => facing.ProblemWithin(columns, rows)).FirstOrDefault(problem => problem is not null)
-        ?? (Frames > columns && AllFacings.Any(facing => facing.Source == FacingSource.Row)
+        ?? (Frames > columns && IsAnyFacingOnRow
             ? $"The walk's {Frames} frames don't fit in {columns} columns."
             : null);
 
@@ -67,7 +79,7 @@ internal sealed partial class FacingCycleSetup : ObservableObject
     {
         Rows = new FacingRows { Down = Down.Row, Up = Up.Row, Left = Left.Row, Right = Right.Row },
         Frames = new TileAnimation { FrameCount = Frames, FrameMilliseconds = FrameMilliseconds },
-        Sequences = AllFacings.All(facing => facing.Source == FacingSource.Row)
+        Sequences = AllFacings.All(facing => facing.IsOnRow)
             ? null
             : new FacingSequences
             {
@@ -78,12 +90,55 @@ internal sealed partial class FacingCycleSetup : ObservableObject
             },
     };
 
-    private void OnFacingChanged(object? sender, PropertyChangedEventArgs e) =>
-        OnPropertyChanged(((FacingSetup)sender!).Facing switch
+    [RelayCommand(CanExecute = nameof(CanTogglePicking))]
+    private void TogglePicking(FacingSetup facing) => PickingFacing = PickingFacing == facing ? null : facing;
+
+    private static bool CanTogglePicking(FacingSetup? facing) => facing?.IsOnCells == true;
+
+    // Only the typed fields go on: a flag or the cells' text would rerun the problem line for nothing (editor rule).
+    private void OnFacingChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        var facing = (FacingSetup)sender!;
+        if (e.PropertyName == nameof(FacingSetup.Source))
+        {
+            OnSourceChanged(facing);
+        }
+
+        if (e.PropertyName is nameof(FacingSetup.Source) or nameof(FacingSetup.Row) or nameof(FacingSetup.Cells)
+            or nameof(FacingSetup.MirrorOf))
+        {
+            OnPropertyChanged(NameOf(facing));
+        }
+    }
+
+    // Decision 771: a facing switched to Cells with none starts from its row's run, so a sheet is edited from where it
+    // was; it picks next. One leaving Cells stops picking.
+    private void OnSourceChanged(FacingSetup facing)
+    {
+        if (facing.IsOnCells)
+        {
+            if (facing.Cells.Count == 0)
+            {
+                facing.Cells = [.. Enumerable.Range(0, Math.Max(Frames, 0)).Select(column => new SpriteCell(column, facing.Row))];
+            }
+
+            PickingFacing = facing;
+        }
+        else if (PickingFacing == facing)
+        {
+            PickingFacing = null;
+        }
+
+        OnPropertyChanged(nameof(IsAnyFacingOnRow));
+        TogglePickingCommand.NotifyCanExecuteChanged();
+    }
+
+    private static string NameOf(FacingSetup facing) =>
+        facing.Facing switch
         {
             Facing.Down => nameof(Down),
             Facing.Up => nameof(Up),
             Facing.Left => nameof(Left),
             _ => nameof(Right),
-        });
+        };
 }

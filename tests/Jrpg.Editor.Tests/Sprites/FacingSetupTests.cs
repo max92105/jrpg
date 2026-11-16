@@ -70,6 +70,77 @@ public sealed class FacingSetupTests
         Assert.Equal("The up row must be within 1..4 (was 5).", up.ProblemWithin(4, 4));
     }
 
+    [Fact]
+    public void MirrorChoices_Left_ListsTheOtherThree()
+    {
+        Assert.Equal([Facing.Down, Facing.Up, Facing.Right], new FacingSetup(Facing.Left).MirrorChoices);
+    }
+
+    [Fact]
+    public void CellsText_ThreeCells_NumbersFromOne()
+    {
+        var up = Up(FacingSource.Cells, new SpriteCell(0, 2), new SpriteCell(1, 2), new SpriteCell(0, 2));
+
+        Assert.Equal("3 cells: (1, 3) (2, 3) (1, 3)", up.CellsText);
+    }
+
+    [Fact]
+    public void Source_ChangedToMirror_RaisesIsMirror()
+    {
+        var up = Up(FacingSource.Row);
+        var raised = new List<string?>();
+        up.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        up.Source = FacingSource.Mirror;
+
+        Assert.Contains(nameof(FacingSetup.IsMirror), raised);
+    }
+
+    [Fact]
+    public void CellsText_CellAdded_IsRaised()
+    {
+        var up = Up(FacingSource.Cells);
+        var raised = new List<string?>();
+        up.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        up.AddCell(new SpriteCell(1, 1));
+
+        Assert.Contains(nameof(FacingSetup.CellsText), raised);
+    }
+
+    [Fact]
+    public void RemoveLastCell_ThreeCells_KeepsTheFirstTwo()
+    {
+        var up = Up(FacingSource.Cells, new SpriteCell(0, 2), new SpriteCell(1, 2), new SpriteCell(2, 2));
+
+        up.RemoveLastCellCommand.Execute(null);
+
+        Assert.Equal([new SpriteCell(0, 2), new SpriteCell(1, 2)], up.Cells);
+    }
+
+    [Fact]
+    public void RemoveLastCellCanExecute_CellAdded_IsRaised()
+    {
+        var up = Up(FacingSource.Cells);
+        var lit = false;
+        up.RemoveLastCellCommand.CanExecuteChanged += (_, _) => lit = up.RemoveLastCellCommand.CanExecute(null);
+
+        up.AddCell(new SpriteCell(1, 1));
+
+        Assert.True(lit);
+    }
+
+    [Fact]
+    public void ClearCells_ThenAddCell_StartsANewSequence()
+    {
+        var up = Up(FacingSource.Cells, new SpriteCell(0, 2), new SpriteCell(1, 2));
+
+        up.ClearCellsCommand.Execute(null);
+        up.AddCell(new SpriteCell(3, 0));
+
+        Assert.Equal([new SpriteCell(3, 0)], up.Cells);
+    }
+
     private static FacingSetup Up(FacingSource source, params SpriteCell[] cells) =>
         new(Facing.Up) { Source = source, Cells = cells };
 }

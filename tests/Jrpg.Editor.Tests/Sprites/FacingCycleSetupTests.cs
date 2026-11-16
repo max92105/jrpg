@@ -72,6 +72,63 @@ public sealed class FacingCycleSetupTests
         Assert.Contains(nameof(FacingCycleSetup.Up), raised);
     }
 
+    // Decision 771: Left reads 4 frames on row 1, so its sequence starts as that run.
+    [Fact]
+    public void Source_RowToCells_StartsWithTheRowsRun()
+    {
+        var walk = Mixed();
+
+        walk.Left.Source = FacingSource.Cells;
+
+        Assert.Equal([new SpriteCell(0, 1), new SpriteCell(1, 1), new SpriteCell(2, 1), new SpriteCell(3, 1)], walk.Left.Cells);
+    }
+
+    [Fact]
+    public void Source_RowToCellsAgain_KeepsThePickedCells()
+    {
+        var walk = Mixed();
+        walk.Left.Source = FacingSource.Cells;
+        walk.Left.Cells = [new SpriteCell(2, 0)];
+        walk.Left.Source = FacingSource.Row;
+
+        walk.Left.Source = FacingSource.Cells;
+
+        Assert.Equal([new SpriteCell(2, 0)], walk.Left.Cells);
+    }
+
+    [Fact]
+    public void ToCycle_CellsBackToRow_GivesTheRowKept()
+    {
+        var walk = Mixed();
+
+        walk.Up.Source = FacingSource.Row;
+
+        Assert.Equal((5, null), (walk.ToCycle().Rows.Up, walk.ToCycle().Sequences!.Up));
+    }
+
+    [Fact]
+    public void IsAnyFacingOnRow_EveryFacingOffRow_IsFalse()
+    {
+        Assert.False(EveryFacingOnCells().IsAnyFacingOnRow);
+    }
+
+    [Fact]
+    public void IsAnyFacingOnRow_OneFacingOnRow_IsTrue()
+    {
+        var walk = EveryFacingOnCells();
+
+        walk.Left.Source = FacingSource.Row;
+
+        Assert.True(walk.IsAnyFacingOnRow);
+    }
+
+    private static FacingCycleSetup Mixed()
+    {
+        var walk = new FacingCycleSetup();
+        walk.CopyFrom(_mixed);
+        return walk;
+    }
+
     private static FacingCycleSetup EveryFacingOnCells()
     {
         var walk = new FacingCycleSetup();

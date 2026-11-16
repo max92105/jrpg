@@ -107,7 +107,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 ### Phase 2: the Character sprites window
 - [x] **SW1. Each facing's setup as typed: row, cells or mirror** (Editor, about 240 lines) →
   [slices/SW1.md](slices/SW1.md)
-- [ ] **SW2. Picking cells and the boxes' members: the rules** (Editor, about 260 lines; split point SW2a/SW2b named)
+- [x] **SW2. Picking cells and the boxes' members: the rules** (Editor, about 260 lines; split point SW2a/SW2b named)
   → [slices/SW2.md](slices/SW2.md)
 - [ ] **SW3. The window: Shows boxes, picking on the image, the marks and the pace line** (Editor, about 220 lines) →
   [slices/SW3.md](slices/SW3.md)

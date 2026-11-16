@@ -1,4 +1,6 @@
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Sprites;
 
@@ -15,6 +17,7 @@ internal sealed partial class FacingSetup(Facing facing) : ObservableObject
     public Facing Facing { get; } = facing;
 
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsOnRow), nameof(IsOnCells), nameof(IsMirror))]
     public partial FacingSource Source { get; set; }
 
     /// <summary>
@@ -25,6 +28,8 @@ internal sealed partial class FacingSetup(Facing facing) : ObservableObject
 
     /// <summary>The picked cells in order; replaced whole on a change, so a change notifies.</summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(CellsText))]
+    [NotifyCanExecuteChangedFor(nameof(RemoveLastCellCommand), nameof(ClearCellsCommand))]
     public partial IReadOnlyList<SpriteCell> Cells { get; set; } = [];
 
     /// <summary>
@@ -32,6 +37,28 @@ internal sealed partial class FacingSetup(Facing facing) : ObservableObject
     /// </summary>
     [ObservableProperty]
     public partial Facing MirrorOf { get; set; } = facing == Facing.Down ? Facing.Up : Facing.Down;
+
+    /// <summary>The facings this one can mirror: the three others, in the enum's order.</summary>
+    public IReadOnlyList<Facing> MirrorChoices { get; } = [.. Enum.GetValues<Facing>().Where(other => other != facing)];
+
+    public bool IsOnRow => Source == FacingSource.Row;
+
+    public bool IsOnCells => Source == FacingSource.Cells;
+
+    public bool IsMirror => Source == FacingSource.Mirror;
+
+    /// <summary>
+    /// "4 cells: (1, 3) (2, 3) (3, 3) (2, 3)": column then row, counted from 1 as the image numbers them.
+    /// </summary>
+    public string CellsText =>
+        $"{Cells.Count} {(Cells.Count == 1 ? "cell" : "cells")}"
+        + (Cells.Count == 0 ? "" : ": " + string.Join(' ', Cells.Select(cell => string.Create(
+            CultureInfo.InvariantCulture, $"({cell.Column + 1}, {cell.Row + 1})"))));
+
+    /// <summary>
+    /// Adds a picked cell at the end of the sequence; the same cell again is a repeat (decision 772).
+    /// </summary>
+    public void AddCell(SpriteCell cell) => Cells = [.. Cells, cell];
 
     /// <summary>Takes a record's row and what overrides it.</summary>
     /// <param name="row">The record's row for this facing.</param>
@@ -73,6 +100,14 @@ internal sealed partial class FacingSetup(Facing facing) : ObservableObject
         FacingSource.Cells => CellsProblemWithin(columns, rows),
         _ => null,
     };
+
+    [RelayCommand(CanExecute = nameof(HasCells))]
+    private void RemoveLastCell() => Cells = [.. Cells.Take(Cells.Count - 1)];
+
+    [RelayCommand(CanExecute = nameof(HasCells))]
+    private void ClearCells() => Cells = [];
+
+    private bool HasCells() => Cells.Count > 0;
 
     private string? CellsProblemWithin(int columns, int rows)
     {

@@ -126,6 +126,28 @@ internal sealed partial class FieldSpriteSetupViewModel : ObservableObject
     public FieldSpriteSheet ToSheet() => Problem is { } problem ? throw new InvalidOperationException(problem) : Record();
 
     /// <summary>
+    /// Adds the cell under a point of the image to the picking facing's sequence (decision 772): nothing without a
+    /// picking facing, outside the whole frames (an image that doesn't split evenly leaves an edge that isn't one) or
+    /// while the cut gives no frame. A command, never a throw.
+    /// </summary>
+    /// <param name="x">The point's distance from the image's left edge, in image pixels.</param>
+    /// <param name="y">The point's distance from the image's top edge, in image pixels.</param>
+    public void PickCellAt(double x, double y)
+    {
+        if (Walk.PickingFacing is not { } picking || FrameWidth < 1 || FrameHeight < 1 || x < 0 || y < 0)
+        {
+            return;
+        }
+
+        var column = Math.Floor(x / FrameWidth);
+        var row = Math.Floor(y / FrameHeight);
+        if (column < Columns && row < Rows)
+        {
+            picking.AddCell(new SpriteCell((int)column, (int)row));
+        }
+    }
+
+    /// <summary>
     /// The frame the preview shows for a facing after walking this long; null while there is a problem.
     /// </summary>
     public SpriteFrame? PreviewFrameAt(Facing facing, TimeSpan elapsed) =>
@@ -145,6 +167,13 @@ internal sealed partial class FieldSpriteSetupViewModel : ObservableObject
     private List<FieldSpriteSheet> RecordsWithThis() =>
         [.. _catalog.Current.FieldSprites.Values.Where(sheet => sheet.File != File), Record()];
 
-    // Every input inside the walk feeds the problem and the preview too (the editor rule on derived notes).
-    private void OnWalkChanged(object? sender, PropertyChangedEventArgs e) => OnPropertyChanged(nameof(Problem));
+    // Every input inside the walk feeds the problem and the preview too (the editor rule on derived notes). The picking
+    // facing and the frame count's flag change nothing in the record, so they leave the problem line be.
+    private void OnWalkChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is not (nameof(FacingCycleSetup.PickingFacing) or nameof(FacingCycleSetup.IsAnyFacingOnRow)))
+        {
+            OnPropertyChanged(nameof(Problem));
+        }
+    }
 }

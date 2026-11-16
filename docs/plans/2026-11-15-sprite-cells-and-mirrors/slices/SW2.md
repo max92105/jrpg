@@ -60,3 +60,10 @@ an image size given in the test, 100 x 130 px cut in 4 x 4 frames of 25 x 32 px,
 
 ## Verify by hand
 None: the window's boxes, clicks and buttons are SW3.
+
+- **Done, with deviations:** run whole (no SW2a/SW2b split), plus `TogglePickingCommand_FacingOnRow_CannotExecute` (the
+  greyed side). `CopyFrom` clears the picking facing, so opening a record whose facing reads cells picks nothing until
+  its Pick or its Shows box is used; `CellsText` says "1 cell" for one and "0 cells" for none. Review: the relays pass
+  only typed fields to `Problem` (a facing's `Source`, `Row`, `Cells`, `MirrorOf`; not `PickingFacing` nor
+  `IsAnyFacingOnRow`), so a Pick click keeps a refused copy's line; tests added for that, the column and top bounds,
+  and the Pick and `CellsText` relays.

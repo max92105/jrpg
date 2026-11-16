@@ -78,7 +78,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 a slice is done and write its deviations in the slice file. Tunables, design and risks: [design.md](design.md).
 
 ### Phase 1: damage tiers
-- [ ] ADR 0056, damage tiers as an effects catalog. Write it from decisions 782-794, 817 and 818, with design.md,
+- [x] ADR 0056, damage tiers as an effects catalog. Write it from decisions 782-794, 817 and 818, with design.md,
   section 4's options and costs (the catalog chosen; tiers in `rules.json` and today's flat power refused) and the
   resolved-references rebuild row 7 needs (decision 789); the developer delegated approval, so no question is asked.
 - [ ] **T1. A tiered skill deals its user's Power times its record's `perPower`** (Core, about 160 lines) →

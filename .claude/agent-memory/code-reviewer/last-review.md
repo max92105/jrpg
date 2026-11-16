@@ -5,11 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-skills-and-statuses-model, slice T1 (TieredEffect, Effect.Tier, CombatStats.Power,
-DamageFormula.TieredAmount/MaxPower, EffectScaling tier branch). 2026-11-15. Round 1. Verdict: Ready to commit.
+Plan 2026-11-15-skills-and-statuses-model, slice T2 (effects.json, CatalogReferenceConverter<T>,
+EffectCatalogValidator, EffectValidator.FindTierProblem, ItemCatalogValidator tier refusal). 2026-11-15. Round 1.
+Verdict: Ready to commit.
 
-- Suggestion (open): CombatStats.Power doc says "an enemy's content power", but Combatant.FromEnemy sets none until T3;
-  the slice's "(T3)" was dropped.
-- Checked: TieredAmount's long product cannot overflow for int power x perPower <= 1000 (T2 bound); MaxPower x
-  Calculate's 1.8e12 per power, and x1.5 dominance after, still fit a long.
-- SW3's suggestions dropped (committed slice); its Frozen(Brush) follow-up is in backlog.md (line ~277).
+- Suggestion (open): ContentCatalogLoader.Load's `namingEffects` (a JsonSerializerOptions) -> `effectReferenceOptions`.
+- Suggestion (open): no loader-level test that effects.json goes through EffectCatalogValidator (only unit tests).
+- Follow-up (open): EffectValidator.FindDamageTypeProblem prints C# enum names ({type} on {effect.Kind}) where the
+  new FindTierProblem uses ContentJsonOptions.EnumName; pre-existing.
+- Checked: OptionalFieldFilter Kind guard needed (converter-backed TieredEffect has no Properties); converter's
+  JsonException becomes "skills.json at $[i].effect.tier: no effect 'x'." via ContentFileReader; skills/items are not
+  written by the editor yet, so no write path lacks the reference converter.
+- T1's CombatStats.Power doc suggestion dropped (committed slice).

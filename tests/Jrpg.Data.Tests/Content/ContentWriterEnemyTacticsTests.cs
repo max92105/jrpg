@@ -59,11 +59,23 @@ public sealed class ContentWriterEnemyTacticsTests : IDisposable
         Assert.False(WrittenGoblinTactics()[0]!.AsObject().ContainsKey("isPriority"));
     }
 
+    [Fact]
+    public void WriteEnemies_OnceRule_WritesItAndReadsItBack()
+    {
+        var once = new EnemyAction { SkillId = "cleave", Weight = 1, IsOncePerBattle = true };
+
+        _writer.WriteMapCatalogs(WithGoblinTactics(once));
+
+        Assert.True((bool?)WrittenGoblinTactics()[0]!["isOncePerBattle"]);
+        Assert.Equal([once], ContentCatalogLoader.Load(_content.Path).Enemies["goblin"].Tactics);
+    }
+
+    // A power of 5, so a rule may name cleave, whose effect is tiered.
     private ContentCatalog WithGoblinTactics(params EnemyAction[] tactics)
     {
         var enemies = new Dictionary<string, EnemyDefinition>(_catalog.Enemies)
         {
-            ["goblin"] = _catalog.Enemies["goblin"] with { Tactics = tactics },
+            ["goblin"] = _catalog.Enemies["goblin"] with { Power = 5, Tactics = tactics },
         };
 
         return _catalog with { Enemies = enemies };

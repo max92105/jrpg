@@ -21,4 +21,9 @@ public sealed record EnemyAction
     /// Chosen before any draw while eligible, the first in the list among several (decision 841).
     /// </summary>
     public bool IsPriority { get; init; }
+
+    /// <summary>
+    /// Not eligible once the enemy used its skill this battle, through any rule (decision 842); never on the attack.
+    /// </summary>
+    public bool IsOncePerBattle { get; init; }
 }

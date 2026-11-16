@@ -18,6 +18,9 @@ internal static class AbsentWhenFalseFilter
         // Decisions 841, 848: most rules share the weighted draw.
         (typeof(EnemyAction), "isPriority"),
 
+        // Decisions 842, 848: most rules stay eligible all battle.
+        (typeof(EnemyAction), "isOncePerBattle"),
+
         // Decision 202: only a few skills keep their user's turn.
         (typeof(SkillDefinition), "isQuick"),
     ];

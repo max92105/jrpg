@@ -8,8 +8,8 @@ namespace Jrpg.Core.Battle;
 /// is chosen first, the first in the list among several, without a draw (decision 841); otherwise it draws once for the
 /// pick, only when more than one eligible action shares the weight. Then what the targeting draws. An enemy without
 /// tactics, or with nothing eligible, attacks without a pick (decisions 403, 412), so it keeps its seeded results. A
-/// rule with a target aims by it (decision 834) and is eligible only when it finds someone (decision 836); deciding
-/// whether a rule is eligible never draws.
+/// rule with a target aims by it (decision 834) and is eligible only when it finds someone (decision 836); a once rule
+/// isn't, after the enemy used its skill this battle (decision 842). Deciding whether a rule is eligible never draws.
 /// </summary>
 /// <param name="random">The battle's draws.</param>
 /// <param name="skills">The content's skills, which an enemy's actions name by id.</param>
@@ -41,10 +41,14 @@ public sealed class EnemyTactics(IRandom random, IReadOnlyDictionary<string, Ski
     }
 
     private bool IsEligible(EnemyAction action, BattleState battle) =>
-        ConditionHolds(action, battle) && CanUseSkill(action, battle) && HasTarget(action, battle);
+        ConditionHolds(action, battle) && CanUseSkill(action, battle) && HasTarget(action, battle)
+        && !IsUsedUp(action, battle.CurrentActor);
 
     private static bool ConditionHolds(EnemyAction action, BattleState battle) =>
         action.When is not { } condition || TacticConditions.Holds(condition, battle.CurrentActor, battle);
+
+    private static bool IsUsedUp(EnemyAction action, Combatant actor) =>
+        action is { IsOncePerBattle: true, SkillId: { } skillId } && actor.TacticMemory.HasUsed(skillId);
 
     private bool CanUseSkill(EnemyAction action, BattleState battle) =>
         action.SkillId is not { } skillId || battle.CanUse(skills[skillId]);

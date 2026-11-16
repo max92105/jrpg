@@ -71,7 +71,8 @@ internal static class EnemyTacticsValidator
             : AtLeast($"{field}.weight", action.Weight, 1)
                 ?? FindConditionProblem(action.When, $"{field}.when")
                 ?? FindSkillProblem(action.SkillId, field, skills)
-                ?? FindTargetProblem(action, field, skills);
+                ?? FindTargetProblem(action, field, skills)
+                ?? FindOncePerBattleProblem(action, field);
 
     // A percent of 0 or 100 would make an HP condition never or nearly always hold, so content says what it means.
     private static string? FindConditionProblem(TacticCondition? condition, string field)
@@ -107,6 +108,13 @@ internal static class EnemyTacticsValidator
             ? $"{named} needs a when that names someone."
             : $"{named} doesn't fit {label}, which aims at {ContentJsonOptions.EnumName(TacticTargetFit.AimOf(skill))}.";
     }
+
+    // Decision 842: a once rule is used up by its skill's use, and the attack, the fallback when nothing is eligible,
+    // names no skill.
+    private static string? FindOncePerBattleProblem(EnemyAction action, string field) =>
+        action is { IsOncePerBattle: true, SkillId: null }
+            ? $"{field} (attack).isOncePerBattle: the attack can't be once per battle."
+            : null;
 
     private static string? FindSkillProblem(string? skillId, string field, IReadOnlyDictionary<string, SkillDefinition> skills)
     {

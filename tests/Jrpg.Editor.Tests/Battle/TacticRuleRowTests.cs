@@ -3,8 +3,8 @@ using Jrpg.Editor.Battle;
 
 namespace Jrpg.Editor.Tests.Battle;
 
-// One rule as the Tactics tab types it (decision 849): its boxes read from an action and built back, the problem of a
-// box that isn't a number, and the numbered sentence the list shows, its skill by id (decision 853).
+// One rule as the Tactics tab types it (decision 849): its boxes read from an action and built back, and the problem of
+// a box that isn't a number; its sentence is TacticRuleRowSentenceTests'.
 public sealed class TacticRuleRowTests
 {
     private static readonly EnemyAction _healOnThatOne = new()
@@ -87,18 +87,29 @@ public sealed class TacticRuleRowTests
     }
 
     [Fact]
+    public void ToAction_OnceChecked_IsOncePerBattle()
+    {
+        var row = TacticRuleRow.New();
+
+        row.IsOncePerBattle = true;
+
+        Assert.True(row.ToAction().IsOncePerBattle);
+    }
+
+    [Fact]
     public void CopyOf_ProblemTyped_CopiesTheBoxesAsTyped()
     {
         var row = TacticRuleRow.From(_healOnThatOne);
         row.WeightText = "x";
         row.IsPriority = true;
+        row.IsOncePerBattle = true;
 
         var copy = TacticRuleRow.CopyOf(row);
 
         Assert.NotSame(row, copy);
         Assert.Equal(
-            (row.When, row.NumberText, row.SkillId, row.On, "x", true),
-            (copy.When, copy.NumberText, copy.SkillId, copy.On, copy.WeightText, copy.IsPriority));
+            (row.When, row.NumberText, row.SkillId, row.On, "x", true, true),
+            (copy.When, copy.NumberText, copy.SkillId, copy.On, copy.WeightText, copy.IsPriority, copy.IsOncePerBattle));
     }
 
     [Fact]
@@ -142,139 +153,5 @@ public sealed class TacticRuleRowTests
         row.When = TacticConditionChoice.Of(TacticConditionKind.AllyFallen);
 
         Assert.Equal(("", false), (row.NumberUnit, row.IsNumberShown));
-    }
-
-    [Fact]
-    public void Sentence_HealOnThatOne_ReadsWhenUseOnAndWeight()
-    {
-        var row = TacticRuleRow.From(_healOnThatOne);
-
-        row.Index = 2;
-
-        Assert.Equal("2. When an ally's HP is below 50 %: field_dressing on that one, weight 3", row.Sentence);
-    }
-
-    [Fact]
-    public void Sentence_AlwaysAttack_ReadsAlwaysAndAttack()
-    {
-        var row = TacticRuleRow.New();
-
-        row.WeightText = "4";
-
-        Assert.Equal("0. Always: attack on automatic, weight 4", row.Sentence);
-    }
-
-    [Fact]
-    public void Sentence_KindWithoutNumber_HasNoNumber()
-    {
-        var row = TacticRuleRow.From(_healOnThatOne);
-
-        row.When = TacticConditionChoice.Of(TacticConditionKind.AllyFallen);
-
-        Assert.Equal("0. When an ally has fallen: field_dressing on that one, weight 3", row.Sentence);
-    }
-
-    [Fact]
-    public void Sentence_NumberBoxEmpty_ReadsAQuestionMark()
-    {
-        var row = TacticRuleRow.New();
-
-        row.When = TacticConditionChoice.Of(TacticConditionKind.OwnHpBelow);
-
-        Assert.Equal("0. When its HP is below ? %: attack on automatic, weight 1", row.Sentence);
-    }
-
-    // Read from the action, so the sentence also shows From copied it.
-    [Fact]
-    public void Sentence_Priority_EndsWithPriority()
-    {
-        var row = TacticRuleRow.From(new EnemyAction { Weight = 2, IsPriority = true });
-
-        Assert.Equal("0. Always: attack on automatic, weight 2, priority", row.Sentence);
-    }
-
-    [Fact]
-    public void Sentence_PriorityChecked_IsRaised()
-    {
-        var row = TacticRuleRow.New();
-        var notified = NoticesOf(row);
-
-        row.IsPriority = true;
-
-        Assert.Contains(nameof(TacticRuleRow.Sentence), notified);
-    }
-
-    [Fact]
-    public void Sentence_SkillChanged_IsRaised()
-    {
-        var row = TacticRuleRow.New();
-        var notified = NoticesOf(row);
-
-        row.SkillId = "cleave";
-
-        Assert.Contains(nameof(TacticRuleRow.Sentence), notified);
-    }
-
-    [Fact]
-    public void Sentence_TargetChanged_IsRaised()
-    {
-        var row = TacticRuleRow.New();
-        var notified = NoticesOf(row);
-
-        row.On = TacticTargetChoice.Of(TacticTarget.Self);
-
-        Assert.Contains(nameof(TacticRuleRow.Sentence), notified);
-    }
-
-    [Fact]
-    public void Sentence_IndexChanged_IsRaised()
-    {
-        var row = TacticRuleRow.New();
-        var notified = NoticesOf(row);
-
-        row.Index = 3;
-
-        Assert.Contains(nameof(TacticRuleRow.Sentence), notified);
-    }
-
-    [Theory]
-    [InlineData(nameof(TacticRuleRow.NumberText))]
-    [InlineData(nameof(TacticRuleRow.WeightText))]
-    public void Problem_NumberBoxTyped_IsRaisedWithTheSentence(string box)
-    {
-        var row = TacticRuleRow.New();
-        var notified = NoticesOf(row);
-
-        typeof(TacticRuleRow).GetProperty(box)!.SetValue(row, "7");
-
-        Assert.Superset(
-            new HashSet<string?> { nameof(TacticRuleRow.Problem), nameof(TacticRuleRow.Sentence) },
-            notified.ToHashSet());
-    }
-
-    [Fact]
-    public void When_Changed_RaisesTheNumberBoxAndTheLines()
-    {
-        var row = TacticRuleRow.New();
-        var notified = NoticesOf(row);
-
-        row.When = TacticConditionChoice.Of(TacticConditionKind.OwnHpBelow);
-
-        Assert.Superset(
-            new HashSet<string?>
-            {
-                nameof(TacticRuleRow.IsNumberShown),
-                nameof(TacticRuleRow.NumberUnit),
-                nameof(TacticRuleRow.Sentence),
-                nameof(TacticRuleRow.Problem),
-            },
-            notified.ToHashSet());
-    }
-
-    private static List<string?> NoticesOf(TacticRuleRow row)
-    {
-        var notified = new List<string?>();
-        row.PropertyChanged += (_, e) => notified.Add(e.PropertyName);
-        return notified;
     }
 }

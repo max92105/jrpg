@@ -9,7 +9,7 @@ using Jrpg.Data.Tests.Content;
 namespace Jrpg.Data.Tests.Battle;
 
 // A rule's target against its skill's aim and its trigger (ADR 0057, decision 840): the message names the enemy, the
-// rule's place, the skill and its aim.
+// rule's place, the skill and its aim. A rule's flags: the attack can't be once per battle (decision 842).
 public sealed class EnemyTacticRuleValidatorTests
 {
     private static readonly EnemyDefinition _goblin = new()
@@ -114,6 +114,22 @@ public sealed class EnemyTacticRuleValidatorTests
         Assert.Equal(
             "enemies.json: enemy 'goblin': phases[0].tactics[1] (attack).on: subject needs a when that names someone.",
             problem);
+    }
+
+    [Fact]
+    public void Validate_OnceOnTheAttack_IsRefused()
+    {
+        var problem = ProblemOf(new EnemyAction { Weight = 1, IsOncePerBattle = true });
+
+        Assert.Equal(
+            "enemies.json: enemy 'goblin': tactics[0] (attack).isOncePerBattle: the attack can't be once per battle.",
+            problem);
+    }
+
+    [Fact]
+    public void Validate_OnceOnASkill_IsAccepted()
+    {
+        Assert.Null(ProblemOf(new EnemyAction { SkillId = "cleave", Weight = 1, IsOncePerBattle = true }));
     }
 
     [Fact]

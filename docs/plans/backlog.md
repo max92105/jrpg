@@ -319,7 +319,5 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   their own file) before the next test lands there (enemy behavior plan, EB6 and EB7 reviews).
 - Ten editor views declare their own `BooleanToVisibilityConverter x:Key="VisibleWhenTrue"`: one key in
   `Shell/EditorTheme.xaml` would serve them all (EB7 review).
-- `tests/Jrpg.Editor.Tests/Battle/TacticRuleRowTests.cs` is at 280 lines: split it before EB9 or EB10 adds the rule's
-  next flags' tests (enemy behavior plan, EB8 review).
 - Five Data test files (the enemy validator's and writer's, EB9's `EnemyTacticConditionValidatorTests` among them)
   each build their own `_goblin` fixture: one shared test enemy in `Jrpg.Data.Tests` would serve them (EB9).

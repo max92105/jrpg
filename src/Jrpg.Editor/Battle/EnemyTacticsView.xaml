@@ -105,6 +105,10 @@
                     Margin="0,6,0,0"
                     IsChecked="{Binding IsPriority}"
                     ToolTip="While it can be chosen (its When holds, its skill is usable, its On finds someone), it is chosen without a draw; among several, the first in the list" />
+          <CheckBox Content="Once per battle"
+                    Margin="0,4,0,0"
+                    IsChecked="{Binding IsOncePerBattle}"
+                    ToolTip="Once the enemy has used this rule's skill in this battle, through any rule, it can't be chosen again; never on the attack" />
         </StackPanel>
       </StackPanel>
       <ListBox ItemsSource="{Binding SelectedList.Rules}"

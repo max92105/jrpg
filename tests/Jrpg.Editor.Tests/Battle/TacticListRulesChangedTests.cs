@@ -13,7 +13,7 @@ public sealed class TacticListRulesChangedTests
         Tactics = [new EnemyAction { Weight = 4 }, new EnemyAction { SkillId = "cleave", Weight = 2 }],
     };
 
-    public static TheoryData<string> TypedBoxes => ["When", "NumberText", "SkillId", "On", "IsPriority"];
+    public static TheoryData<string> TypedBoxes => ["When", "NumberText", "SkillId", "On", "IsPriority", "IsOncePerBattle"];
 
     [Fact]
     public void RulesChanged_WeightTyped_IsRaised()
@@ -180,6 +180,9 @@ public sealed class TacticListRulesChangedTests
                 break;
             case "IsPriority":
                 row.IsPriority = true;
+                break;
+            case "IsOncePerBattle":
+                row.IsOncePerBattle = true;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(box), box, "No such box.");

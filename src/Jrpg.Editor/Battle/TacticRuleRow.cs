@@ -6,10 +6,10 @@ namespace Jrpg.Editor.Battle;
 
 /// <summary>
 /// One rule of an enemy as the Tactics tab types it (decision 849): its When choice and number, its skill, its target,
-/// its weight and whether it is a priority rule (decision 841), and the numbered sentence the list shows. The number
-/// box keeps what was typed while its kind reads none, so switching back finds it, and is never written then.
-/// <see cref="Problem"/> is only what keeps the action from being built; a percent outside 1..99 or a target that
-/// doesn't fit the skill is Data's rule, shown by the list.
+/// its weight, whether it is a priority rule (decision 841) and whether it is once per battle (decision 842), and the
+/// numbered sentence the list shows. The number box keeps what was typed while its kind reads none, so switching back
+/// finds it, and is never written then. <see cref="Problem"/> is only what keeps the action from being built; a percent
+/// outside 1..99 or a target that doesn't fit the skill is Data's rule, shown by the list.
 /// </summary>
 internal sealed partial class TacticRuleRow : ObservableObject
 {
@@ -35,6 +35,7 @@ internal sealed partial class TacticRuleRow : ObservableObject
         On = TacticTargetChoice.Of(action.On),
         WeightText = TypedNumber.Text(action.Weight),
         IsPriority = action.IsPriority,
+        IsOncePerBattle = action.IsOncePerBattle,
     };
 
     /// <summary>A rule as Add starts it: always, the attack, automatic, weight 1 (decision 859).</summary>
@@ -51,6 +52,7 @@ internal sealed partial class TacticRuleRow : ObservableObject
         On = row.On,
         WeightText = row.WeightText,
         IsPriority = row.IsPriority,
+        IsOncePerBattle = row.IsOncePerBattle,
     };
 
     [ObservableProperty]
@@ -79,6 +81,10 @@ internal sealed partial class TacticRuleRow : ObservableObject
     [NotifyPropertyChangedFor(nameof(Sentence))]
     public partial bool IsPriority { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Sentence))]
+    public partial bool IsOncePerBattle { get; set; }
+
     /// <summary>
     /// Its place in its list, set by the list: Data's <c>tactics[i]</c>, so a problem's rule is found.
     /// </summary>
@@ -98,11 +104,12 @@ internal sealed partial class TacticRuleRow : ObservableObject
 
     /// <summary>
     /// "2. When an ally's HP is below 50 %: field_dressing on that one, weight 3", the boxes as typed, ", priority"
-    /// after a priority rule's weight; the skill by id, since the row doesn't hold the catalog (decision 853).
+    /// after a priority rule's weight and ", once per battle" after a once rule's; the skill by id, since the row
+    /// doesn't hold the catalog (decision 853).
     /// </summary>
     public string Sentence =>
         $"{Index}. {WhenWords}: {(SkillId.Length == 0 ? "attack" : SkillId)} on {On.Label}, weight {WeightText}"
-        + (IsPriority ? ", priority" : "");
+        + (IsPriority ? ", priority" : "") + (IsOncePerBattle ? ", once per battle" : "");
 
     /// <summary>
     /// The weight, then a number the kind reads, that isn't a whole number; null when it can be built.
@@ -122,6 +129,7 @@ internal sealed partial class TacticRuleRow : ObservableObject
                 When = When.Kind is { } kind ? new TacticCondition(kind, TypedPercent) : null,
                 On = On.Target,
                 IsPriority = IsPriority,
+                IsOncePerBattle = IsOncePerBattle,
             };
 
     private TacticConditionNumber Number =>

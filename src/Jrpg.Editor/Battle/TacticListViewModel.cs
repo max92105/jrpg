@@ -151,7 +151,7 @@ internal sealed partial class TacticListViewModel : ObservableObject
     {
         if (e.PropertyName is nameof(TacticRuleRow.When) or nameof(TacticRuleRow.NumberText)
             or nameof(TacticRuleRow.SkillId) or nameof(TacticRuleRow.On) or nameof(TacticRuleRow.WeightText)
-            or nameof(TacticRuleRow.IsPriority))
+            or nameof(TacticRuleRow.IsPriority) or nameof(TacticRuleRow.IsOncePerBattle))
         {
             RulesChanged?.Invoke(this, EventArgs.Empty);
         }

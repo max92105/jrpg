@@ -107,7 +107,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/SW.md](slices/SW.md)
 
 ### Phase 3: the new status behaviors
-- [ ] **TT. A tick may have a damage type: Burning meets fire resistance** (Core + Data + content, about 150 lines) →
+- [x] **TT. A tick may have a damage type: Burning meets fire resistance** (Core + Data + content, about 150 lines) →
   [slices/TT.md](slices/TT.md)
 - [ ] **ST. A status acts at the start or the end of its holder's turn** (Core + Data + content, about 240 lines) →
   [slices/ST.md](slices/ST.md)

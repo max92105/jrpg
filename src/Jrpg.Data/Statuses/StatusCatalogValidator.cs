@@ -1,3 +1,4 @@
+using Jrpg.Core.Stats;
 using Jrpg.Core.Statuses;
 using Jrpg.Data.Content;
 
@@ -5,8 +6,9 @@ namespace Jrpg.Data.Statuses;
 
 /// <summary>
 /// The rules for <c>statuses.json</c> (ADR 0055): each record named, with at least one part, at most one ticking part
-/// and each kind once, every amount in its kind's range (decision 797); and the records of one family alike, part for
-/// part, so a refresh can keep the stronger of each (decision 800).
+/// and each kind once, every amount in its kind's range (decision 797), a damage type on damage ticks only (decision
+/// 803); and the records of one family alike, part for part in kind and type, so a refresh can keep the stronger one of
+/// each part (decision 800).
 /// </summary>
 internal static class StatusCatalogValidator
 {
@@ -50,7 +52,7 @@ internal static class StatusCatalogValidator
                 return $"parts[{index}]: {NameOf(part.Kind)} is listed twice.";
             }
 
-            if (FindAmountProblem(part, index) is { } problem)
+            if ((FindAmountProblem(part, index) ?? FindTypeProblem(part, index)) is { } problem)
             {
                 return problem;
             }
@@ -77,13 +79,25 @@ internal static class StatusCatalogValidator
         };
     }
 
-    // Each family's records have the same part kinds in the same order as its first record.
+    // A type means what a damage tick meets resistance as (decision 803): no other kind deals damage.
+    private static string? FindTypeProblem(StatusPart part, int index)
+    {
+        if (part.DamageType is not { } type || part.Kind == StatusPartKind.DamageEachTurn)
+        {
+            return null;
+        }
+
+        var typeName = ContentJsonOptions.EnumName(type);
+        return $"parts[{index}]: damageType is only for damageEachTurn (was {typeName} on {NameOf(part.Kind)}).";
+    }
+
+    // Each family's records have the same part kinds and types in the same order as its first record.
     private static string? FindFamilyProblem(IReadOnlyList<StatusDefinition> statuses)
     {
         foreach (var family in statuses.GroupBy(status => status.FamilyKey))
         {
             var first = family.First();
-            var unlike = family.FirstOrDefault(status => !KindsOf(status).SequenceEqual(KindsOf(first)));
+            var unlike = family.FirstOrDefault(status => !ShapeOf(status).SequenceEqual(ShapeOf(first)));
             if (unlike is not null)
             {
                 return $"family '{family.Key}': {unlike.Id}'s parts differ from {first.Id}'s.";
@@ -93,7 +107,8 @@ internal static class StatusCatalogValidator
         return null;
     }
 
-    private static IEnumerable<StatusPartKind> KindsOf(StatusDefinition status) => status.Parts.Select(part => part.Kind);
+    private static IEnumerable<(StatusPartKind Kind, DamageType? Type)> ShapeOf(StatusDefinition status) =>
+        status.Parts.Select(part => (part.Kind, part.DamageType));
 
     private static string NameOf(StatusPartKind kind) => ContentJsonOptions.EnumName(kind);
 }

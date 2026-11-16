@@ -1,3 +1,4 @@
+using Jrpg.Core.Stats;
 using Jrpg.Core.Statuses;
 using Jrpg.Data.Content;
 using Jrpg.Data.Statuses;
@@ -38,6 +39,10 @@ public sealed class StatusCatalogValidatorTests
             "a status ticks once: it can't hold both damageEachTurn and healEachTurn."
         },
         { With(Part(ResistanceChange, 8), Part(ResistanceChange, 4)), "parts[1]: resistanceChange is listed twice." },
+        {
+            With(new StatusPart(HealEachTurn, 4, DamageType.Fire)),
+            "parts[0]: damageType is only for damageEachTurn (was fire on healEachTurn)."
+        },
     };
 
     [Theory]
@@ -67,6 +72,16 @@ public sealed class StatusCatalogValidatorTests
         Assert.Equal("statuses.json: family 'poison': poison_2's parts differ from poison_1's.", exception.Message);
     }
 
+    [Fact]
+    public void Validate_OneFamilyWithAnotherDamageType_Throws()
+    {
+        var fire = _poison with { Id = "poison_2", Parts = [new StatusPart(DamageEachTurn, 15, DamageType.Fire)] };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate(_poison, fire));
+
+        Assert.Equal("statuses.json: family 'poison': poison_2's parts differ from poison_1's.", exception.Message);
+    }
+
     // Part for part: a refresh compares the parts in order (decision 800).
     [Fact]
     public void Validate_OneFamilyWithTheSameKindsInAnotherOrder_Throws()
@@ -82,6 +97,10 @@ public sealed class StatusCatalogValidatorTests
     [Fact]
     public void Validate_DamageEachTurnOfOne_Accepted() =>
         Assert.Null(Record.Exception(() => Validate(With(Part(DamageEachTurn, 1)))));
+
+    [Fact]
+    public void Validate_TypedDamageEachTurn_Accepted() =>
+        Assert.Null(Record.Exception(() => Validate(With(new StatusPart(DamageEachTurn, 8, DamageType.Fire)))));
 
     [Fact]
     public void Validate_DamageTakenChangeOfMinus99_Accepted() =>

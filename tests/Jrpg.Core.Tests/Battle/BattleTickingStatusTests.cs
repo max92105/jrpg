@@ -4,6 +4,8 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
+using Jrpg.Core.Stats;
+using Jrpg.Core.Statuses;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -13,6 +15,8 @@ namespace Jrpg.Core.Tests.Battle;
 // straight onto their holder, so each is fresh when its holder's turn ends: it ticks anyway.
 public sealed class BattleTickingStatusTests
 {
+    private const string BurningId = "burning";
+
     [Fact]
     public void Execute_PoisonedActorEndsTurn_LosesPowerIgnoringResistancesAndExposed()
     {
@@ -156,6 +160,67 @@ public sealed class BattleTickingStatusTests
         Assert.Equal(3, paladin.Resources.AmountOf("conviction"));
     }
 
+    // A weakness of 25 % adds a quarter, as it would to a fire hit (decision 803).
+    [Fact]
+    public void Execute_FireTickOnFireWeakHolder_TakesMore()
+    {
+        var (goblin, battle) = GoblinToAct(firePermille: -250);
+        goblin.Statuses.Apply(Burning(8));
+
+        var events = battle.Execute(new DefendCommand());
+
+        Assert.Equal(10, TickOn(goblin, BurningId, events));
+        Assert.Equal(15, goblin.Vitals.Hp);
+    }
+
+    [Fact]
+    public void Execute_FireTickOnGuardedHolder_TakesLess()
+    {
+        var (goblin, battle) = GoblinToAct(firePermille: 0);
+        goblin.Statuses.Apply(TestStatuses.Guard(50, 3));
+        goblin.Statuses.Apply(Burning(8));
+
+        var events = battle.Execute(new DefendCommand());
+
+        Assert.Equal(4, TickOn(goblin, BurningId, events));
+    }
+
+    // Exposed's +50 % would make the 8 a 12: a tick isn't a hit.
+    [Fact]
+    public void Execute_TypedTickOnExposedHolder_IgnoresExposed()
+    {
+        var (goblin, battle) = GoblinToAct(firePermille: 0);
+        goblin.Statuses.Apply(TestStatuses.Exposed(50, 3));
+        goblin.Statuses.Apply(Burning(8));
+
+        var events = battle.Execute(new DefendCommand());
+
+        Assert.Equal(8, TickOn(goblin, BurningId, events));
+    }
+
+    // A full resistance is held at the cap (75 %), which leaves 3 × 0.25 = 0.75, rounded down to 0 and raised to 1.
+    [Fact]
+    public void Execute_TypedTickAgainstFullResistance_TakesOne()
+    {
+        var (goblin, battle) = GoblinToAct(firePermille: 1000);
+        goblin.Statuses.Apply(Burning(3));
+
+        var events = battle.Execute(new DefendCommand());
+
+        Assert.Equal(1, TickOn(goblin, BurningId, events));
+    }
+
+    [Fact]
+    public void Execute_UntypedTickOnFireWeakHolder_TakesItsAmount()
+    {
+        var (goblin, battle) = GoblinToAct(firePermille: -250);
+        goblin.Statuses.Apply(TestStatuses.Poison(8, 3));
+
+        var events = battle.Execute(new DefendCommand());
+
+        Assert.Equal(8, TickOn(goblin, TestStatuses.PoisonId, events));
+    }
+
     private static (Combatant Hero, Combatant Goblin, BattleState Battle) Battle(int goblinHp, params SkillDefinition[] skills)
     {
         var hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithSkills(skills).Build());
@@ -165,6 +230,34 @@ public sealed class BattleTickingStatusTests
 
     private static Combatant Goblin(int hp) =>
         Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: hp, damage: 20).Build());
+
+    // The hero has defended, so the next command is the goblin's and its upkeep ends it.
+    private static (Combatant Goblin, BattleState Battle) GoblinToAct(int firePermille)
+    {
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder()
+            .WithStats(maxHp: 25, damage: 20)
+            .WithResistances(Resistances.None with { Fire = firePermille })
+            .Build());
+        var hero = Combatant.FromPartyMember(new PartyMemberBuilder().Build());
+        var battle = new BattleState([hero, goblin], new Inventory(), new FixedSequenceRandom(1));
+        battle.Execute(new DefendCommand());
+        return (goblin, battle);
+    }
+
+    // No other test grants a typed tick, so its record is built here.
+    private static StatusGrant Burning(int amount) => new(
+        new StatusDefinition
+        {
+            Id = BurningId,
+            Name = BurningId,
+            Description = "",
+            Parts = [new StatusPart(StatusPartKind.DamageEachTurn, amount, DamageType.Fire)],
+        },
+        Turns: 3);
+
+    private static int TickOn(Combatant holder, string statusId, IReadOnlyList<BattleEvent> events) => Assert.Single(
+        events.OfType<StatusTicked>(),
+        ticked => (ticked.Holder, TestStatuses.IdOf(ticked.Status)) == (holder, statusId)).Amount;
 
     private static SkillDefinition Skill(string id, Effect effect) =>
         new() { Id = id, Name = id, Description = "", IconFile = "", Effect = effect };

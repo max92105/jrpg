@@ -1,3 +1,4 @@
+using Jrpg.Core.Effects;
 using Jrpg.Core.Statuses;
 
 namespace Jrpg.Core.Battle;
@@ -7,8 +8,9 @@ internal static class TurnUpkeep
 {
     /// <summary>
     /// Each of the holder's statuses with a ticking part takes or restores its amount in HP, in the order applied; a
-    /// fresh one ticks too, only its countdown waits. A tick isn't a hit, so it ignores resistances and a change in
-    /// damage taken and sets off no hit trigger.
+    /// fresh one ticks too, only its countdown waits. A tick isn't a hit, so it ignores a change in damage taken and
+    /// sets off no hit trigger; a damage tick with a type meets the holder's resistance to that type, and an untyped
+    /// one meets none (decision 803).
     /// </summary>
     public static void TickStatuses(Combatant holder, IReadOnlyList<Combatant> combatants, List<BattleEvent> events)
     {
@@ -21,7 +23,7 @@ internal static class TurnUpkeep
             }
 
             var ticked = part.Kind == StatusPartKind.DamageEachTurn
-                ? holder.Vitals.TakeDamage(part.Amount)
+                ? holder.Vitals.TakeDamage(TickDamageOf(holder, part))
                 : holder.Vitals.RestoreHp(part.Amount);
             events.Add(new StatusTicked(holder, status.Status, ticked));
             if (!holder.IsAlive)
@@ -55,5 +57,18 @@ internal static class TurnUpkeep
         {
             other.Statuses.ClearFreshMarks();
         }
+    }
+
+    // A typed tick meets the holder's resistance, Guard's raise included, but it isn't a hit: no crit, block or
+    // penetration, and no extra share taken, since Exposed weighs on hits alone.
+    private static int TickDamageOf(Combatant holder, StatusPart part)
+    {
+        if (part.DamageType is not { } type)
+        {
+            return part.Amount;
+        }
+
+        var mitigation = new Mitigation(holder.CurrentStats.Resistances.Of(type), ExtraTakenPermille: 0);
+        return DamageFormula.Calculate(part.Amount, DamageFormula.NormalHit, mitigation);
     }
 }

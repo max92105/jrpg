@@ -56,6 +56,9 @@ internal static class AbsentWhenNullFilter
         // ADR 0056: a heal record has no type.
         (typeof(TieredEffect), "damageType"),
 
+        // Decision 803: only a typed tick names its type.
+        (typeof(StatusPart), "damageType"),
+
         // ADR 0054: a walk whose facings all read their rows has no sequences, and a facing that reads its row has no
         // sequence of its own.
         (typeof(FacingCycle), "sequences"),

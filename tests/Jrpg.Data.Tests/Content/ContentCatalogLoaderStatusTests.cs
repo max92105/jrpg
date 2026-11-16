@@ -1,3 +1,4 @@
+using Jrpg.Core.Stats;
 using Jrpg.Core.Statuses;
 using Jrpg.Data.Content;
 
@@ -25,6 +26,15 @@ public sealed class ContentCatalogLoaderStatusTests : IDisposable
         var statuses = ContentCatalogLoader.Load(_content.Path).Statuses;
 
         Assert.Equal(statuses["guard_1"].FamilyKey, statuses["guard_2"].FamilyKey);
+    }
+
+    // Decision 805: Fire Blast's Burning meets fire resistance.
+    [Fact]
+    public void Load_RepositoryStatuses_BurningTicksAsFire()
+    {
+        var burning = ContentCatalogLoader.Load(_content.Path).Statuses["burning_1"];
+
+        Assert.Contains(burning.Parts, part => (part.Kind, part.DamageType) == (StatusPartKind.DamageEachTurn, DamageType.Fire));
     }
 
     [Fact]

@@ -40,6 +40,25 @@ public sealed class ContentWriterEnemyTacticsTests : IDisposable
         Assert.Equal([onLowestFoe], ContentCatalogLoader.Load(_content.Path).Enemies["goblin"].Tactics);
     }
 
+    [Fact]
+    public void WriteEnemies_PriorityRule_WritesIsPriority()
+    {
+        var priority = new EnemyAction { Weight = 1, IsPriority = true };
+
+        _writer.WriteMapCatalogs(WithGoblinTactics(priority));
+
+        Assert.True((bool?)WrittenGoblinTactics()[0]!["isPriority"]);
+        Assert.Equal([priority], ContentCatalogLoader.Load(_content.Path).Enemies["goblin"].Tactics);
+    }
+
+    [Fact]
+    public void WriteEnemies_RuleWithoutPriority_LeavesItOut()
+    {
+        _writer.WriteMapCatalogs(WithGoblinTactics(new EnemyAction { Weight = 1 }));
+
+        Assert.False(WrittenGoblinTactics()[0]!.AsObject().ContainsKey("isPriority"));
+    }
+
     private ContentCatalog WithGoblinTactics(params EnemyAction[] tactics)
     {
         var enemies = new Dictionary<string, EnemyDefinition>(_catalog.Enemies)

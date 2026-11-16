@@ -3,8 +3,8 @@ using Jrpg.Editor.Battle;
 
 namespace Jrpg.Editor.Tests.Battle;
 
-// What tells a list's owner to check again (decision 849): a rule's box typed or picked, the threshold typed, a rule
-// added, removed or moved, each once; never a rule's own sentence, number or problem notice.
+// What tells a list's owner to check again (decision 849): a rule's box typed, picked or checked, the threshold typed,
+// a rule added, removed or moved, each once; never a rule's own sentence, number or problem notice.
 public sealed class TacticListRulesChangedTests
 {
     private static readonly EnemyPhase _twoRulePhase = new()
@@ -13,7 +13,7 @@ public sealed class TacticListRulesChangedTests
         Tactics = [new EnemyAction { Weight = 4 }, new EnemyAction { SkillId = "cleave", Weight = 2 }],
     };
 
-    public static TheoryData<string> TypedBoxes => ["When", "NumberText", "SkillId", "On"];
+    public static TheoryData<string> TypedBoxes => ["When", "NumberText", "SkillId", "On", "IsPriority"];
 
     [Fact]
     public void RulesChanged_WeightTyped_IsRaised()
@@ -177,6 +177,9 @@ public sealed class TacticListRulesChangedTests
                 break;
             case "On":
                 row.On = TacticTargetChoice.Of(TacticTarget.LowestHpFoe);
+                break;
+            case "IsPriority":
+                row.IsPriority = true;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(box), box, "No such box.");

@@ -16,4 +16,9 @@ public sealed record EnemyAction
     /// Whom it aims at (decision 834); null aims as the skill or the attack always did (decisions 400, 401).
     /// </summary>
     public TacticTarget? On { get; init; }
+
+    /// <summary>
+    /// Chosen before any draw while eligible, the first in the list among several (decision 841).
+    /// </summary>
+    public bool IsPriority { get; init; }
 }

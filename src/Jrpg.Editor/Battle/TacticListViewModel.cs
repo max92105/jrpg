@@ -41,8 +41,8 @@ internal sealed partial class TacticListViewModel : ObservableObject
     }
 
     /// <summary>
-    /// A rule's box typed or picked, the threshold typed, or a rule added, removed or moved; never a rule's own
-    /// sentence, number or problem notice, so the owner re-checks once per change (<c>.claude/rules/editor.md</c>).
+    /// A rule's box typed, picked or checked, the threshold typed, or a rule added, removed or moved; never a rule's
+    /// own sentence, number or problem notice, so the owner re-checks once per change (<c>.claude/rules/editor.md</c>).
     /// </summary>
     public event EventHandler? RulesChanged;
 
@@ -150,7 +150,8 @@ internal sealed partial class TacticListViewModel : ObservableObject
     private void OnRuleChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is nameof(TacticRuleRow.When) or nameof(TacticRuleRow.NumberText)
-            or nameof(TacticRuleRow.SkillId) or nameof(TacticRuleRow.On) or nameof(TacticRuleRow.WeightText))
+            or nameof(TacticRuleRow.SkillId) or nameof(TacticRuleRow.On) or nameof(TacticRuleRow.WeightText)
+            or nameof(TacticRuleRow.IsPriority))
         {
             RulesChanged?.Invoke(this, EventArgs.Empty);
         }

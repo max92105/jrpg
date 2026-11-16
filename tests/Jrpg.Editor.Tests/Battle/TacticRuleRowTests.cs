@@ -77,17 +77,28 @@ public sealed class TacticRuleRowTests
     }
 
     [Fact]
+    public void ToAction_PriorityChecked_IsPriority()
+    {
+        var row = TacticRuleRow.New();
+
+        row.IsPriority = true;
+
+        Assert.True(row.ToAction().IsPriority);
+    }
+
+    [Fact]
     public void CopyOf_ProblemTyped_CopiesTheBoxesAsTyped()
     {
         var row = TacticRuleRow.From(_healOnThatOne);
         row.WeightText = "x";
+        row.IsPriority = true;
 
         var copy = TacticRuleRow.CopyOf(row);
 
         Assert.NotSame(row, copy);
         Assert.Equal(
-            (row.When, row.NumberText, row.SkillId, row.On, "x"),
-            (copy.When, copy.NumberText, copy.SkillId, copy.On, copy.WeightText));
+            (row.When, row.NumberText, row.SkillId, row.On, "x", true),
+            (copy.When, copy.NumberText, copy.SkillId, copy.On, copy.WeightText, copy.IsPriority));
     }
 
     [Fact]
@@ -171,6 +182,26 @@ public sealed class TacticRuleRowTests
         row.When = TacticConditionChoice.Of(TacticConditionKind.OwnHpBelow);
 
         Assert.Equal("0. When its HP is below ? %: attack on automatic, weight 1", row.Sentence);
+    }
+
+    // Read from the action, so the sentence also shows From copied it.
+    [Fact]
+    public void Sentence_Priority_EndsWithPriority()
+    {
+        var row = TacticRuleRow.From(new EnemyAction { Weight = 2, IsPriority = true });
+
+        Assert.Equal("0. Always: attack on automatic, weight 2, priority", row.Sentence);
+    }
+
+    [Fact]
+    public void Sentence_PriorityChecked_IsRaised()
+    {
+        var row = TacticRuleRow.New();
+        var notified = NoticesOf(row);
+
+        row.IsPriority = true;
+
+        Assert.Contains(nameof(TacticRuleRow.Sentence), notified);
     }
 
     [Fact]

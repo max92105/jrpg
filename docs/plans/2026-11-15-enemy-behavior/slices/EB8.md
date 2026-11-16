@@ -38,3 +38,5 @@ exist (EB9).
 1. Editor: Database > Enemies, `goblin`, Tactics: Add a rule, Use "Cleave", check Priority, apply, Save all. Run the
    game, New game, walk the forest until goblins attack: every goblin turn is Cleave (the plaque reads "Cleave"). Back
    in the editor, Ctrl+Z and Save all; `git diff content/enemies.json` is empty.
+- **Done:** as planned; besides the planned tests, `Sentence_PriorityChecked_IsRaised`, the copy test and the
+  RulesChanged box theory carry the flag, and `docs/map.md`'s editor row names the rule's priority check box.

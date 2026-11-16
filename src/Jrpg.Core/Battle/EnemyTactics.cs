@@ -4,11 +4,12 @@ using Jrpg.Core.Skills;
 namespace Jrpg.Core.Battle;
 
 /// <summary>
-/// Chooses what an enemy does on its turn (ADR 0034); <see cref="EnemyTargeting"/> aims it. It draws once for the pick,
-/// only when more than one eligible action shares the weight, then what the targeting draws. An enemy without tactics,
-/// or with nothing eligible, attacks without a pick (decisions 403, 412), so it keeps its seeded results. A rule with a
-/// target aims by it (decision 834) and is eligible only when it finds someone (decision 836); deciding whether a rule
-/// is eligible never draws.
+/// Chooses what an enemy does on its turn (ADR 0034); <see cref="EnemyTargeting"/> aims it. An eligible priority rule
+/// is chosen first, the first in the list among several, without a draw (decision 841); otherwise it draws once for the
+/// pick, only when more than one eligible action shares the weight. Then what the targeting draws. An enemy without
+/// tactics, or with nothing eligible, attacks without a pick (decisions 403, 412), so it keeps its seeded results. A
+/// rule with a target aims by it (decision 834) and is eligible only when it finds someone (decision 836); deciding
+/// whether a rule is eligible never draws.
 /// </summary>
 /// <param name="random">The battle's draws.</param>
 /// <param name="skills">The content's skills, which an enemy's actions name by id.</param>
@@ -25,10 +26,12 @@ public sealed class EnemyTactics(IRandom random, IReadOnlyDictionary<string, Ski
         }
 
         var eligible = EligibleActions(battle);
-        return eligible.Count == 0
-            ? Attack(battle)
-            : CommandFor(eligible[WeightedPick.Pick([.. eligible.Select(action => action.Weight)], random)], battle);
+        return eligible.Count == 0 ? Attack(battle) : CommandFor(Pick(eligible), battle);
     }
+
+    private EnemyAction Pick(List<EnemyAction> eligible) =>
+        eligible.FirstOrDefault(action => action.IsPriority)
+        ?? eligible[WeightedPick.Pick([.. eligible.Select(action => action.Weight)], random)];
 
     private List<EnemyAction> EligibleActions(BattleState battle)
     {

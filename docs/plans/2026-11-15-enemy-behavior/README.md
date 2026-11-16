@@ -121,7 +121,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 - [x] **EB7. The Tactics tab** (Editor, about 190 lines, mostly XAML) → [slices/EB7.md](slices/EB7.md)
 
 ### Phase 3: priority and reactions
-- [ ] **EB8. Priority: an eligible priority rule is chosen before any draw** (Core + Data + Editor, about 160 lines) →
+- [x] **EB8. Priority: an eligible priority rule is chosen before any draw** (Core + Data + Editor, about 160 lines) →
   [slices/EB8.md](slices/EB8.md)
 - [ ] **EB9. Reactions: it was hit, critically hit, hit on a weakness; the enemy's tactic memory** (Core + Data +
   Editor, about 300 lines) → [slices/EB9.md](slices/EB9.md)

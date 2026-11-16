@@ -5,10 +5,11 @@ using Jrpg.Editor.Catalogs;
 namespace Jrpg.Editor.Battle;
 
 /// <summary>
-/// One rule of an enemy as the Tactics tab types it (decision 849): its When choice and number, its skill, its target
-/// and its weight, and the numbered sentence the list shows. The number box keeps what was typed while its kind reads
-/// none, so switching back finds it, and is never written then. <see cref="Problem"/> is only what keeps the action
-/// from being built; a percent outside 1..99 or a target that doesn't fit the skill is Data's rule, shown by the list.
+/// One rule of an enemy as the Tactics tab types it (decision 849): its When choice and number, its skill, its target,
+/// its weight and whether it is a priority rule (decision 841), and the numbered sentence the list shows. The number
+/// box keeps what was typed while its kind reads none, so switching back finds it, and is never written then.
+/// <see cref="Problem"/> is only what keeps the action from being built; a percent outside 1..99 or a target that
+/// doesn't fit the skill is Data's rule, shown by the list.
 /// </summary>
 internal sealed partial class TacticRuleRow : ObservableObject
 {
@@ -33,6 +34,7 @@ internal sealed partial class TacticRuleRow : ObservableObject
         SkillId = action.SkillId ?? "",
         On = TacticTargetChoice.Of(action.On),
         WeightText = TypedNumber.Text(action.Weight),
+        IsPriority = action.IsPriority,
     };
 
     /// <summary>A rule as Add starts it: always, the attack, automatic, weight 1 (decision 859).</summary>
@@ -48,6 +50,7 @@ internal sealed partial class TacticRuleRow : ObservableObject
         SkillId = row.SkillId,
         On = row.On,
         WeightText = row.WeightText,
+        IsPriority = row.IsPriority,
     };
 
     [ObservableProperty]
@@ -72,6 +75,10 @@ internal sealed partial class TacticRuleRow : ObservableObject
     [NotifyPropertyChangedFor(nameof(Sentence), nameof(Problem))]
     public partial string WeightText { get; set; }
 
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Sentence))]
+    public partial bool IsPriority { get; set; }
+
     /// <summary>
     /// Its place in its list, set by the list: Data's <c>tactics[i]</c>, so a problem's rule is found.
     /// </summary>
@@ -90,11 +97,12 @@ internal sealed partial class TacticRuleRow : ObservableObject
     };
 
     /// <summary>
-    /// "2. When an ally's HP is below 50 %: field_dressing on that one, weight 3", the boxes as typed; the skill by id,
-    /// since the row doesn't hold the catalog (decision 853).
+    /// "2. When an ally's HP is below 50 %: field_dressing on that one, weight 3", the boxes as typed, ", priority"
+    /// after a priority rule's weight; the skill by id, since the row doesn't hold the catalog (decision 853).
     /// </summary>
     public string Sentence =>
-        $"{Index}. {WhenWords}: {(SkillId.Length == 0 ? "attack" : SkillId)} on {On.Label}, weight {WeightText}";
+        $"{Index}. {WhenWords}: {(SkillId.Length == 0 ? "attack" : SkillId)} on {On.Label}, weight {WeightText}"
+        + (IsPriority ? ", priority" : "");
 
     /// <summary>
     /// The weight, then a number the kind reads, that isn't a whole number; null when it can be built.
@@ -113,6 +121,7 @@ internal sealed partial class TacticRuleRow : ObservableObject
                 Weight = TypedNumber.Parse(WeightText)!.Value,
                 When = When.Kind is { } kind ? new TacticCondition(kind, TypedPercent) : null,
                 On = On.Target,
+                IsPriority = IsPriority,
             };
 
     private TacticConditionNumber Number =>

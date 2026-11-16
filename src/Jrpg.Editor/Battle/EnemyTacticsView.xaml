@@ -101,6 +101,10 @@
                      Text="{Binding WeightText, UpdateSourceTrigger=PropertyChanged}"
                      ToolTip="Its share of the draw among the rules whose When holds" />
           </StackPanel>
+          <CheckBox Content="Priority: chosen before any draw"
+                    Margin="0,6,0,0"
+                    IsChecked="{Binding IsPriority}"
+                    ToolTip="While it can be chosen (its When holds, its skill is usable, its On finds someone), it is chosen without a draw; among several, the first in the list" />
         </StackPanel>
       </StackPanel>
       <ListBox ItemsSource="{Binding SelectedList.Rules}"

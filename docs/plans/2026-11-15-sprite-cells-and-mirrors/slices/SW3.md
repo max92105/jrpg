@@ -70,3 +70,10 @@ The window shows the sheets, so steps 1-8 are the developer's; the implementer r
    under "NPCs > New NPC". Then, his content call (decision 775): choose `npc merchant A v00.png`, set Right (and
    Up if its row is wrong) as he sees fit, OK, File > Save all, and check the milestone map's merchant in the game.
 9. Run `.claude/scripts/open-editor-windows.ps1`: no `ERROR` line.
+
+- **Done, with deviations:** the Pick toggle is a `CheckBox` (the theme styles none for a bare `ToggleButton`; a
+  `CheckBox` is one, so its click keeps the one-way binding), each facing's line one `DataTemplate` shown four times;
+  `PaceText_FrameTimeTyped_IsRaised` added (the relay); the pace line sits under the Frame time box, the 330 px panel
+  having no room beside it; column 1's number starts clear of row 1's at small zooms (review). The implementer ran step 9: the window opened with no `ERROR`
+  and no binding-error line, its capture unopened (Mana Seed). Steps 1 to 8 are the developer's, the merchant's
+  setup included (decision 775).

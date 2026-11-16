@@ -1,5 +1,5 @@
 # Character sprite cells and mirrors (editor push, roadmap row 5)
-Status: approved
+Status: retro pending
 
 Drafted on 2026-11-15 from the editor push's roadmap row 5 and design 3.5 (need 1), while the developer was away
 (see "Defaults to confirm"). His words: "for NPC you assume row and column will always be the same
@@ -109,7 +109,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/SW1.md](slices/SW1.md)
 - [x] **SW2. Picking cells and the boxes' members: the rules** (Editor, about 260 lines; split point SW2a/SW2b named)
   → [slices/SW2.md](slices/SW2.md)
-- [ ] **SW3. The window: Shows boxes, picking on the image, the marks and the pace line** (Editor, about 220 lines) →
+- [x] **SW3. The window: Shows boxes, picking on the image, the marks and the pace line** (Editor, about 220 lines) →
   [slices/SW3.md](slices/SW3.md)
 
 ## Decisions

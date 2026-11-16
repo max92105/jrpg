@@ -12,6 +12,8 @@
         ShowInTaskbar="False">
   <Window.Resources>
     <sprites:RowIndexConverter x:Key="RowIndex" />
+    <sprites:SameItemConverter x:Key="SameItem" />
+    <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
     <Style x:Key="FieldLabel" TargetType="TextBlock">
       <Setter Property="Width" Value="110" />
       <Setter Property="VerticalAlignment" Value="Center" />
@@ -22,6 +24,51 @@
     <Style x:Key="RowBox" TargetType="ComboBox" BasedOn="{StaticResource {x:Type ComboBox}}">
       <Setter Property="Width" Value="70" />
     </Style>
+    <!-- One facing's line (ADR 0054): what it shows, then its row, the facing it mirrors, or its picked cells with Pick,
+         Remove last and Clear. The setup comes from the panel's scroller, whose data context it is. -->
+    <DataTemplate x:Key="FacingLine" DataType="{x:Type sprites:FacingSetup}">
+      <StackPanel Margin="0,4,0,0">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="{Binding Facing}" Width="50" VerticalAlignment="Center" />
+          <ComboBox Width="90"
+                    ItemsSource="{x:Static sprites:FacingSourceChoice.All}"
+                    DisplayMemberPath="Label"
+                    SelectedValuePath="Source"
+                    SelectedValue="{Binding Source}"
+                    ToolTip="Row: its row's frames. Cells: frames picked on the image. Mirror of: another facing flipped." />
+          <ComboBox Style="{StaticResource RowBox}"
+                    Margin="6,0,0,0"
+                    ItemsSource="{Binding DataContext.RowChoices, RelativeSource={RelativeSource AncestorType=ScrollViewer}}"
+                    SelectedIndex="{Binding Row, Converter={StaticResource RowIndex}}"
+                    Visibility="{Binding IsOnRow, Converter={StaticResource VisibleWhenTrue}}" />
+          <ComboBox Width="80"
+                    Margin="6,0,0,0"
+                    ItemsSource="{Binding MirrorChoices}"
+                    SelectedItem="{Binding MirrorOf}"
+                    Visibility="{Binding IsMirror, Converter={StaticResource VisibleWhenTrue}}" />
+        </StackPanel>
+        <StackPanel Margin="50,2,0,0" Visibility="{Binding IsOnCells, Converter={StaticResource VisibleWhenTrue}}">
+          <TextBlock Text="{Binding CellsText}" TextWrapping="Wrap" Foreground="{StaticResource MutedTextBrush}" />
+          <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
+            <!-- Checked while this facing picks; a click runs the command, which moves the picking to it or off. -->
+            <CheckBox Content="Pick"
+                      VerticalAlignment="Center"
+                      Command="{Binding DataContext.Walk.TogglePickingCommand, RelativeSource={RelativeSource AncestorType=ScrollViewer}}"
+                      CommandParameter="{Binding}"
+                      ToolTip="Clicks on the image add frames to this facing, in order">
+              <CheckBox.IsChecked>
+                <MultiBinding Converter="{StaticResource SameItem}" Mode="OneWay">
+                  <Binding />
+                  <Binding Path="DataContext.Walk.PickingFacing" RelativeSource="{RelativeSource AncestorType=ScrollViewer}" />
+                </MultiBinding>
+              </CheckBox.IsChecked>
+            </CheckBox>
+            <Button Content="Remove last" Margin="8,0,0,0" Command="{Binding RemoveLastCellCommand}" />
+            <Button Content="Clear" Margin="4,0,0,0" Command="{Binding ClearCellsCommand}" />
+          </StackPanel>
+        </StackPanel>
+      </StackPanel>
+    </DataTemplate>
   </Window.Resources>
   <DockPanel Margin="12">
     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
@@ -79,53 +126,53 @@
 
       <GridSplitter Grid.Column="1" Width="5" Margin="4,0,0,0" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
 
-      <!-- The chosen image's setup, and the four facings walking as the game draws them, over a 48 px cell outline. -->
-      <StackPanel Grid.Column="3" Width="330" Margin="12,0,0,0" DataContext="{Binding Setup}" Style="{StaticResource EnabledWhenChosen}">
-        <TextBlock Text="{Binding File, FallbackValue=Setup}" FontWeight="Bold" />
-        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-          <TextBlock Text="Columns" Style="{StaticResource FieldLabel}" />
-          <TextBox Style="{StaticResource FieldBox}" Text="{Binding Columns, UpdateSourceTrigger=PropertyChanged}" />
-          <TextBlock Text="Rows" Margin="12,0,0,0" VerticalAlignment="Center" />
-          <TextBox Style="{StaticResource FieldBox}" Margin="8,0,0,0" Text="{Binding Rows, UpdateSourceTrigger=PropertyChanged}" />
+      <!-- The chosen image's setup, and the four facings walking as the game draws them, over a 48 px cell outline; it
+           scrolls when the window is shorter than the four facing lines. -->
+      <ScrollViewer Grid.Column="3" Margin="12,0,0,0" DataContext="{Binding Setup}" VerticalScrollBarVisibility="Auto">
+        <StackPanel Width="330" Style="{StaticResource EnabledWhenChosen}">
+          <TextBlock Text="{Binding File, FallbackValue=Setup}" FontWeight="Bold" />
+          <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+            <TextBlock Text="Columns" Style="{StaticResource FieldLabel}" />
+            <TextBox Style="{StaticResource FieldBox}" Text="{Binding Columns, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBlock Text="Rows" Margin="12,0,0,0" VerticalAlignment="Center" />
+            <TextBox Style="{StaticResource FieldBox}" Margin="8,0,0,0" Text="{Binding Rows, UpdateSourceTrigger=PropertyChanged}" />
+          </StackPanel>
+          <TextBlock Margin="0,4,0,0" Foreground="{StaticResource MutedTextBrush}">
+            <Run Text="Frame" /><Run Text="{Binding FrameWidth, Mode=OneWay}" /><Run Text="x" /><Run Text="{Binding FrameHeight, Mode=OneWay}" /><Run Text="px" />
+          </TextBlock>
+          <TextBlock Text="Each facing shows (rows as numbered on the image)" Margin="0,8,0,0" />
+          <ContentControl Content="{Binding Walk.Down}" ContentTemplate="{StaticResource FacingLine}" />
+          <ContentControl Content="{Binding Walk.Up}" ContentTemplate="{StaticResource FacingLine}" />
+          <ContentControl Content="{Binding Walk.Left}" ContentTemplate="{StaticResource FacingLine}" />
+          <ContentControl Content="{Binding Walk.Right}" ContentTemplate="{StaticResource FacingLine}" />
+          <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+            <TextBlock Text="Frames per row" Style="{StaticResource FieldLabel}" />
+            <TextBox Style="{StaticResource FieldBox}"
+                     Text="{Binding Walk.Frames, UpdateSourceTrigger=PropertyChanged}"
+                     IsEnabled="{Binding Walk.IsAnyFacingOnRow}"
+                     ToolTip="The frames a facing on its row walks through, from column 1" />
+            <TextBlock Text="Frame time (ms)" Margin="12,0,8,0" VerticalAlignment="Center" />
+            <TextBox Style="{StaticResource FieldBox}" Text="{Binding Walk.FrameMilliseconds, UpdateSourceTrigger=PropertyChanged}" />
+          </StackPanel>
+          <TextBlock Text="{Binding PaceText}" Foreground="{StaticResource MutedTextBrush}" Margin="0,2,0,0" />
+          <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+            <TextBlock Text="Scale" Style="{StaticResource FieldLabel}" ToolTip="Whole number; 3 for 16 px sheets in 48 px cells" />
+            <TextBox Style="{StaticResource FieldBox}" Text="{Binding Scale, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBlock Text="Feet (px)" Margin="12,0,8,0" VerticalAlignment="Center" ToolTip="Sheet pixels between the frame's bottom and the feet" />
+            <TextBox Style="{StaticResource FieldBox}" Text="{Binding FeetPixels, UpdateSourceTrigger=PropertyChanged}" />
+          </StackPanel>
+          <TextBlock Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Margin="0,6,0,0" Text="{Binding Problem}" />
+          <TextBlock Text="Walking: down, left, right, up" FontWeight="Bold" Margin="0,10,0,0" />
+          <Image x:Name="Preview"
+                 Stretch="None"
+                 HorizontalAlignment="Left"
+                 Margin="0,4,0,0"
+                 RenderOptions.BitmapScalingMode="NearestNeighbor" />
         </StackPanel>
-        <TextBlock Margin="0,4,0,0" Foreground="{StaticResource MutedTextBrush}">
-          <Run Text="Frame" /><Run Text="{Binding FrameWidth, Mode=OneWay}" /><Run Text="x" /><Run Text="{Binding FrameHeight, Mode=OneWay}" /><Run Text="px" />
-        </TextBlock>
-        <TextBlock Text="Walk rows (as numbered on the image)" Margin="0,8,0,0" />
-        <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-          <TextBlock Text="Down" Style="{StaticResource FieldLabel}" />
-          <ComboBox Style="{StaticResource RowBox}" ItemsSource="{Binding RowChoices}" SelectedIndex="{Binding Walk.Down.Row, Converter={StaticResource RowIndex}}" />
-          <TextBlock Text="Up" Margin="12,0,8,0" VerticalAlignment="Center" />
-          <ComboBox Style="{StaticResource RowBox}" ItemsSource="{Binding RowChoices}" SelectedIndex="{Binding Walk.Up.Row, Converter={StaticResource RowIndex}}" />
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-          <TextBlock Text="Left" Style="{StaticResource FieldLabel}" />
-          <ComboBox Style="{StaticResource RowBox}" ItemsSource="{Binding RowChoices}" SelectedIndex="{Binding Walk.Left.Row, Converter={StaticResource RowIndex}}" />
-          <TextBlock Text="Right" Margin="12,0,8,0" VerticalAlignment="Center" />
-          <ComboBox Style="{StaticResource RowBox}" ItemsSource="{Binding RowChoices}" SelectedIndex="{Binding Walk.Right.Row, Converter={StaticResource RowIndex}}" />
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-          <TextBlock Text="Walk frames" Style="{StaticResource FieldLabel}" />
-          <TextBox Style="{StaticResource FieldBox}" Text="{Binding Walk.Frames, UpdateSourceTrigger=PropertyChanged}" />
-          <TextBlock Text="Frame time (ms)" Margin="12,0,8,0" VerticalAlignment="Center" />
-          <TextBox Style="{StaticResource FieldBox}" Text="{Binding Walk.FrameMilliseconds, UpdateSourceTrigger=PropertyChanged}" />
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-          <TextBlock Text="Scale" Style="{StaticResource FieldLabel}" ToolTip="Whole number; 3 for 16 px sheets in 48 px cells" />
-          <TextBox Style="{StaticResource FieldBox}" Text="{Binding Scale, UpdateSourceTrigger=PropertyChanged}" />
-          <TextBlock Text="Feet (px)" Margin="12,0,8,0" VerticalAlignment="Center" ToolTip="Sheet pixels between the frame's bottom and the feet" />
-          <TextBox Style="{StaticResource FieldBox}" Text="{Binding FeetPixels, UpdateSourceTrigger=PropertyChanged}" />
-        </StackPanel>
-        <TextBlock Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Margin="0,6,0,0" Text="{Binding Problem}" />
-        <TextBlock Text="Walking: down, left, right, up" FontWeight="Bold" Margin="0,10,0,0" />
-        <Image x:Name="Preview"
-               Stretch="None"
-               HorizontalAlignment="Left"
-               Margin="0,4,0,0"
-               RenderOptions.BitmapScalingMode="NearestNeighbor" />
-      </StackPanel>
+      </ScrollViewer>
 
-      <!-- The image with its frame grid, zoomable; the rows numbered from 1 on its left edge. -->
+      <!-- The image with its frame grid, zoomable; the rows numbered from 1 on its left edge, the columns along its top,
+           the picking facing's cells numbered in pick order; a click adds the frame under it while a facing picks. -->
       <DockPanel Grid.Column="2" Margin="8,0,0,0">
         <viewport:CellZoomBar x:Name="ZoomBar" DockPanel.Dock="Top" Margin="0,0,0,4" HorizontalAlignment="Left" />
         <ScrollViewer x:Name="ImageScroller"
@@ -135,9 +182,12 @@
           <Grid x:Name="ImageView"
                 HorizontalAlignment="Left"
                 VerticalAlignment="Top"
-                RenderOptions.BitmapScalingMode="NearestNeighbor">
+                RenderOptions.BitmapScalingMode="NearestNeighbor"
+                MouseLeftButtonDown="OnImageClicked"
+                ToolTip="With Pick on, click a frame to add it">
             <Image x:Name="SheetImage" Stretch="Fill" />
             <Image x:Name="SheetMarks" Stretch="Fill" />
+            <Image x:Name="PickMarks" Stretch="Fill" />
           </Grid>
         </ScrollViewer>
       </DockPanel>

@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Jrpg.Core.Sprites;
@@ -12,8 +13,9 @@ namespace Jrpg.Editor.Sprites;
 
 /// <summary>
 /// The Character sprites window (decisions 568-570): the images on the left, the chosen one in the middle with its
-/// frame grid, its setup on the right with the four facings walking at the editor's animation time. OK applies the
-/// session as one undo step, greyed while a problem shows; Cancel drops it.
+/// frame grid, its setup on the right with the four facings walking at the editor's animation time. While a facing
+/// picks, a click on the image adds the frame under it, and the image numbers that facing's cells (decision 772). OK
+/// applies the session as one undo step, greyed while a problem shows; Cancel drops it.
 /// </summary>
 internal sealed partial class FieldSpriteWindow : Window
 {
@@ -89,12 +91,14 @@ internal sealed partial class FieldSpriteWindow : Window
         if (_setup is not null)
         {
             _setup.PropertyChanged -= OnSetupChanged;
+            _setup.Walk.PropertyChanged -= OnWalkChanged;
         }
 
         _setup = _sprites.Setup;
         if (_setup is not null)
         {
             _setup.PropertyChanged += OnSetupChanged;
+            _setup.Walk.PropertyChanged += OnWalkChanged;
         }
 
         _sheet = _setup is null ? null : SpriteImageFile.Load(_artRoot, _setup.File);
@@ -113,12 +117,16 @@ internal sealed partial class FieldSpriteWindow : Window
         DrawPreview();
     }
 
-    // The sheet at the zoom's size per frame, its grid and row numbers over it.
+    // The picking facing never reaches the setup's own notices (it changes nothing in the record), so the marks listen
+    // to the walk itself.
+    private void OnWalkChanged(object? sender, PropertyChangedEventArgs e) => DrawPickMarks();
+
+    // The sheet at the zoom's size per frame, its grid, row and column numbers and the pick marks over it.
     private void DrawSheet()
     {
         if (_sheet is null || _setup is null)
         {
-            SheetImage.Source = SheetMarks.Source = null;
+            SheetImage.Source = SheetMarks.Source = PickMarks.Source = null;
             return;
         }
 
@@ -126,9 +134,27 @@ internal sealed partial class FieldSpriteWindow : Window
         _scale = _zoom.ScaleFor(Math.Max(1, _setup.FrameWidth));
         SheetImage.Source = _sheet;
         SheetMarks.Source = SpriteSheetMarks.Draw(size, _setup.FrameWidth, _setup.FrameHeight, _scale);
-        SheetImage.Width = SheetMarks.Width = size.PixelWidth;
-        SheetImage.Height = SheetMarks.Height = size.PixelHeight;
+        SheetImage.Width = SheetMarks.Width = PickMarks.Width = size.PixelWidth;
+        SheetImage.Height = SheetMarks.Height = PickMarks.Height = size.PixelHeight;
         ImageView.LayoutTransform = new ScaleTransform(_scale, _scale);
+        DrawPickMarks();
+    }
+
+    // Nothing while no facing picks or the cut gives no frame.
+    private void DrawPickMarks()
+    {
+        var hasFrames = _setup is { FrameWidth: >= 1, FrameHeight: >= 1 };
+        PickMarks.Source = _sheet is not null && hasFrames && _setup is { Walk.PickingFacing: { } picking }
+            ? SequenceMarks.Draw(
+                (_sheet.PixelWidth, _sheet.PixelHeight), (_setup.FrameWidth, _setup.FrameHeight), picking.Cells, _scale)
+            : null;
+    }
+
+    // The image is sized in its own pixels under the zoom's layout transform, so the point is in image pixels.
+    private void OnImageClicked(object sender, MouseButtonEventArgs e)
+    {
+        var point = e.GetPosition(SheetImage);
+        _setup?.PickCellAt(point.X, point.Y);
     }
 
     // Redrawn only when a facing's frame changed, as the composer's canvas does.
@@ -184,6 +210,7 @@ internal sealed partial class FieldSpriteWindow : Window
         if (_setup is not null)
         {
             _setup.PropertyChanged -= OnSetupChanged;
+            _setup.Walk.PropertyChanged -= OnWalkChanged;
         }
     }
 }

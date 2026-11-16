@@ -274,3 +274,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   struct through its parameterless constructor); add them to the sprite cells plan's `RequiredStructMembers` list.
 - `Editor/Sprites/FieldSpriteSetupViewModel.PreviewFrameAt` (formerly `PreviewCellAt`) has no caller but its tests:
   the walk preview reads the record itself; remove it or give it the preview (sprite cells plan, SC3 review).
+- Editor marks drawing copied many times: the `Frozen(Brush)` helper (`SequenceMarks`, `SpriteSheetMarks`,
+  `CollisionDrawing`, `TilesheetMarks`' `Frozen<T>`) and the clipped `DrawingGroup` pinned by a transparent rectangle
+  and frozen (six files); one shared marks-drawing type could hold both (sprite cells plan, SW3 review).

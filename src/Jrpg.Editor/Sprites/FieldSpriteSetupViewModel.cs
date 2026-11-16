@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Maps;
@@ -126,6 +127,16 @@ internal sealed partial class FieldSpriteSetupViewModel : ObservableObject
     public FieldSpriteSheet ToSheet() => Problem is { } problem ? throw new InvalidOperationException(problem) : Record();
 
     /// <summary>
+    /// "150 ms a frame, 6.7 frames a second" beside the Frame time box (decision 774), following it as typed; empty
+    /// while the time is below 1 ms.
+    /// </summary>
+    public string PaceText => Walk.FrameMilliseconds < 1
+        ? ""
+        : string.Create(
+            CultureInfo.InvariantCulture,
+            $"{Walk.FrameMilliseconds} ms a frame, {1000.0 / Walk.FrameMilliseconds:0.0} frames a second");
+
+    /// <summary>
     /// Adds the cell under a point of the image to the picking facing's sequence (decision 772): nothing without a
     /// picking facing, outside the whole frames (an image that doesn't split evenly leaves an edge that isn't one) or
     /// while the cut gives no frame. A command, never a throw.
@@ -174,6 +185,11 @@ internal sealed partial class FieldSpriteSetupViewModel : ObservableObject
         if (e.PropertyName is not (nameof(FacingCycleSetup.PickingFacing) or nameof(FacingCycleSetup.IsAnyFacingOnRow)))
         {
             OnPropertyChanged(nameof(Problem));
+        }
+
+        if (e.PropertyName == nameof(FacingCycleSetup.FrameMilliseconds))
+        {
+            OnPropertyChanged(nameof(PaceText));
         }
     }
 }

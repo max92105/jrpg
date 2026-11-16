@@ -15,7 +15,10 @@ public sealed class Inventory
     /// <summary>Owned gear, one piece per row, in pickup order.</summary>
     public IReadOnlyList<GearPiece> Gear => _gear;
 
-    /// <summary>Stacks the item, or adds equipment as that many plain pieces (decision 344).</summary>
+    /// <summary>
+    /// Stacks the item, or adds equipment as that many pieces with nothing rolled: a unique's own piece (ADR 0058),
+    /// else a plain one (decision 344).
+    /// </summary>
     /// <returns>
     /// How many copies didn't fit because the stack reached <see cref="ItemDefinition.MaxStack"/>; always 0 for
     /// equipment, which has no cap.
@@ -26,7 +29,7 @@ public sealed class Inventory
 
         if (item.Equipment is not null)
         {
-            _gear.AddRange(Enumerable.Repeat(GearPiece.Plain(item), quantity));
+            _gear.AddRange(Enumerable.Repeat(GearPiece.Unrolled(item), quantity));
             return 0;
         }
 

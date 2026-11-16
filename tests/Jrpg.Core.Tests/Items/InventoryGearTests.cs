@@ -20,6 +20,22 @@ public sealed class InventoryGearTests
         Assert.Empty(_inventory.Entries);
     }
 
+    // A map gift or a starting item comes through Add: a unique's copies are its own piece, never plain (ADR 0058).
+    [Fact]
+    public void Add_UniqueItem_AddsItsUniquePiecePerCopy()
+    {
+        var cleaver = _sword with
+        {
+            Id = "chiefs_cleaver",
+            IsUnique = true,
+            FixedAffixes = [new RolledAffix("power", StatKind.Power, 7)],
+        };
+
+        _inventory.Add(cleaver, 2);
+
+        Assert.Equal([GearPiece.Unique(cleaver), GearPiece.Unique(cleaver)], _inventory.Gear);
+    }
+
     // An upgraded piece keeps its row (forge plan, M3a): the shield after it stays after it.
     [Fact]
     public void TryReplace_OwnedPiece_KeepsItsPlace()

@@ -50,3 +50,5 @@ Shop's questions name a unique by its own name ("Chief's Cleaver", not "Unique C
   "Chief's Cleaver" with 220 gold. Revert the table.
 - Save the game holding the Cleaver, change its `power` value to 4 in `content/items.json`, load the save: the Cleaver
   shows +4 Power. Revert.
+- **Note from IU2:** `GearRepair` sums the worn bonuses through `ContentCatalog.PieceFrom` (about line 89): a saved
+  Unique piece on a base no longer unique must be made Common before that sum runs, or it sums the old fixed affixes.

@@ -105,7 +105,7 @@ slices run; IU5 is optional and IU16 merged into IU15.
 - [x] ADR 0058, unique items as records with fixed affixes (amends ADR 0029). Write it from the README's decisions
   864-872 and 875, recording decisions 681, 866 and 875 as defaults to confirm (the options in design.md, section 4); no
   question is asked.
-- [ ] **IU2. A unique item gives its own piece everywhere: dropped, stocked, given, restored** (Core, about 230 lines)
+- [x] **IU2. A unique item gives its own piece everywhere: dropped, stocked, given, restored** (Core, about 230 lines)
   → [slices/IU2.md](slices/IU2.md)
 - [ ] **IU3. `items.json` holds uniques: `isUnique` and `fixedAffixes`, loaded and checked; a placeholder unique**
   (Data + content, about 240 lines) → [slices/IU3.md](slices/IU3.md)

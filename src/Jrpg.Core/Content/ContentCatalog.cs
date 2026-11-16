@@ -75,8 +75,23 @@ public sealed record ContentCatalog
     /// <summary>The class that gives a member their numbers at their level (ADR 0017).</summary>
     public ClassDefinition ClassOf(PartyMemberDefinition member) => Classes[member.ClassId];
 
-    /// <summary>A saved piece back as a piece, each affix's stat read from the pool.</summary>
-    /// <remarks>For a repaired save, as <c>GameSession.Restore</c> takes: its base and affixes are known.</remarks>
-    public GearPiece PieceFrom(SavedGear saved) =>
-        GearPiece.Rolled(Items[saved.ItemId], saved.Rarity, [.. saved.Affixes.Select(affix => new RolledAffix(affix.AffixId, Affixes[affix.AffixId].Stat, affix.Value))]);
+    /// <summary>
+    /// A saved piece back as a piece, each affix's stat read from the pool; a unique from its record.
+    /// </summary>
+    /// <remarks>
+    /// For a repaired save, as <c>GameSession.Restore</c> takes: its base and affixes are known. A unique's saved
+    /// rarity and affixes are ignored (decision 868): its record is the truth, so an edited unique reaches every copy
+    /// the party owns.
+    /// </remarks>
+    public GearPiece PieceFrom(SavedGear saved)
+    {
+        var item = Items[saved.ItemId];
+        if (item.IsUnique)
+        {
+            return GearPiece.Unique(item);
+        }
+
+        var affixes = saved.Affixes.Select(affix => new RolledAffix(affix.AffixId, Affixes[affix.AffixId].Stat, affix.Value));
+        return GearPiece.Rolled(item, saved.Rarity, [.. affixes]);
+    }
 }

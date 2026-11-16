@@ -45,6 +45,17 @@ public sealed class GearPiece : IEquatable<GearPiece>
     /// <exception cref="ArgumentException"><paramref name="item"/> isn't equipment.</exception>
     public static GearPiece Plain(ItemDefinition item) => Rolled(item, Rarity.Common, []);
 
+    /// <summary>The piece a unique item always is: Unique with its fixed affixes in order (ADR 0058).</summary>
+    /// <exception cref="ArgumentException"><paramref name="item"/> isn't unique, or isn't equipment.</exception>
+    public static GearPiece Unique(ItemDefinition item) =>
+        item.IsUnique
+            ? Rolled(item, Rarity.Unique, item.FixedAffixes)
+            : throw new ArgumentException($"Item '{item.Id}' is not unique.", nameof(item));
+
+    /// <summary>The piece an item gives when nothing rolls: a unique's own, else a plain one (decision 344).</summary>
+    /// <exception cref="ArgumentException"><paramref name="item"/> isn't equipment.</exception>
+    public static GearPiece Unrolled(ItemDefinition item) => item.IsUnique ? Unique(item) : Plain(item);
+
     /// <param name="item">The base item.</param>
     /// <param name="rarity">What the roll gave.</param>
     /// <param name="affixes">In roll order; copied.</param>

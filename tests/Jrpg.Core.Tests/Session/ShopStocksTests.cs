@@ -1,6 +1,7 @@
 using Jrpg.Core.Items;
 using Jrpg.Core.Session;
 using Jrpg.Core.Tests.Randomness;
+using Jrpg.Core.Trade;
 using static Jrpg.Core.Tests.Builders.ShopCatalog;
 
 namespace Jrpg.Core.Tests.Session;
@@ -66,6 +67,29 @@ public sealed class ShopStocksTests
 
         Assert.Equal([Magic(Ring, Agility, 4)], again.Pieces);
         Assert.Equal([Magic(Sword, Power, 5), Magic(Ring, Agility, 2)], rerolled.Pieces);
+    }
+
+    // A base sword would draw its affix's value; the unique draws nothing, and the random holds nothing (decision 867).
+    [Fact]
+    public void StockFor_ShopListingAUnique_StocksItsUniquePiece()
+    {
+        var cleaver = Sword with
+        {
+            Id = "chiefs_cleaver",
+            IsUnique = true,
+            FixedAffixes = [new RolledAffix(Power.Id, Power.Stat, 7)],
+        };
+        var built = Build();
+        var catalog = built with
+        {
+            Items = new Dictionary<string, ItemDefinition>(built.Items) { [cleaver.Id] = cleaver },
+            Shops = new Dictionary<string, ShopDefinition> { ["relics"] = new("relics", "Relics", [cleaver.Id]) },
+        };
+        var stocks = new ShopStocks(catalog, GameSession.GearRollFor(catalog, new FixedSequenceRandom()));
+
+        var stock = stocks.StockFor("relics", leaderLevel: 1);
+
+        Assert.Equal([GearPiece.Unique(cleaver)], stock.Pieces);
     }
 
     [Fact]

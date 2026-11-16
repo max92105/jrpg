@@ -3,10 +3,11 @@ using Jrpg.Core.Stats;
 namespace Jrpg.Core.Items;
 
 /// <summary>
-/// One rolled line on a gear piece. Its stat is resolved from the affix pool when the piece is rolled or loaded, so the
-/// piece's bonuses need no catalog afterwards (ADR 0029).
+/// One line on a gear piece: rolled, or fixed on a unique item (ADR 0058). Its stat is resolved from the affix pool
+/// when the piece is rolled or loaded, or when a unique's record loads, so the piece's bonuses need no catalog
+/// afterwards (ADR 0029).
 /// </summary>
-/// <param name="AffixId">The affix in the pool it was rolled from.</param>
+/// <param name="AffixId">The pool affix it was rolled from, or the one a unique names.</param>
 /// <param name="Stat">What it raises.</param>
 /// <param name="Value">
 /// In the stat's bonus unit, as an item's bonuses: whole points for a primary, max HP or speed, whole percents for the

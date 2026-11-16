@@ -15,6 +15,64 @@ public sealed class GearPieceTests
 
     private static readonly ItemDefinition _potion = new ItemDefinitionBuilder().WithId("potion").Build();
 
+    // Crit listed before Power, against the stats' order, so a sort by stat would show.
+    private static readonly ItemDefinition _cleaver = _sword with
+    {
+        Id = "chiefs_cleaver",
+        IsUnique = true,
+        FixedAffixes = [Affix(StatKind.CritChance, 4), Affix(StatKind.Power, 7)],
+    };
+
+    [Fact]
+    public void Unique_UniqueItem_IsUniqueWithItsFixedAffixesInOrder()
+    {
+        var piece = GearPiece.Unique(_cleaver);
+
+        Assert.Equal((_cleaver, Rarity.Unique), (piece.Base, piece.Rarity));
+        Assert.Equal([Affix(StatKind.CritChance, 4), Affix(StatKind.Power, 7)], piece.Affixes);
+    }
+
+    [Fact]
+    public void Unique_ItemNotMarkedUnique_Throws()
+    {
+        var exception = Assert.Throws<ArgumentException>(() => GearPiece.Unique(_sword));
+
+        Assert.Contains("'bronze_sword'", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Unique_UniqueConsumable_Throws()
+    {
+        var uniquePotion = _potion with { IsUnique = true };
+
+        Assert.Throws<ArgumentException>(() => GearPiece.Unique(uniquePotion));
+    }
+
+    [Fact]
+    public void Unrolled_UniqueItem_IsItsUniquePiece()
+    {
+        var piece = GearPiece.Unrolled(_cleaver);
+
+        Assert.Equal(GearPiece.Unique(_cleaver), piece);
+    }
+
+    [Fact]
+    public void Unrolled_OrdinaryItem_IsPlain()
+    {
+        var piece = GearPiece.Unrolled(_sword);
+
+        Assert.Equal(GearPiece.Plain(_sword), piece);
+    }
+
+    // The base gives Power 2; the fixed affixes add 7 to it and 4 crit.
+    [Fact]
+    public void Bonuses_UniquePiece_AddsItsFixedAffixesToTheBase()
+    {
+        var piece = GearPiece.Unique(_cleaver);
+
+        Assert.Equal((9, 4), (piece.Bonuses.Of(StatKind.Power), piece.Bonuses.Of(StatKind.CritChance)));
+    }
+
     [Fact]
     public void Plain_Consumable_Throws()
     {

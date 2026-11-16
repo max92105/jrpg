@@ -27,6 +27,9 @@ internal static class AbsentWhenFalseFilter
 
         // Decision 339: only a crafting material is one.
         (typeof(ItemDefinition), "isMaterial"),
+
+        // ADR 0058: only a hand-made piece is unique.
+        (typeof(ItemDefinition), "isUnique"),
     ];
 
     public static void SkipFalseOptionalFields(JsonTypeInfo typeInfo) =>

@@ -8,16 +8,23 @@ namespace Jrpg.Core.Loot;
 /// that many affixes by weight among the pool's affixes for the item's kind, never one twice (decision 359), each value
 /// in its range; and, at the Forge, adds one more affix to a piece or draws all of its affixes again the same way
 /// (decisions 351, 352). Every draw is skipped when only one outcome is possible, so a Common-only table leaves the
-/// random untouched.
+/// random untouched; a unique item never rolls and comes as its own piece, drawing nothing (decision 867).
 /// </summary>
 internal sealed class GearRoll(IReadOnlyList<AffixDefinition> pool, LootRules rules, IRandom random)
 {
-    /// <param name="item">A base item that is equipment.</param>
+    /// <param name="item">An item that is equipment, a base or a unique.</param>
     /// <param name="luckPermille">The party's drop luck, raising the tiers above Common (decision 349).</param>
-    /// <returns>A piece with fewer affixes than its rarity asks when the pool has too few for the kind.</returns>
+    /// <returns>
+    /// A piece with fewer affixes than its rarity asks when the pool has too few for the kind; a unique's own piece.
+    /// </returns>
     /// <exception cref="ArgumentException"><paramref name="item"/> isn't equipment.</exception>
     public GearPiece Roll(ItemDefinition item, int luckPermille)
     {
+        if (item.IsUnique)
+        {
+            return GearPiece.Unique(item);
+        }
+
         var kind = item.Equipment?.Kind ?? throw new ArgumentException($"Item '{item.Id}' is not equipment.", nameof(item));
         var rarity = RollRarity(luckPermille);
         var rule = rules.Rarities[rarity];

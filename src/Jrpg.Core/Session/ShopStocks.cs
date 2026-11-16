@@ -9,7 +9,7 @@ namespace Jrpg.Core.Session;
 /// Every opened shop's stock by id (decision 385): rolled the first time a shop opens, kept while the leader stays at
 /// the level it rolled at, and rolled again on the next opening once the leader has gained a level. Each gear entry of
 /// the shop's list rolls into one piece through the shared <see cref="GearRoll"/>, in list order and with no luck
-/// (decision 349); stacks are the catalog's items, never rolled.
+/// (decision 349), a unique coming as its own piece (ADR 0058); stacks are the catalog's items, never rolled.
 /// </summary>
 internal sealed class ShopStocks
 {

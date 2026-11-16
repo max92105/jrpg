@@ -321,3 +321,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   `Shell/EditorTheme.xaml` would serve them all (EB7 review).
 - Five Data test files (the enemy validator's and writer's, EB9's `EnemyTacticConditionValidatorTests` among them)
   each build their own `_goblin` fixture: one shared test enemy in `Jrpg.Data.Tests` would serve them (EB9).
+- Ten Core records write their `Equals` by hand (`ItemDefinition`, `DropTable`, `Effect`, `StatusDefinition`,
+  `QuestDefinition`, `CinematicDefinition`...): a member added later and left out passes every test and breaks the
+  draft's change detection; one shared reflection test (each init property changed alone with `with` must make the
+  records unequal) would guard them all (items plan, IU2 review).

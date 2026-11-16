@@ -86,6 +86,31 @@ public sealed class DropRollTests
         Assert.Equal(["power", "crit_chance"], piece.Affixes.Select(affix => affix.AffixId));
     }
 
+    // Two copies: a fixed quantity draws nothing, so the chance is the one draw (decision 867). A base would draw its
+    // rarity between Common and Magic for each copy.
+    [Fact]
+    public void Roll_TableListingAUnique_DropsItsUniquePieceAfterTheChanceDraw()
+    {
+        var cleaver = _sword with
+        {
+            Id = "chiefs_cleaver",
+            IsUnique = true,
+            FixedAffixes = [new RolledAffix("power", StatKind.Power, 7)],
+        };
+        var commonOrMagic = new LootRules(new Dictionary<Rarity, RarityRule>
+        {
+            [Rarity.Common] = new(Weight: 1, MinAffixes: 0, MaxAffixes: 0),
+            [Rarity.Magic] = new(Weight: 1, MinAffixes: 0, MaxAffixes: 0),
+        });
+        var random = new FixedSequenceRandom(299);
+        var gearRoll = new GearRoll([], commonOrMagic, random);
+        var roll = new DropRoll(new Dictionary<string, ItemDefinition> { ["chiefs_cleaver"] = cleaver }, gearRoll, random);
+
+        var drops = roll.Roll([Table(new DropEntry("chiefs_cleaver", 30) { MinQuantity = 2, MaxQuantity = 2 })], luckPermille: 0);
+
+        Assert.Equal([GearPiece.Unique(cleaver), GearPiece.Unique(cleaver)], drops.Gear);
+    }
+
     // A 30 % entry is 300 permille: 300 misses it, but +50 % luck makes it 450 (decision 349).
     [Fact]
     public void Roll_DrawJustAboveChance_DropsWithLuck()

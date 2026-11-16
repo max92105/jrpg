@@ -136,6 +136,22 @@ public sealed class GearRollTests
         Assert.Equal(Rarity.Magic, piece.Rarity);
     }
 
+    // The scripted random holds nothing, so any draw would throw (decision 867).
+    [Fact]
+    public void Roll_UniqueItem_ReturnsItsPieceAndDrawsNothing()
+    {
+        var cleaver = _sword with
+        {
+            Id = "chiefs_cleaver",
+            IsUnique = true,
+            FixedAffixes = [new RolledAffix("power", StatKind.Power, 7)],
+        };
+
+        var piece = Roll(cleaver, _rules);
+
+        Assert.Equal(GearPiece.Unique(cleaver), piece);
+    }
+
     // The scripted random holds nothing, so the refusal comes before any draw.
     [Fact]
     public void Roll_NotEquipment_Throws()

@@ -25,6 +25,20 @@ public sealed class PricingTests
         Assert.Equal(155, _pricing.PriceOf(piece));
     }
 
+    // ADR 0031's formula unchanged (decision 871): 100 for the base, 20 and 35 for its fixed affixes.
+    [Fact]
+    public void PriceOf_UniquePiece_IsItsBaseAndFixedAffixValues()
+    {
+        var cleaver = _sword with
+        {
+            Id = "chiefs_cleaver",
+            IsUnique = true,
+            FixedAffixes = [new RolledAffix("power", StatKind.Power, 9), new RolledAffix("crit_chance", StatKind.CritChance, 5)],
+        };
+
+        Assert.Equal(155, _pricing.PriceOf(GearPiece.Unique(cleaver)));
+    }
+
     // The share of the whole price, base and affixes (decision 375 as read): 155 at 50 % is 77.
     [Fact]
     public void SalePriceOf_RolledPiece_SharesBasePlusAffixValues()

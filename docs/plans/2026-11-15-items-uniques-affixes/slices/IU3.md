@@ -71,3 +71,5 @@ out at their defaults. `chiefs_cleaver` is the placeholder unique, placed nowher
 - Set its `power` value to 0 in `content/items.json`, run the game: the start stops on "items.json: item
   'chiefs_cleaver': fixedAffixes[0] (power): value must be nonzero and within -100..100 (was 0)."; set it to 9: the
   game starts (above the 2..5 roll range, decision 866); revert.
+- **Note from IU2:** the `isUnique` (AbsentWhenFalse) and `fixedAffixes` (AbsentWhenEmpty) filter rows landed in IU2:
+  the identical-bytes test needed them once `ItemDefinition` had the members; skip that bullet.

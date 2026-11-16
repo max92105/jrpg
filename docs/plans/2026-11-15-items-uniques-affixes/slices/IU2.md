@@ -58,3 +58,6 @@ Nothing loads a unique from a file yet (IU3): the tests build their records.
 
 ## Verify by hand
 - Nothing to see yet: no content holds a unique (IU3 adds the placeholder). Run the game: it starts and plays as before.
+- **Done, with deviations:** IU3's two filter lines came forward (`isUnique` absent when false, `fixedAffixes` when
+  empty): without them the writer's identical-bytes test failed; `StockFor_...` for `ShopFor_...`; added
+  `Unique_UniqueConsumable_Throws` and `Equals_SameFixedAffixesButAnotherPrice_AreNotEqual`.

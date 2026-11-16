@@ -70,6 +70,27 @@ public sealed class ContentWriterEnemyTacticsTests : IDisposable
         Assert.Equal([once], ContentCatalogLoader.Load(_content.Path).Enemies["goblin"].Tactics);
     }
 
+    [Fact]
+    public void WriteEnemies_HpCondition_LeavesTurnsOut()
+    {
+        var onAllyBelowHalf = new EnemyAction { Weight = 1, When = new TacticCondition(TacticConditionKind.AllyHpBelow, 50) };
+
+        _writer.WriteMapCatalogs(WithGoblinTactics(onAllyBelowHalf));
+
+        Assert.False(WrittenGoblinTactics()[0]!["when"]!.AsObject().ContainsKey("turns"));
+    }
+
+    [Fact]
+    public void WriteEnemies_EveryNthTurn_WritesTurnsAndReadsItBack()
+    {
+        var everyThirdTurn = new EnemyAction { Weight = 1, When = new(TacticConditionKind.EveryNthTurn, Turns: 3) };
+
+        _writer.WriteMapCatalogs(WithGoblinTactics(everyThirdTurn));
+
+        Assert.Equal(3, (int?)WrittenGoblinTactics()[0]!["when"]!["turns"]);
+        Assert.Equal([everyThirdTurn], ContentCatalogLoader.Load(_content.Path).Enemies["goblin"].Tactics);
+    }
+
     // A power of 5, so a rule may name cleave, whose effect is tiered.
     private ContentCatalog WithGoblinTactics(params EnemyAction[] tactics)
     {

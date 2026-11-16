@@ -46,6 +46,30 @@ public sealed class TacticRuleRowSentenceTests
     }
 
     [Fact]
+    public void Sentence_FoeHpBelow_ReadsTheShare()
+    {
+        var row = TacticRuleRow.New();
+
+        row.When = TacticConditionChoice.Of(TacticConditionKind.FoeHpBelow);
+        row.NumberText = "50";
+
+        Assert.Equal("0. When a foe's HP is below 50 %: attack on automatic, weight 1", row.Sentence);
+    }
+
+    // No ordinal: every 3 turns are its turns 3, 6, 9 (decision 847).
+    [Fact]
+    public void Sentence_EveryNthTurn_ReadsEveryNTurns()
+    {
+        var row = TacticRuleRow.New();
+
+        row.When = TacticConditionChoice.Of(TacticConditionKind.EveryNthTurn);
+        row.NumberText = "3";
+        row.SkillId = "cleave";
+
+        Assert.Equal("0. Every 3 turns of its own: cleave on automatic, weight 1", row.Sentence);
+    }
+
+    [Fact]
     public void Sentence_NumberBoxEmpty_ReadsAQuestionMark()
     {
         var row = TacticRuleRow.New();

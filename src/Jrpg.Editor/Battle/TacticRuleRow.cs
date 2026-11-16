@@ -9,7 +9,7 @@ namespace Jrpg.Editor.Battle;
 /// its weight, whether it is a priority rule (decision 841) and whether it is once per battle (decision 842), and the
 /// numbered sentence the list shows. The number box keeps what was typed while its kind reads none, so switching back
 /// finds it, and is never written then. <see cref="Problem"/> is only what keeps the action from being built; a percent
-/// outside 1..99 or a target that doesn't fit the skill is Data's rule, shown by the list.
+/// outside 1..99, turns outside 2..10 or a target that doesn't fit the skill is Data's rule, shown by the list.
 /// </summary>
 internal sealed partial class TacticRuleRow : ObservableObject
 {
@@ -26,11 +26,17 @@ internal sealed partial class TacticRuleRow : ObservableObject
         WeightText = TypedNumber.Text(NewWeight);
     }
 
-    // A percent is 0 only where the kind reads none (Data refuses 0 where one is read), so its box starts empty there.
+    // A percent or turns is 0 only where the kind reads none (Data refuses 0 where one is read), so the box starts
+    // empty there; Data leaves at most one of them above 0.
     public static TacticRuleRow From(EnemyAction action) => new()
     {
         When = TacticConditionChoice.Of(action.When?.Kind),
-        NumberText = action.When is { Percent: > 0 and var percent } ? TypedNumber.Text(percent) : "",
+        NumberText = action.When switch
+        {
+            { Percent: > 0 and var percent } => TypedNumber.Text(percent),
+            { Turns: > 0 and var turns } => TypedNumber.Text(turns),
+            _ => "",
+        },
         SkillId = action.SkillId ?? "",
         On = TacticTargetChoice.Of(action.On),
         WeightText = TypedNumber.Text(action.Weight),
@@ -99,13 +105,14 @@ internal sealed partial class TacticRuleRow : ObservableObject
     {
         TacticConditionNumber.None => "",
         TacticConditionNumber.Percent => "%",
+        TacticConditionNumber.Turns => "turns",
         _ => throw new InvalidOperationException($"No unit for {Number}."),
     };
 
     /// <summary>
     /// "2. When an ally's HP is below 50 %: field_dressing on that one, weight 3", the boxes as typed, ", priority"
     /// after a priority rule's weight and ", once per battle" after a once rule's; the skill by id, since the row
-    /// doesn't hold the catalog (decision 853).
+    /// doesn't hold the catalog (decision 853). Every N turns reads "Every 3 turns of its own", without an ordinal.
     /// </summary>
     public string Sentence =>
         $"{Index}. {WhenWords}: {(SkillId.Length == 0 ? "attack" : SkillId)} on {On.Label}, weight {WeightText}"
@@ -115,9 +122,12 @@ internal sealed partial class TacticRuleRow : ObservableObject
     /// The weight, then a number the kind reads, that isn't a whole number; null when it can be built.
     /// </summary>
     public string? Problem =>
-        TypedNumber.ProblemOf("Weight", WeightText) ?? (IsNumberShown ? TypedNumber.ProblemOf("Percent", NumberText) : null);
+        TypedNumber.ProblemOf("Weight", WeightText) ?? (IsNumberShown ? TypedNumber.ProblemOf(NumberName, NumberText) : null);
 
-    /// <summary>The action as typed: the attack's id left out, a percent of 0 for a kind that reads none.</summary>
+    /// <summary>
+    /// The action as typed: the attack's id left out, the number written to the percent or the turns its kind reads, 0
+    /// in the other.
+    /// </summary>
     /// <exception cref="InvalidOperationException">There is a <see cref="Problem"/>.</exception>
     public EnemyAction ToAction() =>
         Problem is { } problem
@@ -126,7 +136,7 @@ internal sealed partial class TacticRuleRow : ObservableObject
             {
                 SkillId = SkillId.Length == 0 ? null : SkillId,
                 Weight = TypedNumber.Parse(WeightText)!.Value,
-                When = When.Kind is { } kind ? new TacticCondition(kind, TypedPercent) : null,
+                When = When.Kind is { } kind ? ConditionOf(kind) : null,
                 On = On.Target,
                 IsPriority = IsPriority,
                 IsOncePerBattle = IsOncePerBattle,
@@ -138,6 +148,7 @@ internal sealed partial class TacticRuleRow : ObservableObject
     private string WhenWords => (When.Kind, IsNumberShown) switch
     {
         (null, _) => "Always",
+        (_, true) when Number == TacticConditionNumber.Turns => $"Every {ShownNumber} turns of its own",
         (_, true) => $"When {When.Label} {ShownNumber} {NumberUnit}",
         _ => $"When {When.Label}",
     };
@@ -145,5 +156,16 @@ internal sealed partial class TacticRuleRow : ObservableObject
     // The box as typed, trimmed; "?" while empty, its problem line naming it.
     private string ShownNumber => NumberText.Trim() is { Length: > 0 } typed ? typed : "?";
 
-    private int TypedPercent => IsNumberShown ? TypedNumber.Parse(NumberText)!.Value : 0;
+    private string NumberName => Number == TacticConditionNumber.Turns ? "Turns" : "Percent";
+
+    private TacticCondition ConditionOf(TacticConditionKind kind) => Number switch
+    {
+        TacticConditionNumber.None => new TacticCondition(kind),
+        TacticConditionNumber.Percent => new TacticCondition(kind, Percent: TypedValue),
+        TacticConditionNumber.Turns => new TacticCondition(kind, Turns: TypedValue),
+        _ => throw new InvalidOperationException($"No number box for {Number}."),
+    };
+
+    // Read only for a kind that reads a number, whose box Problem has checked is a whole number.
+    private int TypedValue => TypedNumber.Parse(NumberText)!.Value;
 }

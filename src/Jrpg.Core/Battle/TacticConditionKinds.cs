@@ -17,6 +17,8 @@ public static class TacticConditionKinds
             [TacticConditionKind.WasHit] = new(TacticSubject.Foes, TacticConditionNumber.None, IsReaction: true),
             [TacticConditionKind.WasCriticallyHit] = new(TacticSubject.Foes, TacticConditionNumber.None, IsReaction: true),
             [TacticConditionKind.WasHitOnWeakness] = new(TacticSubject.Foes, TacticConditionNumber.None, IsReaction: true),
+            [TacticConditionKind.FoeHpBelow] = new(TacticSubject.Foes, TacticConditionNumber.Percent),
+            [TacticConditionKind.EveryNthTurn] = new(TacticSubject.Itself, TacticConditionNumber.Turns),
         }.ToFrozenDictionary();
 
     /// <exception cref="ArgumentOutOfRangeException">A kind the table doesn't hold.</exception>

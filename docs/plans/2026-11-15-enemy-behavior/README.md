@@ -128,7 +128,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 
 ### Phase 4: more ways to choose (trimmable)
 - [x] **EB10. Once per battle** (Core + Data + Editor, about 180 lines) → [slices/EB10.md](slices/EB10.md)
-- [ ] **EB11. Triggers: a foe's HP is below, every Nth turn of its own** (Core + Data + Editor, about 290 lines) →
+- [x] **EB11. Triggers: a foe's HP is below, every Nth turn of its own** (Core + Data + Editor, about 290 lines) →
   [slices/EB11.md](slices/EB11.md)
 - [ ] **EB12. Target: a foe without the skill's statuses** (Core + Data + Editor, about 130 lines) →
   [slices/EB12.md](slices/EB12.md)

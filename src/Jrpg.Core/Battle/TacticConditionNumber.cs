@@ -8,4 +8,7 @@ public enum TacticConditionNumber
 
     /// <summary>A whole percent of max HP, 1..99.</summary>
     Percent,
+
+    /// <summary>A count of the enemy's own turns acted, 2..10.</summary>
+    Turns,
 }

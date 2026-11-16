@@ -10,6 +10,9 @@ namespace Jrpg.Data.Battle;
 /// </summary>
 internal static class EnemyTacticsValidator
 {
+    // Decision 847: past 10 of its own turns a fight rarely reaches the beat, so a rule that far apart reads as never.
+    private const int MostTurnsBetween = 10;
+
     /// <param name="tactics">The actions, in content's order.</param>
     /// <param name="field">The list's name in the file, for messages.</param>
     /// <param name="skills">The skills an action may name.</param>
@@ -74,7 +77,8 @@ internal static class EnemyTacticsValidator
                 ?? FindTargetProblem(action, field, skills)
                 ?? FindOncePerBattleProblem(action, field);
 
-    // A percent of 0 or 100 would make an HP condition never or nearly always hold, so content says what it means.
+    // A percent of 0 or 100 would make an HP condition never or nearly always hold, and every 1st turn is always, so
+    // content says what it means; a number the kind doesn't read is left out, so a reader isn't misled by it.
     private static string? FindConditionProblem(TacticCondition? condition, string field)
     {
         if (condition is null)
@@ -84,13 +88,18 @@ internal static class EnemyTacticsValidator
 
         return TacticConditionKinds.ShapeOf(condition.Kind).Number switch
         {
-            TacticConditionNumber.Percent => Within($"{field}.percent", condition.Percent, 1, 99),
-            TacticConditionNumber.None when condition.Percent != 0 =>
-                $"{field}.percent must be left out of {ContentJsonOptions.EnumName(condition.Kind)} (was {condition.Percent}).",
-            TacticConditionNumber.None => null,
+            TacticConditionNumber.Percent => Within($"{field}.percent", condition.Percent, 1, 99)
+                ?? LeftOutProblem($"{field}.turns", condition.Turns, condition.Kind),
+            TacticConditionNumber.Turns => LeftOutProblem($"{field}.percent", condition.Percent, condition.Kind)
+                ?? Within($"{field}.turns", condition.Turns, 2, MostTurnsBetween),
+            TacticConditionNumber.None => LeftOutProblem($"{field}.percent", condition.Percent, condition.Kind)
+                ?? LeftOutProblem($"{field}.turns", condition.Turns, condition.Kind),
             _ => throw new ArgumentOutOfRangeException(nameof(condition), condition.Kind, "Unknown tactic condition number."),
         };
     }
+
+    private static string? LeftOutProblem(string numberField, int number, TacticConditionKind kind) =>
+        number == 0 ? null : $"{numberField} must be left out of {ContentJsonOptions.EnumName(kind)} (was {number}).";
 
     // Runs after the skill's own check, so a skill id the action names is known by then.
     private static string? FindTargetProblem(

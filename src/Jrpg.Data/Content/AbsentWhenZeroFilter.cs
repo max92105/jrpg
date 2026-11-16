@@ -20,8 +20,10 @@ internal static class AbsentWhenZeroFilter
         (typeof(ObjectTile), "level"),
         // ADR 0043: most sheets stand on the frame's bottom edge.
         (typeof(FieldSpriteSheet), "feetPixels"),
-        // Decision 586: only the HP condition kinds read a percent; the fallen one leaves it at 0.
+        // Decision 586: only the HP condition kinds read a percent; the other kinds leave it at 0.
         (typeof(TacticCondition), "percent"),
+        // Decision 848: only every Nth turn reads its turns.
+        (typeof(TacticCondition), "turns"),
         // ADR 0055: a skip or a taunt has no number.
         (typeof(StatusPart), "amount"),
         // Decision 787: only an enemy with tiered skills has a Power.

@@ -34,6 +34,14 @@ public sealed class TacticRuleRowTests
     }
 
     [Fact]
+    public void From_EveryNthTurn_ReadsTheTurns()
+    {
+        var row = TacticRuleRow.From(new EnemyAction { Weight = 1, When = new(TacticConditionKind.EveryNthTurn, Turns: 3) });
+
+        Assert.Equal("3", row.NumberText);
+    }
+
+    [Fact]
     public void ToAction_TypedBoxes_BuildsTheAction()
     {
         var row = TacticRuleRow.New();
@@ -74,6 +82,17 @@ public sealed class TacticRuleRowTests
         row.NumberText = "40";
 
         Assert.Equal(new TacticCondition(TacticConditionKind.AllyFallen), row.ToAction().When);
+    }
+
+    [Fact]
+    public void ToAction_EveryNthTurn_WritesTheTurns()
+    {
+        var row = TacticRuleRow.New();
+
+        row.When = TacticConditionChoice.Of(TacticConditionKind.EveryNthTurn);
+        row.NumberText = "3";
+
+        Assert.Equal(new TacticCondition(TacticConditionKind.EveryNthTurn, Turns: 3), row.ToAction().When);
     }
 
     [Fact]
@@ -133,6 +152,17 @@ public sealed class TacticRuleRowTests
         Assert.Equal("Percent must be a whole number (was 'x').", row.Problem);
     }
 
+    [Fact]
+    public void Problem_TurnsNotANumberWhileShown_NamesTurns()
+    {
+        var row = TacticRuleRow.New();
+
+        row.When = TacticConditionChoice.Of(TacticConditionKind.EveryNthTurn);
+        row.NumberText = "x";
+
+        Assert.Equal("Turns must be a whole number (was 'x').", row.Problem);
+    }
+
     // A kind without a number hides the box, so what it holds can't stop the rule.
     [Fact]
     public void Problem_PercentNotANumberWhileHidden_IsNull()
@@ -153,5 +183,15 @@ public sealed class TacticRuleRowTests
         row.When = TacticConditionChoice.Of(TacticConditionKind.AllyFallen);
 
         Assert.Equal(("", false), (row.NumberUnit, row.IsNumberShown));
+    }
+
+    [Fact]
+    public void NumberUnit_EveryNthTurn_IsTurns()
+    {
+        var row = TacticRuleRow.From(_healOnThatOne);
+
+        row.When = TacticConditionChoice.Of(TacticConditionKind.EveryNthTurn);
+
+        Assert.Equal(("turns", true), (row.NumberUnit, row.IsNumberShown));
     }
 }

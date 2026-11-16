@@ -5,11 +5,12 @@ namespace Jrpg.Core.Battle;
 /// <summary>
 /// Writes one <see cref="BattleState.Execute"/> call's events into the enemies' tactic memories: the one place the
 /// memory is written, after every event of the call, as phases are entered (ADR 0034, decision 846), so every path that
-/// hits is seen. An enemy that acts forgets its reactions first, as its turn answered them; a stunned one never acts,
-/// so it keeps them (decision 844). An enemy that uses a skill notes it for its once-per-battle rules (decision 842).
-/// Then each damage hit a foe's action landed on an enemy notes it was hit, critically hit and hit on a weakness as it
-/// was, by the actor (decision 845). A miss lands nothing and a status tick is no <see cref="EffectApplied"/>, so
-/// neither counts; a blocked hit still lands, so it does.
+/// hits is seen. An enemy that acts forgets its reactions first, as its turn answered them, and counts the turn for its
+/// every-Nth-turn rules; a stunned one never acts, so it keeps them (decision 844) and its turn doesn't count (decision
+/// 847). An enemy that uses a skill notes it for its once-per-battle rules (decision 842). Then each damage hit a foe's
+/// action landed on an enemy notes it was hit, critically hit and hit on a weakness as it was, by the actor (decision
+/// 845). A miss lands nothing and a status tick is no <see cref="EffectApplied"/>, so neither counts; a blocked hit
+/// still lands, so it does.
 /// </summary>
 internal static class TacticMemoryNotes
 {
@@ -34,6 +35,7 @@ internal static class TacticMemoryNotes
     private static void NoteOwnTurn(TacticMemory memory, BattleCommand command)
     {
         memory.ForgetReactions();
+        memory.NoteTurnActed();
         if (command is SkillCommand used)
         {
             memory.NoteUsed(used.Skill.Id);

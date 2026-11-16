@@ -21,6 +21,7 @@ public sealed class EnemyTacticTargetTests
 
     private static readonly TacticCondition _allyBelowHalf = new(TacticConditionKind.AllyHpBelow, 50);
     private static readonly TacticCondition _allyFallen = new(TacticConditionKind.AllyFallen);
+    private static readonly TacticCondition _foeBelowHalf = new(TacticConditionKind.FoeHpBelow, 50);
 
     // The wounded ally is lower, which the automatic heal would take.
     [Fact]
@@ -137,6 +138,30 @@ public sealed class EnemyTacticTargetTests
         var command = ChooseFor(actor, [Member("sarxian"), Ally("Standing", hp: 50), fallen], draws: []);
 
         Assert.Equal(fallen, TargetOf(command));
+    }
+
+    // Only the member at 40 % met the condition; "that one" picks it without the draw an automatic strike makes.
+    [Fact]
+    public void ChooseCommand_SubjectOfFoeHpBelow_AimsAtTheHurtFoe()
+    {
+        var hurt = Member("jazog", hp: 40);
+        var actor = Actor(Rule(_strike, TacticTarget.Subject, _foeBelowHalf));
+
+        var command = ChooseFor(actor, [Member("sarxian", hp: 60), hurt], draws: []);
+
+        Assert.Equal(hurt, TargetOf(command));
+    }
+
+    // Only the member at 40 % met the condition; the roll of 500 fails the enemy's 50 % shrug-off (decision 838).
+    [Fact]
+    public void ChooseCommand_SubjectOfFoeHpBelowWhileAnotherMemberTaunts_AimsAtTheTaunter()
+    {
+        var taunter = Taunting(Member("jazog", hp: 90));
+        var actor = Actor(Rule(_strike, TacticTarget.Subject, _foeBelowHalf), crowdControlResistance: 50);
+
+        var command = ChooseFor(actor, [Member("sarxian", hp: 40), taunter], draws: [500]);
+
+        Assert.Equal(taunter, TargetOf(command));
     }
 
     // Without a condition "that one" names nobody: the attack holds the whole weight; the one value is its target.

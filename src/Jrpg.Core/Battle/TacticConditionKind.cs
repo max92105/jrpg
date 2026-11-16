@@ -20,4 +20,12 @@ public enum TacticConditionKind
 
     /// <summary>A damage hit landed on the enemy's weakness since its last turn, by a foe's action.</summary>
     WasHitOnWeakness,
+
+    /// <summary>A living foe's HP is under the share.</summary>
+    FoeHpBelow,
+
+    /// <summary>
+    /// The turn it chooses for is its Nth, 2Nth... turn acted this battle, a skipped one not counted (decision 847).
+    /// </summary>
+    EveryNthTurn,
 }

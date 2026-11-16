@@ -17,6 +17,8 @@ internal sealed record TacticConditionChoice(TacticConditionKind? Kind, string L
         new(TacticConditionKind.WasHit, "it was hit"),
         new(TacticConditionKind.WasCriticallyHit, "it was critically hit"),
         new(TacticConditionKind.WasHitOnWeakness, "it was hit on a weakness"),
+        new(TacticConditionKind.FoeHpBelow, "a foe's HP is below"),
+        new(TacticConditionKind.EveryNthTurn, "every N turns of its own"),
     ];
 
     /// <exception cref="InvalidOperationException">A kind given no words yet, which the guard test catches.</exception>

@@ -7,9 +7,9 @@ using Jrpg.Core.Tests.Randomness;
 
 namespace Jrpg.Core.Tests.Battle;
 
-// An action is eligible only while its condition holds (decision 402). The enemy's one action here is Cleave, which
-// draws nothing, so a command is the Cleave when the condition holds, and otherwise the attack (decision 403) with its
-// one draw.
+// An action is eligible only while its condition holds (decision 402). The enemy's one action here is Cleave, or Mend
+// for the heal's test, which draw nothing, so a command is that skill when the condition holds, and otherwise the
+// attack (decision 403) with its one draw.
 public sealed class EnemyTacticConditionTests
 {
     private static readonly SkillDefinition _cleave = new()
@@ -19,6 +19,15 @@ public sealed class EnemyTacticConditionTests
         Description = "",
         IconFile = "",
         Effect = new Effect(EffectKind.Damage, 10, Targeting.AllEnemies),
+    };
+
+    private static readonly SkillDefinition _mend = new()
+    {
+        Id = "mend",
+        Name = "Mend",
+        Description = "",
+        IconFile = "",
+        Effect = new Effect(EffectKind.RestoreHp, 25, Targeting.SingleAlly),
     };
 
     private readonly Combatant _ally = Enemy("Ally");
@@ -115,16 +124,67 @@ public sealed class EnemyTacticConditionTests
         Assert.IsType<AttackCommand>(ChooseFor(actor, draws: [0]));
     }
 
+    [Fact]
+    public void ChooseCommand_FoeHpBelowAndAMemberHurt_ActionIsEligible()
+    {
+        var actor = Actor(new TacticCondition(TacticConditionKind.FoeHpBelow, 50));
+        _member.Vitals.TakeDamage(51);
+
+        Assert.IsType<SkillCommand>(ChooseFor(actor, draws: []));
+    }
+
+    [Fact]
+    public void ChooseCommand_FoeHpAtTheThreshold_ActionIsNotEligible()
+    {
+        var actor = Actor(new TacticCondition(TacticConditionKind.FoeHpBelow, 50));
+        _member.Vitals.TakeDamage(50);
+
+        Assert.IsType<AttackCommand>(ChooseFor(actor, draws: [0]));
+    }
+
+    [Fact]
+    public void ChooseCommand_FoeHpBelowOnlyAnAllyHurt_ActionIsNotEligible()
+    {
+        var actor = Actor(new TacticCondition(TacticConditionKind.FoeHpBelow, 50));
+        _ally.Vitals.TakeDamage(51);
+
+        Assert.IsType<AttackCommand>(ChooseFor(actor, draws: [0]));
+    }
+
+    [Fact]
+    public void ChooseCommand_FoeHpBelowOnlyAFallenMember_ActionIsNotEligible()
+    {
+        var actor = Actor(new TacticCondition(TacticConditionKind.FoeHpBelow, 50));
+        _member.Vitals.TakeDamage(_member.Vitals.MaxHp);
+
+        Assert.IsType<AttackCommand>(ChooseFor(actor, draws: [0]));
+    }
+
+    // The trigger names the member; before decision 835 the heal kept only those, none of its legal targets, and threw.
+    // The actor comes first in battle order, against a pick of the first.
+    [Fact]
+    public void ChooseCommand_AutomaticSingleAllyHealOnFoeHpBelow_HealsTheLowestShare()
+    {
+        var actor = Actor(new TacticCondition(TacticConditionKind.FoeHpBelow, 50), _mend);
+        _member.Vitals.TakeDamage(51);
+        _ally.Vitals.TakeDamage(60);
+
+        var command = ChooseFor(actor, draws: []);
+
+        Assert.Equal(_ally, Assert.Single(Assert.IsType<SkillCommand>(command).Targets));
+    }
+
     // Shuffle values (0, 2, 1) swap the last combatant to the front, so the actor is first.
     private BattleCommand ChooseFor(Combatant actor, int[] draws)
     {
         var battle = new BattleState([_member, _otherMember, _ally, actor], new Inventory(), new FixedSequenceRandom(0, 2, 1));
-        var skills = new Dictionary<string, SkillDefinition> { [_cleave.Id] = _cleave };
+        var skills = new Dictionary<string, SkillDefinition> { [_cleave.Id] = _cleave, [_mend.Id] = _mend };
         return new EnemyTactics(new FixedSequenceRandom(draws), skills).ChooseCommand(battle);
     }
 
-    private static Combatant Actor(TacticCondition condition) =>
-        Combatant.FromEnemy(EnemyBuilder("Actor").WithTactics(new EnemyAction { SkillId = _cleave.Id, Weight = 1, When = condition }).Build());
+    private static Combatant Actor(TacticCondition condition, SkillDefinition? skill = null) =>
+        Combatant.FromEnemy(EnemyBuilder("Actor")
+            .WithTactics(new EnemyAction { SkillId = (skill ?? _cleave).Id, Weight = 1, When = condition }).Build());
 
     private static Combatant Member(string id) => Combatant.FromPartyMember(new PartyMemberBuilder().WithId(id).Build());
 

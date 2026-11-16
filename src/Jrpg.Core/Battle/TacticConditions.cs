@@ -14,6 +14,8 @@ internal static class TacticConditions
             TacticConditionKind.OwnHpBelow => IsBelow(enemy, condition.Percent) ? [enemy] : [],
             TacticConditionKind.AllyHpBelow => [.. AlliesOf(enemy, battle).Where(ally => ally.IsAlive && IsBelow(ally, condition.Percent))],
             TacticConditionKind.AllyFallen => [.. AlliesOf(enemy, battle).Where(ally => !ally.IsAlive)],
+            TacticConditionKind.FoeHpBelow => FoesBelow(condition.Percent, enemy, battle),
+            TacticConditionKind.EveryNthTurn => ItselfOnItsBeat(condition.Turns, enemy),
             _ when TacticConditionKinds.ShapeOf(condition.Kind).IsReaction => enemy.TacticMemory.Noted(condition.Kind),
             _ => throw new ArgumentOutOfRangeException(nameof(condition), condition.Kind, "Unknown tactic condition."),
         };
@@ -23,6 +25,13 @@ internal static class TacticConditions
 
     private static IEnumerable<Combatant> AlliesOf(Combatant enemy, BattleState battle) =>
         battle.Combatants.Where(combatant => combatant.Side == enemy.Side && combatant != enemy);
+
+    private static Combatant[] FoesBelow(int percent, Combatant enemy, BattleState battle) =>
+        [.. battle.Combatants.Where(foe => foe.Side != enemy.Side && foe.IsAlive && IsBelow(foe, percent))];
+
+    // The memory counts a turn once it was acted, so the turn it chooses for is its TurnsActed + 1th (decision 847).
+    private static Combatant[] ItselfOnItsBeat(int turns, Combatant enemy) =>
+        (enemy.TacticMemory.TurnsActed + 1) % turns == 0 ? [enemy] : [];
 
     private static bool IsBelow(Combatant combatant, int percent) =>
         combatant.Vitals.Hp * 100 < combatant.Vitals.MaxHp * percent;

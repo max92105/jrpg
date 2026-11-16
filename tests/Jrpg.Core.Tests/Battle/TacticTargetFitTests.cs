@@ -19,6 +19,10 @@ public sealed class TacticTargetFitTests
     [InlineData(TacticTarget.Subject, TacticConditionKind.AllyHpBelow, Targeting.SingleEnemy, false)]
     [InlineData(TacticTarget.Subject, TacticConditionKind.AllyFallen, Targeting.SingleFallenAlly, true)]
     [InlineData(TacticTarget.Subject, TacticConditionKind.OwnHpBelow, Targeting.Self, true)]
+    [InlineData(TacticTarget.Subject, TacticConditionKind.FoeHpBelow, Targeting.SingleEnemy, true)]
+    [InlineData(TacticTarget.Subject, TacticConditionKind.FoeHpBelow, Targeting.SingleAlly, false)]
+    [InlineData(TacticTarget.Subject, TacticConditionKind.EveryNthTurn, Targeting.Self, true)]
+    [InlineData(TacticTarget.Subject, TacticConditionKind.EveryNthTurn, Targeting.SingleEnemy, false)]
     public void Fits_TargetTriggerAndAim_MatchesTheTable(
         TacticTarget? target, TacticConditionKind? kind, Targeting? aim, bool expected)
     {

@@ -102,6 +102,29 @@ public sealed class ContentWriterItemTests : IDisposable
         Assert.Equal(before, ContentFileBytes());
     }
 
+    // Read back through the pool: each fixed affix written as its id and value, in order (ADR 0058).
+    [Fact]
+    public void WriteMapCatalogs_UniqueAdded_WritesItsFixedAffixesBack()
+    {
+        var band = new ItemDefinition
+        {
+            Id = "test_band",
+            Name = "Test Band",
+            Description = "",
+            IconFile = "Armor.png",
+            MaxStack = 99,
+            IsUsableFromMenu = false,
+            Equipment = new EquipmentStats(EquipmentKind.Ring) { Bonuses = StatBonuses.None },
+            Price = 300,
+            IsUnique = true,
+            FixedAffixes = [FixedFromPool("crit_chance", 9), FixedFromPool("power", 7)],
+        };
+
+        _writer.WriteMapCatalogs(WithItems(band));
+
+        Assert.Equal(band, ContentCatalogLoader.Load(_content.Path).Items["test_band"]);
+    }
+
     [Fact]
     public void Write_PlainArmor_LeavesOutEveryDefaultField()
     {
@@ -124,6 +147,8 @@ public sealed class ContentWriterItemTests : IDisposable
 
     private ContentCatalog WithItems(ItemDefinition item) =>
         _catalog with { Items = new Dictionary<string, ItemDefinition>(_catalog.Items) { [item.Id] = item } };
+
+    private RolledAffix FixedFromPool(string affixId, int value) => new(affixId, _catalog.Affixes[affixId].Stat, value);
 
     private ContentCatalog WithAffixes(AffixDefinition affix) =>
         _catalog with { Affixes = new Dictionary<string, AffixDefinition>(_catalog.Affixes) { [affix.Id] = affix } };

@@ -11,6 +11,7 @@ using Jrpg.Core.Skills;
 using Jrpg.Core.Sprites;
 using Jrpg.Core.Statuses;
 using Jrpg.Core.Trade;
+using Jrpg.Data.Items;
 using Jrpg.Data.Maps;
 using Jrpg.Data.Quests;
 
@@ -60,7 +61,7 @@ public sealed partial class ContentWriter
         new(ContentCatalogLoader.EffectsFile, ContentFileWriter.Serialize(SortedTieredEffects(catalog))),
         new(ContentCatalogLoader.StatusesFile, ContentFileWriter.Serialize(SortedStatuses(catalog))),
         new(ContentCatalogLoader.SkillsFile, ContentFileWriter.Serialize(SortedSkills(catalog), ReferenceConverters(catalog))),
-        new(ContentCatalogLoader.ItemsFile, ContentFileWriter.Serialize(SortedItems(catalog), ReferenceConverters(catalog))),
+        new(ContentCatalogLoader.ItemsFile, ContentFileWriter.Serialize(SortedItems(catalog), ItemConverters(catalog))),
         new(ContentCatalogLoader.AffixesFile, ContentFileWriter.Serialize(SortedAffixes(catalog))),
     ];
 
@@ -71,6 +72,11 @@ public sealed partial class ContentWriter
         new CatalogReferenceConverter<TieredEffect>(catalog.TieredEffects, effect => effect.Id, "effect"),
         new CatalogReferenceConverter<StatusDefinition>(catalog.Statuses, status => status.Id, "status"),
     ];
+
+    // An item's effect names records as a skill's does; a unique's fixed affix is written as its affix's id and value,
+    // the stat being the pool's (decision 865).
+    private static JsonConverter[] ItemConverters(ContentCatalog catalog) =>
+        [.. ReferenceConverters(catalog), new FixedAffixConverter(catalog.Affixes)];
 
     private static List<TilesheetDefinition> SortedSheets(ContentCatalog catalog) =>
         [.. catalog.Tilesheets.Values.OrderBy(sheet => sheet.Id, StringComparer.Ordinal)];

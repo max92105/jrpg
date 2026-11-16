@@ -1,5 +1,6 @@
 using System.Collections.Frozen;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Cinematics;
 using Jrpg.Core.Content;
@@ -63,19 +64,28 @@ public static class ContentCatalogLoader
             .ToFrozenDictionary(status => status.Id);
         var tieredEffects = ReadValidated<IReadOnlyList<TieredEffect>>(contentRoot, EffectsFile, EffectCatalogValidator.Validate)
             .ToFrozenDictionary(effect => effect.Id);
-        var effectReferenceOptions = ContentJsonOptions.StrictWith(
+        JsonConverter[] effectReferences =
+        [
             new CatalogReferenceConverter<TieredEffect>(tieredEffects, effect => effect.Id, "effect"),
-            new CatalogReferenceConverter<StatusDefinition>(statuses, status => status.Id, "status"));
+            new CatalogReferenceConverter<StatusDefinition>(statuses, status => status.Id, "status"),
+        ];
         var skills = ReadValidated<IReadOnlyList<SkillDefinition>>(
-            contentRoot, SkillsFile, effectReferenceOptions, SkillCatalogValidator.Validate);
+            contentRoot, SkillsFile, ContentJsonOptions.StrictWith(effectReferences), SkillCatalogValidator.Validate);
         var skillsById = skills.ToFrozenDictionary(skill => skill.Id);
         var classReferences = new ClassReferences(skillsById);
         var classes = ReadValidated<IReadOnlyList<ClassDefinition>>(
             contentRoot, ClassesFile, (file, list) => ClassCatalogValidator.Validate(file, list, classReferences));
         var classIds = classes.Select(classDefinition => classDefinition.Id).ToFrozenSet();
         var rules = ReadValidated<GameRules>(contentRoot, RulesFile, GameRulesValidator.Validate);
+
+        // Before the items: a unique's fixed affix names a pool affix by id, resolved as it is read (decision 865).
+        var affixesById = ReadValidated<IReadOnlyList<AffixDefinition>>(contentRoot, AffixesFile, AffixCatalogValidator.Validate)
+            .ToFrozenDictionary(affix => affix.Id);
         var items = ReadValidated<IReadOnlyList<ItemDefinition>>(
-            contentRoot, ItemsFile, effectReferenceOptions, ItemCatalogValidator.Validate);
+            contentRoot,
+            ItemsFile,
+            ContentJsonOptions.StrictWith([.. effectReferences, new FixedAffixConverter(affixesById)]),
+            (file, list) => ItemCatalogValidator.Validate(file, list, affixesById));
         var itemsById = items.ToFrozenDictionary(item => item.Id);
 
         // rules.json is read before the items, so its crafting block is checked against them only now.
@@ -86,7 +96,6 @@ public static class ContentCatalogLoader
         var questsById = quests.ToFrozenDictionary(quest => quest.Id);
         var cinematics = ReadValidated<IReadOnlyList<CinematicDefinition>>(
             contentRoot, CinematicsFile, CinematicCatalogValidator.Validate);
-        var affixes = ReadValidated<IReadOnlyList<AffixDefinition>>(contentRoot, AffixesFile, AffixCatalogValidator.Validate);
         var dropTables = ReadValidated<IReadOnlyList<DropTable>>(
             contentRoot, DropTablesFile, (file, list) => DropTableCatalogValidator.Validate(file, list, itemsById));
         var dropTableIds = dropTables.Select(table => table.Id).ToFrozenSet();
@@ -145,7 +154,7 @@ public static class ContentCatalogLoader
             Rules = rules,
             NewGame = newGame,
 
-            Affixes = affixes.ToFrozenDictionary(affix => affix.Id),
+            Affixes = affixesById,
 
             DropTables = dropTables.ToFrozenDictionary(table => table.Id),
             Shops = shops.ToFrozenDictionary(shop => shop.Id),

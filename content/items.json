@@ -93,6 +93,31 @@
     "price": 300
   },
   {
+    "id": "chiefs_cleaver",
+    "name": "Chief\u0027s Cleaver",
+    "description": "A notched goblin blade that still bites. Placeholder: the developer writes the real unique.",
+    "iconFile": "Weapon.png",
+    "maxStack": 99,
+    "isUsableFromMenu": false,
+    "equipment": {
+      "kind": "weapon",
+      "damage": 28,
+      "damageType": "slashing"
+    },
+    "price": 400,
+    "isUnique": true,
+    "fixedAffixes": [
+      {
+        "affixId": "power",
+        "value": 5
+      },
+      {
+        "affixId": "crit_chance",
+        "value": 3
+      }
+    ]
+  },
+  {
     "id": "elixir",
     "name": "Elixir",
     "description": "Restores 100 HP.",

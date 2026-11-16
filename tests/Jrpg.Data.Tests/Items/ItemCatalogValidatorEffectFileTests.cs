@@ -74,5 +74,5 @@ public sealed class ItemCatalogValidatorEffectFileTests
         Assert.Equal($"items.json: item 'bomb': {Rule}", exception.Message);
     }
 
-    private static void Validate(ItemDefinition item) => ItemCatalogValidator.Validate("items.json", [item]);
+    private static void Validate(ItemDefinition item) => ItemCatalogValidator.Validate("items.json", [item], AffixPools.None);
 }

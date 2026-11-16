@@ -23,7 +23,7 @@ public sealed class ItemCatalogValidatorPriceTests
     [InlineData(Purse.MaxGold + 1)]
     public void Validate_PriceOutOfRange_ThrowsNamingTheField(int price)
     {
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate("items.json", [_potion with { Price = price }]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([_potion with { Price = price }]));
 
         Assert.EndsWith($"price must be within 1..{Purse.MaxGold} (was {price}).", exception.Message, StringComparison.Ordinal);
     }
@@ -33,12 +33,14 @@ public sealed class ItemCatalogValidatorPriceTests
     [InlineData(Purse.MaxGold)]
     public void Validate_PriceAtABound_DoesNotThrow(int price)
     {
-        Assert.Null(Record.Exception(() => ItemCatalogValidator.Validate("items.json", [_potion with { Price = price }])));
+        Assert.Null(Record.Exception(() => Validate([_potion with { Price = price }])));
     }
 
     [Fact]
     public void Validate_NoPrice_DoesNotThrow()
     {
-        Assert.Null(Record.Exception(() => ItemCatalogValidator.Validate("items.json", [_potion])));
+        Assert.Null(Record.Exception(() => Validate([_potion])));
     }
+
+    private static void Validate(ItemDefinition[] items) => ItemCatalogValidator.Validate("items.json", items, AffixPools.None);
 }

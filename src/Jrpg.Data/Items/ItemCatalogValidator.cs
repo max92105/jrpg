@@ -1,5 +1,6 @@
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
+using Jrpg.Core.Loot;
 using Jrpg.Core.Party;
 using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
@@ -14,9 +15,20 @@ internal static class ItemCatalogValidator
     /// </summary>
     internal const int MostBonus = 100;
 
-    public static void Validate(string fileName, IReadOnlyList<ItemDefinition> items) =>
+    /// <param name="fileName">The file the items come from, which every refusal names.</param>
+    /// <param name="items">The items, in the file's order.</param>
+    /// <param name="pool">
+    /// The affix pool by id, as <c>affixes.json</c> holds it: a unique's fixed value takes its affix's side of zero.
+    /// </param>
+    public static void Validate(
+        string fileName, IReadOnlyList<ItemDefinition> items, IReadOnlyDictionary<string, AffixDefinition> pool) =>
         new ContentListValidator<ItemDefinition>(fileName, "item", item => item.Id)
-            .Validate(items, item => FindProblem(item) ?? FindTierProblem(item) ?? FindStripProblem(item));
+            .Validate(
+                items,
+                item => FindProblem(item)
+                    ?? UniqueItemRules.FindProblem(item, pool)
+                    ?? FindTierProblem(item)
+                    ?? FindStripProblem(item));
 
     private static string? FindStripProblem(ItemDefinition item) =>
         OwnEffectStripValidator.FindProblem(item.EffectFile, item.Effect);

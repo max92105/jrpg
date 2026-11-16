@@ -24,7 +24,7 @@ public sealed class ItemCatalogValidatorTests
     [Fact]
     public void Validate_ValidItems_DoesNotThrow()
     {
-        var exception = Record.Exception(() => ItemCatalogValidator.Validate(FileName, [_potion, _potion with { Id = "hi_potion" }]));
+        var exception = Record.Exception(() => Validate([_potion, _potion with { Id = "hi_potion" }]));
 
         Assert.Null(exception);
     }
@@ -32,7 +32,7 @@ public sealed class ItemCatalogValidatorTests
     [Fact]
     public void Validate_DuplicateId_ThrowsNamingTheId()
     {
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [_potion, _potion]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([_potion, _potion]));
 
         Assert.Equal("items.json: item id 'potion' is used more than once.", exception.Message);
     }
@@ -40,7 +40,7 @@ public sealed class ItemCatalogValidatorTests
     [Fact]
     public void Validate_NullEntry_ThrowsNamingTheIndex()
     {
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [_potion, null!]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([_potion, null!]));
 
         Assert.Equal("items.json: entry 1 is null.", exception.Message);
     }
@@ -51,7 +51,7 @@ public sealed class ItemCatalogValidatorTests
     public void Validate_EmptyName_ThrowsNamingTheField(string name)
     {
         var exception = Assert.Throws<ContentValidationException>(
-            () => ItemCatalogValidator.Validate(FileName, [_potion with { Name = name }]));
+            () => Validate([_potion with { Name = name }]));
 
         Assert.Equal("items.json: item 'potion': name must not be empty.", exception.Message);
     }
@@ -61,7 +61,7 @@ public sealed class ItemCatalogValidatorTests
     {
         var kit = _potion with { Id = "camp_kit", IsUsableFromMenu = false, Effect = new Effect(EffectKind.Rest, Power: 0, Targeting.AllAllies) };
 
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [kit]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([kit]));
 
         Assert.Equal(
             "items.json: item 'camp_kit': effect.kind rest needs isUsableFromMenu true and effect.targeting allAllies; a rest is used from the menu on the whole party.",
@@ -72,7 +72,7 @@ public sealed class ItemCatalogValidatorTests
     public void Validate_MaxStackZero_ThrowsNamingTheField()
     {
         var exception = Assert.Throws<ContentValidationException>(
-            () => ItemCatalogValidator.Validate(FileName, [_potion with { MaxStack = 0 }]));
+            () => Validate([_potion with { MaxStack = 0 }]));
 
         Assert.Equal("items.json: item 'potion': maxStack must be at least 1 (was 0).", exception.Message);
     }
@@ -82,7 +82,7 @@ public sealed class ItemCatalogValidatorTests
     {
         var bomb = _potion with { Id = "bomb", Effect = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, DamageType: DamageType.Fire) };
 
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [bomb]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([bomb]));
 
         Assert.StartsWith("items.json: item 'bomb': isUsableFromMenu", exception.Message, StringComparison.Ordinal);
     }
@@ -92,7 +92,7 @@ public sealed class ItemCatalogValidatorTests
     {
         var charm = _potion with { Id = "charm", Effect = new Effect(EffectKind.RestoreHp, Power: 15, Targeting.AlliesInRange, Range: 1) };
 
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [charm]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([charm]));
 
         Assert.Equal("items.json: item 'charm': effect.targeting alliesInRange is for skills only; an item has no battle formation to reach along.", exception.Message);
     }
@@ -102,7 +102,7 @@ public sealed class ItemCatalogValidatorTests
     {
         var hourglass = _potion with { Id = "hourglass", Effect = new Effect(EffectKind.ReadyExtraTurn, Power: 0, Targeting.OtherCombatant) };
 
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [hourglass]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([hourglass]));
 
         Assert.Equal("items.json: item 'hourglass': effect.kind readyExtraTurn and effect.targeting otherCombatant are for skills only; an item has no turn order.", exception.Message);
     }
@@ -112,7 +112,7 @@ public sealed class ItemCatalogValidatorTests
     {
         var dart = _potion with { Id = "dart", Effect = new Effect(EffectKind.Damage, Power: 5, Targeting.OtherCombatant, DamageType: DamageType.Fire) };
 
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [dart]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([dart]));
 
         Assert.EndsWith("effect.kind readyExtraTurn and effect.targeting otherCombatant are for skills only; an item has no turn order.", exception.Message, StringComparison.Ordinal);
     }
@@ -122,7 +122,7 @@ public sealed class ItemCatalogValidatorTests
     {
         var hybrid = _potion with { Equipment = new EquipmentStats(EquipmentKind.Weapon) { Damage = 1 } };
 
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [hybrid]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([hybrid]));
 
         Assert.Equal("items.json: item 'potion': an item has either an effect or equipment, not both.", exception.Message);
     }
@@ -131,7 +131,7 @@ public sealed class ItemCatalogValidatorTests
     public void Validate_NegativeEffectPower_ThrowsNamingTheField()
     {
         var exception = Assert.Throws<ContentValidationException>(
-            () => ItemCatalogValidator.Validate(FileName, [_potion with { Effect = _potion.Effect! with { Power = -1 } }]));
+            () => Validate([_potion with { Effect = _potion.Effect! with { Power = -1 } }]));
 
         Assert.Equal("items.json: item 'potion': effect.power must be at least 0 (was -1).", exception.Message);
     }
@@ -141,7 +141,7 @@ public sealed class ItemCatalogValidatorTests
     {
         var feather = _potion with { Id = "revive_feather", Effect = new Effect(EffectKind.Revive, Power: 0, Targeting.AllFallenAllies) };
 
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [feather]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([feather]));
 
         Assert.Equal("items.json: item 'revive_feather': effect.power must be at least 1 for a revive effect (was 0).", exception.Message);
     }
@@ -151,7 +151,7 @@ public sealed class ItemCatalogValidatorTests
     {
         var sword = Equipment(new EquipmentStats(EquipmentKind.Weapon) { DamageType = DamageType.Slashing });
 
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [sword]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([sword]));
 
         Assert.Equal("items.json: item 'gear': equipment.damage must be at least 1 for a weapon (was 0).", exception.Message);
     }
@@ -161,7 +161,7 @@ public sealed class ItemCatalogValidatorTests
     {
         var armor = Equipment(new EquipmentStats(EquipmentKind.Chest) { Damage = 5 });
 
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [armor]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([armor]));
 
         Assert.Equal("items.json: item 'gear': equipment.damage is only for a weapon (was 5 on Chest).", exception.Message);
     }
@@ -171,7 +171,7 @@ public sealed class ItemCatalogValidatorTests
     {
         var sword = Equipment(new EquipmentStats(EquipmentKind.Weapon) { Damage = 5 });
 
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [sword]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([sword]));
 
         Assert.Equal("items.json: item 'gear': equipment.damageType is required for a weapon.", exception.Message);
     }
@@ -181,7 +181,7 @@ public sealed class ItemCatalogValidatorTests
     {
         var armor = Equipment(new EquipmentStats(EquipmentKind.Chest) { DamageType = DamageType.Slashing });
 
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [armor]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([armor]));
 
         Assert.Equal("items.json: item 'gear': equipment.damageType is only for a weapon (was Slashing on Chest).", exception.Message);
     }
@@ -191,7 +191,7 @@ public sealed class ItemCatalogValidatorTests
     {
         var ring = Equipment(new EquipmentStats(EquipmentKind.Chest) { Bonuses = Bonuses((StatKind.Power, 5), (StatKind.FireResistance, 0)) });
 
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [ring]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([ring]));
 
         Assert.Equal("items.json: item 'gear': equipment.bonuses.fireResistance must be nonzero and within -100..100 (was 0).", exception.Message);
     }
@@ -201,7 +201,7 @@ public sealed class ItemCatalogValidatorTests
     {
         var ring = Equipment(new EquipmentStats(EquipmentKind.Chest) { Bonuses = Bonuses((StatKind.Power, 101)) });
 
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [ring]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([ring]));
 
         Assert.Equal("items.json: item 'gear': equipment.bonuses.power must be nonzero and within -100..100 (was 101).", exception.Message);
     }
@@ -216,7 +216,7 @@ public sealed class ItemCatalogValidatorTests
     {
         var ring = Equipment(new EquipmentStats(EquipmentKind.Ring) { Bonuses = Bonuses((kind, 5)) });
 
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [ring]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([ring]));
 
         Assert.Equal($"items.json: item 'gear': equipment.bonuses.{name} is a stat only affixes give (ADR 0030).", exception.Message);
     }
@@ -226,7 +226,7 @@ public sealed class ItemCatalogValidatorTests
     {
         var cursed = Equipment(new EquipmentStats(EquipmentKind.Chest) { Bonuses = Bonuses((StatKind.Agility, -100)) });
 
-        var exception = Record.Exception(() => ItemCatalogValidator.Validate(FileName, [cursed]));
+        var exception = Record.Exception(() => Validate([cursed]));
 
         Assert.Null(exception);
     }
@@ -235,7 +235,7 @@ public sealed class ItemCatalogValidatorTests
     public void Validate_EmptyId_ThrowsNamingTheEntry()
     {
         var exception = Assert.Throws<ContentValidationException>(
-            () => ItemCatalogValidator.Validate(FileName, [_potion with { Id = " " }]));
+            () => Validate([_potion with { Id = " " }]));
 
         Assert.Equal("items.json: entry 0 has an empty id.", exception.Message);
     }
@@ -245,4 +245,6 @@ public sealed class ItemCatalogValidatorTests
 
     private static ItemDefinition Equipment(EquipmentStats stats) =>
         _potion with { Id = "gear", IsUsableFromMenu = false, Effect = null, Equipment = stats };
+
+    private static void Validate(ItemDefinition[] items) => ItemCatalogValidator.Validate(FileName, items, AffixPools.None);
 }

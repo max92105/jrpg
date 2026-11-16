@@ -208,11 +208,13 @@ public static class CatalogProblems
     /// starting items, each against these items.
     /// </summary>
     /// <param name="items">The items as they will be written.</param>
-    /// <param name="content">The rules, shops, drop tables and new game that name the items.</param>
+    /// <param name="content">
+    /// The affix pool the uniques name, and the rules, shops, drop tables and new game that name the items.
+    /// </param>
     /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
     internal static void CheckItems(IReadOnlyList<ItemDefinition> items, ContentCatalog content)
     {
-        ItemCatalogValidator.Validate(ContentCatalogLoader.ItemsFile, items);
+        ItemCatalogValidator.Validate(ContentCatalogLoader.ItemsFile, items, content.Affixes);
         var byId = items.ToDictionary(item => item.Id, StringComparer.Ordinal);
         CraftingRulesValidator.Validate(ContentCatalogLoader.RulesFile, content.Rules.Crafting, byId);
         // By id, as the files are written, so the first problem named is the one the loader would name.

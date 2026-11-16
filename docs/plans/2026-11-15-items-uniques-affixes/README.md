@@ -107,7 +107,7 @@ slices run; IU5 is optional and IU16 merged into IU15.
   question is asked.
 - [x] **IU2. A unique item gives its own piece everywhere: dropped, stocked, given, restored** (Core, about 230 lines)
   → [slices/IU2.md](slices/IU2.md)
-- [ ] **IU3. `items.json` holds uniques: `isUnique` and `fixedAffixes`, loaded and checked; a placeholder unique**
+- [x] **IU3. `items.json` holds uniques: `isUnique` and `fixedAffixes`, loaded and checked; a placeholder unique**
   (Data + content, about 240 lines) → [slices/IU3.md](slices/IU3.md)
 - [ ] **IU4. A saved unique follows its record, the Forge never rerolls one, and a unique is named alone** (Data + Core
   + Game, about 200 lines) → [slices/IU4.md](slices/IU4.md)

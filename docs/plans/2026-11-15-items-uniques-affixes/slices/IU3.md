@@ -73,3 +73,6 @@ out at their defaults. `chiefs_cleaver` is the placeholder unique, placed nowher
   game starts (above the 2..5 roll range, decision 866); revert.
 - **Note from IU2:** the `isUnique` (AbsentWhenFalse) and `fixedAffixes` (AbsentWhenEmpty) filter rows landed in IU2:
   the identical-bytes test needed them once `ItemDefinition` had the members; skip that bullet.
+- **Done, with deviations:** the unique rules are `Items/UniqueItemRules` (the validator reached 199 lines); the sign
+  reads the affix's range alone (the pool's check keeps an affix-only stat above 0); a pool lacking the named affix is
+  refused ("affixes.json has no such affix."); the writer's converter holds `catalog.Affixes`; more shape/bound tests.

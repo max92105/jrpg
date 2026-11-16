@@ -25,10 +25,12 @@ public sealed class ItemCatalogValidatorTierTests
             },
         };
 
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate("items.json", [potion]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([potion]));
 
         Assert.Equal(
             "items.json: item 'potion': effect.tier is for skills: an item isn't raised by its user (decision 785).",
             exception.Message);
     }
+
+    private static void Validate(ItemDefinition[] items) => ItemCatalogValidator.Validate("items.json", items, AffixPools.None);
 }

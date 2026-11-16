@@ -24,7 +24,7 @@ public sealed class ItemCatalogValidatorMaterialTests
     [Fact]
     public void Validate_Material_DoesNotThrow()
     {
-        var exception = Record.Exception(() => ItemCatalogValidator.Validate(FileName, [_scrap]));
+        var exception = Record.Exception(() => Validate([_scrap]));
 
         Assert.Null(exception);
     }
@@ -34,7 +34,7 @@ public sealed class ItemCatalogValidatorMaterialTests
     {
         var material = _scrap with { Effect = new Effect(EffectKind.RestoreHp, Power: 15, Targeting.SingleAlly) };
 
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [material]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([material]));
 
         Assert.Equal("items.json: item 'scrap': a material (isMaterial true) has no effect.", exception.Message);
     }
@@ -44,7 +44,7 @@ public sealed class ItemCatalogValidatorMaterialTests
     {
         var material = _scrap with { Equipment = new EquipmentStats(EquipmentKind.Chest) };
 
-        var exception = Assert.Throws<ContentValidationException>(() => ItemCatalogValidator.Validate(FileName, [material]));
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([material]));
 
         Assert.Equal("items.json: item 'scrap': a material (isMaterial true) has no equipment.", exception.Message);
     }
@@ -53,8 +53,10 @@ public sealed class ItemCatalogValidatorMaterialTests
     public void Validate_MaterialUsableFromMenu_Throws()
     {
         var exception = Assert.Throws<ContentValidationException>(
-            () => ItemCatalogValidator.Validate(FileName, [_scrap with { IsUsableFromMenu = true }]));
+            () => Validate([_scrap with { IsUsableFromMenu = true }]));
 
         Assert.Equal("items.json: item 'scrap': a material (isMaterial true) needs isUsableFromMenu false.", exception.Message);
     }
+
+    private static void Validate(ItemDefinition[] items) => ItemCatalogValidator.Validate(FileName, items, AffixPools.None);
 }

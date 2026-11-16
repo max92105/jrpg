@@ -19,6 +19,7 @@ using Jrpg.Editor.Objects;
 using Jrpg.Editor.Objects.Composing;
 using Jrpg.Editor.Quests;
 using Jrpg.Editor.Skills;
+using Jrpg.Editor.Statuses;
 using Jrpg.Editor.Tiles;
 using Jrpg.Editor.Trade;
 
@@ -103,6 +104,7 @@ internal sealed partial class MainViewModel : ObservableObject
             EffectStripEditing = CreateEffectStripEditing();
             SkillEditing = new SkillEditingViewModel(Content, ReadSkillChoices);
             TieredEffectEditing = new TieredEffectEditingViewModel(Content);
+            StatusEditing = new StatusEditingViewModel(Content);
             NpcSpriteChange = new NpcSpriteChange(Content, Placing.Browser);
             if (MapIds.Count > 0)
             {

@@ -2,6 +2,7 @@
              x:ClassModifier="internal"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:catalogs="clr-namespace:Jrpg.Editor.Catalogs"
              xmlns:skills="clr-namespace:Jrpg.Editor.Skills">
   <UserControl.Resources>
     <Style x:Key="FieldLabel" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
@@ -11,7 +12,7 @@
     <!-- A click into a cost or grant row's box chooses that row, so Add, Remove and the moves act on the row being typed
          in. -->
     <Style x:Key="TypedRow" TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
-      <EventSetter Event="PreviewGotKeyboardFocus" Handler="OnTypedRowFocused" />
+      <Setter Property="catalogs:RowFocus.ChoosesRow" Value="True" />
     </Style>
   </UserControl.Resources>
   <DockPanel>

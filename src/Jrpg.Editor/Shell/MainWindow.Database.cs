@@ -9,6 +9,7 @@ using Jrpg.Editor.Loot;
 using Jrpg.Editor.Quests;
 using Jrpg.Editor.Skills;
 using Jrpg.Editor.Sprites;
+using Jrpg.Editor.Statuses;
 using Jrpg.Editor.Trade;
 using Jrpg.Editor.Workspaces;
 
@@ -29,6 +30,7 @@ internal sealed partial class MainWindow
         ["Effect strips"] = OpenEffectStrips,
         ["Skills"] = OpenSkills,
         ["Effects"] = OpenTieredEffects,
+        ["Statuses"] = OpenStatuses,
         ["Cinematics"] = OpenCinematics,
         ["Enemies"] = OpenEnemies,
     };
@@ -174,6 +176,16 @@ internal sealed partial class MainWindow
         }
 
         OpenInDialog("Effects", effectEditing.Start, effectEditing.Apply, edited => new TieredEffectCatalogPage(edited));
+    }
+
+    private void OpenStatuses()
+    {
+        if (_viewModel.StatusEditing is not { } statusEditing)
+        {
+            return;
+        }
+
+        OpenInDialog("Statuses", statusEditing.Start, statusEditing.Apply, edited => new StatusCatalogPage(edited));
     }
 
     // The sprite records (decision 569); the page's Import... copies images through the view model, whose import event

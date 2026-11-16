@@ -48,3 +48,7 @@ None new (draw and wiring): `StatusCatalogViewModelTests` and `StatusViewModelTe
 - **Note from FX5:** `Families` is raised when another status is chosen (an add, a copy and a removal choose one),
   never while a family is typed, so the editable Family box keeps its text; a family typed on one status is offered
   once another is chosen. Hand check 3 reads "statuses.json: family 'poison': poison_2's parts differ from poison_1's."
+- **Done, with deviations:** Acts at binds through a new `Statuses/TimingButtonConverter` (4 tests) writing back only a
+  check, so the radio group's unchecking never retimes the status left; the Family box keeps WPF's text search, which
+  autocompletes a typed prefix of a listed family; `MainViewModel.cs` +2 (the using), 289 lines. Review: the row focus
+  handler's third copy became `Catalogs/RowFocus.ChoosesRow` (3 tests), set by the Drop tables, Skills and Statuses rows.

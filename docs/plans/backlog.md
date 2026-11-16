@@ -300,3 +300,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `X.Insert(SelectedX is null ? X.Count : X.IndexOf(SelectedX) + 1, row)`, "insert after the chosen row": since
   SK7 `Events/ListOrder.InsertAfter` does it (the Skills page's costs and grants); five copies remain to replace with it
   (Cinematics, Events, Loot, Quests, Trade) (skill and status editors plan, SK5 review).
+- The Effects page's Kind box and list (`Effects/TieredEffectViewModel.Kinds`) and the Statuses page's part Kind box
+  (`Statuses/StatusPartRow.Kinds`) show the enums' C# names (`RestoreHp`, `DamageEachTurn`) where the files say
+  `restoreHp`, `damageEachTurn`: one choice type or display converter spelling them as the files do would serve both
+  (skill and status editors plan, FX2b and FX6 reviews).

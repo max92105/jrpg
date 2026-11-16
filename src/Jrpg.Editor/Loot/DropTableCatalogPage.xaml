@@ -2,6 +2,7 @@
              x:ClassModifier="internal"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:catalogs="clr-namespace:Jrpg.Editor.Catalogs"
              xmlns:loot="clr-namespace:Jrpg.Editor.Loot">
   <UserControl.Resources>
     <!-- The Enemies page keeps its own, 70 wide: two copies, so this one stays local. -->
@@ -63,7 +64,7 @@
       <ListBox ItemsSource="{Binding Entries}" SelectedItem="{Binding SelectedEntry}">
         <ListBox.ItemContainerStyle>
           <Style TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
-            <EventSetter Event="PreviewGotKeyboardFocus" Handler="OnEntryRowFocused" />
+            <Setter Property="catalogs:RowFocus.ChoosesRow" Value="True" />
           </Style>
         </ListBox.ItemContainerStyle>
         <ListBox.ItemTemplate>

@@ -8,6 +8,7 @@ using Jrpg.Editor.Effects;
 using Jrpg.Editor.GifImport;
 using Jrpg.Editor.Loot;
 using Jrpg.Editor.Skills;
+using Jrpg.Editor.Statuses;
 using Jrpg.Editor.Tiles;
 using Jrpg.Editor.Trade;
 
@@ -15,9 +16,9 @@ namespace Jrpg.Editor.Shell;
 
 /// <summary>
 /// The Database menu's pages over the draft (ADR 0045, decision 583): the shops, the drop tables, the enemies, the
-/// cinematics (ADR 0046), the effect strips (decision 659), the skills and the tiered effects (decision 976), beside
-/// the quests; and the image import the Enemies page and the Character sprites page share, through Data, asking first
-/// before it replaces any image of the art folder.
+/// cinematics (ADR 0046), the effect strips (decision 659), the skills, the tiered effects and the statuses (decision
+/// 976), beside the quests; and the image import the Enemies page and the Character sprites page share, through Data,
+/// asking first before it replaces any image of the art folder.
 /// </summary>
 internal sealed partial class MainViewModel
 {
@@ -34,6 +35,8 @@ internal sealed partial class MainViewModel
     public SkillEditingViewModel? SkillEditing { get; }
 
     public TieredEffectEditingViewModel? TieredEffectEditing { get; }
+
+    public StatusEditingViewModel? StatusEditing { get; }
 
     /// <summary>
     /// Copies images into an art folder (asking before replacing one, decisions 125 and 590); a file copy, not an undo

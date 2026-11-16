@@ -1,5 +1,4 @@
 using System.Windows.Controls;
-using System.Windows.Input;
 
 namespace Jrpg.Editor.Skills;
 
@@ -14,8 +13,4 @@ internal sealed partial class SkillCatalogPage : UserControl
         InitializeComponent();
         DataContext = skills;
     }
-
-    // Selected on focus, as the Drop tables page's entries are: a trigger on IsKeyboardFocusWithin lets go as soon as
-    // Remove takes the focus, so it would act on no row.
-    private void OnTypedRowFocused(object sender, KeyboardFocusChangedEventArgs e) => ((ListBoxItem)sender).IsSelected = true;
 }

@@ -1,0 +1,135 @@
+<UserControl x:Class="Jrpg.Editor.Statuses.StatusCatalogPage"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:catalogs="clr-namespace:Jrpg.Editor.Catalogs"
+             xmlns:core="clr-namespace:Jrpg.Core.Statuses;assembly=Jrpg.Core"
+             xmlns:statuses="clr-namespace:Jrpg.Editor.Statuses">
+  <UserControl.Resources>
+    <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
+    <statuses:TimingButtonConverter x:Key="TimingButton" />
+    <Style x:Key="FieldLabel" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+      <Setter Property="Width" Value="90" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <!-- A click into a part row's box chooses that row, so Add, Remove and the moves act on the row being typed in. -->
+    <Style x:Key="TypedRow" TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+      <Setter Property="catalogs:RowFocus.ChoosesRow" Value="True" />
+    </Style>
+  </UserControl.Resources>
+  <DockPanel>
+    <!-- The draft's statuses in id order, the ones added this session after them; only those can be removed. -->
+    <DockPanel DockPanel.Dock="Left" Width="260">
+      <TextBlock DockPanel.Dock="Top" Text="Statuses" FontWeight="Bold" />
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
+        <Button Content="Add" Width="40" Command="{Binding AddStatusCommand}" ToolTip="A harmful status with one damage part, last in the list, its id and name to type" />
+        <Button Content="Duplicate" Width="64" Margin="4,0,0,0" Command="{Binding DuplicateStatusCommand}" ToolTip="A copy of the chosen status after it, its id to type" />
+        <Button Content="New tier" Width="64" Margin="4,0,0,0" Command="{Binding NewTierCommand}" ToolTip="A copy of the chosen status after it in its family, its id the next tier (poison_2 after poison_1)" />
+        <Button Content="Remove" Width="56" Margin="4,0,0,0" Command="{Binding RemoveStatusCommand}" ToolTip="Only a status added this session; skills and items grant a saved one" />
+      </StackPanel>
+      <ListBox ItemsSource="{Binding Statuses}" SelectedItem="{Binding SelectedStatus}" Margin="0,4,0,0">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="{Binding Id}" />
+              <TextBlock Text="{Binding Name}" Foreground="{StaticResource MutedTextBrush}" Margin="6,0,0,0" />
+            </StackPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+
+    <!-- The chosen status: its boxes, the skills granting it (read-only: skills.json names it) and its parts in order. -->
+    <ScrollViewer Margin="12,0,0,0" VerticalScrollBarVisibility="Auto">
+      <StackPanel DataContext="{Binding SelectedStatus}" Style="{StaticResource EnabledWhenChosen}">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="Id" Style="{StaticResource FieldLabel}" />
+          <TextBox Width="240"
+                   Text="{Binding IdText, UpdateSourceTrigger=PropertyChanged}"
+                   IsEnabled="{Binding IsNew}"
+                   ToolTip="Lowercase letters, digits and _, its tier last (poison_1); fixed once saved, since skills and items grant it" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Name" Style="{StaticResource FieldLabel}" />
+          <TextBox Width="240" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Description" Style="{StaticResource FieldLabel}" VerticalAlignment="Top" />
+          <TextBox Width="400"
+                   Height="40"
+                   TextWrapping="Wrap"
+                   VerticalScrollBarVisibility="Auto"
+                   Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="What it does, in a short line; it may be empty" />
+        </StackPanel>
+        <CheckBox Content="Harmful" Margin="90,6,0,0" IsChecked="{Binding IsHarmful}" ToolTip="It hurts its holder; unticked for a boon such as Guard" />
+        <!-- Text search stays on: a status's family, set as the status is chosen and before Families is raised,
+             selects only an item matching it exactly, so the new list always holds the selected item and its refresh
+             never blanks the family; off, a picked item left selected under typed text could drop out and blank it. -->
+        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+          <TextBlock Text="Family" Style="{StaticResource FieldLabel}" />
+          <ComboBox Width="160"
+                    IsEditable="True"
+                    Text="{Binding FamilyText, UpdateSourceTrigger=PropertyChanged}"
+                    ItemsSource="{Binding DataContext.Families, RelativeSource={RelativeSource AncestorType=statuses:StatusCatalogPage}}"
+                    ToolTip="Statuses of one family don't stack: a holder keeps one (empty: its own id)" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+          <TextBlock Text="Acts at" Style="{StaticResource FieldLabel}" />
+          <RadioButton Content="Start of its holder's turn"
+                       IsChecked="{Binding ActsAt, Converter={StaticResource TimingButton}, ConverterParameter={x:Static core:StatusTiming.StartOfTurn}}" />
+          <RadioButton Content="End of its holder's turn"
+                       Margin="16,0,0,0"
+                       IsChecked="{Binding ActsAt, Converter={StaticResource TimingButton}, ConverterParameter={x:Static core:StatusTiming.EndOfTurn}}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+          <TextBlock Text="Mark letter" Style="{StaticResource FieldLabel}" />
+          <TextBox Width="30"
+                   MaxLength="1"
+                   Text="{Binding MarkLetterText, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="The letter on its battle mark; empty for the name's first" />
+        </StackPanel>
+        <TextBlock Text="{Binding UsedByText}" TextWrapping="Wrap" Margin="0,12,0,0" />
+        <TextBlock Text="Parts" FontWeight="Bold" Margin="0,12,0,0" />
+        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+          <ListBox Width="760" MinHeight="24" ItemsSource="{Binding Parts}" SelectedItem="{Binding SelectedPart}"
+                   ItemContainerStyle="{StaticResource TypedRow}">
+            <ListBox.ItemTemplate>
+              <DataTemplate>
+                <StackPanel Orientation="Horizontal">
+                  <ComboBox Width="170" ItemsSource="{Binding Kinds}" SelectedItem="{Binding Kind}" ToolTip="What the part does while the status is held" />
+                  <!-- A fixed width, so the boxes after it stay in their columns while a kind without an amount hides it. -->
+                  <StackPanel Width="230" Margin="4,0,0,0" Orientation="Horizontal">
+                    <TextBox Width="50"
+                             Text="{Binding AmountText, UpdateSourceTrigger=PropertyChanged}"
+                             Visibility="{Binding HasAmount, Converter={StaticResource VisibleWhenTrue}}" />
+                    <TextBlock Text="{Binding AmountLabel}" Margin="4,0,0,0" VerticalAlignment="Center" />
+                  </StackPanel>
+                  <ComboBox Width="190"
+                            Margin="4,0,0,0"
+                            ItemsSource="{Binding DamageTypeChoices}"
+                            DisplayMemberPath="Line"
+                            SelectedItem="{Binding SelectedDamageTypeChoice}"
+                            IsEnabled="{Binding CanTypeDamageType}"
+                            ToolTip="What a damage tick meets resistance as; a damage tick's only" />
+                  <ComboBox Width="130"
+                            Margin="4,0,0,0"
+                            ItemsSource="{Binding Stats}"
+                            SelectedItem="{Binding Stat}"
+                            IsEnabled="{Binding CanTypeStat}"
+                            ToolTip="The stat a stat change changes; a stat change's only" />
+                </StackPanel>
+              </DataTemplate>
+            </ListBox.ItemTemplate>
+          </ListBox>
+          <StackPanel Margin="4,0,0,0">
+            <Button Content="Add" Width="60" Command="{Binding AddPartCommand}" ToolTip="A damage tick of 1 HP, after the chosen row" />
+            <Button Content="Remove" Width="60" Margin="0,4,0,0" Command="{Binding RemovePartCommand}" />
+            <Button Content="Up" Width="60" Margin="0,4,0,0" Command="{Binding MovePartUpCommand}" />
+            <Button Content="Down" Width="60" Margin="0,4,0,0" Command="{Binding MovePartDownCommand}" />
+          </StackPanel>
+        </StackPanel>
+      </StackPanel>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

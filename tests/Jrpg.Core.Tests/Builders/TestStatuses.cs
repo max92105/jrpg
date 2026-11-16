@@ -34,7 +34,7 @@ internal static class TestStatuses
     public static StatusGrant Exposed(int percent, int turns) => new(StatusKind.Exposed, percent, turns);
 
     /// <summary>The holder loses its next turn; <paramref name="chance"/> is the percent it lands with.</summary>
-    public static StatusGrant Stun(int chance, int turns) => new(StatusKind.Stun, chance, turns);
+    public static StatusGrant Stun(int chance, int turns) => new(StatusKind.Stun, 0, turns) { Chance = chance };
 
     /// <summary>Every enemy attack goes to the holder.</summary>
     public static StatusGrant Taunt(int turns) => new(StatusKind.Taunt, 0, turns);
@@ -46,6 +46,8 @@ internal static class TestStatuses
     public static int AmountOf(ActiveStatus status) => status.Power;
 
     public static int AmountOf(StatusGrant grant) => grant.Power;
+
+    public static int ChanceOf(StatusGrant grant) => grant.Chance;
 
     /// <summary>The effect, granting <paramref name="grant"/> to each target still standing after it.</summary>
     public static Effect Granting(Effect effect, StatusGrant grant) => effect with { Statuses = [grant] };

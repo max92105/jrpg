@@ -105,3 +105,7 @@ named change is that Burning and Poison, two families, both tick on one target. 
    stuns sometimes (an "S" mark, the goblin's turn skipped, "Stun" shown on the target), or the goblin resists.
 3. New game with Omer: Fire Blast leaves a "B" mark named Burning that ticks at the end of the goblin's turn; cast it
    twice on one goblin: still one mark, its turns refreshed.
+
+- **Note from CH's review:** a dominant force raises a status-only skill's grants by their power, so since CH it no
+  longer raises a stun's chance (its power is 0); SW's `Strengthened` raises the record's parts, never the chance, as
+  decision 799 says. No status-only stun skill exists in content.

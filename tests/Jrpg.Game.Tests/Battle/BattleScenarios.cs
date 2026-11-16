@@ -75,7 +75,7 @@ internal static class BattleScenarios
         {
             [skillId] = skill with
             {
-                Effect = skill.Effect with { Power = 5, Tier = null, Statuses = [stun with { Power = 100 }] },
+                Effect = skill.Effect with { Power = 5, Tier = null, Statuses = [stun with { Chance = 100 }] },
             },
         };
     }

@@ -51,3 +51,11 @@ to confirm).
   sometimes, as before.
 
 - **Note from R1:** `TestStatuses.ChanceOf(StatusGrant)` is CH's to add, with its first user.
+
+- **Done, with deviations:** a stun's number moved to its chance, so the tests reading an active stun's amount now
+  read 0 (`BattleStatusTests`, three tuples), and `StatusSetTests.Apply_SameKindAgain_RefreshesTurnsKeepsStrongerPower`
+  refreshes an Exposed instead (the rule it tests needs a number). `EffectScalingTests`' clever caster raises the
+  poison's chance to 150 too, held at 1000 permille only when rolled. `GrantScalingTests` keeps the bound below zero
+  (`ChancePermille_StunBelowResistance_IsZero`) beside the slice's three, and `EffectValidatorTests` turns the stun
+  power theory into chance rows at 0 and 101 and accepted ones at 1 and 100. Hand check: Shield Bash's stun is the
+  developer's to see.

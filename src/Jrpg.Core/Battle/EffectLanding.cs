@@ -9,12 +9,12 @@ namespace Jrpg.Core.Battle;
 /// An effect landing on its targets, in order: each of its hits, the status it grants to a target still standing, and
 /// what a fall sets off (ADR 0019, ADR 0021). A damaging hit rolls to land first, then to crit (decision 325), then to
 /// be blocked (decision 348); one that misses is no hit at all, and a damage effect that missed every hit leaves no
-/// status behind (decision 326). A stun rolls against its target's crowd control resistance (decision 324). Each landed
-/// damaging hit heals its living hitter by their lifesteal's share of the HP it took (decision 346); an item's hits
-/// never do (decision 321).
+/// status behind (decision 326). Every grant rolls its chance, a stun's cut by its target's crowd control resistance
+/// (decisions 801, 324); one that fails is resisted. Each landed damaging hit heals its living hitter by their
+/// lifesteal's share of the HP it took (decision 346); an item's hits never do (decision 321).
 /// </summary>
 /// <param name="combatants">Everyone in the battle, for the triggers a fall sets off.</param>
-/// <param name="rolls">The battle's rolls, for whether each hit lands and crits, and whether a stun takes.</param>
+/// <param name="rolls">The battle's rolls, for whether each hit lands and crits, and whether each status takes.</param>
 internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceRolls rolls)
 {
     /// <param name="actor">Who used it, for the gains a landed hit triggers.</param>
@@ -135,11 +135,11 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceR
         }
     }
 
-    // A stun rolls its chance against the target's crowd control resistance (decision 324); the other statuses land.
+    // Every grant rolls its chance, a stun's cut by its target's crowd control resistance (decisions 801, 324); one
+    // that fails is resisted (decision 802).
     private void Grant(StatusGrant grant, Combatant target, List<BattleEvent> events)
     {
-        if (grant.Kind == StatusKind.Stun
-            && !rolls.Succeeds(GrantScaling.StunChancePermille(grant.Power, target.CurrentStats.CrowdControlResistancePermille)))
+        if (!rolls.Succeeds(GrantScaling.ChancePermille(grant, target.CurrentStats.CrowdControlResistancePermille)))
         {
             events.Add(new StatusResisted(target, grant.Kind));
             return;

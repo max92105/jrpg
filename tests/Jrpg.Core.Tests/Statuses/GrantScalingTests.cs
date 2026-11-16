@@ -32,21 +32,37 @@ public sealed class GrantScalingTests
         Assert.Equal(TestStatuses.Stun(72, 1), scaled);
     }
 
+    // Decision 801: Intelligence raises every grant's chance, not only a stun's.
     [Fact]
-    public void StunChancePermille_ResistanceBelowChance_IsTheDifference()
+    public void Scaled_PoisonChance_RaisedByStatusPermille()
     {
-        Assert.Equal(500, GrantScaling.StunChancePermille(scaledPower: 60, crowdControlResistancePermille: 100));
+        var scaled = GrantScaling.Scaled(_poison with { Chance = 50 }, statusPermille: 1200, extraTurns: 0);
+
+        Assert.Equal(60, TestStatuses.ChanceOf(scaled));
     }
 
     [Fact]
-    public void StunChancePermille_ResistanceAboveChance_IsZero()
+    public void ChancePermille_StunAgainstResistance_SubtractsIt()
     {
-        Assert.Equal(0, GrantScaling.StunChancePermille(scaledPower: 30, crowdControlResistancePermille: 500));
+        Assert.Equal(500, GrantScaling.ChancePermille(TestStatuses.Stun(60, 1), crowdControlResistancePermille: 100));
     }
 
     [Fact]
-    public void StunChancePermille_PowerPastHundred_IsWhole()
+    public void ChancePermille_StunBelowResistance_IsZero()
     {
-        Assert.Equal(1000, GrantScaling.StunChancePermille(scaledPower: 120, crowdControlResistancePermille: 0));
+        Assert.Equal(0, GrantScaling.ChancePermille(TestStatuses.Stun(30, 1), crowdControlResistancePermille: 500));
+    }
+
+    // Only a stun is cut by crowd control resistance (decision 324).
+    [Fact]
+    public void ChancePermille_OtherStatusAgainstResistance_IgnoresIt()
+    {
+        Assert.Equal(500, GrantScaling.ChancePermille(_poison with { Chance = 50 }, crowdControlResistancePermille: 300));
+    }
+
+    [Fact]
+    public void ChancePermille_AboveOneHundred_HeldAtOneThousand()
+    {
+        Assert.Equal(1000, GrantScaling.ChancePermille(TestStatuses.Stun(120, 1), crowdControlResistancePermille: 0));
     }
 }

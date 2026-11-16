@@ -78,7 +78,7 @@
     "resourceChanges": [ { "resourceId": "stamina", "amount": -3 } ],
     "effect": {
       "kind": "damage", "damageType": "blunt", "power": 0, "tier": "blunt_1", "targeting": "singleEnemy",
-      "statuses": [ { "kind": "stun", "power": 60, "turns": 1 } ]
+      "statuses": [ { "kind": "stun", "power": 0, "turns": 1, "chance": 60 } ]
     }
   },
   {
@@ -228,7 +228,7 @@
     "soundFile": "PlaceholderSkillBlunt.wav",
     "effect": {
       "kind": "damage", "damageType": "blunt", "power": 0, "tier": "blunt_1", "targeting": "singleEnemy", "hits": 2,
-      "statuses": [ { "kind": "stun", "power": 30, "turns": 1 } ]
+      "statuses": [ { "kind": "stun", "power": 0, "turns": 1, "chance": 30 } ]
     }
   },
   {
@@ -264,7 +264,7 @@
     "soundFile": "PlaceholderSkillBlunt.wav",
     "effect": {
       "kind": "damage", "damageType": "blunt", "power": 0, "tier": "blunt_2", "targeting": "singleEnemy",
-      "statuses": [ { "kind": "stun", "power": 40, "turns": 1 } ]
+      "statuses": [ { "kind": "stun", "power": 0, "turns": 1, "chance": 40 } ]
     }
   },
   {

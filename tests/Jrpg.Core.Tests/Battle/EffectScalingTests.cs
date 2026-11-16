@@ -48,7 +48,7 @@ public sealed class EffectScalingTests
 
         var scaled = EffectScaling.ScaledFor(poison, new CombatStats(0) { StatusPermille = 1500, ExtraStatusTurns = 1 });
 
-        Assert.Equal([TestStatuses.Poison(15, 4)], scaled.Statuses);
+        Assert.Equal([TestStatuses.Poison(15, 4) with { Chance = 150 }], scaled.Statuses);
     }
 
     // Decision 784: Power 20 at 200 % damage and a tiered record of 4 per Power give 80; Power's percent would count

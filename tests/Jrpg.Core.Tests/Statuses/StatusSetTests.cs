@@ -22,15 +22,15 @@ public sealed class StatusSetTests
     [Fact]
     public void Apply_SameKindAgain_RefreshesTurnsKeepsStrongerPower()
     {
-        _statuses.Apply(TestStatuses.Stun(5, 3));
+        _statuses.Apply(TestStatuses.Exposed(5, 3));
         _statuses.ClearFreshMarks();
         _statuses.CountDown();
 
-        _statuses.Apply(TestStatuses.Stun(2, 3));
+        _statuses.Apply(TestStatuses.Exposed(2, 3));
 
         var status = Assert.Single(_statuses.Active);
         Assert.Equal(
-            (TestStatuses.StunId, 5, 3, true),
+            (TestStatuses.ExposedId, 5, 3, true),
             (TestStatuses.IdOf(status), TestStatuses.AmountOf(status), status.TurnsLeft, status.IsFresh));
     }
 

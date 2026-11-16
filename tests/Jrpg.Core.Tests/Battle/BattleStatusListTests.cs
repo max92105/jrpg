@@ -80,6 +80,55 @@ public sealed class BattleStatusListTests
         Assert.Equal([30, 12], goblin.Statuses.Active.Select(TestStatuses.AmountOf));
     }
 
+    // Decision 801: every grant rolls its chance; at 60 % a draw of 700 misses and the status is resisted.
+    [Fact]
+    public void Execute_PoisonAtSixtyPercent_RollsAndCanMiss()
+    {
+        var (goblin, events) = CastSickness(chanceDraw: 700);
+
+        Assert.Contains(events.OfType<StatusResisted>(), resisted => resisted.Target == goblin);
+        Assert.Empty(goblin.Statuses.Active);
+    }
+
+    [Fact]
+    public void Execute_PoisonAtSixtyPercent_LandsOnALowDraw()
+    {
+        var (goblin, _) = CastSickness(chanceDraw: 100);
+
+        Assert.Equal([TestStatuses.PoisonId], goblin.Statuses.Active.Select(TestStatuses.IdOf));
+    }
+
+    // Crowd control resistance cuts only a stun (decision 324): an enemy with 50 % taunts itself for sure.
+    [Fact]
+    public void Execute_SelfTauntWithCrowdControlResistance_AlwaysLands()
+    {
+        var taunt = Skill(
+            "bellow", TestStatuses.Granting(new Effect(EffectKind.GrantStatus, 0, Targeting.Self), TestStatuses.Taunt(2)));
+        var chief = Combatant.FromEnemy(new EnemyDefinitionBuilder()
+            .WithCrowdControlResistance(50)
+            .WithTactics(new EnemyAction { SkillId = taunt.Id, Weight = 1 })
+            .Build());
+        var hero = Combatant.FromPartyMember(new PartyMemberBuilder().Build());
+        var battle = new BattleState([hero, chief], new Inventory(), new FixedSequenceRandom(0));
+
+        battle.Execute(new SkillCommand(taunt, [chief]));
+
+        Assert.True(chief.Statuses.Has(TestStatuses.TauntId));
+    }
+
+    // The shuffle (1) puts the hero first; the next draw is the poison's roll.
+    private static (Combatant Goblin, IReadOnlyList<BattleEvent> Events) CastSickness(int chanceDraw)
+    {
+        var sickness = Skill(
+            "sickness",
+            TestStatuses.Granting(
+                new Effect(EffectKind.GrantStatus, 0, Targeting.SingleEnemy), TestStatuses.Poison(8, 3) with { Chance = 60 }));
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 100, damage: 20).Build());
+        var hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithSkills(sickness).Build());
+        var battle = new BattleState([hero, goblin], new Inventory(), new FixedSequenceRandom(1, chanceDraw));
+        return (goblin, battle.Execute(new SkillCommand(sickness, [goblin])));
+    }
+
     private static SkillDefinition Skill(string id, Effect effect) =>
         new() { Id = id, Name = id, Description = "", IconFile = "", Effect = effect };
 }

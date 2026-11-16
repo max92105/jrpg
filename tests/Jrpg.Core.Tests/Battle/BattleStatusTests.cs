@@ -76,7 +76,7 @@ public sealed class BattleStatusTests
 
         var status = Assert.Single(_hero.Statuses.Active);
         Assert.Equal(
-            (TestStatuses.StunId, 100, 2, false),
+            (TestStatuses.StunId, 0, 2, false),
             (TestStatuses.IdOf(status), TestStatuses.AmountOf(status), status.TurnsLeft, status.IsFresh));
     }
 
@@ -97,7 +97,7 @@ public sealed class BattleStatusTests
             skip => (skip.Combatant, TestStatuses.IdOf(skip.Cause)) == (second, TestStatuses.StunId));
         var status = Assert.Single(second.Statuses.Active);
         Assert.Equal(
-            (TestStatuses.StunId, 100, 1, false),
+            (TestStatuses.StunId, 0, 1, false),
             (TestStatuses.IdOf(status), TestStatuses.AmountOf(status), status.TurnsLeft, status.IsFresh));
     }
 
@@ -129,7 +129,7 @@ public sealed class BattleStatusTests
             skip => (skip.Combatant, TestStatuses.IdOf(skip.Cause)) == (goblin, TestStatuses.StunId));
         var status = Assert.Single(goblin.Statuses.Active);
         Assert.Equal(
-            (TestStatuses.StunId, 100, 1, false),
+            (TestStatuses.StunId, 0, 1, false),
             (TestStatuses.IdOf(status), TestStatuses.AmountOf(status), status.TurnsLeft, status.IsFresh));
     }
 

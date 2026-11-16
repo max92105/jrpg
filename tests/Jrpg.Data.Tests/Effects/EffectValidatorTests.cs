@@ -165,21 +165,24 @@ public sealed class EffectValidatorTests
         Assert.Equal("effect.targeting must be otherCombatant for a readyExtraTurn effect (was SingleEnemy).", problem);
     }
 
-    // A stun's power is its chance to land (decision 324): 0 would never land, and past 100 it would read as more than
-    // a sure stun.
+    // A grant's chance to land is a percent (decision 798): at 0 it would never land, and a number past 100 would mean
+    // nothing more than 100 does.
     [Theory]
     [InlineData(0)]
     [InlineData(101)]
-    public void FindProblem_StunPowerOutsideChance_NamesThePower(int power)
+    public void FindProblem_ChanceOutsideAPercent_NamesTheChance(int chance)
     {
-        var bash = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, DamageType: DamageType.Blunt)
-        {
-            Statuses = [new StatusGrant(StatusKind.Stun, power, Turns: 1)],
-        };
+        var problem = EffectValidator.FindProblem(BashWithChance(chance));
 
-        var problem = EffectValidator.FindProblem(bash);
+        Assert.Equal($"effect.statuses[0].chance must be within 1..100 (was {chance}).", problem);
+    }
 
-        Assert.Equal($"effect.statuses[0].power must be within 1..100 for a stun, its chance to land (was {power}).", problem);
+    [Theory]
+    [InlineData(1)]
+    [InlineData(100)]
+    public void FindProblem_ChanceAtABound_Accepted(int chance)
+    {
+        Assert.Null(EffectValidator.FindProblem(BashWithChance(chance)));
     }
 
     [Fact]
@@ -187,11 +190,17 @@ public sealed class EffectValidatorTests
     {
         var bash = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, DamageType: DamageType.Blunt)
         {
-            Statuses = [new StatusGrant(StatusKind.Stun, Power: 60, Turns: 1)],
+            Statuses = [new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1) { Chance = 60 }],
         };
 
         var problem = EffectValidator.FindProblem(bash);
 
         Assert.Null(problem);
     }
+
+    private static Effect BashWithChance(int chance) =>
+        new(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, DamageType: DamageType.Blunt)
+        {
+            Statuses = [new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1) { Chance = chance }],
+        };
 }

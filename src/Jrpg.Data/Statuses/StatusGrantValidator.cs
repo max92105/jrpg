@@ -12,8 +12,7 @@ internal static class StatusGrantValidator
     public static string? FindProblem(StatusGrant grant, int index) =>
         grant.Turns < 1 ? $"effect.statuses[{index}].turns must be at least 1 (was {grant.Turns})."
         : grant.Power < 0 ? $"effect.statuses[{index}].power must be at least 0 (was {grant.Power})."
-        : grant.Kind == StatusKind.Stun && grant.Power is < 1 or > WholeChance
-            ? $"effect.statuses[{index}].power must be within 1..{WholeChance} for a stun, its chance to land "
-                + $"(was {grant.Power})."
+        : grant.Chance is < 1 or > WholeChance
+            ? $"effect.statuses[{index}].chance must be within 1..{WholeChance} (was {grant.Chance})."
         : null;
 }

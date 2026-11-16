@@ -34,3 +34,7 @@ writes it. Data's own refusal (power 0 with a tiered skill, T3) reaches the prob
 3. Type `x` in Power: the problem line says Power isn't a whole number and OK is greyed. Type `3`, OK, File > Save all:
    `content/enemies.json` gains `"power": 3` after `"damageType"` for the goblin. Undo (Ctrl+Z), Save all: the line
    is gone and `git diff content/enemies.json` is empty.
+
+- **Done:** as planned (the Stats tab is stacked panels, so the row went in under Damage type with no rows to shift).
+  The implementer ran step 1: the Enemies window opened with no `ERROR`, its capture showing Power 0 under Damage
+  type. Steps 2 and 3 are the developer's.

@@ -1,5 +1,8 @@
+using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
+using Jrpg.Core.Effects;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
 using Jrpg.Data.Art;
 using Jrpg.Data.Content;
@@ -95,6 +98,46 @@ public sealed class EnemyCatalogViewModelTests
         Assert.Equal("enemies.json: enemy 'goblin': dodge must be within 0..50 (was 51).", catalog.Problem);
         Assert.Contains(nameof(EnemyCatalogViewModel.Problem), notified);
         Assert.Contains(nameof(EnemyCatalogViewModel.CanApply), notified);
+    }
+
+    // T3's rule reaches the line through Data: the goblin uses a tiered skill built here with no Power.
+    [Fact]
+    public void Problem_TieredSkillWithPowerZero_ShowsDataMessage()
+    {
+        var cleave = new SkillDefinition
+        {
+            Id = "tiered_cleave",
+            Name = "Cleave",
+            Description = "",
+            IconFile = "",
+            Effect = new Effect(EffectKind.Damage, 0, Targeting.SingleEnemy, DamageType: DamageType.Slashing)
+            {
+                Tier = new TieredEffect("slashing_1", EffectKind.Damage, 2) { DamageType = DamageType.Slashing },
+            },
+        };
+        var cleaves = new EnemyAction { SkillId = cleave.Id, Weight = 1 };
+        var goblin = _catalog.Enemies["goblin"] with { Power = 0, Tactics = [cleaves] };
+        var draft = _catalog with
+        {
+            Skills = new Dictionary<string, SkillDefinition>(_catalog.Skills) { [cleave.Id] = cleave },
+            Enemies = new Dictionary<string, EnemyDefinition>(_catalog.Enemies) { ["goblin"] = goblin },
+        };
+
+        var catalog = new EnemyCatalogViewModel(draft, _ => []);
+
+        Assert.Equal(
+            "enemies.json: enemy 'goblin': power must be at least 1: its skill 'tiered_cleave' names a tiered effect (was 0).",
+            catalog.Problem);
+    }
+
+    [Fact]
+    public void Problem_PowerAboveTenThousand_ShowsDataMessage()
+    {
+        var catalog = new EnemyCatalogViewModel(_catalog, _ => []);
+
+        catalog.Enemies.Single(enemy => enemy.Id == "goblin").PowerText = "10001";
+
+        Assert.Equal("enemies.json: enemy 'goblin': power must be within 0..10000 (was 10001).", catalog.Problem);
     }
 
     [Fact]

@@ -135,6 +135,42 @@ public sealed class EnemyViewModelTests
         Assert.Equal("Max HP must be a whole number (was 'ten').", enemy.Problem);
     }
 
+    [Fact]
+    public void From_EnemyWithPower_ShowsItsPower()
+    {
+        Assert.Equal("5", EnemyViewModel.From(Goblin with { Power = 5 }).PowerText);
+    }
+
+    [Fact]
+    public void ToEnemy_TypedPower_SetsPower()
+    {
+        var enemy = EnemyViewModel.From(Goblin with { Power = 5 });
+
+        enemy.PowerText = "7";
+
+        Assert.Equal(7, enemy.ToEnemy().Power);
+    }
+
+    [Fact]
+    public void Problem_PowerNotANumber_NamesPower()
+    {
+        var enemy = EnemyViewModel.From(Goblin);
+
+        enemy.PowerText = "x";
+
+        Assert.Equal("Power must be a whole number (was 'x').", enemy.Problem);
+    }
+
+    // The box as typed, not the record's 5.
+    [Fact]
+    public void DuplicateOf_TypedPower_CopiesIt()
+    {
+        var typed = EnemyViewModel.From(Goblin with { Power = 5 });
+        typed.PowerText = "9";
+
+        Assert.Equal("9", EnemyViewModel.DuplicateOf(typed).PowerText);
+    }
+
     // A negative number parses; whether it is allowed is Data's rule, shown by the list.
     [Fact]
     public void Problem_NegativeDamage_IsNotTheFormsToRefuse()

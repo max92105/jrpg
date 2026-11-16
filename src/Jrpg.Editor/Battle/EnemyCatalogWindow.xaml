@@ -77,6 +77,10 @@
                               SelectedItem="{Binding DamageType}" />
                   </StackPanel>
                   <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Power" Style="{StaticResource FieldLabel}" ToolTip="What its tiered skills multiply; 0 for an enemy with none" />
+                    <TextBox Style="{StaticResource NumberBox}" Text="{Binding PowerText, UpdateSourceTrigger=PropertyChanged}" />
+                  </StackPanel>
+                  <StackPanel Orientation="Horizontal">
                     <TextBlock Text="Accuracy (%)" Style="{StaticResource FieldLabel}" />
                     <TextBox Style="{StaticResource NumberBox}" Text="{Binding AccuracyText, UpdateSourceTrigger=PropertyChanged}" />
                   </StackPanel>

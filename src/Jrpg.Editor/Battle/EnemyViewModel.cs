@@ -43,6 +43,7 @@ internal sealed partial class EnemyViewModel : ObservableObject
         Name = original.Name;
         MaxHpText = TypedNumber.Text(original.MaxHp);
         DamageText = TypedNumber.Text(original.Damage);
+        PowerText = TypedNumber.Text(original.Power);
         DamageType = original.DamageType;
         AccuracyText = TypedNumber.Text(original.Accuracy);
         DodgeText = TypedNumber.Text(original.Dodge);
@@ -73,6 +74,7 @@ internal sealed partial class EnemyViewModel : ObservableObject
             Name = chosen.Name,
             MaxHpText = chosen.MaxHpText,
             DamageText = chosen.DamageText,
+            PowerText = chosen.PowerText,
             DamageType = chosen.DamageType,
             AccuracyText = chosen.AccuracyText,
             DodgeText = chosen.DodgeText,
@@ -113,6 +115,11 @@ internal sealed partial class EnemyViewModel : ObservableObject
 
     [ObservableProperty]
     public partial DamageType DamageType { get; set; }
+
+    /// <summary>What its tiered skills multiply, as typed (decision 794); 0 for an enemy with none.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Problem))]
+    public partial string PowerText { get; set; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Problem))]
@@ -164,6 +171,7 @@ internal sealed partial class EnemyViewModel : ObservableObject
                 Name = Name.Trim(),
                 MaxHp = TypedNumber.Parse(MaxHpText)!.Value,
                 Damage = TypedNumber.Parse(DamageText)!.Value,
+                Power = TypedNumber.Parse(PowerText)!.Value,
                 DamageType = DamageType,
                 Accuracy = TypedNumber.Parse(AccuracyText)!.Value,
                 Dodge = TypedNumber.Parse(DodgeText)!.Value,
@@ -180,6 +188,7 @@ internal sealed partial class EnemyViewModel : ObservableObject
     private string? FirstNumberProblem() =>
         TypedNumber.ProblemOf("Max HP", MaxHpText)
         ?? TypedNumber.ProblemOf("Damage", DamageText)
+        ?? TypedNumber.ProblemOf("Power", PowerText)
         ?? TypedNumber.ProblemOf("Accuracy", AccuracyText)
         ?? TypedNumber.ProblemOf("Dodge", DodgeText)
         ?? TypedNumber.ProblemOf("Crit chance", CritChanceText)

@@ -27,3 +27,6 @@ shared preview-and-pace control on this page).
 ## Verify by hand
 Agents may run it (effects are generated art). The script: "Database>Effect strips...: opened", the strip playing. In
 the editor: type a frame time: the pace changes; Esc: closes with no `RenderTick` report; reopen: the strip unchanged.
+- **Done, with deviations:** `CanApply` removed (the window was its only reader): `CanApply_WithAProblem_IsFalse`
+  renamed `Problem_HitFramePastTheImage_IsTheChosenStrips`, its assert on the problem's words; the test helper
+  `Window()` and its locals renamed `Catalog()` and `catalog`; the test file was 210 lines, now 242.

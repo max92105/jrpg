@@ -31,9 +31,6 @@ internal sealed partial class MainViewModel
 
     public EffectStripEditingViewModel? EffectStripEditing { get; }
 
-    /// <summary>Whether Database > Effect strips... can open its window: false while the content didn't load.</summary>
-    public bool HasEffectStripEditing => EffectStripEditing is not null;
-
     /// <summary>
     /// Copies images into an art folder (asking before replacing one, decisions 125 and 590); a file copy, not an undo
     /// step. The art warning is read again and the outcome goes to the status bar, as the tilesheet import's.

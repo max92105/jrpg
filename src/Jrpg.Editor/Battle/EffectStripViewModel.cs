@@ -7,11 +7,11 @@ using Jrpg.Editor.Catalogs;
 namespace Jrpg.Editor.Battle;
 
 /// <summary>
-/// One effect strip as the Effect strips window edits it (decision 659): its file fixed, its frame time and hit frame
+/// One effect strip as the Effect strips page edits it (decision 659): its file fixed, its frame time and hit frame
 /// kept as typed, its swing chosen or left empty for none. It is listed (written to <c>effect-strips.json</c>) while
 /// its boxes differ from the unlisted pace (ADR 0048), or still hold the record it was loaded from until Reset to
 /// unlisted. <see cref="Problem"/> is a box that isn't a whole number, then a hit frame past the image's frames; the
-/// ranges are Data's rules, shown by the window.
+/// ranges are Data's rules, shown by the page.
 /// </summary>
 internal sealed partial class EffectStripViewModel : ObservableObject
 {
@@ -49,7 +49,7 @@ internal sealed partial class EffectStripViewModel : ObservableObject
     public int? FrameCount { get; }
 
     /// <summary>
-    /// The strip's frames at its typed frame time, which the window's preview plays; null while the image is missing or
+    /// The strip's frames at its typed frame time, which the page's preview plays; null while the image is missing or
     /// the frame time isn't a whole number from 1.
     /// </summary>
     public TileAnimation? PreviewLoop =>

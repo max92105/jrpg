@@ -97,7 +97,7 @@ page recipe: [page-recipe.md](page-recipe.md).
 - [x] **WD4. The Drop tables page; the Enemies window's Edit... opens it in a dialog** (Editor, about 130 lines) →
   [slices/WD4.md](slices/WD4.md)
 - [x] **WD5. The Enemies page** (Editor, about 150 lines) → [slices/WD5.md](slices/WD5.md)
-- [ ] **WD6. The Effect strips page** (Editor, about 130 lines) → [slices/WD6.md](slices/WD6.md)
+- [x] **WD6. The Effect strips page** (Editor, about 130 lines) → [slices/WD6.md](slices/WD6.md)
 - [ ] **WD7. The Cinematics page** (Editor, about 140 lines) → [slices/WD7.md](slices/WD7.md)
 - [ ] **WD8. The Character sprites page** (Editor, about 150 lines) → [slices/WD8.md](slices/WD8.md)
 

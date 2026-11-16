@@ -4,7 +4,7 @@ using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Tests.Battle;
 
-// The Effect strips window's session over the test world's draft (decision 659), its folder one image of four frames.
+// The Effect strips page's session over the test world's draft (decision 659), its folder one image of four frames.
 public sealed class EffectStripEditingViewModelTests
 {
     private readonly CatalogDraft _draft = new(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")));

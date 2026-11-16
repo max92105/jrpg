@@ -4,18 +4,19 @@ using CommunityToolkit.Mvvm.Input;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Data.Content;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Battle;
 
 /// <summary>
-/// The Effect strips window's state (decision 659, ADR 0045): every image in the effects folder in name order with its
+/// The Effect strips page's state (decision 659, ADR 0045): every image in the effects folder in name order with its
 /// record or the unlisted pace, then each record whose image is missing (still editable and saved, decision 442).
 /// Editing a strip's boxes lists it; Reset to unlisted puts the unlisted pace back, so OK drops its record. The problem
 /// line is the chosen strip's own, then another strip's named by file, then Data's for the whole list; OK greys while
-/// there is one. Nothing names a record by id, so no undo is refused. Reads no file itself: the folder's listing and an
-/// image's size come in as lookups.
+/// there is one. Nothing names a record by id, so no undo is refused, and a strip is chosen by its file. Reads no file
+/// itself: the folder's listing and an image's size come in as lookups.
 /// </summary>
-internal sealed partial class EffectStripCatalogViewModel : ObservableObject
+internal sealed partial class EffectStripCatalogViewModel : ObservableObject, IEditedCatalog
 {
     /// <param name="current">The records as they are now.</param>
     /// <param name="images">The readable images in the effects folder.</param>
@@ -46,7 +47,7 @@ internal sealed partial class EffectStripCatalogViewModel : ObservableObject
     public IReadOnlyList<string> SwingChoices { get; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Problem), nameof(CanApply))]
+    [NotifyPropertyChangedFor(nameof(Problem))]
     [NotifyCanExecuteChangedFor(nameof(ResetToUnlistedCommand))]
     public partial EffectStripViewModel? SelectedStrip { get; set; }
 
@@ -55,7 +56,9 @@ internal sealed partial class EffectStripCatalogViewModel : ObservableObject
         ?? Strips.Where(strip => strip.Problem is not null).Select(strip => $"{strip.File}: {strip.Problem}").FirstOrDefault()
         ?? CatalogProblems.OfEffectStrips(ListedStrips());
 
-    public bool CanApply => Problem is null;
+    public string? ChosenKey => SelectedStrip?.File;
+
+    public void Choose(string key) => SelectedStrip = Strips.FirstOrDefault(strip => strip.File == key) ?? SelectedStrip;
 
     /// <summary>The records OK writes: every listed strip, sorted by file; an unlisted one has none.</summary>
     /// <exception cref="InvalidOperationException">There is a <see cref="Problem"/>; OK is greyed then.</exception>
@@ -93,7 +96,6 @@ internal sealed partial class EffectStripCatalogViewModel : ObservableObject
     private void RefreshFromTheStrips()
     {
         OnPropertyChanged(nameof(Problem));
-        OnPropertyChanged(nameof(CanApply));
         ResetToUnlistedCommand.NotifyCanExecuteChanged();
     }
 }

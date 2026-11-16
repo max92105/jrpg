@@ -4,7 +4,7 @@ using Jrpg.Editor.Battle;
 
 namespace Jrpg.Editor.Tests.Battle;
 
-// What the Effect strips window's preview plays and says, on a four-frame image of 8 x 8 frames looked up by the test.
+// What the Effect strips page's preview plays and says, on a four-frame image of 8 x 8 frames looked up by the test.
 public sealed class EffectStripPreviewTests
 {
     private const string Burst = "Burst.png";

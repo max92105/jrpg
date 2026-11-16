@@ -1,20 +1,9 @@
-<Window x:Class="Jrpg.Editor.Battle.EffectStripCatalogWindow"
-        x:ClassModifier="internal"
-        Style="{StaticResource EditorWindow}"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="Effect strips"
-        Width="720"
-        Height="720"
-        WindowStartupLocation="CenterOwner"
-        ShowInTaskbar="False">
-  <DockPanel Margin="12">
-    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
-      <Button Content="OK" Width="80" IsDefault="True" Click="OnOkClicked" IsEnabled="{Binding CanApply}" />
-      <Button Content="Cancel" Width="80" Margin="8,0,0,0" IsCancel="True" />
-    </StackPanel>
-    <TextBlock DockPanel.Dock="Bottom" Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Margin="0,8,0,0" Text="{Binding Problem}" />
-
+<UserControl x:Class="Jrpg.Editor.Battle.EffectStripCatalogPage"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:battle="clr-namespace:Jrpg.Editor.Battle">
+  <DockPanel>
     <!-- The effects images in name order, then the records whose image is missing; an unlisted one is greyed. -->
     <DockPanel DockPanel.Dock="Left" Width="240">
       <TextBlock DockPanel.Dock="Top" Text="Effects images" FontWeight="Bold" />
@@ -56,7 +45,7 @@
         <TextBlock Text="Swing" Width="110" VerticalAlignment="Center" />
         <ComboBox Width="240"
                   IsEditable="True"
-                  ItemsSource="{Binding DataContext.SwingChoices, RelativeSource={RelativeSource AncestorType=Window}}"
+                  ItemsSource="{Binding DataContext.SwingChoices, RelativeSource={RelativeSource AncestorType=battle:EffectStripCatalogPage}}"
                   Text="{Binding SwingFile, UpdateSourceTrigger=PropertyChanged}"
                   ToolTip="The strip an Attack sweeps in front of the attacker before this one; empty for none" />
       </StackPanel>
@@ -65,7 +54,7 @@
               Width="130"
               HorizontalAlignment="Left"
               Margin="110,12,0,0"
-              Command="{Binding DataContext.ResetToUnlistedCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+              Command="{Binding DataContext.ResetToUnlistedCommand, RelativeSource={RelativeSource AncestorType=battle:EffectStripCatalogPage}}"
               ToolTip="Back to the default pace, hit frame 0 and no swing: OK then writes no record for it" />
 
       <!-- The chosen strip looping at its typed frame time, one frame at a time over black, as an enemy's attack shows it
@@ -76,4 +65,4 @@
       <TextBlock x:Name="FrameText" Foreground="{StaticResource MutedTextBrush}" Margin="110,4,0,0" />
     </StackPanel>
   </DockPanel>
-</Window>
+</UserControl>

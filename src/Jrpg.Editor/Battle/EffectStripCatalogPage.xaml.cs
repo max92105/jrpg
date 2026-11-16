@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Jrpg.Core.Maps;
 using Jrpg.Editor.Hosting;
@@ -8,12 +9,12 @@ using Jrpg.Editor.Tiles;
 namespace Jrpg.Editor.Battle;
 
 /// <summary>
-/// The Effect strips window (decision 659, ADR 0045): OK keeps the session's records when nothing would be refused,
-/// Cancel drops them. The problem line shows live and greys OK while it shows. The chosen strip plays in the preview at
-/// its typed frame time on the editor's animation clock, one square frame of the image at a time, so its pace is tuned
-/// by eye; an image is read once per window.
+/// The Effect strips page (decision 659, ADR 0045): the effects images on the left, the chosen strip's boxes and
+/// preview on the right. Its host shows the problem line and keeps or drops the session. The chosen strip plays in the
+/// preview at its typed frame time on the editor's animation clock, one square frame of the image at a time, while the
+/// page is shown, so its pace is tuned by eye; an image is read once per page.
 /// </summary>
-internal sealed partial class EffectStripCatalogWindow : Window
+internal sealed partial class EffectStripCatalogPage : UserControl
 {
     private readonly RenderTick _renderTick;
     private readonly EffectStripCatalogViewModel _strips;
@@ -27,10 +28,10 @@ internal sealed partial class EffectStripCatalogWindow : Window
     private BitmapSource? _image;
     private int? _shownFrame;
 
-    /// <param name="strips">The window's state, from <see cref="EffectStripEditingViewModel.Start"/>.</param>
+    /// <param name="strips">The page's state, from <see cref="EffectStripEditingViewModel.Start"/>.</param>
     /// <param name="loadImage">Decodes an effects image at its own size; null when it can't.</param>
     /// <param name="animationTime">The editor's animation clock, which the preview plays on.</param>
-    public EffectStripCatalogWindow(
+    public EffectStripCatalogPage(
         EffectStripCatalogViewModel strips, Func<string, BitmapSource?> loadImage, TileAnimationTime animationTime)
     {
         InitializeComponent();
@@ -39,11 +40,10 @@ internal sealed partial class EffectStripCatalogWindow : Window
         (_loadImage, _animationTime) = (loadImage, animationTime);
         strips.PropertyChanged += OnStripsChanged;
         WatchChosenStrip();
-        _renderTick.Start();
-        Closed += (_, _) => _renderTick.Stop();
+        // WPF may raise Loaded twice, which Start ignores while it runs; a page shown again after Unloaded plays again.
+        Loaded += (_, _) => _renderTick.Start();
+        Unloaded += (_, _) => _renderTick.Stop();
     }
-
-    private void OnOkClicked(object sender, RoutedEventArgs e) => DialogResult = true;
 
     private void OnStripsChanged(object? sender, PropertyChangedEventArgs e)
     {

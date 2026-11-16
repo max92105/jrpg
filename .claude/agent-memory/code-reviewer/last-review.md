@@ -5,16 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-skill-and-status-editors, slice FX1 (Data/Content/CatalogReferences.Rebound,
-CatalogProblems.OfTieredEffects, CatalogDraft.SetTieredEffects; code uncommitted). 2026-11-16. Round 1.
-Verdict: Ready to commit.
+Plan 2026-11-15-skill-and-status-editors, slice FX2a (the rules half of FX2: Core TieredEffect.AmountAt, Editor
+Catalogs/TierIds, Effects/TieredEffect{,Catalog,Editing}ViewModel; code uncommitted; the page is FX2b). 2026-11-16.
+Round 1. Verdict: Ready to commit.
 
-- Warning (open): CatalogProblemsSkillTests.OfTieredEffects_RepositoryEffects_IsNull reads the test world, not the
-  repository; rename OfTieredEffects_TestWorldEffects_IsNull (the slice's planned name was the wrong one).
-- Suggestion (open): C7 test asserts only after redo; add the state after the two undos (Bolt named Bolt, Fire1).
-- Suggestion (open): CatalogReferences' exception doc gives only the undo reason; OfTieredEffects also relies on the
-  Effects page removing only added records (FX2).
-- Confirmed: enemies (EnemyAction.SkillId) and classes (SkillIds) hold ids; only skills' and items' Effect hold
-  resolved records, so Rebound covers every CatalogReferenceConverter user. Undo order with SetSkills is sound.
-- SK7 items: NoChoices renamed PoisonOnlyChoices (fixed); SkillGrants.Problem now SectionRowProblem.FirstOf (fixed);
-  TypedRecord comment suggestion not carried.
+- Warning (open): TieredEffectCatalogViewModel.Problem reports the first broken effect in list order, not the chosen
+  one's first as FX2.md's Goal (and FX5.md) say; matches every other catalog page, so reword the slices or record it.
+- Suggestion (open): Duplicate on an added effect whose id is still empty gives "_1" (Stem("") is ""); grey Duplicate
+  or give an empty id while the chosen id is empty.
+- Suggestion (open): DuplicateOf builds the record at StartingPerPower then overwrites PerPowerText; a one-line why
+  comment, or a constructor taking the per-Power text.
+- FX1 carried items: OfTieredEffects_TestWorldEffects_IsNull renamed (fixed); CatalogReferences exception doc now
+  names the page rule (fixed); C7 suggestion dropped.

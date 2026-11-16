@@ -77,6 +77,21 @@ public static class CatalogProblems
         FirstProblem(() => CheckDropTables(tables, content));
 
     /// <summary>
+    /// The first problem in the skills (decision 974): a skill's own rule, then the classes' check (a class's skills
+    /// use only its resources) and the enemies' check (an enemy's skills use none), both run with these skills, since
+    /// the editor writes neither file; null when the loader would take them.
+    /// </summary>
+    /// <param name="skills">The skills as edited.</param>
+    /// <param name="content">The classes and the enemies that name the skills.</param>
+    public static string? OfSkills(IReadOnlyList<SkillDefinition> skills, ContentCatalog content) =>
+        FirstProblem(() =>
+        {
+            CheckSkills(skills, content);
+            var edited = content with { Skills = skills.ToDictionary(skill => skill.Id, StringComparer.Ordinal) };
+            CheckEnemies([.. content.Enemies.Values], edited);
+        });
+
+    /// <summary>
     /// The checks the loader makes on <c>field-sprites.json</c>, for the writer and the problem line alike.
     /// </summary>
     /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
@@ -124,7 +139,7 @@ public static class CatalogProblems
     /// <summary>
     /// The checks the loader makes on <c>skills.json</c>, then on <c>classes.json</c> against these skills, since a
     /// class's skills may use only its resources (decision 974); the enemies that name these skills are checked by
-    /// <see cref="CheckEnemies"/>, which the writer runs after this.
+    /// <see cref="CheckEnemies"/>, which the writer and <see cref="OfSkills"/> run after this.
     /// </summary>
     /// <param name="skills">The skills as they will be written.</param>
     /// <param name="content">The classes that name the skills.</param>

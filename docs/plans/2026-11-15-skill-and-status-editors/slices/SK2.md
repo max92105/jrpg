@@ -55,3 +55,6 @@ undo step.
 
 ## Verify by hand
 None: no page yet (SK4).
+- **Done, with deviations:** a new skill comes from `SkillViewModel.ForNew(start, takenIds)` (the test needed one; SK3's
+  `New` and `DuplicateOf` can build on it); two more draft tests (`CostChanged`, `RequirementChanged`) and two more view
+  model tests; the Data test named `OfSkills_TestWorldSkills_IsNull`. About 477 lines (`wc -l`): 166 source, 311 tests.

@@ -62,3 +62,5 @@ line (the chosen skill's own, then another's named by id, then Data's for the wh
 
 ## Verify by hand
 None: the page comes in SK4.
+- **Note from SK2:** a new skill is made by `SkillViewModel.ForNew(start, takenIds)`, the saved skills' ids passed once
+  (they can't change in a session); `New(firstDamageTier)` and `DuplicateOf(chosen)` pass the catalog's ids.

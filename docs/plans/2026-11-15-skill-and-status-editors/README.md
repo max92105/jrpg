@@ -115,7 +115,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 ### Phase 1: the Skills page
 - [x] **SK1. The writer takes over `skills.json`, `effects.json` and `statuses.json`** (Data + content, two commits:
   the relay alone, then about 190 lines) → [slices/SK1.md](slices/SK1.md)
-- [ ] **SK2. A skill's texts and files as typed, and the draft's skills step** (Data + Editor, about 200 lines) →
+- [x] **SK2. A skill's texts and files as typed, and the draft's skills step** (Data + Editor, about 200 lines) →
   [slices/SK2.md](slices/SK2.md)
 - [ ] **SK3. The skill list: Add, Duplicate, Remove, who uses a skill, the strip's pace, `IEditedCatalog`** (Editor,
   about 230 lines) → [slices/SK3.md](slices/SK3.md)

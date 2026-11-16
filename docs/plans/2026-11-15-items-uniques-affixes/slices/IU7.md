@@ -55,3 +55,6 @@ nothing when nothing changed.
 
 ## Verify by hand
 - None: the page comes next (IU8).
+- **Note from IU6:** the list relays `ItemViewModel.Changed` (typed boxes only); `ItemFixtures.Catalog` is the test
+  world's items plus the five fixtures, so sort and problem tests pick the fixtures by id; a new item's id is checked
+  against no taken id in `ItemViewModel` (as `EnemyViewModel`): a saved id retyped is the list's or Data's problem.

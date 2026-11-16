@@ -53,3 +53,5 @@ equipment, a unique or a consumable shows its general fields only.
   line in the Output window.
 - Add unique, type the id `test_band`, name "Test Band", OK, Save all: `items.json` gains `test_band` with
   `"isUnique": true` in id order; its category shows "Unique" and can't be changed. Ctrl+Z, Save all: it's gone.
+- **Note from IU6:** until IU13, a unique's "Sells for" line is the share of its base price only, not of its piece
+  value with the fixed affixes' gold: don't read it as the shop's figure at the hand check.

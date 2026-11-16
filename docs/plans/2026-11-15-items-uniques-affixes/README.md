@@ -117,7 +117,7 @@ slices run; IU5 is optional and IU16 merged into IU15.
   user's Power** (Core + Data + content + Game, about 250 lines) → [slices/IU5.md](slices/IU5.md)
 
 ### Phase 3: the Items page
-- [ ] **IU6. One item as the Items page types it: the general fields and the sale line** (Editor, about 220 lines) →
+- [x] **IU6. One item as the Items page types it: the general fields and the sale line** (Editor, about 220 lines) →
   [slices/IU6.md](slices/IU6.md)
 - [ ] **IU7. The Items list and its undo step: add by category, unique included, duplicate, remove while new** (Editor
   + Data, about 220 lines) → [slices/IU7.md](slices/IU7.md)

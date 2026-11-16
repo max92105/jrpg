@@ -327,3 +327,5 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   records unequal) would guard them all (items plan, IU2 review).
 - `ItemDefinitionBuilder` has no `AsUnique(...)`: the `with { IsUnique = true, FixedAffixes = [...] }` block is
   copied in about fifteen test files across Core and Data (items plan, IU2-IU4 reviews).
+- `Editor/Catalogs/RecordListProblem.FirstOf` counts two new records with empty ids as one id twice ("Item  is listed
+  twice.", ahead of their own "The id must not be empty."): skip empty ids in the twice check (items plan, IU6 review).

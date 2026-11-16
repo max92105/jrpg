@@ -49,3 +49,6 @@ box raises its change at once (the page's boxes bind on `PropertyChanged`, page-
 
 ## Verify by hand
 - None: no page yet (IU8). The tests are the check.
+- **Done, with deviations:** `ItemFixtures.Catalog` keeps the test world's items beside the five fixtures (its shops,
+  tables, Forge and new game name them); `ItemViewModel.Changed` (typed boxes only) added for IU7's relay; a new id is
+  checked against no taken id (`ProblemOf(Id, [])`, as `EnemyViewModel`); eleven tests beyond the listed ones.

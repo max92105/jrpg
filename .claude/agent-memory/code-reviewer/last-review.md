@@ -5,20 +5,18 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-enemy-behavior, slice EB10 (once per battle: TacticMemory.HasUsed/NoteUsed,
-TacticMemoryNotes.NoteOwnTurn, EnemyAction.IsOncePerBattle, EnemyTactics.IsUsedUp, Data validator + AbsentWhenFalse
-row, editor check box; TacticRuleRowTests split). 2026-11-16. Round 1. Verdict: Ready to commit (no Critical, no
-Warning).
+Plan 2026-11-15-enemy-behavior, slice EB11 (FoeHpBelow, EveryNthTurn: TacticCondition.Turns, TacticConditionNumber.Turns,
+TacticMemory.TurnsActed/NoteTurnActed, validator LeftOutProblem + MostTurnsBetween, AbsentWhenZero "turns", editor
+choice phrases + TacticRuleRow ConditionOf/NumberName). 2026-11-16. Round 1. Verdict: Ready to commit (no Critical).
 
-- Suggestion (open, optional): EnemyOncePerBattleTests ChooseCommand_OnceRuleInAPhaseAfterUseBeforeThePhase - assert
-  the member's Execute returned an EnemyPhaseEntered for the actor; without it the test also passes if the phase is
-  never entered (the base list's once cleave is used up too).
-- Suggestion (open, optional): TacticMemory.HasUsed/NoteUsed have no summary while NoteReaction/ForgetReactions do;
-  one line "by skill id, through any rule (decision 842)" on HasUsed.
-- EB9 carried: TacticConditionShape summary now names IsReaction (fixed); early-return suggestion in
-  TacticMemoryNotes.Note dropped (declined, NoteOwnTurn now holds the enemy's part).
-- Checked, no finding: every SkillCommand that reaches Execute is noted, a miss, a backfire and a ReadyExtraTurn skill
-  included (UseSkill throws before any event on an unusable skill, so Execute never notes a refused one); a quick
-  skill notes before the same turn's next pick; the split moved all 11 sentence/notice tests + the theory unchanged;
-  writer fixture Power 5 is decision 787's rule (EnemyCatalogValidator:33) and touches no other assertion; the
-  AbsentWhenFalse row is covered by ContentWriterRepositoryTests' identical-bytes test.
+- Warning (open): EnemyEveryNthTurnTests - turns 1, 3, 6 also pass with `TurnsActed + 1 >= Turns` ("from the 3rd turn
+  on"); add ChooseCommand_EveryThirdTurnOnItsFourthTurn_IsNotEligible (DefendFor rounds: 3, Tactics(0), AttackCommand).
+- Warning (open): TacticRuleRow.WhenWords - EveryNthTurn reads "When every Nth turn of its own 3 turns: ..."; word the
+  Turns case (e.g. "Every 3 turns of its own") or relabel, with a Sentence test in TacticRuleRowSentenceTests.
+- Suggestion (open, optional): TacticRuleRowSentenceTests has no FoeHpBelow/EveryNthTurn sentence pinned (covered by
+  the Warning's test for the turns one).
+- EB10 carried suggestions dropped (optional, not re-raised).
+- Checked, no finding: quick skill counting twice is unreachable today (enemies hold no resources, Combatant.FromEnemy;
+  Data requires a cost on isQuick, SkillCatalogValidator:23), a readied extra turn counts as a turn acted (decision 847's
+  "turns acted"); stun skip arrives in the member's Execute so NoteOwnTurn isn't called for the stunned enemy; validator
+  bounds 1/11 refused, 2/10 accepted, percent 1/99 accepted; Turns 0 % would throw in Core but Data refuses it.

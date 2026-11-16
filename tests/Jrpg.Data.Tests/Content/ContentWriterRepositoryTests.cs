@@ -62,31 +62,6 @@ public sealed class ContentWriterRepositoryTests : IDisposable
         Assert.Equal(File.ReadAllBytes(_content.PathOf("new-game.json")), File.ReadAllBytes(written));
     }
 
-    // effects.json is written as the writer lays it out, sorted by id, for row 7's Effects window to take it over.
-    [Fact]
-    public void Effects_RepositoryFile_WritesBackUnchanged()
-    {
-        var written = _content.PathOf("effects.written.json");
-
-        var sorted = _catalog.TieredEffects.Values.OrderBy(effect => effect.Id, StringComparer.Ordinal).ToList();
-
-        ContentFileWriter.Write(written, sorted);
-
-        Assert.Equal(File.ReadAllBytes(_content.PathOf("effects.json")), File.ReadAllBytes(written));
-    }
-
-    // statuses.json is written as the writer lays it out, sorted by id, for row 7's Statuses window to take it over.
-    [Fact]
-    public void Statuses_RepositoryFile_WritesBackUnchanged()
-    {
-        var written = _content.PathOf("statuses.written.json");
-        var sorted = _catalog.Statuses.Values.OrderBy(status => status.Id, StringComparer.Ordinal).ToList();
-
-        ContentFileWriter.Write(written, sorted);
-
-        Assert.Equal(File.ReadAllBytes(_content.PathOf("statuses.json")), File.ReadAllBytes(written));
-    }
-
     private byte[] CatalogFileBytes() =>
         [.. File.ReadAllBytes(_content.PathOf("tilesheets.json")),
          .. File.ReadAllBytes(_content.PathOf("tiles.json")),
@@ -97,7 +72,10 @@ public sealed class ContentWriterRepositoryTests : IDisposable
          .. File.ReadAllBytes(_content.PathOf("enemies.json")),
          .. File.ReadAllBytes(_content.PathOf("drop-tables.json")),
          .. File.ReadAllBytes(_content.PathOf("cinematics.json")),
-         .. File.ReadAllBytes(_content.PathOf("effect-strips.json"))];
+         .. File.ReadAllBytes(_content.PathOf("effect-strips.json")),
+         .. File.ReadAllBytes(_content.PathOf("skills.json")),
+         .. File.ReadAllBytes(_content.PathOf("effects.json")),
+         .. File.ReadAllBytes(_content.PathOf("statuses.json"))];
 
     // Both files one after the other, compared byte for byte: line endings and encoding count.
     private byte[] MapFileBytes(string mapId) =>

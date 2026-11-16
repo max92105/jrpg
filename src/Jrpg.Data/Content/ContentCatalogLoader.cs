@@ -31,10 +31,10 @@ namespace Jrpg.Data.Content;
 
 public static class ContentCatalogLoader
 {
-    private const string ClassesFile = "classes.json";
+    internal const string ClassesFile = "classes.json";
     private const string RulesFile = "rules.json";
     internal const string ItemsFile = "items.json";
-    private const string SkillsFile = "skills.json";
+    internal const string SkillsFile = "skills.json";
     private const string PartyMembersFile = "party-members.json";
     internal const string EnemiesFile = "enemies.json";
     private const string EncountersFile = "encounters.json";

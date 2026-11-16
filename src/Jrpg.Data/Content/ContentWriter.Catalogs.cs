@@ -1,10 +1,14 @@
+using System.Text.Json.Serialization;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Cinematics;
 using Jrpg.Core.Content;
+using Jrpg.Core.Effects;
 using Jrpg.Core.Loot;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Quests;
+using Jrpg.Core.Skills;
 using Jrpg.Core.Sprites;
+using Jrpg.Core.Statuses;
 using Jrpg.Core.Trade;
 using Jrpg.Data.Maps;
 using Jrpg.Data.Quests;
@@ -26,6 +30,11 @@ public sealed partial class ContentWriter
         CatalogProblems.CheckFieldSprites(SortedFieldSprites(catalog), catalog);
         CatalogProblems.CheckShops(SortedShops(catalog), catalog);
         CatalogProblems.CheckDropTables(SortedDropTables(catalog), catalog);
+
+        // Before the enemies, so a skill's own problem is named before an enemy's tactic naming it.
+        CatalogProblems.CheckTieredEffects(SortedTieredEffects(catalog));
+        CatalogProblems.CheckStatuses(SortedStatuses(catalog));
+        CatalogProblems.CheckSkills(SortedSkills(catalog), catalog);
         CatalogProblems.CheckEnemies(SortedEnemies(catalog), catalog);
         CatalogProblems.CheckCinematics(SortedCinematics(catalog));
         CatalogProblems.CheckEffectStrips(SortedEffectStrips(catalog));
@@ -45,6 +54,17 @@ public sealed partial class ContentWriter
         new(ContentCatalogLoader.DropTablesFile, ContentFileWriter.Serialize(SortedDropTables(catalog))),
         new(ContentCatalogLoader.CinematicsFile, ContentFileWriter.Serialize(SortedCinematics(catalog))),
         new(ContentCatalogLoader.EffectStripsFile, ContentFileWriter.Serialize(SortedEffectStrips(catalog))),
+        new(ContentCatalogLoader.EffectsFile, ContentFileWriter.Serialize(SortedTieredEffects(catalog))),
+        new(ContentCatalogLoader.StatusesFile, ContentFileWriter.Serialize(SortedStatuses(catalog))),
+        new(ContentCatalogLoader.SkillsFile, ContentFileWriter.Serialize(SortedSkills(catalog), ReferenceConverters(catalog))),
+    ];
+
+    // A skill names its tier and the statuses it grants by id (decision 972); effects.json and statuses.json hold those
+    // records whole, so only skills.json is written with these.
+    private static JsonConverter[] ReferenceConverters(ContentCatalog catalog) =>
+    [
+        new CatalogReferenceConverter<TieredEffect>(catalog.TieredEffects, effect => effect.Id, "effect"),
+        new CatalogReferenceConverter<StatusDefinition>(catalog.Statuses, status => status.Id, "status"),
     ];
 
     private static List<TilesheetDefinition> SortedSheets(ContentCatalog catalog) =>
@@ -75,6 +95,15 @@ public sealed partial class ContentWriter
 
     private static List<EffectStripDefinition> SortedEffectStrips(ContentCatalog catalog) =>
         [.. catalog.EffectStrips.Values.OrderBy(strip => strip.File, StringComparer.Ordinal)];
+
+    private static List<TieredEffect> SortedTieredEffects(ContentCatalog catalog) =>
+        [.. catalog.TieredEffects.Values.OrderBy(effect => effect.Id, StringComparer.Ordinal)];
+
+    private static List<StatusDefinition> SortedStatuses(ContentCatalog catalog) =>
+        [.. catalog.Statuses.Values.OrderBy(status => status.Id, StringComparer.Ordinal)];
+
+    private static List<SkillDefinition> SortedSkills(ContentCatalog catalog) =>
+        [.. catalog.Skills.Values.OrderBy(skill => skill.Id, StringComparer.Ordinal)];
 
     // A catalog file's name and its bytes as they will be written.
     private sealed record CatalogWrite(string File, byte[] Bytes);

@@ -1,13 +1,20 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Cinematics;
 using Jrpg.Core.Content;
+using Jrpg.Core.Effects;
 using Jrpg.Core.Loot;
+using Jrpg.Core.Skills;
 using Jrpg.Core.Sprites;
+using Jrpg.Core.Statuses;
 using Jrpg.Core.Trade;
 using Jrpg.Data.Battle;
 using Jrpg.Data.Cinematics;
+using Jrpg.Data.Effects;
 using Jrpg.Data.Loot;
+using Jrpg.Data.Party;
+using Jrpg.Data.Skills;
 using Jrpg.Data.Sprites;
+using Jrpg.Data.Statuses;
 using Jrpg.Data.Trade;
 
 namespace Jrpg.Data.Content;
@@ -113,6 +120,35 @@ public static class CatalogProblems
     /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
     internal static void CheckDropTables(IReadOnlyList<DropTable> tables, ContentCatalog content) =>
         DropTableCatalogValidator.Validate(ContentCatalogLoader.DropTablesFile, tables, content.Items);
+
+    /// <summary>
+    /// The checks the loader makes on <c>skills.json</c>, then on <c>classes.json</c> against these skills, since a
+    /// class's skills may use only its resources (decision 974); the enemies that name these skills are checked by
+    /// <see cref="CheckEnemies"/>, which the writer runs after this.
+    /// </summary>
+    /// <param name="skills">The skills as they will be written.</param>
+    /// <param name="content">The classes that name the skills.</param>
+    /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
+    internal static void CheckSkills(IReadOnlyList<SkillDefinition> skills, ContentCatalog content)
+    {
+        SkillCatalogValidator.Validate(ContentCatalogLoader.SkillsFile, skills);
+        var references = new ClassReferences(skills.ToDictionary(skill => skill.Id, StringComparer.Ordinal));
+        ClassCatalogValidator.Validate(ContentCatalogLoader.ClassesFile, [.. content.Classes.Values], references);
+    }
+
+    /// <summary>
+    /// The checks the loader makes on <c>effects.json</c>, for the writer and the problem line alike.
+    /// </summary>
+    /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
+    internal static void CheckTieredEffects(IReadOnlyList<TieredEffect> effects) =>
+        EffectCatalogValidator.Validate(ContentCatalogLoader.EffectsFile, effects);
+
+    /// <summary>
+    /// The checks the loader makes on <c>statuses.json</c>, for the writer and the problem line alike.
+    /// </summary>
+    /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
+    internal static void CheckStatuses(IReadOnlyList<StatusDefinition> statuses) =>
+        StatusCatalogValidator.Validate(ContentCatalogLoader.StatusesFile, statuses);
 
     // The loader's refusal as a line, or null when it would take the catalog.
     private static string? FirstProblem(Action check)

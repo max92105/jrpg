@@ -1,5 +1,6 @@
 using System.Text.Json.Serialization.Metadata;
 using Jrpg.Core.Battle;
+using Jrpg.Core.Effects;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Sprites;
 using Jrpg.Core.Statuses;
@@ -27,6 +28,8 @@ internal static class AbsentWhenZeroFilter
         (typeof(EnemyDefinition), "power"),
         // ADR 0048: most strips land their hit on their first frame.
         (typeof(EffectStripDefinition), "hitFrame"),
+        // Decision 973: only an effect on the allies in range reads its range.
+        (typeof(Effect), "range"),
     ];
 
     public static void SkipZeroOptionalFields(JsonTypeInfo typeInfo) =>

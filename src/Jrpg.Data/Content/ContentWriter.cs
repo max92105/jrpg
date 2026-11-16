@@ -24,10 +24,11 @@ public sealed partial class ContentWriter(string contentRoot)
         _stamps.Take(contentRoot, SerializedCatalogs(loaded).Select(write => (write.File, write.Bytes)));
 
     /// <summary>
-    /// Writes the tilesheet, tile, object, quest, field sprite, shop, enemy, drop table and cinematic catalogs that
-    /// changed, each sorted by id, after checking them all as the loader would, with every map's layout checked against
-    /// them (the quests and stages its events name included, decision 394; the shops its steps open). Missing art
-    /// doesn't stop a save (decision 442): the editor warns, the game's startup refuses the missing file.
+    /// Writes the tilesheet, tile, object, quest, field sprite, shop, enemy, drop table, cinematic, effect strip,
+    /// skill, tiered effect and status catalogs that changed, each sorted by id, after checking them all as the loader
+    /// would, with every map's layout checked against them (the quests and stages its events name included, decision
+    /// 394; the shops its steps open). Missing art doesn't stop a save (decision 442): the editor warns, the game's
+    /// startup refuses the missing file.
     /// </summary>
     /// <param name="catalog">The content holding the catalogs to save; its maps are the ones checked.</param>
     /// <exception cref="ContentValidationException">

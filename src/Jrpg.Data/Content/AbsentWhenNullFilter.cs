@@ -5,6 +5,7 @@ using Jrpg.Core.Effects;
 using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Quests;
+using Jrpg.Core.Skills;
 using Jrpg.Core.Sprites;
 using Jrpg.Core.Statuses;
 
@@ -55,6 +56,15 @@ internal static class AbsentWhenNullFilter
 
         // Decision 810: a mark shows its name's first letter unless the record names another.
         (typeof(StatusDefinition), "markLetter"),
+
+        // Decision 710: a skill without its own strip plays its user's.
+        (typeof(SkillDefinition), "effectFile"),
+
+        // ADR 0027: only a damage effect has a type.
+        (typeof(Effect), "damageType"),
+
+        // ADR 0056: a flat power names no tier.
+        (typeof(Effect), "tier"),
 
         // ADR 0056: a heal record has no type.
         (typeof(TieredEffect), "damageType"),

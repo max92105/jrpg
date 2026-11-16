@@ -1,3 +1,6 @@
+using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using Jrpg.Core.Dialogue;
 using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
@@ -70,6 +73,16 @@ public sealed class ContentFileWriterTests : IDisposable
     }
 
     [Fact]
+    public void Serialize_WithConverter_UsesItForItsType()
+    {
+        var holder = new MarkHolder(new Mark(3), 5);
+
+        var text = Encoding.UTF8.GetString(ContentFileWriter.Serialize(holder, new FixedMarkConverter()));
+
+        Assert.Equal("{\r\n  \"mark\": \"fixed\",\r\n  \"count\": 5\r\n}\r\n", text);
+    }
+
+    [Fact]
     public void Write_TileList_UsesCamelCaseCrlfAndFinalNewline()
     {
         IReadOnlyList<TileDefinition> tiles = [new() { Id = 1, IsWalkable = true, SheetId = "city", Column = 4, Row = 2 }];
@@ -77,5 +90,19 @@ public sealed class ContentFileWriterTests : IDisposable
         ContentFileWriter.Write(_path, tiles);
 
         Assert.Equal("[\r\n  {\r\n    \"id\": 1,\r\n    \"isWalkable\": true,\r\n    \"sheetId\": \"city\",\r\n    \"column\": 4,\r\n    \"row\": 2\r\n  }\r\n]\r\n", File.ReadAllText(_path));
+    }
+
+    private sealed record Mark(int Value);
+
+    private sealed record MarkHolder(Mark Mark, int Count);
+
+    // Writes every mark as the same string, so the test sees whether the converter or the record's own layout ran.
+    private sealed class FixedMarkConverter : JsonConverter<Mark>
+    {
+        public override Mark Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options) =>
+            throw new NotSupportedException();
+
+        public override void Write(Utf8JsonWriter writer, Mark value, JsonSerializerOptions options) =>
+            writer.WriteStringValue("fixed");
     }
 }

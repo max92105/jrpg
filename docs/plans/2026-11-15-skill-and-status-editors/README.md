@@ -1,5 +1,5 @@
 # Skill and status editors and the animation tools (editor push, roadmap row 7)
-Status: approved
+Status: approved, in progress
 
 Planned on 2026-11-15 from roadmap row 7 of [the editor push](../2026-11-15-editor-push/README.md) (design.md sections
 3.4, 3.5 need 2, 3.8) and the approved row 6 plan, [skills and statuses model](../2026-11-15-skills-and-statuses-model/README.md)
@@ -113,7 +113,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 a slice is done and write its deviations in the slice file. Tunables, design and risks: [design.md](design.md).
 
 ### Phase 1: the Skills page
-- [ ] **SK1. The writer takes over `skills.json`, `effects.json` and `statuses.json`** (Data + content, two commits:
+- [x] **SK1. The writer takes over `skills.json`, `effects.json` and `statuses.json`** (Data + content, two commits:
   the relay alone, then about 190 lines) → [slices/SK1.md](slices/SK1.md)
 - [ ] **SK2. A skill's texts and files as typed, and the draft's skills step** (Data + Editor, about 200 lines) →
   [slices/SK2.md](slices/SK2.md)

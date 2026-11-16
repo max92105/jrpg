@@ -63,3 +63,6 @@ three. No page changes them yet (SK4, FX2, FX6).
 ## Verify by hand
 None: no page changes skills yet. The game starts and battles play as before; `git diff content/skills.json` in the
 relay commit shows only layout and order.
+- **Done, with deviations:** the relay commit (1296b8da) also re-anchored `ContentCatalogLoaderTieredEffectTests` on the
+  new layout and made `CopiedContentRoot.Replace` throw on a missing anchor; the one-argument `Serialize` keeps the
+  shared options; the relay test is `WriteMapCatalogs_Skills_LoadTheSameAfterRelay` (it runs on the test world).

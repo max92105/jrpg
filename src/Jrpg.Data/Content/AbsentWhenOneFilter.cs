@@ -1,11 +1,13 @@
 using System.Text.Json.Serialization.Metadata;
+using Jrpg.Core.Effects;
 using Jrpg.Core.Loot;
 
 namespace Jrpg.Data.Content;
 
 /// <summary>
 /// Leaves a whole-number field out of a file while it is 1, its default, so a table the editor writes reads like a
-/// hand-written one (decision 600, decision 586's pattern): a drop entry's quantities, each on its own.
+/// hand-written one (decision 600, decision 586's pattern): a drop entry's quantities, each on its own, and an effect's
+/// hits (decision 973).
 /// </summary>
 internal static class AbsentWhenOneFilter
 {
@@ -14,6 +16,9 @@ internal static class AbsentWhenOneFilter
         // Decision 343: an entry gives a single copy unless content says otherwise.
         (typeof(DropEntry), "minQuantity"),
         (typeof(DropEntry), "maxQuantity"),
+
+        // Decision 973: most effects land once.
+        (typeof(Effect), "hits"),
     ];
 
     public static void SkipOneOptionalFields(JsonTypeInfo typeInfo) =>

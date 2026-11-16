@@ -35,3 +35,7 @@ frame time keeping the shown frame, a frame time that isn't usable holding the f
 
 ## Verify by hand
 None: the control comes in AN1b.
+- **Done, with deviations:** code 111 lines, tests 368 (the plan said about 60 and 80), split into `FramePlaybackTests`
+  and `FramePlaybackNoticeTests` (the raised notices) to stay under 300 lines; the frame is Core's
+  `TileAnimation.LoopFrameAt`, the formula `FrameAt` runs, so no record is built per frame; the map's `Animation` row
+  comes now, not in AN1b.

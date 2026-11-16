@@ -137,7 +137,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 - [x] **FX6. Database > Statuses...: the page** (Editor + script, about 170 lines) → [slices/FX6.md](slices/FX6.md)
 
 ### Phase 3: the animation tools
-- [ ] **AN1a. The preview's playback rules** (Editor, about 140 lines) → [slices/AN1a.md](slices/AN1a.md)
+- [x] **AN1a. The preview's playback rules** (Editor, about 140 lines) → [slices/AN1a.md](slices/AN1a.md)
 - [ ] **AN1b. The shared preview control, first in the Effect strips page** (Editor, about 140 lines) →
   [slices/AN1b.md](slices/AN1b.md)
 - [ ] **AN2. The GIF import plays the GIF before it writes, its pace editable for a battle sprite** (Editor, about 220

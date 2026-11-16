@@ -49,3 +49,6 @@ Agents may run it (effects are generated art).
    `effect-strips.json` holds 300 for it. Ctrl+Z, Save all.
 3. Type "x": the preview holds its frame and the problem line names the frame time.
 4. Run `.claude/scripts/open-editor-windows.ps1`: no `ERROR` or binding-error line, no `RenderTick` report on close.
+- **Note from AN1a:** `docs/map.md` already has the Editor `Animation` row (`FramePlayback`): add `FramePreview` and
+  `PreviewFrames` to it. Null `Frames` is `Show(0)`; the three commands grey with no frames and the Steps' `Execute`
+  divides by the count, so a key handler on the control checks `CanExecute` first.

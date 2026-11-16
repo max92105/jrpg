@@ -5,15 +5,16 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-enemy-behavior, slice EB5 (Editor/Battle/EnemyTacticsViewModel, EnemyTacticsViewModelTests,
-EnemyTacticsChangedTests, map.md Battle row, EB5 Done note). 2026-11-16. Round 1.
+Plan 2026-11-15-enemy-behavior, slice EB6 (EnemyViewModel.Tactics partial, ToEnemy writes rules, TacticsSummary gone,
+re-pinned ToEnemy tests, Apply_UntouchedSession_RecordsNothing). 2026-11-16. Round 1.
 Verdict: Ready to commit (no Critical, no Warning).
 
-- Suggestion (open, optional): the two test files repeat the same catalog load and goblin-with-rules setup; a shared
-  fixture would keep the two bosses' purposes side by side (only two copies, so not a Growth finding).
-- Carried from EB4: Label "Below  % HP" for an empty threshold: fixed (ShownThreshold shows "?").
-- Carried from EB4: Renumber loop follow-up: fixed (ListOrder.Renumber exists and both view models use it).
-- Carried from EB4: no test removes a phase's last rule: dropped (by design; Data's check reaches the page in EB6).
-- Checked, no finding: Changed raised after NamePhaseFields (owner sees renamed fields); Field set never raises
-  RulesChanged; ctor wiring before CollectionChanged hook raises nothing; removed list unwatched (tested); NewThreshold
-  floor at 1 tested with "1", "2", "3", "x"; nullable SelectedList recorded in the slice note.
+- Suggestion (open, optional): ToEnemy_Unchanged_EqualsTheRecord flattens phase rules with SelectMany (a rule moved
+  between phases would pass; the chief has one phase today); compare per phase with Zip as IsSameEnemy does.
+- Suggestion (open, optional): "Renamed from ... in EB6" / "Re-pinned ... in EB6" test comments are history; keep the why.
+- Follow-up: EnemyCatalogViewModelTests at 299 lines; the next test there needs a split.
+- Follow-up: DatabaseMenu.xaml Enemies tooltip "tactics and phases stay in enemies.json" (EB7 note records it).
+- Carried from EB5: shared fixture suggestion for the tactics test files: dropped (optional, not carried further).
+- Checked, no finding: IsSameEnemy compares Tactics and each phase's threshold and rules by content (EnemyAction,
+  TacticCondition are value records); untouched test proves lists rebuilt (NotSame) and CanUndo false; content's chief
+  has "when" conditions; On round-trip pinned by TacticListViewModelTests; notification exactly [Tactics, Problem].

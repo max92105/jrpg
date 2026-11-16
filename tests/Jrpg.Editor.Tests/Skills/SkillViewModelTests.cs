@@ -1,16 +1,17 @@
+using Jrpg.Core.Effects;
 using Jrpg.Core.Resources;
 using Jrpg.Editor.Skills;
 
 namespace Jrpg.Editor.Tests.Skills;
 
-// One skill as the Skills page edits it: its texts, files and costs as typed, the id fixed once saved, and what no box
-// edits yet (the effect) carried through from the record.
+// One skill as the Skills page edits it: its texts, files, costs and effect as typed, the id fixed once saved, and what
+// no box edits yet (the statuses its effect grants) carried through from the record.
 public sealed class SkillViewModelTests
 {
     [Fact]
     public void From_Skill_FillsEveryBox()
     {
-        var skill = SkillViewModel.From(SkillFixtures.Bolt with { IsQuick = true }, "mana");
+        var skill = SkillViewModel.From(SkillFixtures.Bolt with { IsQuick = true }, SkillFixtures.NoChoices);
 
         Assert.Equal(("bolt", "Bolt", "A bolt of fire that poisons."), (skill.IdText, skill.Name, skill.Description));
         Assert.Equal(("Bolt.png", "Bolt.wav", "BoltStrip.png"), (skill.IconFile, skill.SoundFile, skill.EffectFile));
@@ -23,14 +24,14 @@ public sealed class SkillViewModelTests
     public void ToSkill_EditedTexts_KeepsTheEffectAndCostsByContent()
     {
         var bolt = SkillFixtures.Bolt;
-        var skill = SkillViewModel.From(bolt, "mana");
+        var skill = SkillViewModel.From(bolt, SkillFixtures.NoChoices);
 
         skill.Name = " Spark ";
         skill.Description = "A small spark.";
         skill.IconFile = "Spark.png";
         skill.SoundFile = "Spark.wav";
 
-        // The cost lists are rebuilt from their rows, so they are compared by content below.
+        // The cost lists and the effect are rebuilt from their boxes, so they are compared by content.
         var edited = skill.ToSkill();
         Assert.Equal(
             bolt with
@@ -43,7 +44,7 @@ public sealed class SkillViewModelTests
                 Requirements = edited.Requirements,
             },
             edited);
-        Assert.Same(bolt.Effect, edited.Effect);
+        Assert.Equal(bolt.Effect, edited.Effect);
         Assert.Equal(bolt.ResourceChanges, edited.ResourceChanges);
         Assert.Equal(bolt.Requirements, edited.Requirements);
     }
@@ -51,7 +52,7 @@ public sealed class SkillViewModelTests
     [Fact]
     public void ToSkill_AmountRetyped_WritesTheTypedCost()
     {
-        var skill = SkillViewModel.From(SkillFixtures.Bolt, "mana");
+        var skill = SkillViewModel.From(SkillFixtures.Bolt, SkillFixtures.NoChoices);
 
         skill.Costs.Changes[0].AmountText = "-3";
 
@@ -61,18 +62,28 @@ public sealed class SkillViewModelTests
     [Fact]
     public void Problem_CostRowNotANumber_IsTheRowProblem()
     {
-        var skill = SkillViewModel.From(SkillFixtures.Bolt, "mana");
+        var skill = SkillViewModel.From(SkillFixtures.Bolt, SkillFixtures.NoChoices);
 
         skill.Costs.Needs[0].AtLeastText = "two";
 
         Assert.Equal("Needs row 1: At least must be a whole number (was 'two').", skill.Problem);
     }
 
+    [Fact]
+    public void Problem_EffectBoxNotANumber_IsTheBoxProblem()
+    {
+        var skill = SkillViewModel.From(SkillFixtures.Bolt, SkillFixtures.NoChoices);
+
+        skill.Effect.HitsText = "two";
+
+        Assert.Equal("Hits must be a whole number (was 'two').", skill.Problem);
+    }
+
     // Copied from the boxes: reading the half-typed amount would throw.
     [Fact]
     public void DuplicateOf_AmountHalfTyped_CopiesTheTypedRows()
     {
-        var chosen = SkillViewModel.From(SkillFixtures.Bolt, "mana");
+        var chosen = SkillViewModel.From(SkillFixtures.Bolt, SkillFixtures.NoChoices);
         chosen.Costs.Changes[0].AmountText = "-";
 
         var copy = SkillViewModel.DuplicateOf(chosen, ["bolt"]);
@@ -81,10 +92,35 @@ public sealed class SkillViewModelTests
         Assert.NotSame(chosen.Costs.Changes[0], copy.Costs.Changes[0]);
     }
 
+    // SK7's grant rows replace the carried statuses.
+    [Fact]
+    public void ToSkill_EffectEdited_KeepsTheLoadedGrants()
+    {
+        var skill = SkillViewModel.From(SkillFixtures.Bolt, SkillFixtures.NoChoices);
+
+        skill.Effect.Targeting = Targeting.AllEnemies;
+
+        var effect = skill.ToSkill().Effect;
+        Assert.Equal(Targeting.AllEnemies, effect.Targeting);
+        Assert.Same(SkillFixtures.Bolt.Effect.Statuses, effect.Statuses);
+    }
+
+    [Fact]
+    public void DuplicateOf_EffectRetyped_CopiesTheTypedBoxes()
+    {
+        var chosen = SkillViewModel.From(SkillFixtures.Bolt, SkillFixtures.NoChoices);
+        chosen.Effect.HitsText = "x";
+
+        var copy = SkillViewModel.DuplicateOf(chosen, ["bolt"]);
+
+        Assert.Equal("x", copy.Effect.HitsText);
+        Assert.NotSame(chosen.Effect, copy.Effect);
+    }
+
     [Fact]
     public void ToSkill_EmptyStrip_WritesNone()
     {
-        var skill = SkillViewModel.From(SkillFixtures.Bolt, "mana");
+        var skill = SkillViewModel.From(SkillFixtures.Bolt, SkillFixtures.NoChoices);
 
         skill.EffectFile = " ";
 
@@ -94,7 +130,7 @@ public sealed class SkillViewModelTests
     [Fact]
     public void ToSkill_StripWithSpaces_TrimsIt()
     {
-        var skill = SkillViewModel.From(SkillFixtures.Bolt, "mana");
+        var skill = SkillViewModel.From(SkillFixtures.Bolt, SkillFixtures.NoChoices);
 
         skill.EffectFile = " Spark.png ";
 
@@ -104,7 +140,7 @@ public sealed class SkillViewModelTests
     [Fact]
     public void ToSkill_NewSkillWithAFreeId_TakesItTrimmed()
     {
-        var skill = SkillViewModel.ForNew(SkillFixtures.Bolt, ["bolt"], "mana");
+        var skill = SkillViewModel.ForNew(SkillFixtures.Bolt, ["bolt"], SkillFixtures.NoChoices);
 
         skill.IdText = " spark ";
 
@@ -114,7 +150,7 @@ public sealed class SkillViewModelTests
     [Fact]
     public void ToSkill_Problem_Throws()
     {
-        var skill = SkillViewModel.ForNew(SkillFixtures.Bolt, ["bolt"], "mana");
+        var skill = SkillViewModel.ForNew(SkillFixtures.Bolt, ["bolt"], SkillFixtures.NoChoices);
 
         Assert.Throws<InvalidOperationException>(skill.ToSkill);
     }
@@ -122,7 +158,7 @@ public sealed class SkillViewModelTests
     [Fact]
     public void Problem_NewSkillWithATakenId_NamesIt()
     {
-        var skill = SkillViewModel.ForNew(SkillFixtures.Bolt, ["bolt"], "mana");
+        var skill = SkillViewModel.ForNew(SkillFixtures.Bolt, ["bolt"], SkillFixtures.NoChoices);
 
         skill.IdText = "bolt";
 
@@ -132,7 +168,7 @@ public sealed class SkillViewModelTests
     [Fact]
     public void Changed_TypedName_Raised()
     {
-        var skill = SkillViewModel.From(SkillFixtures.Bolt, "mana");
+        var skill = SkillViewModel.From(SkillFixtures.Bolt, SkillFixtures.NoChoices);
         var raised = 0;
         skill.Changed += (_, _) => raised++;
 
@@ -145,7 +181,7 @@ public sealed class SkillViewModelTests
     [Fact]
     public void Changed_ProblemNotice_NotRaised()
     {
-        var skill = SkillViewModel.ForNew(SkillFixtures.Bolt, ["bolt"], "mana");
+        var skill = SkillViewModel.ForNew(SkillFixtures.Bolt, ["bolt"], SkillFixtures.NoChoices);
         var raised = 0;
         skill.Changed += (_, _) => raised++;
 
@@ -157,11 +193,23 @@ public sealed class SkillViewModelTests
     [Fact]
     public void Changed_CostTyped_Raised()
     {
-        var skill = SkillViewModel.From(SkillFixtures.Bolt, "mana");
+        var skill = SkillViewModel.From(SkillFixtures.Bolt, SkillFixtures.NoChoices);
         var raised = 0;
         skill.Changed += (_, _) => raised++;
 
         skill.Costs.Changes[0].AmountText = "-3";
+
+        Assert.Equal(1, raised);
+    }
+
+    [Fact]
+    public void Changed_EffectTyped_Raised()
+    {
+        var skill = SkillViewModel.From(SkillFixtures.Bolt, SkillFixtures.NoChoices);
+        var raised = 0;
+        skill.Changed += (_, _) => raised++;
+
+        skill.Effect.HitsText = "2";
 
         Assert.Equal(1, raised);
     }

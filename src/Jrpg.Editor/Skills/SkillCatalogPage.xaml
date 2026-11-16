@@ -34,8 +34,8 @@
       </ListBox>
     </DockPanel>
 
-    <!-- The chosen skill: its texts, files and costs; its effect and statuses keep their file values until their sections
-         exist. Who uses it is read-only: the classes and enemies files name it. -->
+    <!-- The chosen skill: its texts, files, costs and effect; the statuses its effect grants keep their file values until
+         their section exists. Who uses it is read-only: the classes and enemies files name it. -->
     <ScrollViewer Margin="12,0,0,0" VerticalScrollBarVisibility="Auto">
       <StackPanel DataContext="{Binding SelectedSkill}" Style="{StaticResource EnabledWhenChosen}">
         <StackPanel Orientation="Horizontal">
@@ -148,6 +148,55 @@
               <Button Content="Add" Width="60" Command="{Binding AddNeedCommand}" ToolTip="A need of 1 of the first resource, after the chosen row" />
               <Button Content="Remove" Width="60" Margin="0,4,0,0" Command="{Binding RemoveNeedCommand}" />
             </StackPanel>
+          </StackPanel>
+        </StackPanel>
+
+        <!-- A tier sets the kind, the type and the amount; a box the tier, the kind or the targeting doesn't read greys. -->
+        <StackPanel DataContext="{Binding Effect}">
+          <TextBlock Text="Effect" FontWeight="Bold" Margin="0,12,0,0" />
+          <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+            <TextBlock Text="Tier" Style="{StaticResource FieldLabel}" />
+            <ComboBox Width="240"
+                      ItemsSource="{Binding DataContext.Choices.Tiers, RelativeSource={RelativeSource AncestorType=skills:SkillCatalogPage}}"
+                      DisplayMemberPath="Line"
+                      SelectedValuePath="Id"
+                      SelectedValue="{Binding TierId}"
+                      ToolTip="A named damage or heal: the user's Power times its per-Power number (Database > Effects...)" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Kind" Style="{StaticResource FieldLabel}" />
+            <ComboBox Width="160" ItemsSource="{Binding Kinds}" SelectedItem="{Binding Kind}" IsEnabled="{Binding CanTypeKind}" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Damage type" Style="{StaticResource FieldLabel}" />
+            <ComboBox Width="160"
+                      ItemsSource="{Binding DamageTypes}"
+                      SelectedItem="{Binding DamageType}"
+                      IsEnabled="{Binding CanTypeDamageType}" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Power" Style="{StaticResource FieldLabel}" />
+            <TextBox Width="60"
+                     Text="{Binding PowerText, UpdateSourceTrigger=PropertyChanged}"
+                     IsEnabled="{Binding CanTypePower}"
+                     ToolTip="Used without a tier: HP before the user's Power raises it" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Targeting" Style="{StaticResource FieldLabel}" />
+            <ComboBox Width="160" ItemsSource="{Binding Targetings}" SelectedItem="{Binding Targeting}" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Range" Style="{StaticResource FieldLabel}" />
+            <TextBox Width="60"
+                     Text="{Binding RangeText, UpdateSourceTrigger=PropertyChanged}"
+                     IsEnabled="{Binding CanTypeRange}"
+                     ToolTip="How many places on each side an alliesInRange effect reaches" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Hits" Style="{StaticResource FieldLabel}" />
+            <TextBox Width="60"
+                     Text="{Binding HitsText, UpdateSourceTrigger=PropertyChanged}"
+                     ToolTip="Times it lands on each target; above 1 only for damage" />
           </StackPanel>
         </StackPanel>
         <TextBlock Text="{Binding DataContext.LearnedByText, RelativeSource={RelativeSource AncestorType=skills:SkillCatalogPage}}"

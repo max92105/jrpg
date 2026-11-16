@@ -29,27 +29,24 @@ internal sealed partial class SkillCatalogViewModel : ObservableObject, IEditedC
 
     private readonly TieredEffect? _firstDamageTier;
 
-    // An added cost row starts on it; empty when the boxes offer no resource.
-    private readonly string _firstResourceId;
-
     /// <param name="content">
-    /// The draft as it is: the skills edited, the tiers Add starts from and who uses them.
+    /// The draft as it is: the skills edited and who uses them.
     /// </param>
-    /// <param name="choices">What the page's boxes offer, read when it opened.</param>
+    /// <param name="choices">
+    /// What the page's boxes offer, read when it opened; Add starts on its first damage tier.
+    /// </param>
     public SkillCatalogViewModel(ContentCatalog content, SkillChoices choices)
     {
         _content = content;
         Choices = choices;
         _savedIds = [.. content.Skills.Keys];
-        _firstDamageTier = content.TieredEffects.Values
-            .Where(tier => tier.Kind == EffectKind.Damage)
-            .MinBy(tier => tier.Id, StringComparer.Ordinal);
-        _firstResourceId = choices.Resources is [var first, ..] ? first.Id : "";
+        // The Tier box lists the records by id, so its first damage one is the first by id.
+        _firstDamageTier = choices.Tiers.Select(choice => choice.Tier).FirstOrDefault(tier => tier?.Kind == EffectKind.Damage);
         Skills =
         [
             .. content.Skills.Values
                 .OrderBy(skill => skill.Id, StringComparer.Ordinal)
-                .Select(skill => SkillViewModel.From(skill, _firstResourceId)),
+                .Select(skill => SkillViewModel.From(skill, choices)),
         ];
         foreach (var skill in Skills)
         {
@@ -115,7 +112,7 @@ internal sealed partial class SkillCatalogViewModel : ObservableObject, IEditedC
 
     /// <summary>Adds a skill last and chooses it, so its id is the next thing typed.</summary>
     [RelayCommand]
-    private void AddSkill() => Insert(SkillViewModel.New(_firstDamageTier, _savedIds, _firstResourceId), Skills.Count);
+    private void AddSkill() => Insert(SkillViewModel.New(_firstDamageTier, _savedIds, Choices), Skills.Count);
 
     /// <summary>Adds a copy of the chosen skill after it, its id left to type (decision 585).</summary>
     [RelayCommand(CanExecute = nameof(HasSelectedSkill))]

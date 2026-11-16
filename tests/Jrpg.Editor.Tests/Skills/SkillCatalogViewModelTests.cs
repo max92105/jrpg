@@ -1,8 +1,10 @@
+using Jrpg.Core.Content;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
+using Jrpg.Editor.Effects;
 using Jrpg.Editor.Skills;
 
 namespace Jrpg.Editor.Tests.Skills;
@@ -52,6 +54,19 @@ public sealed class SkillCatalogViewModelTests
         var effect = catalog.SelectedSkill.ToSkill().Effect;
         Assert.Same(SkillFixtures.Fire1, effect.Tier);
         Assert.Equal((EffectKind.Damage, DamageType.Fire, 0), (effect.Kind, effect.DamageType, effect.Power));
+    }
+
+    // The Tier box is the page's one source of tiers: Add reads its records, never the content's.
+    [Fact]
+    public void AddSkill_TierBoxEmpty_StartsAFlatDamage()
+    {
+        var content = SkillFixtures.CatalogWithoutUsers([], [SkillFixtures.Fire1]);
+        var catalog = new SkillCatalogViewModel(content, SkillFixtures.NoChoices);
+
+        catalog.AddSkillCommand.Execute(null);
+        catalog.SelectedSkill!.IdText = "spark";
+
+        Assert.Null(catalog.SelectedSkill.ToSkill().Effect.Tier);
     }
 
     [Fact]
@@ -165,6 +180,22 @@ public sealed class SkillCatalogViewModelTests
             catalog.Problem);
     }
 
+    // Decision 704: a skill's damage names a tier, so a flat one is refused by Data, not by the boxes.
+    [Fact]
+    public void Problem_TierNoneChosen_IsDataTierMessage()
+    {
+        var content = SkillFixtures.CatalogWithoutUsers([SkillFixtures.Bolt], [SkillFixtures.Fire1]);
+        var catalog = WithTheTierBox(content);
+
+        catalog.Skills[0].Effect.TierId = "";
+        catalog.Skills[0].Effect.PowerText = "12";
+
+        Assert.Equal(
+            "skills.json: skill 'bolt': effect.tier is required for a skill's damage or restoreHp effect: its amount is its "
+                + "user's Power times the record's perPower (decision 704).",
+            catalog.Problem);
+    }
+
     // Clarity, offered first, isn't the resource the saved bolt names: the added row reads the offered list.
     [Fact]
     public void AddSkill_ThenAddChange_StartsOnTheFirstOfferedResource()
@@ -235,8 +266,12 @@ public sealed class SkillCatalogViewModelTests
     }
 
     private static SkillCatalogViewModel CatalogOf(params SkillDefinition[] skills) =>
-        new(SkillFixtures.CatalogWithoutUsers(skills, [SkillFixtures.Fire1]), SkillFixtures.NoChoices);
+        WithTheTierBox(SkillFixtures.CatalogWithoutUsers(skills, [SkillFixtures.Fire1]));
 
     private static SkillCatalogViewModel CatalogWithTiers(params TieredEffect[] tiers) =>
-        new(SkillFixtures.CatalogWithoutUsers([], tiers), SkillFixtures.NoChoices);
+        WithTheTierBox(SkillFixtures.CatalogWithoutUsers([], tiers));
+
+    // The page's Tier box over the content's records, which Add starts from.
+    private static SkillCatalogViewModel WithTheTierBox(ContentCatalog content) =>
+        new(content, SkillFixtures.NoChoices with { Tiers = TierChoice.AllIn(content) });
 }

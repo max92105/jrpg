@@ -58,9 +58,13 @@ message. The grants keep their file values until SK7.
 1. Database > Skills..., `fire_blast`: Tier `fire_1`, Kind and Damage type greyed at damage and fire, Power 0 greyed.
 2. Tier `fire_2`, OK, Save all: `git diff content/skills.json` shows `"tier": "fire_2"` only. Run the game, fight with
    the mage: Fire Blast hits harder. Revert with Ctrl+Z and Save all.
-3. Tier none, Kind damage, Damage type ice, Power 12: OK lights (a flat damage); Cancel.
+3. Tier none, Kind damage, Damage type ice, Power 12: the problem line shows Data's "effect.tier is required for a
+   skill's damage or restoreHp effect" (decision 704) and OK greys; Cancel.
 4. `aura_of_protection`: Range enabled with its number; Targeting single ally: Range greys.
 5. Run `.claude/scripts/open-editor-windows.ps1`: no `ERROR` or binding-error line.
 - **Note from SK3:** with no damage tier, `SkillViewModel.New` starts a flat damage of power 1 typed as Core's first
   damage type (Data needs one); Data refuses a skill's damage without a tier (decision 704), so check step 3's "OK
   lights".
+- **Done, with deviations:** code 219 new lines (`SkillEffectSection` 185), +22 changed, XAML +49; tests 308 new, +103
+  changed. The section keeps the tiers and the picked record, so `ToEffect()` takes none; `SkillViewModel`'s factories
+  take `SkillChoices`; Damage type has no none entry. Step 3 corrected: Data refuses an untiered damage (decision 704).

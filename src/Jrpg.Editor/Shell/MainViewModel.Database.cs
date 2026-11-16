@@ -4,6 +4,7 @@ using Jrpg.Data.Audio;
 using Jrpg.Editor.Battle;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Cinematics;
+using Jrpg.Editor.Effects;
 using Jrpg.Editor.GifImport;
 using Jrpg.Editor.Loot;
 using Jrpg.Editor.Skills;
@@ -76,7 +77,8 @@ internal sealed partial class MainViewModel
             SkillFileChoices.Of(AudioFolders.FilesIn(_audioRoot, AudioFolders.Effects), skills.Select(skill => skill.SoundFile)),
             SkillFileChoices.Of(ArtFolders.ImagesIn(ArtRoot, ArtFolders.Effects), skills.Select(skill => skill.EffectFile ?? "")),
             current.EffectStrips,
-            ResourceChoice.AllIn(current));
+            ResourceChoice.AllIn(current),
+            TierChoice.AllIn(current));
     }
 
     // An image the folder holds but can't be read is left out, as the Character sprites page's: its size is unknown.

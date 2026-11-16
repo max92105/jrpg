@@ -46,6 +46,16 @@ public sealed class ContentCatalogLoaderStatusTests : IDisposable
         Assert.Equal(StatusTiming.StartOfTurn, burning.ActsAt);
     }
 
+    // Decision 808: Enfeeble grants Weakened, which lowers the damage its holder deals.
+    [Fact]
+    public void Load_RepositoryEnfeeble_GrantsWeakened()
+    {
+        var enfeeble = ContentCatalogLoader.Load(_content.Path).Skills["enfeeble"];
+
+        var weakened = Assert.Single(enfeeble.Effect.Statuses, grant => grant.Status.Id == "weakened_1").Status;
+        Assert.Contains(weakened.Parts, part => part.Kind == StatusPartKind.DamageDealtChange);
+    }
+
     [Fact]
     public void Load_StatusesFileMissing_RefusesNamingIt()
     {

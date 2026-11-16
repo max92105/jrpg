@@ -51,3 +51,7 @@ force multiplies after the sum (decision 817). `weakened_1` (-25 %) and a placeh
 - Run the game, Title > New game, choose Sarxian, fight the goblins, Skill > Enfeeble on one goblin (it costs nothing
   and builds Instability): a "W" mark named Weakened; that goblin's hits on Sarxian are about a quarter smaller than
   the others' for three of its turns.
+- **Done, with deviations:** Enfeeble is in `skills.json` but not on the warlock's `skillIds`: the Status page's
+  skills section holds three two-line skills, so a fourth fails `StatusLayoutTests` (backlog); the hand check waits for
+  that. `ModifiedFlat`'s rounding test uses 26 (22, where rounding twice gives 21; 24 can't tell them apart); the
+  Weakened attack test is unarmed; `TestStatuses.Empowered` gives the add-up test a second family.

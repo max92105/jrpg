@@ -34,6 +34,8 @@ public sealed class StatusCatalogValidatorTests
         { With(Part(ResistanceChange, 0)), "parts[0]: resistanceChange's amount must not be 0." },
         { With(Part(DamageTakenChange, -100)), "parts[0]: damageTakenChange's amount must be above -100 and not 0 (was -100)." },
         { With(Part(DamageTakenChange, 0)), "parts[0]: damageTakenChange's amount must be above -100 and not 0 (was 0)." },
+        { With(Part(DamageDealtChange, -100)), "parts[0]: damageDealtChange's amount must be above -100 and not 0 (was -100)." },
+        { With(Part(DamageDealtChange, 0)), "parts[0]: damageDealtChange's amount must be above -100 and not 0 (was 0)." },
         {
             With(Part(DamageEachTurn, 8), Part(HealEachTurn, 4)),
             "a status ticks once: it can't hold both damageEachTurn and healEachTurn."
@@ -116,6 +118,10 @@ public sealed class StatusCatalogValidatorTests
     [Fact]
     public void Validate_DamageTakenChangeOfMinus99_Accepted() =>
         Assert.Null(Record.Exception(() => Validate(With(Part(DamageTakenChange, -99)))));
+
+    [Fact]
+    public void Validate_DamageDealtChangeOfMinus99_Accepted() =>
+        Assert.Null(Record.Exception(() => Validate(With(Part(DamageDealtChange, -99)))));
 
     [Fact]
     public void Validate_NegativeResistanceChange_Accepted() =>

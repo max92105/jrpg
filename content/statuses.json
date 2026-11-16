@@ -135,5 +135,19 @@
         "kind": "drawAttacks"
       }
     ]
+  },
+  {
+    "id": "weakened_1",
+    "name": "Weakened",
+    "description": "Deals less damage.",
+    "isHarmful": true,
+    "actsAt": "endOfTurn",
+    "family": "weakened",
+    "parts": [
+      {
+        "kind": "damageDealtChange",
+        "amount": -25
+      }
+    ]
   }
 ]

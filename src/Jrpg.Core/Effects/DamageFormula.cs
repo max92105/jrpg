@@ -76,6 +76,20 @@ internal static class DamageFormula
         return (int)Math.Clamp(amount, 0, MaxPower);
     }
 
+    /// <summary>
+    /// Any flat damage's amount, such as the basic attack's: its raw damage times Power's percent times 1 plus the sum
+    /// of the damage modifiers (decisions 784, 786), in one <c>long</c> product rounded down once and never below 0. A
+    /// weapon of 26 at 115 % while Weakened (-25 %) deals 22.425, kept as 22; rounding after either factor gives 21.
+    /// </summary>
+    /// <param name="raw">The raw damage: an untiered skill's power, a weapon's, the unarmed one, or an enemy's.</param>
+    /// <param name="damagePermille">The user's damage percent from Power, in permille.</param>
+    /// <param name="modifierPermille">The modifiers' sum in permille; -1000 cancels the damage.</param>
+    public static int ModifiedFlat(int raw, int damagePermille, int modifierPermille)
+    {
+        var amount = (long)raw * damagePermille * (Whole + modifierPermille) / (Whole * Whole);
+        return (int)Math.Max(0, amount);
+    }
+
     /// <returns>
     /// <c>hpTaken × permille ÷ 1000</c>, rounded down: a share of what the hit really took, so overkill steals
     /// nothing, and per hit, so a small hit can steal 0 (decision 365).

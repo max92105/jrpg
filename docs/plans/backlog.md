@@ -283,3 +283,9 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Data/Effects/EffectValidator.FindStatusesProblem` refuses one status id twice in an effect, not two records of one
   family (`guard_1` and `guard_2`), which then refresh each other on landing; decision 798 allows it today: compare
   `FamilyKey` if the developer wants that refused (skills and statuses plan, SW review).
+- `Game/Menus` Status page: its skills section (268 px) holds three two-line skills, so no class can have a fourth;
+  Enfeeble and Cone of Cold wait in `skills.json` off their classes' `skillIds` until the section scrolls or pages
+  (skills and statuses plan, WK; needed before row 12's classes and progression).
+- `Core/Effects/DamageFormula.ModifiedFlat` has no cap, where `TieredAmount` stops at `MaxPower` so `Calculate`'s
+  product fits a `long` (decision 818); harmless while flat damage is small and the only modifier negative: cap it
+  when row 9 adds a positive gear modifier (skills and statuses plan, WK review).

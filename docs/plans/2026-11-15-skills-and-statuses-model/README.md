@@ -111,7 +111,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/TT.md](slices/TT.md)
 - [x] **ST. A status acts at the start or the end of its holder's turn** (Core + Data + content, about 240 lines) →
   [slices/ST.md](slices/ST.md)
-- [ ] **WK. Weakened: a status lowers the damage its holder deals** (Core + Data + content, about 220 lines) →
+- [x] **WK. Weakened: a status lowers the damage its holder deals** (Core + Data + content, about 220 lines) →
   [slices/WK.md](slices/WK.md)
 - [ ] **SL. Slowed: a status changes a stat by points, with its own mark letter** (Core + Data + Game + content, about
   260 lines) → [slices/SL.md](slices/SL.md)

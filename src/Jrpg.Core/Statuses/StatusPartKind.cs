@@ -27,4 +27,10 @@ public enum StatusPartKind
     /// Every hit on the holder lands the amount harder, in percent; a negative one softer, above -100.
     /// </summary>
     DamageTakenChange,
+
+    /// <summary>
+    /// Every damage the holder deals changes by the amount, in percent added to its damage modifiers' sum (decision
+    /// 786); a negative one lowers it, above -100.
+    /// </summary>
+    DamageDealtChange,
 }

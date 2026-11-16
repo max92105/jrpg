@@ -188,6 +188,18 @@
     "effect": { "kind": "damage", "damageType": "dark", "power": 0, "tier": "dark_3", "targeting": "singleEnemy" }
   },
   {
+    "id": "enfeeble",
+    "name": "Enfeeble",
+    "description": "Saps one enemy's strength for three of its turns. Feeds instability. Placeholder: the developer writes the real spell.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillDark.wav",
+    "resourceChanges": [ { "resourceId": "instability", "amount": 2 } ],
+    "effect": {
+      "kind": "grantStatus", "power": 0, "targeting": "singleEnemy",
+      "statuses": [ { "status": "weakened_1", "turns": 3 } ]
+    }
+  },
+  {
     "id": "rejuvenate",
     "name": "Rejuvenate",
     "description": "Wakes the life in one ally, mending wounds for three of their turns. Feeds Growth. Placeholder: the developer writes the real skill.",

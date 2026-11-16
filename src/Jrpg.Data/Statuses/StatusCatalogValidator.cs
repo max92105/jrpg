@@ -73,7 +73,7 @@ internal static class StatusCatalogValidator
             StatusPartKind.SkipTurn or StatusPartKind.DrawAttacks =>
                 part.Amount == 0 ? null : $"parts[{index}]: {NameOf(part.Kind)} has no amount (was {part.Amount}).",
             StatusPartKind.ResistanceChange => part.Amount == 0 ? $"{field} must not be 0." : null,
-            StatusPartKind.DamageTakenChange =>
+            StatusPartKind.DamageTakenChange or StatusPartKind.DamageDealtChange =>
                 part.Amount is > -100 and not 0 ? null : $"{field} must be above -100 and not 0 (was {part.Amount}).",
             _ => throw new InvalidOperationException($"No amount rule for {part.Kind}."),
         };

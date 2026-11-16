@@ -198,4 +198,15 @@ public sealed class DamageFormulaTests
     [Fact]
     public void TieredAmount_HugeProduct_HeldAtMaxPower() =>
         Assert.Equal(DamageFormula.MaxPower, DamageFormula.TieredAmount(int.MaxValue, 1000, 0));
+
+    // A weapon of 26 at Power's 115 % while Weakened (-25 %): 26 x 1.15 x 0.75 = 22.425, kept as 22. Rounding after
+    // either factor first (29, or 19) would lose a point and give 21.
+    [Fact]
+    public void ModifiedFlat_WeaponAtPowerPercentWeakened_IsRoundedOnce() =>
+        Assert.Equal(22, DamageFormula.ModifiedFlat(26, 1150, -250));
+
+    // The floor: Calculate then gives its minimum 1.
+    [Fact]
+    public void ModifiedFlat_ModifiersAtMinusOneHundredPercent_IsZero() =>
+        Assert.Equal(0, DamageFormula.ModifiedFlat(24, 1150, -1000));
 }

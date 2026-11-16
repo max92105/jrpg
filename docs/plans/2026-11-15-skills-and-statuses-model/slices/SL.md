@@ -52,3 +52,5 @@ default). The mage's placeholder Cone of Cold (`ice_1`) leaves it for two turns.
 - Run the game, Title > New game, choose Omer, fight the goblins: Cone of Cold (4 mana) hits one goblin with ice and
   leaves an "L" mark named Slowed for two of its turns; its attacks miss Omer more often meanwhile, and its turns come
   as often as before.
+- **Note from WK:** the Status page shows three skills per class, so Cone of Cold, a fourth, stays off the mage's
+  `skillIds` as Enfeeble stayed off the warlock's, until the page scrolls (backlog).

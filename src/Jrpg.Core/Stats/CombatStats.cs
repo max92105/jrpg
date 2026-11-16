@@ -20,6 +20,12 @@ public sealed record CombatStats(int AttackDamage)
     public int Power { get; init; }
 
     /// <summary>
+    /// The sum of the modifiers on the damage the combatant deals, in permille (decision 704's "1 + the sum"): its
+    /// statuses' damage dealt changes, and gear's once row 9 adds one; 0 by default. Never on healing (decision 786).
+    /// </summary>
+    public int DamageModifierPermille { get; init; }
+
+    /// <summary>
     /// The hit chance against 0 dodge, in permille (decision 297): a member's from the sheet, an enemy's from content.
     /// </summary>
     public int AccuracyPermille { get; init; } = 1000;

@@ -39,6 +39,43 @@ public sealed class StatusModifiersTests
         Assert.Equal(_stats, current);
     }
 
+    // Weakened's -25 % is -250 in the modifiers' sum, in permille.
+    [Fact]
+    public void Apply_Weakened_LowersTheDamageModifier()
+    {
+        var statuses = new StatusSet();
+        statuses.Apply(TestStatuses.Weakened(-25, 3));
+
+        var current = StatusModifiers.Apply(_stats, statuses);
+
+        Assert.Equal(-250, current.DamageModifierPermille);
+    }
+
+    // Two families each change the damage dealt; the formula reads their sum (decision 704): -250 + 100.
+    [Fact]
+    public void Apply_TwoDamageDealtChanges_AddUp()
+    {
+        var statuses = new StatusSet();
+        statuses.Apply(TestStatuses.Weakened(-25, 3));
+        statuses.Apply(TestStatuses.Empowered(10, 3));
+
+        var current = StatusModifiers.Apply(_stats, statuses);
+
+        Assert.Equal(-150, current.DamageModifierPermille);
+    }
+
+    // A later source, such as gear's (row 9), keeps its share: 100 - 250 = -150.
+    [Fact]
+    public void Apply_WeakenedOverANonZeroBase_AddsToIt()
+    {
+        var statuses = new StatusSet();
+        statuses.Apply(TestStatuses.Weakened(-25, 3));
+
+        var current = StatusModifiers.Apply(_stats with { DamageModifierPermille = 100 }, statuses);
+
+        Assert.Equal(-150, current.DamageModifierPermille);
+    }
+
     [Fact]
     public void ExtraDamageTakenPercent_Exposed_IsItsPower()
     {

@@ -22,6 +22,10 @@ internal static class TestStatuses
 
     public const string TauntId = "taunt";
 
+    public const string WeakenedId = "weakened";
+
+    public const string EmpoweredId = "empowered";
+
     /// <summary>The holder loses <paramref name="amount"/> HP at the end of each of its turns.</summary>
     public static StatusGrant Poison(int amount, int turns) =>
         new(Record(PoisonId, new StatusPart(StatusPartKind.DamageEachTurn, amount)), turns);
@@ -44,6 +48,16 @@ internal static class TestStatuses
 
     /// <summary>Every enemy attack goes to the holder.</summary>
     public static StatusGrant Taunt(int turns) => new(Record(TauntId, new StatusPart(StatusPartKind.DrawAttacks)), turns);
+
+    /// <summary>Every damage the holder deals changes by <paramref name="percent"/>: Weakened's is negative.</summary>
+    public static StatusGrant Weakened(int percent, int turns) =>
+        new(Record(WeakenedId, new StatusPart(StatusPartKind.DamageDealtChange, percent)), turns);
+
+    /// <summary>
+    /// Every damage the holder deals rises by <paramref name="percent"/>, in a family apart from Weakened's.
+    /// </summary>
+    public static StatusGrant Empowered(int percent, int turns) =>
+        new(Record(EmpoweredId, new StatusPart(StatusPartKind.DamageDealtChange, percent)), turns);
 
     public static string IdOf(StatusDefinition status) => status.Id;
 

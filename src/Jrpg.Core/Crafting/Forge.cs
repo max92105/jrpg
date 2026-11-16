@@ -94,7 +94,8 @@ public sealed class Forge
     public ForgeQuote QuoteReroll(GearPiece piece)
     {
         var cost = _rules.RerollCost;
-        var refusal = piece.Affixes.Count == 0 ? ForgeRefusal.NoAffixes
+        var refusal = piece.Base.IsUnique ? ForgeRefusal.FixedAffixes
+            : piece.Affixes.Count == 0 ? ForgeRefusal.NoAffixes
             : !CanPay(cost) ? ForgeRefusal.ShortOfMaterials
             : (ForgeRefusal?)null;
         return new ForgeQuote(cost, refusal);

@@ -325,3 +325,5 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   `QuestDefinition`, `CinematicDefinition`...): a member added later and left out passes every test and breaks the
   draft's change detection; one shared reflection test (each init property changed alone with `with` must make the
   records unequal) would guard them all (items plan, IU2 review).
+- `ItemDefinitionBuilder` has no `AsUnique(...)`: the `with { IsUnique = true, FixedAffixes = [...] }` block is
+  copied in about fifteen test files across Core and Data (items plan, IU2-IU4 reviews).

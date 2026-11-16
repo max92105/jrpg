@@ -1,3 +1,4 @@
+using Jrpg.Core.Content;
 using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
 using Jrpg.Core.Saving;
@@ -11,6 +12,26 @@ namespace Jrpg.Data.Tests.Saving;
 // leather cap is worn on the head.
 public sealed class GearRepairTests
 {
+    private static readonly SavedGear _savedCleaver = new("cleaver", Rarity.Unique, [new SavedAffix("power", 9)]);
+
+    // The pool with "sturdy" beside "power": +1..10 Constitution on rings, which raises max HP.
+    private static readonly ContentCatalog _catalogWithSturdy = CatalogWithPowerAffix with
+    {
+        Affixes = new Dictionary<string, AffixDefinition>(CatalogWithPowerAffix.Affixes)
+        {
+            ["sturdy"] = new()
+            {
+                Id = "sturdy",
+                Stat = StatKind.Constitution,
+                Min = 1,
+                Max = 10,
+                Kinds = [EquipmentKind.Ring],
+                Weight = 10,
+                GoldValue = 20,
+            },
+        },
+    };
+
     [Fact]
     public void Repair_UnknownBase_DropsPiece()
     {
@@ -88,17 +109,77 @@ public sealed class GearRepairTests
     [Fact]
     public void Repair_WornAffixRaisingMaxHp_KeepsHpAndDropsTheUnknownAffix()
     {
-        var sturdy = new AffixDefinition { Id = "sturdy", Stat = StatKind.Constitution, Min = 1, Max = 10, Kinds = [EquipmentKind.Ring], Weight = 10, GoldValue = 20 };
-        var catalog = CatalogWithPowerAffix with { Affixes = new Dictionary<string, AffixDefinition>(CatalogWithPowerAffix.Affixes) { ["sturdy"] = sturdy } };
         var ring = new SavedGear("power_ring", Rarity.Rare, [new SavedAffix("sturdy", 10), new SavedAffix("vampiric", 3)]);
         var worn = new Dictionary<EquipmentSlot, SavedGear> { [EquipmentSlot.FirstRing] = ring };
+        var save = RepairableSave with { Members = [Sarxian with { Hp = 215, Worn = worn }, Jazog] };
 
-        var repaired = SaveGameRepair.Repair("slot_01", RepairableSave with { Members = [Sarxian with { Hp = 215, Worn = worn }, Jazog] }, catalog);
+        var repaired = SaveGameRepair.Repair("slot_01", save, _catalogWithSturdy);
 
         Assert.Equal(215, repaired.Save.Members[0].Hp);
         Assert.Equal([new SavedAffix("sturdy", 10)], repaired.Save.Members[0].Worn[EquipmentSlot.FirstRing].Affixes);
         Assert.Equal(["party member 'sarxian': dropped affix 'vampiric' from 'power_ring', which no longer exists."], repaired.Changes);
     }
 
+    // A piece whose base became unique takes the record's rarity and affixes (decision 868).
+    [Fact]
+    public void Repair_UniqueBaseSavedWithOtherValues_TakesItsRecordAndReports()
+    {
+        var saved = new SavedGear("cleaver", Rarity.Magic, [new SavedAffix("power", 3)]);
+
+        var repaired = RepairWithUnique(RepairableSave with { Gear = [saved] });
+
+        Assert.Equal([_savedCleaver], repaired.Save.Gear);
+        Assert.Equal(["the inventory: unique 'cleaver' follows its record now."], repaired.Changes);
+    }
+
+    [Fact]
+    public void Repair_UniqueBaseSavedAsItsRecord_ReportsNothing()
+    {
+        var repaired = RepairWithUnique(RepairableSave with { Gear = [_savedCleaver] });
+
+        Assert.Equal([_savedCleaver], repaired.Save.Gear);
+        Assert.Empty(repaired.Changes);
+    }
+
+    // The record's Power +9 lies above the pool's 2..5: a unique's values are free of the roll range (decision 866).
+    // The saved +5 fits that range, so only the record gives the 9.
+    [Fact]
+    public void Repair_UniqueValueAboveItsAffixsRollRange_IsNotClamped()
+    {
+        var saved = new SavedGear("cleaver", Rarity.Unique, [new SavedAffix("power", 5)]);
+
+        var repaired = RepairWithUnique(RepairableSave with { Gear = [saved] });
+
+        Assert.Equal([new SavedAffix("power", 9)], repaired.Save.Gear[0].Affixes);
+    }
+
+    [Fact]
+    public void Repair_SavedUniqueOnAnOrdinaryBase_BecomesPlainAndReports()
+    {
+        var saved = new SavedGear("bronze_sword", Rarity.Unique, [new SavedAffix("power", 4)]);
+
+        var repaired = Repair(RepairableSave with { Gear = [saved] });
+
+        Assert.Equal([Plain("bronze_sword")], repaired.Save.Gear);
+        Assert.Equal(["the inventory: 'bronze_sword' is no longer a unique, so it became a plain piece."], repaired.Changes);
+    }
+
+    // Sarxian has 203 HP with nothing worn (see above): the worn ring's saved Unique affix, +10 Constitution, leaves
+    // before the sheet, so 215 HP is brought down to 203.
+    [Fact]
+    public void Repair_WornSavedUniqueOnAnOrdinaryBase_CountsNoAffixTowardMaxHp()
+    {
+        var ring = new SavedGear("power_ring", Rarity.Unique, [new SavedAffix("sturdy", 10)]);
+        var worn = new Dictionary<EquipmentSlot, SavedGear> { [EquipmentSlot.FirstRing] = ring };
+        var save = RepairableSave with { Members = [Sarxian with { Hp = 215, Worn = worn }, Jazog] };
+
+        var repaired = SaveGameRepair.Repair("slot_01", save, _catalogWithSturdy);
+
+        Assert.Equal(203, repaired.Save.Members[0].Hp);
+        Assert.Equal(Plain("power_ring"), repaired.Save.Members[0].Worn[EquipmentSlot.FirstRing]);
+    }
+
     private static RepairedSave Repair(SaveGame save) => SaveGameRepair.Repair("slot_01", save, CatalogWithPowerAffix);
+
+    private static RepairedSave RepairWithUnique(SaveGame save) => SaveGameRepair.Repair("slot_01", save, CatalogWithUnique);
 }

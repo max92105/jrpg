@@ -72,6 +72,23 @@ internal static class SaveGameFixtures
         },
     };
 
+    /// <summary>
+    /// <see cref="CatalogWithPowerAffix"/> with one unique, "cleaver": a bronze sword whose record fixes Power +9,
+    /// above the pool's roll range (decision 866).
+    /// </summary>
+    public static readonly ContentCatalog CatalogWithUnique = CatalogWithPowerAffix with
+    {
+        Items = new Dictionary<string, ItemDefinition>(CatalogWithPowerAffix.Items)
+        {
+            ["cleaver"] = CatalogWithPowerAffix.Items["bronze_sword"] with
+            {
+                Id = "cleaver",
+                IsUnique = true,
+                FixedAffixes = [new RolledAffix("power", StatKind.Power, 9)],
+            },
+        },
+    };
+
     public static Dictionary<EquipmentSlot, SavedGear> Wearing(params (EquipmentSlot Slot, string ItemId)[] worn) =>
         worn.ToDictionary(entry => entry.Slot, entry => Plain(entry.ItemId));
 

@@ -88,6 +88,24 @@ public sealed class ForgeUpgradeTests
         Assert.Empty(quote.Materials);
     }
 
+    // A real unique, built from its record, with the upgrade's materials at hand (decision 339).
+    [Fact]
+    public void QuoteUpgrade_UniquePiece_IsRefusedAsHighestRarity()
+    {
+        var cleaver = _sword with
+        {
+            Id = "cleaver",
+            IsUnique = true,
+            FixedAffixes = [new RolledAffix("power", StatKind.Power, 4)],
+        };
+        _inventory.Add(_scrap, 5);
+        _inventory.Add(_essence, 1);
+
+        var quote = NewForge([_power, _crit]).QuoteUpgrade(GearPiece.Unique(cleaver));
+
+        Assert.Equal(ForgeRefusal.HighestRarity, quote.Refusal);
+    }
+
     // Content gives no Rare cost, so Magic is as high as a craft goes.
     [Fact]
     public void QuoteUpgrade_NoCostRowForTheNextTier_RefusedHighestRarity()

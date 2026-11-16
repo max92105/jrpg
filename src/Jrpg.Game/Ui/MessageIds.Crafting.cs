@@ -45,6 +45,9 @@ internal static partial class MessageIds
     /// <summary>Why a reroll is refused: the piece has no affix.</summary>
     public const string ForgeRefusedNoAffixes = "forge_refused_no_affixes";
 
+    /// <summary>Why a reroll is refused: the piece is a unique, whose affixes are fixed (decision 699).</summary>
+    public const string ForgeRefusedFixedAffixes = "forge_refused_fixed_affixes";
+
     /// <summary>Why an action is refused: the party owns fewer of a material than it costs.</summary>
     public const string ForgeRefusedShort = "forge_refused_short";
 

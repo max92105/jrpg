@@ -6,8 +6,9 @@ namespace Jrpg.Data.Saving;
 
 /// <summary>
 /// The shops' half of <see cref="SaveGameRepair"/> (decision 385): the stock of a shop that no longer exists is
-/// dropped; a piece whose base is gone or no longer gear, or that carries an affix the pool no longer has, is dropped;
-/// an affix value out of range is clamped (<see cref="GearRepair"/>'s rule, decision 360). Each change is reported.
+/// dropped; a piece whose base is gone or no longer gear, or that carries an affix the pool no longer has, is dropped,
+/// save a unique's, which follows its record; an affix value out of range is clamped (<see cref="GearRepair"/>'s rules,
+/// decisions 360, 868). Each change is reported.
 /// </summary>
 internal sealed class ShopStockRepair
 {
@@ -16,7 +17,7 @@ internal sealed class ShopStockRepair
     private readonly List<string> _changes;
 
     /// <param name="catalog">The content the save must fit.</param>
-    /// <param name="gear">Clamps the kept pieces' affixes, as it does the owned ones'.</param>
+    /// <param name="gear">Repairs the kept pieces' affixes, as it does the owned ones'.</param>
     /// <param name="changes">The repair's report, which this adds to.</param>
     public ShopStockRepair(ContentCatalog catalog, GearRepair gear, List<string> changes)
     {
@@ -72,7 +73,8 @@ internal sealed class ShopStockRepair
             return false;
         }
 
-        if (piece.Affixes.FirstOrDefault(affix => !_catalog.Affixes.ContainsKey(affix.AffixId)) is { } unknown)
+        // A unique's piece is rebuilt from its record, whatever affixes the save named.
+        if (!item.IsUnique && piece.Affixes.FirstOrDefault(affix => !_catalog.Affixes.ContainsKey(affix.AffixId)) is { } unknown)
         {
             _changes.Add($"{owner}: dropped '{piece.ItemId}' with affix '{unknown.AffixId}', which no longer exists.");
             return false;

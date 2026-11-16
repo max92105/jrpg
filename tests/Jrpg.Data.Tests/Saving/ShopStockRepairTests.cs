@@ -69,6 +69,18 @@ public sealed class ShopStockRepairTests
         Assert.Equal(["shop 'general_store': affix 'power' on 'bronze_sword' brought within 2..5 (was 9)."], repaired.Changes);
     }
 
+    // The Cleaver's record fixes Power +9; the stocked piece named another affix and value (decision 868).
+    [Fact]
+    public void Repair_StockedUniqueSavedWithOtherValues_TakesItsRecord()
+    {
+        var stocked = new SavedGear("cleaver", Rarity.Rare, [new SavedAffix("power", 3), new SavedAffix("vampiric", 2)]);
+
+        var repaired = SaveGameRepair.Repair("slot_01", RepairableSave with { ShopStocks = [Stock(stocked)] }, CatalogWithUnique);
+
+        Assert.Equal([Stock(new SavedGear("cleaver", Rarity.Unique, [new SavedAffix("power", 9)]))], repaired.Save.ShopStocks);
+        Assert.Equal(["shop 'general_store': unique 'cleaver' follows its record now."], repaired.Changes);
+    }
+
     private static SavedShopStock Stock(params SavedGear[] pieces) => new("general_store", 1, pieces);
 
     private static RepairedSave Repair(IReadOnlyList<SavedShopStock> stocks) =>

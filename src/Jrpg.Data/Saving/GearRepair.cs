@@ -8,8 +8,9 @@ namespace Jrpg.Data.Saving;
 /// <summary>
 /// The gear half of <see cref="SaveGameRepair"/>: the pieces members wear, slot by slot, and the owned ones (ADR 0029).
 /// A piece whose base no longer exists is dropped, one whose base is no longer equipment goes back to the stacks as one
-/// copy, a worn one whose kind no longer fits its slot goes back to the owned gear, and an affix the pool no longer has
-/// is dropped and one outside its range clamped into it; each is reported in the repair's changes.
+/// copy, a worn one whose kind no longer fits its slot goes back to the owned gear, a unique base's piece follows its
+/// record (ADR 0058), a saved Unique on a base no longer unique becomes plain, and an affix the pool no longer has is
+/// dropped and one outside its range clamped into it; each is reported in the repair's changes.
 /// </summary>
 internal sealed class GearRepair
 {
@@ -106,12 +107,46 @@ internal sealed class GearRepair
     }
 
     /// <summary>
-    /// The piece with only the affixes the pool still has, each value within its affix's current range (decision 360):
-    /// every change is reported, never silent. Shared with the shops' stocks, which clamp the same way.
+    /// The piece as content now makes it, every change reported, never silent: a unique base gives its record's piece
+    /// whatever the save held (decision 868); a saved Unique on a base no longer unique becomes plain; any other piece
+    /// keeps only the affixes the pool still has, each value within its affix's current range (decision 360). Shared
+    /// with the shops' stocks, which repair the same way.
     /// </summary>
-    /// <param name="saved">The piece as the save keeps it.</param>
+    /// <param name="saved">The piece as the save keeps it; its base is in the catalog and is equipment.</param>
     /// <param name="owner">Who holds it, for the report.</param>
     internal SavedGear RepairAffixes(SavedGear saved, string owner)
+    {
+        var item = _catalog.Items[saved.ItemId];
+        if (item.IsUnique)
+        {
+            return FollowRecord(saved, item, owner);
+        }
+
+        // Made plain before the worn bonuses' sum, which would otherwise count the saved affixes of a Unique rarity on
+        // an ordinary base.
+        if (saved.Rarity == Rarity.Unique)
+        {
+            _changes.Add($"{owner}: '{saved.ItemId}' is no longer a unique, so it became a plain piece.");
+            return saved with { Rarity = Rarity.Common, Affixes = [] };
+        }
+
+        return ClampAffixes(saved, owner);
+    }
+
+    // The record is the truth (decision 868), and its values may lie outside their affixes' roll ranges (decision 866),
+    // so they are never clamped.
+    private SavedGear FollowRecord(SavedGear saved, ItemDefinition item, string owner)
+    {
+        var record = GearPiece.Unique(item).ToSaved();
+        if (saved != record)
+        {
+            _changes.Add($"{owner}: unique '{saved.ItemId}' follows its record now.");
+        }
+
+        return record;
+    }
+
+    private SavedGear ClampAffixes(SavedGear saved, string owner)
     {
         var repaired = new List<SavedAffix>();
         foreach (var affix in saved.Affixes)

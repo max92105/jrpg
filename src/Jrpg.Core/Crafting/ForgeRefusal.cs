@@ -22,4 +22,7 @@ public enum ForgeRefusal
 
     /// <summary>The piece has no affix to reroll (decisions 352, 370).</summary>
     NoAffixes,
+
+    /// <summary>A unique's affixes are fixed on its record and never rerolled (decision 699, ADR 0058).</summary>
+    FixedAffixes,
 }

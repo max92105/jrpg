@@ -16,6 +16,13 @@ public sealed class ForgeRerollTests
     private static readonly ItemDefinition _sword = new ItemDefinitionBuilder().WithId("sword").AsWeapon(5).Build();
     private static readonly GearPiece _magic = GearPiece.Rolled(_sword, Rarity.Magic, [new RolledAffix("power", StatKind.Power, 4)]);
 
+    private static readonly ItemDefinition _cleaver = _sword with
+    {
+        Id = "cleaver",
+        IsUnique = true,
+        FixedAffixes = [new RolledAffix("power", StatKind.Power, 4)],
+    };
+
     private static readonly AffixDefinition[] _pool =
     [
         new() { Id = "power", Stat = StatKind.Power, Min = 2, Max = 5, Kinds = [EquipmentKind.Weapon], Weight = 10, GoldValue = 20 },
@@ -76,6 +83,32 @@ public sealed class ForgeRerollTests
         var rerolled = NewForge().TryReroll(_magic);
 
         Assert.False(rerolled);
+        Assert.Equal((2, 1), (_inventory.QuantityOf("scrap"), _inventory.QuantityOf("essence")));
+    }
+
+    // The quote names the cost even when refused, as for a piece without affixes.
+    [Fact]
+    public void QuoteReroll_UniquePiece_IsRefusedAsFixedAffixes()
+    {
+        var quote = NewForge().QuoteReroll(GearPiece.Unique(_cleaver));
+
+        Assert.Equal(ForgeRefusal.FixedAffixes, quote.Refusal);
+        Assert.Equal(_rules.RerollCost, quote.Materials);
+    }
+
+    // Owned, with the materials at hand: nothing is paid and, the scripted random being empty, nothing is drawn.
+    [Fact]
+    public void TryReroll_UniquePiece_ChangesNothingAndDrawsNothing()
+    {
+        var unique = GearPiece.Unique(_cleaver);
+        _inventory.AddGear(unique);
+        _inventory.Add(_scrap, 2);
+        _inventory.Add(_essence, 1);
+
+        var rerolled = NewForge().TryReroll(unique);
+
+        Assert.False(rerolled);
+        Assert.Equal([unique], _inventory.Gear);
         Assert.Equal((2, 1), (_inventory.QuantityOf("scrap"), _inventory.QuantityOf("essence")));
     }
 

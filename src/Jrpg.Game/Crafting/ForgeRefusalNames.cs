@@ -14,6 +14,7 @@ internal static class ForgeRefusalNames
         ForgeRefusal.NoAffixLeft => MessageIds.ForgeRefusedNoAffixLeft,
         ForgeRefusal.ShortOfMaterials => MessageIds.ForgeRefusedShort,
         ForgeRefusal.NoAffixes => MessageIds.ForgeRefusedNoAffixes,
+        ForgeRefusal.FixedAffixes => MessageIds.ForgeRefusedFixedAffixes,
         _ => throw new ArgumentOutOfRangeException(nameof(refusal), refusal, "A refusal with no line in ui.json."),
     };
 }

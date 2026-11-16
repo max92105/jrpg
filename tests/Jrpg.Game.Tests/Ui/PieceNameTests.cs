@@ -5,7 +5,8 @@ using Jrpg.Game.Ui;
 
 namespace Jrpg.Game.Tests.Ui;
 
-// A rolled piece is named with its rarity first, so a question tells it from a plain one of the same base.
+// A rolled piece is named with its rarity first, so a question tells it from a plain one of the same base; a unique
+// goes by its own name alone.
 [Collection(RepositoryScreenText.CollectionName)]
 public sealed class PieceNameTests
 {
@@ -22,6 +23,23 @@ public sealed class PieceNameTests
         var rarity = _messages.Text(RarityNames.IdOf(Rarity.Magic));
         Assert.Equal(_messages.Format(MessageIds.RolledPieceName, new MessageArgument("rarity", rarity), new MessageArgument("name", _sword.Name)), name);
         Assert.StartsWith(rarity, name);
+    }
+
+    // A unique's name is its own, without the rarity word, though it carries affixes (decision 871).
+    [Fact]
+    public void Of_UniquePiece_IsItsOwnName()
+    {
+        var cleaver = _sword with
+        {
+            Id = "cleaver",
+            Name = "Test Cleaver",
+            IsUnique = true,
+            FixedAffixes = [new RolledAffix("power", StatKind.Power, 5)],
+        };
+
+        var name = PieceName.Of(GearPiece.Unique(cleaver), _messages);
+
+        Assert.Equal("Test Cleaver", name);
     }
 
     [Fact]

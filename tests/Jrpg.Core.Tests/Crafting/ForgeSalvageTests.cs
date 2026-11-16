@@ -1,6 +1,7 @@
 using Jrpg.Core.Crafting;
 using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
+using Jrpg.Core.Stats;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -86,6 +87,22 @@ public sealed class ForgeSalvageTests
 
         Assert.Equal(ForgeRefusal.NoYield, quote.Refusal);
         Assert.Empty(quote.Materials);
+    }
+
+    // A real unique, built from its record: no salvage row names Unique (decision 339).
+    [Fact]
+    public void QuoteSalvage_UniquePiece_IsRefusedAsNoYield()
+    {
+        var cleaver = _sword with
+        {
+            Id = "cleaver",
+            IsUnique = true,
+            FixedAffixes = [new RolledAffix("power", StatKind.Power, 4)],
+        };
+
+        var quote = NewForge().QuoteSalvage(GearPiece.Unique(cleaver));
+
+        Assert.Equal(ForgeRefusal.NoYield, quote.Refusal);
     }
 
     [Fact]

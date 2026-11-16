@@ -5,16 +5,17 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-enemy-behavior, slice EB6 (EnemyViewModel.Tactics partial, ToEnemy writes rules, TacticsSummary gone,
-re-pinned ToEnemy tests, Apply_UntouchedSession_RecordsNothing). 2026-11-16. Round 1.
+Plan 2026-11-15-enemy-behavior, slice EB7 (Battle/EnemyTacticsView, the Enemies page's Tactics tab, Database menu
+tooltip, map row). 2026-11-16. Round 1.
 Verdict: Ready to commit (no Critical, no Warning).
 
-- Suggestion (open, optional): ToEnemy_Unchanged_EqualsTheRecord flattens phase rules with SelectMany (a rule moved
-  between phases would pass; the chief has one phase today); compare per phase with Zip as IsSameEnemy does.
-- Suggestion (open, optional): "Renamed from ... in EB6" / "Re-pinned ... in EB6" test comments are history; keep the why.
-- Follow-up: EnemyCatalogViewModelTests at 299 lines; the next test there needs a split.
-- Follow-up: DatabaseMenu.xaml Enemies tooltip "tactics and phases stay in enemies.json" (EB7 note records it).
-- Carried from EB5: shared fixture suggestion for the tactics test files: dropped (optional, not carried further).
-- Checked, no finding: IsSameEnemy compares Tactics and each phase's threshold and rules by content (EnemyAction,
-  TacticCondition are value records); untouched test proves lists rebuilt (NotSame) and CanUndo false; content's chief
-  has "when" conditions; On round-trip pinned by TacticListViewModelTests; notification exactly [Tactics, Problem].
+- Suggestion (open, optional): docs/map.md Battle row: the EnemyTacticsView clause is spliced inside EnemyCatalogPage's
+  parenthesis, so "the battle sprite previewed..." now reads as part of the Tactics tab; give EnemyTacticsView its own
+  entry after EnemyCatalogPage's.
+- Follow-up: EnemyCatalogViewModelTests still at 299 lines; the next test there needs a split.
+- Follow-up: BooleanToVisibilityConverter "VisibleWhenTrue" declared locally in 10 views; one key in EditorTheme.
+- Fixed: DatabaseMenu.xaml Enemies tooltip (EB6 follow-up) reworded in this slice.
+- Checked, no finding: every binding path matches TacticListViewModel/TacticRuleRow/EnemyTacticsViewModel/
+  EnemyCatalogViewModel (choices are records, Of returns entries of All); rules rows hold no boxes, so no RowFocus;
+  no local Style, page styles via DynamicResource; probe showed SelectedList.Rules/SelectedList.SelectedRule keeps each
+  list's chosen rule across list switches (no null write-back).

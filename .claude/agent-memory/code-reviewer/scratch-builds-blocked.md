@@ -38,6 +38,8 @@ showing the previous item (blank only if the previous was blank or on first load
 choices whose records may name a missing file; fix by appending the missing names to the choices.
 A nullable-enum SelectedItem set to null (not in the list, per-item enum arrays) shows blank and writes nothing back
 on switches or close; a SelectedValuePath box over a shared list writes nothing back on switches (SK6, 2026-11-16).
+A ListBox with ItemsSource="{Binding Sel.Items}" SelectedItem="{Binding Sel.Chosen}" (EB7, 2026-11-16) keeps each
+inner object's Chosen across Sel switches, from the view model or the outer ListBox: no null write-back.
 An ItemsSource set by a style DataTrigger (EW1, 2026-11-15) still shows the locally bound SelectedItem on open, after a
 null-then-set DataContext and on switching: the trigger's late ItemsSource loses nothing.
 

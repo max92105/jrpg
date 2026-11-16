@@ -5,16 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-mode-bar, slice WD8 (Character sprites window -> Sprites/FieldSpritePage in CatalogDialog via
-OpenInDialog from the NPCs entry; MainWindow.FieldSprites.cs deleted; RenderTick.RunWhileLoaded extracted for the
-Enemies, Effect strips and Character sprites pages; FieldSpriteCatalogViewModel implements IEditedCatalog).
-2026-11-16. Round 1. Verdict: Ready to commit. No Critical, no Warning.
+Plan 2026-11-15-skill-and-status-editors, slice SK1 (writer takes over skills.json, effects.json, statuses.json;
+relay commit 1296b8da; code uncommitted). 2026-11-16. Round 1. Verdict: Ready to commit. No Critical.
 
-- Suggestion, open: FieldSpritePage.xaml:67 root DockPanel now wraps a single Grid (OK/Cancel and problem line gone).
-- Follow-up, open: page-recipe.md step 3 / line 22 still describes the Loaded/Unloaded pair by hand; name
-  RenderTick.RunWhileLoaded so stage 3 pages don't write a fourth copy.
-- WD7's Cinematics IsPlaying follow-up: dropped, recorded in slices/WS5.md (note from WD7).
-- Checked: the deviation (only the tick released on Unloaded) holds: old OnClosed released the tick, its own CellZoom
-  via _zooming.Zoom = null, and handlers on _sprites/_setup, all created per session by Start() or by the page; no
-  FieldSpriteWindow / MainWindow.FieldSprites / "Character sprites window" / KeepOnDesktop left in src, tests, map,
-  scripts.
+- Warning, open: ContentWriter.Catalogs.cs CheckCatalogs: CheckTieredEffects, CheckStatuses and SkillCatalogValidator
+  (inside CheckSkills) have no writer test; only the classes.json and enemies.json refusals are tested. Proposed one
+  refusal test per file (statuses.json, effects.json, skills.json), each asserting the file name and no file changed.
+- Suggestion, open: delete ContentWriterRepositoryTests.Effects_/Statuses_RepositoryFile_WritesBackUnchanged
+  (identical-bytes test now covers both through the writer's own sort; "row 7's window" comments stale).
+- Suggestion, open: CatalogProblems.CheckSkills doc's "the enemies' check runs with the catalog's own" is opaque.
+- Checked, no finding: Effect, StatusDefinition override Equals (list members by content), so the reload tests'
+  Assert.Equal is meaningful; test-world skills.json is the live content's; stale tier/status records after an
+  effects/statuses edit are decision 975's (rebind), not SK1's.

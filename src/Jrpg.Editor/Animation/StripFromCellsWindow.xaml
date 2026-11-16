@@ -20,9 +20,21 @@
     </Style>
   </Window.Resources>
   <DockPanel Margin="12">
+    <!-- OK greys on the problem line; a write Data refused keeps the tool open and names its refusal there, until any
+         box or pick changes. -->
     <DockPanel DockPanel.Dock="Bottom" Margin="0,12,0,0">
-      <Button DockPanel.Dock="Right" Content="Cancel" Width="80" IsCancel="True" />
-      <TextBlock Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" VerticalAlignment="Center" Text="{Binding Problem}" />
+      <Button DockPanel.Dock="Right" Content="Cancel" Width="80" Margin="8,0,0,0" IsCancel="True" />
+      <Button DockPanel.Dock="Right"
+              Content="OK"
+              Width="80"
+              IsDefault="True"
+              Click="OnOkClicked"
+              IsEnabled="{Binding CanWrite}"
+              ToolTip="Writes the strip into the effects folder at once (never undone); its record waits for the page's OK" />
+      <StackPanel VerticalAlignment="Center">
+        <TextBlock Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Text="{Binding Problem}" />
+        <TextBlock x:Name="RefusalText" Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" />
+      </StackPanel>
     </DockPanel>
 
     <!-- The cut, the picks and the strip they make, played at the typed pace: the preview has no pace box of its own,

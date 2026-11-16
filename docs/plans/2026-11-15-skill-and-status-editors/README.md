@@ -148,7 +148,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/AN5.md](slices/AN5.md)
 - [x] **AN6. Strip from sheet cells: the window, picking and the preview, opened from the Effect strips page** (Editor
   + script, about 220 lines) → [slices/AN6.md](slices/AN6.md)
-- [ ] **AN7. Strip from sheet cells writes the strip into the Effect strips session** (Editor, about 200 lines) →
+- [x] **AN7. Strip from sheet cells writes the strip into the Effect strips session** (Editor, about 200 lines) →
   [slices/AN7.md](slices/AN7.md)
 
 ### Phase 4: the balance table (after row 12)

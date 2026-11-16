@@ -159,7 +159,11 @@ internal sealed partial class MainWindow
             edited,
             file => SpriteImageFile.LoadFrom(artRoot, ArtFolders.Effects, file),
             (paths, options) => _viewModel.ImportArtImages(ArtFolders.Effects, paths, options),
-            owner => new StripFromCellsWindow { Owner = owner }.ShowDialog()));
+            owner =>
+            {
+                var tool = new StripFromCellsWindow(_viewModel.ImportCellStrip) { Owner = owner };
+                return tool.ShowDialog() == true ? tool.Written : null;
+            }));
     }
 
     private void OpenSkills()

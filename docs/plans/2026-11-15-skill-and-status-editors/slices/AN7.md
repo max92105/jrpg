@@ -58,3 +58,6 @@ record lands with that page's OK (decision 988). A refusal stays on the tool's p
 - **Note from AN6:** the window builds its own `StripFromCellsViewModel` (no constructor parameter yet: `write` is the
   first); OK goes in the bottom bar beside Cancel, the problem line on its left; the opener is one lambda in
   `MainWindow.Database.cs`.
+- **Done, with deviations:** code 238 lines, tests 294; the ask and the report shared with `ImportArtImages` (third copy:
+  `ConfirmsReplacing`, `ReportArtImport`); a refusal on its own line, cleared on any change; the tool's `Problem` greys a
+  strip wider than `TextureLimit.MaxSide` (review; `StripFromCellsWidthTests`); a too-wide refusal test; a Bgr24 cut.

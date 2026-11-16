@@ -312,3 +312,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - An effect image replaced with fewer frames, then the Effect strips page cancelled, leaves the draft's record with a
   hit frame past the new strip, which the game's start refuses (`ArtReferenceCheck.AddHitFramesPastTheirStrip`; the
   art warning shows it): say so on the import line when a replaced strip's record no longer fits (AN4 review).
+- `Editor/Shell/MainViewModel.SheetImport.cs` keeps its own replace question ("tilesheet art", the folder being
+  `tilesheets`) and its own refresh and status report, which AN7's `ConfirmsReplacing` and `ReportArtImport` now
+  serve for the art images (AN7 review).

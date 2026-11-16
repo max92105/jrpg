@@ -16,7 +16,8 @@ namespace Jrpg.Editor.Battle;
 /// shared preview (<see cref="FramePreview"/>, decision 986) at its typed frame time, its hit frame marked, while the
 /// page is shown, so its pace is tuned by eye; an image is read once per page, again once an import replaced it.
 /// Import... under the list copies PNGs and GIFs into the folder, a GIF's pace typed while it plays (decision 989);
-/// Strip from sheet cells... under it opens the tool that picks a sheet's cells (decision 990).
+/// Strip from sheet cells... under it opens the tool that picks a sheet's cells (decision 990); the strip its OK writes
+/// enters the list as an import's.
 /// </summary>
 internal sealed partial class EffectStripCatalogPage : UserControl
 {
@@ -24,7 +25,7 @@ internal sealed partial class EffectStripCatalogPage : UserControl
     private readonly Func<string, BitmapSource?> _loadImage;
     private readonly Dictionary<string, BitmapSource?> _images = new(StringComparer.Ordinal);
     private readonly Func<IReadOnlyList<string>, GifImportOptions, SheetImportResult> _import;
-    private readonly Action<Window> _openStripFromCells;
+    private readonly Func<Window, SheetImportResult?> _makeStripFromCells;
 
     /// <param name="strips">The page's state, from <see cref="EffectStripEditingViewModel.Start"/>.</param>
     /// <param name="loadImage">Decodes an effects image at its own size; null when it can't.</param>
@@ -32,16 +33,19 @@ internal sealed partial class EffectStripCatalogPage : UserControl
     /// The shell's import: copies the chosen images into the effects folder, a GIF as a strip by the options, and says
     /// what it did.
     /// </param>
-    /// <param name="openStripFromCells">Shows Strip from sheet cells over the given window, the page's own.</param>
+    /// <param name="makeStripFromCells">
+    /// Shows Strip from sheet cells over the given window, the page's own, and says what its OK wrote into the effects
+    /// folder; null on Cancel.
+    /// </param>
     public EffectStripCatalogPage(
         EffectStripCatalogViewModel strips,
         Func<string, BitmapSource?> loadImage,
         Func<IReadOnlyList<string>, GifImportOptions, SheetImportResult> import,
-        Action<Window> openStripFromCells)
+        Func<Window, SheetImportResult?> makeStripFromCells)
     {
         InitializeComponent();
         DataContext = _strips = strips;
-        (_loadImage, _import, _openStripFromCells) = (loadImage, import, openStripFromCells);
+        (_loadImage, _import, _makeStripFromCells) = (loadImage, import, makeStripFromCells);
         strips.PropertyChanged += OnStripsChanged;
         ShowChosenStrip();
     }
@@ -61,7 +65,6 @@ internal sealed partial class EffectStripCatalogPage : UserControl
             ? PreviewFrames.OfStrip(image, frameCount)
             : null;
 
-    // A replaced image is read again before its row is chosen, so the preview plays the new frames.
     private void OnImportClicked(object sender, RoutedEventArgs e)
     {
         var owner = Window.GetWindow(this);
@@ -71,7 +74,20 @@ internal sealed partial class EffectStripCatalogPage : UserControl
             return;
         }
 
-        var result = _import(paths, options);
+        TakeImport(_import(paths, options));
+    }
+
+    private void OnStripFromCellsClicked(object sender, RoutedEventArgs e)
+    {
+        if (_makeStripFromCells(Window.GetWindow(this)) is { } written)
+        {
+            TakeImport(written);
+        }
+    }
+
+    // A replaced image is read again before its row is chosen, so the preview plays the new frames.
+    private void TakeImport(SheetImportResult result)
+    {
         ImportStatusText.Text = EffectStripCatalogViewModel.ImportLineOf(result);
         foreach (var file in result.Imported)
         {
@@ -80,8 +96,6 @@ internal sealed partial class EffectStripCatalogPage : UserControl
 
         _strips.TakeImport(result);
     }
-
-    private void OnStripFromCellsClicked(object sender, RoutedEventArgs e) => _openStripFromCells(Window.GetWindow(this));
 
     private BitmapSource? ImageOf(string file)
     {

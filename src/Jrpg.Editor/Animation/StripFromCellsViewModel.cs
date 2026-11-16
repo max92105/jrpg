@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Sprites;
+using Jrpg.Data.Art;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Sprites;
 using Jrpg.Editor.Tiles;
@@ -83,14 +84,16 @@ internal sealed partial class StripFromCellsViewModel : ObservableObject
         TypedNumber.Parse(FrameMillisecondsText) is { } frameTime and >= LowestFrameMilliseconds ? frameTime : null;
 
     /// <summary>
-    /// Why OK can't write the strip, or null: the sheet, the cut, the picks, the name, then the pace.
+    /// Why OK can't write the strip, or null: the sheet, the cut, the picks, the name, the pace, then the width of the
+    /// strip they make.
     /// </summary>
     public string? Problem => _sheetSize is not { } size
         ? "Open a sheet."
         : CutProblem(size)
             ?? (Picks.Count == 0 ? "Pick the cells the strip plays, in order." : null)
             ?? NameProblem()
-            ?? (FrameMilliseconds is null ? $"Frame time must be a whole number from {LowestFrameMilliseconds}." : null);
+            ?? (FrameMilliseconds is null ? $"Frame time must be a whole number from {LowestFrameMilliseconds}." : null)
+            ?? WidthProblem(CellSize!.Value);
 
     public bool CanWrite => Problem is null;
 
@@ -207,6 +210,16 @@ internal sealed partial class StripFromCellsViewModel : ObservableObject
         }
 
         return name.IndexOfAny(_pathCharacters) is var at and >= 0 ? $"The strip's name can't hold '{name[at]}'." : null;
+    }
+
+    // Each cell is padded to a square of its larger side (decision 990), so the strip's width is known before it is
+    // written, and Data refuses one wider than the game loads; its height, one side, is never more than its width.
+    private string? WidthProblem((int Width, int Height) cell)
+    {
+        var width = (long)Picks.Count * Math.Max(cell.Width, cell.Height);
+        return width > TextureLimit.MaxSide
+            ? $"The strip would be {width} px wide; the game takes at most {TextureLimit.MaxSide}."
+            : null;
     }
 
     private string StripFileName()

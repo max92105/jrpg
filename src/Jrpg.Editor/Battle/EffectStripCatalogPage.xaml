@@ -7,7 +7,7 @@
   <DockPanel>
     <!-- The effects images in name order, then the records whose image is missing; an unlisted one is greyed. Import...
          under the list copies images in at once and hands them to the list as typed rows (decision 988); Strip from
-         sheet cells... under it makes a strip of any sheet's cells (decision 990). -->
+         sheet cells... under it makes a strip of any sheet's cells, handed to the list the same way (decision 990). -->
     <DockPanel DockPanel.Dock="Left" Width="240">
       <TextBlock DockPanel.Dock="Top" Text="Effects images" FontWeight="Bold" />
       <StackPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">

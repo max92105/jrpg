@@ -5,7 +5,7 @@ using Jrpg.Editor.Objects;
 namespace Jrpg.Editor.Quests;
 
 /// <summary>
-/// One stage as the Quests window edits it (decision 394): its id is typed while the stage is new and fixed once the
+/// One stage as the Quests page edits it (decision 394): its id is typed while the stage is new and fixed once the
 /// draft holds it, since events and saves name it; its text is the objective the Quests page shows.
 /// </summary>
 internal sealed partial class QuestStageViewModel : ObservableObject

@@ -25,3 +25,5 @@ showed it only on OK).
 ## Verify by hand
 Agents may run it. The script: "Database>Quests...: opened", main-window size. In the editor: a stage with an empty id
 shows its problem at once and greys OK; OK after fixing it, Ctrl+Z takes the session back.
+- **Done:** as planned, plus a fourth test (`ChosenKey_QuestChosen_IsItsId`, the key's other side); the Quests folder's
+  and its tests' comments say "page" for "window". `QuestCatalogViewModelTests` 98 → 140 lines.

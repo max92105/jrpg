@@ -10,7 +10,7 @@ using Jrpg.Editor.Objects;
 namespace Jrpg.Editor.Quests;
 
 /// <summary>
-/// One quest as the Quests window edits it (decision 394): its id (typed while the quest is new, fixed once the draft
+/// One quest as the Quests page edits it (decision 394): its id (typed while the quest is new, fixed once the draft
 /// holds it), title, description, kind and its stages in order. A stage is added after the chosen one; only a stage
 /// added this session can be removed, since a saved one may be named by an event or a save. <see cref="Problem"/> names
 /// the first thing the game would refuse.
@@ -77,7 +77,7 @@ internal sealed partial class QuestViewModel : ObservableObject
         ?? FirstStageProblem();
 
     /// <exception cref="InvalidOperationException">
-    /// There is a <see cref="Problem"/>; the window applies only without one.
+    /// There is a <see cref="Problem"/>; the page's host applies only without one.
     /// </exception>
     public QuestDefinition ToQuest() =>
         Problem is { } problem

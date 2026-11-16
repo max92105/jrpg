@@ -93,7 +93,7 @@ page recipe: [page-recipe.md](page-recipe.md).
   windows open at that size too** (Editor, about 230 lines) → [slices/WD2.md](slices/WD2.md)
 
 ### Stage 2: the six windows as pages (right after stage 1)
-- [ ] **WD3. The Quests page** (Editor, about 130 lines) → [slices/WD3.md](slices/WD3.md)
+- [x] **WD3. The Quests page** (Editor, about 130 lines) → [slices/WD3.md](slices/WD3.md)
 - [ ] **WD4. The Drop tables page; the Enemies window's Edit... opens it in a dialog** (Editor, about 130 lines) →
   [slices/WD4.md](slices/WD4.md)
 - [ ] **WD5. The Enemies page** (Editor, about 150 lines) → [slices/WD5.md](slices/WD5.md)

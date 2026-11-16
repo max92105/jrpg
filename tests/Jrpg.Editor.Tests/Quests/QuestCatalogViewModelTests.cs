@@ -3,7 +3,7 @@ using Jrpg.Editor.Quests;
 
 namespace Jrpg.Editor.Tests.Quests;
 
-// The Quests window's list (decision 394): the draft's quests in id order, new quests chosen as they are added, and a
+// The Quests page's list (decision 394): the draft's quests in id order, new quests chosen as they are added, and a
 // problem naming the quest the game would refuse.
 public sealed class QuestCatalogViewModelTests
 {
@@ -94,5 +94,47 @@ public sealed class QuestCatalogViewModelTests
         catalog.AddQuestCommand.Execute(null);
 
         Assert.Throws<InvalidOperationException>(catalog.ToQuests);
+    }
+
+    // Abc is chosen first (id order), so only Choose picks the errand.
+    [Fact]
+    public void Choose_KnownId_ChoosesIt()
+    {
+        var catalog = new QuestCatalogViewModel([_abc, _errand, _zed]);
+
+        catalog.Choose("placeholder_errand");
+
+        Assert.Equal("placeholder_errand", catalog.SelectedQuest!.Id);
+    }
+
+    [Fact]
+    public void Choose_UnknownId_KeepsTheChoice()
+    {
+        var catalog = new QuestCatalogViewModel([_abc, _errand, _zed]);
+        catalog.Choose("zed");
+
+        catalog.Choose("heist");
+
+        Assert.Equal("zed", catalog.SelectedQuest!.Id);
+    }
+
+    [Fact]
+    public void ChosenKey_NothingChosen_IsNull()
+    {
+        var catalog = new QuestCatalogViewModel([_errand]);
+
+        catalog.SelectedQuest = null;
+
+        Assert.Null(catalog.ChosenKey);
+    }
+
+    [Fact]
+    public void ChosenKey_QuestChosen_IsItsId()
+    {
+        var catalog = new QuestCatalogViewModel([_abc, _errand]);
+
+        catalog.Choose("placeholder_errand");
+
+        Assert.Equal("placeholder_errand", catalog.ChosenKey);
     }
 }

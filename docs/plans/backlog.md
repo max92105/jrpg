@@ -289,3 +289,8 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Core/Effects/DamageFormula.ModifiedFlat` has no cap, where `TieredAmount` stops at `MaxPower` so `Calculate`'s
   product fits a `long` (decision 818); harmless while flat damage is small and the only modifier negative: cap it
   when row 9 adds a positive gear modifier (skills and statuses plan, WK review).
+- `Editor/Quests/QuestCatalogViewModel.OnQuestChanged` raises `Problem` on every quest notice, its own `Label`,
+  `Problem` and `SelectedStage` included, where the editor rules ask for the typed fields only; cheap today (no Data
+  check) (mode bar plan, WD3).
+- `.claude/rules/editor.md`'s dialog line says OK greys "through `CanApply`"; a page in `Workspaces/CatalogDialog`
+  greys it on `IEditedCatalog.Problem`: name both at the mode bar plan's retro (WD2, WD3 reviews).

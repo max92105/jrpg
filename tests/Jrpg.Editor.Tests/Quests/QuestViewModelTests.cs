@@ -3,7 +3,7 @@ using Jrpg.Editor.Quests;
 
 namespace Jrpg.Editor.Tests.Quests;
 
-// One quest as the Quests window edits it (decision 394): saved ids are fixed, a stage is added after the chosen one,
+// One quest as the Quests page edits it (decision 394): saved ids are fixed, a stage is added after the chosen one,
 // only a new stage can be removed, and the problem names what the game would refuse, the stage by position.
 public sealed class QuestViewModelTests
 {

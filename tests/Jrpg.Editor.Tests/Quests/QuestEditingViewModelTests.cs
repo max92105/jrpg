@@ -5,7 +5,7 @@ using Jrpg.Editor.Quests;
 
 namespace Jrpg.Editor.Tests.Quests;
 
-// The Quests window starts from the draft and its whole session is one undo step (decision 394).
+// The Quests page starts from the draft and its whole session is one undo step (decision 394).
 public sealed class QuestEditingViewModelTests
 {
     private readonly CatalogDraft _draft = new(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content")));

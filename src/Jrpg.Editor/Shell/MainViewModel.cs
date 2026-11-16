@@ -163,9 +163,6 @@ internal sealed partial class MainViewModel : ObservableObject
     /// <summary>Null when the content or its art didn't load.</summary>
     public QuestEditingViewModel? QuestEditing { get; }
 
-    /// <summary>Whether Database > Quests... can open its window: false while the content didn't load.</summary>
-    public bool HasQuestEditing => QuestEditing is not null;
-
     [ObservableProperty]
     public partial MapViewModel? CurrentMap { get; private set; }
 

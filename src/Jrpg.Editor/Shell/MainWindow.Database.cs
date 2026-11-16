@@ -5,6 +5,7 @@ using Jrpg.Data.Art;
 using Jrpg.Editor.Battle;
 using Jrpg.Editor.Cinematics;
 using Jrpg.Editor.Loot;
+using Jrpg.Editor.Quests;
 using Jrpg.Editor.Sprites;
 using Jrpg.Editor.Trade;
 using Jrpg.Editor.Workspaces;
@@ -12,10 +13,10 @@ using Jrpg.Editor.Workspaces;
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// The Database menu's dispatch: an entry's title runs its opener (decision 938). Shops... (a page in the catalog
-/// dialog), Drop tables..., Effect strips..., Enemies... and Cinematics...: each edits its catalog of the draft at the
-/// main window's size (decision 930), and OK applies the whole session as one undo step (ADR 0045, decision 591), as
-/// the Quests window does.
+/// The Database menu's dispatch: an entry's title runs its opener (decision 938), which edits its catalog of the draft
+/// at the main window's size (decision 930); OK applies the whole session as one undo step (ADR 0045, decision 591).
+/// Quests... and Shops... open a page in the catalog dialog; Drop tables..., Effect strips..., Enemies... and
+/// Cinematics... still open their own windows.
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -40,6 +41,16 @@ internal sealed partial class MainWindow
         }
 
         open();
+    }
+
+    private void OpenQuests()
+    {
+        if (_viewModel.QuestEditing is not { } questEditing)
+        {
+            return;
+        }
+
+        OpenInDialog("Quests", questEditing.Start, questEditing.Apply, edited => new QuestCatalogPage(edited));
     }
 
     private void OpenShops()

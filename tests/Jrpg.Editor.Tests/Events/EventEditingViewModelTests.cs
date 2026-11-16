@@ -110,7 +110,7 @@ public sealed class EventEditingViewModelTests
             events.Choices.QuestStages.Where(stage => stage.QuestId == "placeholder_errand"));
     }
 
-    // The dialog reads the draft when it opens, so a quest made in the Quests window is offered without a restart.
+    // The dialog reads the draft when it opens, so a quest made in the Quests page is offered without a restart.
     [Fact]
     public void StartEditingAt_QuestSetInTheDraft_OffersIt()
     {

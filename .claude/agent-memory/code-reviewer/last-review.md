@@ -5,16 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-items-uniques-affixes, slice IU2 (ItemDefinition.IsUnique/FixedAffixes + custom equality;
-GearPiece.Unique/Unrolled; Inventory.Add, GearRoll.Roll, ContentCatalog.PieceFrom; IU3's two filter rows pulled forward).
+Plan 2026-11-15-items-uniques-affixes, slice IU3 (FixedAffixConverter, UniqueItemRules, loader reads affixes.json
+before items.json, writer's ItemConverters, CheckItems passes content.Affixes, placeholder chiefs_cleaver).
 2026-11-16. Round 1. Verdict: Ready to commit (no Critical, no Warning).
 
-- Suggestion (open, optional): ItemDefinition's custom Equals lists 12 members in two tuples + FixedAffixes; a member
-  added later and left out passes every test. A reflection test (each init property changed alone makes items unequal)
-  would guard the draft's change detection. Same gap on the other 9 hand-written record Equals in Core.
-- Suggestion (open, optional): RolledAffix `AffixId` param doc "or a unique names" reads as missing a word.
-- Checked, no finding: all 13 ItemDefinition members compared; hash consistent; unique consumable never reaches
-  Unrolled (Inventory.Add branches on Equipment; GearRoll -> Rolled throws "not equipment"; IU3 refuses it at load);
-  "no longer unique" saved piece is IU4's repair (decision 868), PieceFrom takes a repaired save; only Inventory.Add
-  used Plain in src.
-- IU1's open Suggestion (CheckItems shop/table order) dropped: optional, other slice.
+- Follow-up (open, for IU15): ContentWriter.CheckCatalogs runs CheckItems before CheckAffixes, the reverse of the
+  loader's new order; once the Affixes page edits the pool, an affix edited to span 0 with a unique at -1 on it is
+  named as items.json's sign problem instead of affixes.json's range. Swap the two lines in IU15.
+- Checked, no finding: five old validator test files' helpers keep each file's name and every assertion; side-of-zero
+  rule can't meet a 0-spanning range at load (AffixCatalogValidator refuses it, now read first); loader move only puts
+  affixes.json ahead of items/crafting/shops/quests/cinematics, no other pair reordered; int.MinValue tested; null
+  entry tested end to end.
+- IU2's two optional Suggestions dropped (other slice, optional).

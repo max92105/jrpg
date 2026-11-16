@@ -42,3 +42,6 @@ None new (draw and wiring): `StatusCatalogViewModelTests` and `StatusViewModelTe
    Ctrl+Z, Save all.
 5. `slowed_1`: two stat change parts, the Stat boxes show accuracy and crit chance; the mark letter L.
 6. Run `.claude/scripts/open-editor-windows.ps1`: "Database>Statuses...: opened", no `ERROR` or binding-error line.
+- **Note from FX4:** a part's Damage type box binds `DamageTypeChoices` as items and `SelectedDamageTypeChoice` as
+  `SelectedItem` ("(none: ignores resistances)" first, `poison_1`'s); a new stat change's Stat box is blank until
+  picked. The map's Editor `Statuses` row exists (FX4): the page joins it.

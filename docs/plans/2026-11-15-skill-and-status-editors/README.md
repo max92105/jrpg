@@ -130,7 +130,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   step** (Data + Editor, about 220 lines) → [slices/FX1.md](slices/FX1.md)
 - [x] **FX2. Database > Effects...: the tier ids, the rules and the page** (Editor + script, about 290 lines) →
   [slices/FX2.md](slices/FX2.md)
-- [ ] **FX4. A status as typed: its fields and parts** (Editor, perhaps one Core accessibility word, about 220
+- [x] **FX4. A status as typed: its fields and parts** (Editor, perhaps one Core accessibility word, about 220
   lines) → [slices/FX4.md](slices/FX4.md)
 - [ ] **FX5. The statuses' list, New tier, Data's check and the draft step** (Data + Editor, about 210 lines) →
   [slices/FX5.md](slices/FX5.md)

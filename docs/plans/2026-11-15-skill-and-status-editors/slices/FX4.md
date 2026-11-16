@@ -54,3 +54,7 @@ Data's (FX5's problem line).
 
 ## Verify by hand
 None: the page comes in FX6.
+- **Done, with deviations:** `ChangeableStats` was already public (no Core change); `SectionRowProblem` moved from
+  `Skills/` to `Catalogs/` for its third user. Unnumbered: `New` is a harmful 1 HP tick at the turn's end. Size: Editor
+  366 lines with doc comments (`StatusPartRow` 130, `StatusViewModel` 214, `DamageTypeChoice` 22: the review's none
+  entry, so a typeless tick can be chosen back, decision 803); tests 472 (36 tests).

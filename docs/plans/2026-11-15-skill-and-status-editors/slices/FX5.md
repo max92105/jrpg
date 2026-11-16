@@ -53,3 +53,6 @@ rebinds the catalog, so every skill and item granting an edited status holds the
 
 ## Verify by hand
 None: the page comes in FX6.
+- **Note from FX4:** `StatusViewModel.DuplicateOf(chosen, nextId, takenIds)` copies the boxes and part rows as
+  typed; Duplicate passes "", New tier then sets the copy's `FamilyText` to the chosen one's key (its `FamilyText`, else
+  its typed `Id`). `From(status, skills)` takes the draft's skills for the Used by line.

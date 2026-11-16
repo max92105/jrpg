@@ -128,7 +128,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 ### Phase 2: effects and statuses
 - [x] **FX1. Everything naming an edited effect or status follows it: `CatalogReferences`, Data's checks and the draft
   step** (Data + Editor, about 220 lines) → [slices/FX1.md](slices/FX1.md)
-- [ ] **FX2. Database > Effects...: the tier ids, the rules and the page** (Editor + script, about 290 lines) →
+- [x] **FX2. Database > Effects...: the tier ids, the rules and the page** (Editor + script, about 290 lines) →
   [slices/FX2.md](slices/FX2.md)
 - [ ] **FX4. A status as typed: its fields and parts** (Editor, perhaps one Core accessibility word, about 220
   lines) → [slices/FX4.md](slices/FX4.md)

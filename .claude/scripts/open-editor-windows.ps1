@@ -21,7 +21,8 @@ param(
     [string]$Out = (Join-Path $env:TEMP 'jrpg-editor-windows'),
     [string[]]$Windows = @(
         'Database>Quests...', 'Database>Shops...', 'Database>Drop tables...', 'Database>Effect strips...',
-        'Database>Skills...', 'Database>Cinematics...', 'Database>Enemies...', 'NPCs>Character sprites...',
+        'Database>Skills...', 'Database>Effects...', 'Database>Cinematics...', 'Database>Enemies...',
+        'NPCs>Character sprites...',
         'Map>Settings...',
         'Help>Raise a test error'),
     [switch]$EventWindows,

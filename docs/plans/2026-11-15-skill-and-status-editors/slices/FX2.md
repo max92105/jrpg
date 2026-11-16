@@ -89,3 +89,11 @@ problem line (an effect's own, in list order, then Data's, skills included); OK 
   in Core; tests about 520 (Editor 42 tests, Core 3). The problem line is `RecordListProblem`'s, as on every page: an
   effect's own, in list order, then Data's (the Goal said the chosen one's first; reworded here and in FX5.md).
   Duplicate on an added effect whose id is still empty gives the copy an empty id rather than `_1`.
+- **Done (FX2b, the page):** `Effects/TieredEffectCatalogPage` by the page recipe (the list left with each effect's id
+  and kind, Add, Duplicate, Remove; Id, Kind, Damage type greyed for a heal, Per Power, the amount line and the Used by
+  line right; typed boxes `PropertyChanged`); `MainViewModel.TieredEffectEditing` and its constructor line
+  (`MainViewModel.cs` 287 lines); the "Effects" opener in `MainWindow.Database`; "Effects..." after "Skills..." in
+  `DatabaseMenu.xaml` with the slice's tooltip; `'Database>Effects...'` in the smoke script's default list; the map's
+  Effects row names the page. No binding names the page type: every box binds the chosen effect's own view model.
+  Size: about 60 XAML lines and 30 of wiring and code-behind. The smoke script: every entry opened, no `ERROR` or
+  binding-error line.

@@ -4,6 +4,7 @@ using System.Windows.Media.Imaging;
 using Jrpg.Data.Art;
 using Jrpg.Editor.Battle;
 using Jrpg.Editor.Cinematics;
+using Jrpg.Editor.Effects;
 using Jrpg.Editor.Loot;
 using Jrpg.Editor.Quests;
 using Jrpg.Editor.Skills;
@@ -27,6 +28,7 @@ internal sealed partial class MainWindow
         ["Drop tables"] = () => _ = EditDropTables(this, ""),
         ["Effect strips"] = OpenEffectStrips,
         ["Skills"] = OpenSkills,
+        ["Effects"] = OpenTieredEffects,
         ["Cinematics"] = OpenCinematics,
         ["Enemies"] = OpenEnemies,
     };
@@ -162,6 +164,16 @@ internal sealed partial class MainWindow
         }
 
         OpenInDialog("Skills", skillEditing.Start, skillEditing.Apply, edited => new SkillCatalogPage(edited));
+    }
+
+    private void OpenTieredEffects()
+    {
+        if (_viewModel.TieredEffectEditing is not { } effectEditing)
+        {
+            return;
+        }
+
+        OpenInDialog("Effects", effectEditing.Start, effectEditing.Apply, edited => new TieredEffectCatalogPage(edited));
     }
 
     // The sprite records (decision 569); the page's Import... copies images through the view model, whose import event

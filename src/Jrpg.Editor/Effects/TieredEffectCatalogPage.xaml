@@ -1,0 +1,65 @@
+<UserControl x:Class="Jrpg.Editor.Effects.TieredEffectCatalogPage"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <UserControl.Resources>
+    <Style x:Key="FieldLabel" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+      <Setter Property="Width" Value="90" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+  </UserControl.Resources>
+  <DockPanel>
+    <!-- The draft's effects in id order, the ones added this session after them; only those can be removed. -->
+    <DockPanel DockPanel.Dock="Left" Width="220">
+      <TextBlock DockPanel.Dock="Top" Text="Effects" FontWeight="Bold" />
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
+        <Button Content="Add" Width="50" Command="{Binding AddEffectCommand}" ToolTip="A damage effect, last in the list, its id to type" />
+        <Button Content="Duplicate" Width="70" Margin="4,0,0,0" Command="{Binding DuplicateEffectCommand}" ToolTip="A copy of the chosen effect after it, its id the next tier (fire_2 after fire_1), still editable" />
+        <Button Content="Remove" Width="60" Margin="4,0,0,0" Command="{Binding RemoveEffectCommand}" ToolTip="Only an effect added this session; skills and items name a saved one" />
+      </StackPanel>
+      <ListBox ItemsSource="{Binding Effects}" SelectedItem="{Binding SelectedEffect}" Margin="0,4,0,0">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="{Binding Id}" />
+              <TextBlock Text="{Binding Kind}" Foreground="{StaticResource MutedTextBrush}" Margin="6,0,0,0" />
+            </StackPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+
+    <!-- The chosen effect's boxes, then who names it and what it deals; both lines are read-only. -->
+    <ScrollViewer Margin="12,0,0,0" VerticalScrollBarVisibility="Auto">
+      <StackPanel DataContext="{Binding SelectedEffect}" Style="{StaticResource EnabledWhenChosen}">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="Id" Style="{StaticResource FieldLabel}" />
+          <TextBox Width="240"
+                   Text="{Binding IdText, UpdateSourceTrigger=PropertyChanged}"
+                   IsEnabled="{Binding IsNew}"
+                   ToolTip="Lowercase letters, digits and _, its tier last (fire_1); fixed once saved, since skills and items name it" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Kind" Style="{StaticResource FieldLabel}" />
+          <ComboBox Width="160" ItemsSource="{Binding Kinds}" SelectedItem="{Binding Kind}" ToolTip="A damage or a heal" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Damage type" Style="{StaticResource FieldLabel}" />
+          <ComboBox Width="160"
+                    ItemsSource="{Binding DamageTypes}"
+                    SelectedItem="{Binding DamageType}"
+                    IsEnabled="{Binding CanTypeDamageType}"
+                    ToolTip="What the target's resistance meets; a damage's only" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Per Power" Style="{StaticResource FieldLabel}" />
+          <TextBox Width="60"
+                   Text="{Binding PerPowerText, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="What each point of the user's Power gives, from 1" />
+        </StackPanel>
+        <TextBlock Text="{Binding AmountText}" Foreground="{StaticResource MutedTextBrush}" Margin="90,2,0,0" />
+        <TextBlock Text="{Binding UsedByText}" TextWrapping="Wrap" Margin="0,12,0,0" />
+      </StackPanel>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

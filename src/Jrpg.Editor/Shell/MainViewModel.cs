@@ -11,6 +11,7 @@ using Jrpg.Data.Content;
 using Jrpg.Editor.Battle;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Cinematics;
+using Jrpg.Editor.Effects;
 using Jrpg.Editor.Events;
 using Jrpg.Editor.Loot;
 using Jrpg.Editor.Maps;
@@ -101,6 +102,7 @@ internal sealed partial class MainViewModel : ObservableObject
             FieldSpriteEditing = CreateFieldSpriteEditing();
             EffectStripEditing = CreateEffectStripEditing();
             SkillEditing = new SkillEditingViewModel(Content, ReadSkillChoices);
+            TieredEffectEditing = new TieredEffectEditingViewModel(Content);
             NpcSpriteChange = new NpcSpriteChange(Content, Placing.Browser);
             if (MapIds.Count > 0)
             {

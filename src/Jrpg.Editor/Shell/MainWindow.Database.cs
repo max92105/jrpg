@@ -15,7 +15,7 @@ namespace Jrpg.Editor.Shell;
 /// <summary>
 /// The Database menu's dispatch: an entry's title runs its opener (decision 938), which edits its catalog of the draft
 /// at the main window's size (decision 930); OK applies the whole session as one undo step (ADR 0045, decision 591).
-/// Quests... and Shops... open a page in the catalog dialog; Drop tables..., Effect strips..., Enemies... and
+/// Quests..., Shops... and Drop tables... open a page in the catalog dialog; Effect strips..., Enemies... and
 /// Cinematics... still open their own windows.
 /// </summary>
 internal sealed partial class MainWindow
@@ -77,8 +77,8 @@ internal sealed partial class MainWindow
         }
     }
 
-    // The Drop tables window over the owner, on the chosen table; its OK applies its own undo step at once, so a window
-    // under it can take the new tables (decision 602). Returns whether it applied.
+    // The Drop tables page in the catalog dialog over the owner, on the chosen table; its OK applies its own undo step
+    // at once, so a window under it can take the new tables (decision 602). Returns whether it applied.
     private bool EditDropTables(Window owner, string chosenTableId)
     {
         if (_viewModel.DropTableEditing is not { } dropTableEditing)
@@ -87,10 +87,10 @@ internal sealed partial class MainWindow
         }
 
         var edited = dropTableEditing.Start();
-        edited.ChooseTable(chosenTableId);
-        var window = new DropTableCatalogWindow(edited) { Owner = owner };
-        DialogBounds.FitTo(window, owner);
-        if (window.ShowDialog() != true)
+        edited.Choose(chosenTableId);
+        var dialog = new CatalogDialog("Drop tables", new DropTableCatalogPage(edited), edited) { Owner = owner };
+        DialogBounds.FitTo(dialog, this);
+        if (dialog.ShowDialog() != true)
         {
             return false;
         }

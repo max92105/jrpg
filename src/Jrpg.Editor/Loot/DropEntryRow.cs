@@ -5,9 +5,9 @@ using Jrpg.Editor.Catalogs;
 namespace Jrpg.Editor.Loot;
 
 /// <summary>
-/// One drop entry as the Drop tables window edits it (decision 597): its item, fixed once added, and its chance and
+/// One drop entry as the Drop tables page edits it (decision 597): its item, fixed once added, and its chance and
 /// quantity boxes kept as typed. <see cref="Problem"/> is only a box that isn't a whole number; the ranges are Data's
-/// rules, shown by the window's problem line.
+/// rules, shown by the page host's problem line.
 /// </summary>
 internal sealed partial class DropEntryRow : ObservableObject
 {

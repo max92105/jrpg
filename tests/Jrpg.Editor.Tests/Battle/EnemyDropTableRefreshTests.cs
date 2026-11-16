@@ -7,7 +7,7 @@ using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Tests.Battle;
 
-// The Enemies window after a Drop tables window opened from it applied (decision 602): new tables are offered in place,
+// The Enemies window after a Drop tables page opened from it applied (decision 602): new tables are offered in place,
 // no enemy's choice changes, and the problem line checks against the new tables.
 public sealed class EnemyDropTableRefreshTests
 {

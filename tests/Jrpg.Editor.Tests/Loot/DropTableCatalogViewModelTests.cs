@@ -7,7 +7,7 @@ using Jrpg.Editor.Loot;
 
 namespace Jrpg.Editor.Tests.Loot;
 
-// The Drop tables window's list (ADR 0045): tables in id order, only a new table removable (decision 607), the item box
+// The Drop tables page's list (ADR 0045): tables in id order, only a new table removable (decision 607), the item box
 // by name, "Rolled by" from the draft's enemies (decision 603), and the problem line ending with Data's message.
 public sealed class DropTableCatalogViewModelTests
 {
@@ -148,7 +148,6 @@ public sealed class DropTableCatalogViewModelTests
         catalog.Tables[0].Entries[0].ChanceText = "35";
 
         Assert.Contains(nameof(DropTableCatalogViewModel.Problem), notified);
-        Assert.Contains(nameof(DropTableCatalogViewModel.CanApply), notified);
     }
 
     // Typing an id raises the table's Id, Label and Problem notices: only the Id is relayed.
@@ -181,18 +180,17 @@ public sealed class DropTableCatalogViewModelTests
     }
 
     [Fact]
-    public void CanApply_ProblemShown_IsFalse()
+    public void ToTables_ProblemShown_Throws()
     {
         var catalog = new DropTableCatalogViewModel(WithTables(_wolfDrops));
 
         catalog.Tables[0].Entries[0].ChanceText = "";
 
-        Assert.False(catalog.CanApply);
         Assert.Throws<InvalidOperationException>(catalog.ToTables);
     }
 
     [Fact]
-    public void CanApply_NewTableWithOneEntry_IsTrue()
+    public void ToTables_NewTableWithOneEntry_ListsIt()
     {
         var catalog = new DropTableCatalogViewModel(WithTables(_wolfDrops));
         catalog.AddTableCommand.Execute(null);
@@ -202,27 +200,27 @@ public sealed class DropTableCatalogViewModelTests
 
         table.AddEntryCommand.Execute(null);
 
-        Assert.True(catalog.CanApply);
+        Assert.Null(catalog.Problem);
         Assert.Equal(new DropTable("slime_drops", [new DropEntry("potion", 10)]), catalog.ToTables()[^1]);
     }
 
     [Fact]
-    public void ChooseTable_KnownId_ChoosesIt()
+    public void Choose_KnownId_ChoosesIt()
     {
         var catalog = new DropTableCatalogViewModel(WithTables(_spare, _wolfDrops));
 
-        catalog.ChooseTable("wolf_drops");
+        catalog.Choose("wolf_drops");
 
         Assert.Equal("wolf_drops", catalog.SelectedTable!.Id);
     }
 
-    // An enemy with no table passes "": the window opens on its first table, as from the menu.
+    // An enemy with no table passes "": the page opens on its first table, as from the menu.
     [Fact]
-    public void ChooseTable_EmptyId_KeepsTheFirst()
+    public void Choose_EmptyId_KeepsTheFirst()
     {
         var catalog = new DropTableCatalogViewModel(WithTables(_spare, _wolfDrops));
 
-        catalog.ChooseTable("");
+        catalog.Choose("");
 
         Assert.Equal("spare", catalog.SelectedTable!.Id);
     }

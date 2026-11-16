@@ -11,7 +11,7 @@ using Jrpg.Editor.Objects;
 namespace Jrpg.Editor.Loot;
 
 /// <summary>
-/// One drop table as the Drop tables window edits it (ADR 0045): its id (typed while the table is new, fixed once the
+/// One drop table as the Drop tables page edits it (ADR 0045): its id (typed while the table is new, fixed once the
 /// draft holds it, decision 582) and its entry rows in the roll's order, numbered from 0 as Data numbers them, added
 /// after the chosen one from the item box, removed and moved. <see cref="Problem"/> is the typed id's or a row's box
 /// that isn't a number; the rest is Data's, shown by the list. <see cref="EntriesChanged"/> tells the list of each

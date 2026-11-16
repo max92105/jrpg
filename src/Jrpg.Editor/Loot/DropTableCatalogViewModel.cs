@@ -7,16 +7,17 @@ using Jrpg.Core.Loot;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Events;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Loot;
 
 /// <summary>
-/// Every drop table as the Drop tables window edits it (ADR 0045): the draft's tables in id order, the ones added this
+/// Every drop table as the Drop tables page edits it (ADR 0045): the draft's tables in id order, the ones added this
 /// session after them; only an added one can be removed (decisions 581, 607); the entry box offers every item by name;
 /// <see cref="RolledBy"/> says which enemies share the chosen table (decision 603). <see cref="Problem"/> is a table's
-/// own problem first, then Data's message for the whole list (decision 580).
+/// own problem first, then Data's message for the whole list (decision 580). A table is chosen by its id.
 /// </summary>
-internal sealed partial class DropTableCatalogViewModel : ObservableObject
+internal sealed partial class DropTableCatalogViewModel : ObservableObject, IEditedCatalog
 {
     private readonly ContentCatalog _content;
 
@@ -81,26 +82,19 @@ internal sealed partial class DropTableCatalogViewModel : ObservableObject
         RecordListProblem.FirstOf(Tables, table => table.Id, table => table.Problem, "Drop table")
         ?? CatalogProblems.OfDropTables([.. Tables.Select(table => table.ToTable())], _content);
 
-    /// <summary>Whether OK may apply the session: no problem shows.</summary>
-    public bool CanApply => Problem is null;
+    public string? ChosenKey => SelectedTable?.Id;
 
     /// <exception cref="InvalidOperationException">
-    /// There is a <see cref="Problem"/>; the window applies only without one.
+    /// There is a <see cref="Problem"/>; the page's host applies only without one.
     /// </exception>
     public IReadOnlyList<DropTable> ToTables() =>
         Problem is { } problem ? throw new InvalidOperationException(problem) : [.. Tables.Select(table => table.ToTable())];
 
     /// <summary>
-    /// Chooses the table with that id, the enemy's when the window opens from the Enemies window's Edit...; the first
-    /// stays chosen when no table has it (an enemy with none passes "").
+    /// The enemy's table when the page opens from the Enemies window's Edit...; an enemy with none passes "", which
+    /// keeps the first chosen.
     /// </summary>
-    public void ChooseTable(string id)
-    {
-        if (Tables.FirstOrDefault(table => table.Id == id) is { } table)
-        {
-            SelectedTable = table;
-        }
-    }
+    public void Choose(string key) => SelectedTable = Tables.FirstOrDefault(table => table.Id == key) ?? SelectedTable;
 
     /// <summary>Adds a table with nothing typed yet, last, and chooses it, so its id is the next thing typed.</summary>
     [RelayCommand]
@@ -143,10 +137,5 @@ internal sealed partial class DropTableCatalogViewModel : ObservableObject
 
     private void OnTableEntriesChanged(object? sender, EventArgs e) => RaiseProblemChanged();
 
-    // The problem line and OK's state read the same thing.
-    private void RaiseProblemChanged()
-    {
-        OnPropertyChanged(nameof(Problem));
-        OnPropertyChanged(nameof(CanApply));
-    }
+    private void RaiseProblemChanged() => OnPropertyChanged(nameof(Problem));
 }

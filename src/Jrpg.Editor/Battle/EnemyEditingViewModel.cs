@@ -20,7 +20,7 @@ internal sealed class EnemyEditingViewModel(CatalogDraft catalog, Func<string, I
     public void Apply(EnemyCatalogViewModel edited) => catalog.SetEnemies(edited.ToEnemies());
 
     /// <summary>
-    /// After a Drop tables window opened over the Enemies window applied its own step (decision 602): the window's Drop
+    /// After a Drop tables page opened over the Enemies window applied its own step (decision 602): the window's Drop
     /// table box and problem line take the draft's tables.
     /// </summary>
     public void RefreshDropTables(EnemyCatalogViewModel edited) => edited.TakeDropTables(catalog.Current);

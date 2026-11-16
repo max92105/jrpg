@@ -5,7 +5,7 @@ using Jrpg.Editor.Loot;
 
 namespace Jrpg.Editor.Tests.Loot;
 
-// The Drop tables window starts from the draft and its whole session is one undo step (decision 591).
+// The Drop tables page starts from the draft and its whole session is one undo step (decision 591).
 public sealed class DropTableEditingViewModelTests
 {
     private readonly CatalogDraft _draft = new(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")));

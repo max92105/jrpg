@@ -92,11 +92,11 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject
     }
 
     /// <summary>
-    /// After a Drop tables window opened from this one applied its step (decision 602): the box offers every table the
+    /// After a Drop tables page opened from this one applied its step (decision 602): the box offers every table the
     /// draft now holds, each new one inserted at its place in id order so no enemy's box loses its choice, and the
     /// problem line checks the enemies against them.
     /// </summary>
-    /// <param name="current">The draft as the Drop tables window left it.</param>
+    /// <param name="current">The draft as the Drop tables page left it.</param>
     public void TakeDropTables(ContentCatalog current)
     {
         _content = current;

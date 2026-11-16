@@ -29,3 +29,6 @@ stays at 254).
 Agents may run it. The script: "Database>Drop tables...: opened". In the editor: Enemies, an enemy with a table,
 Edit...: the Drop tables dialog on that table over the Enemies window; add a table, OK: the Enemies window's box offers
 it; Cancel the Enemies window: the table stays (its own step), Ctrl+Z takes it back.
+- **Done, with deviations:** `CanApply` removed (the window was its only reader): its two tests renamed
+  `ToTables_ProblemShown_Throws` and `ToTables_NewTableWithOneEntry_ListsIt`, a third's `CanApply` assert dropped, so
+  the base test file is 252 lines; the Battle folder's, its test's and the map's Battle row's "window" say "page".

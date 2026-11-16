@@ -34,8 +34,8 @@ internal sealed partial class EnemyCatalogWindow : Window
     /// <param name="enemies">The window's state.</param>
     /// <param name="art">What the Art tab imports with, reads the battle sprite from and plays its loop on.</param>
     /// <param name="editDropTables">
-    /// Opens the Drop tables window over the given window on the given table id, and takes the draft's tables back when
-    /// its OK applied (decision 602).
+    /// Opens the Drop tables page in a dialog over the given window on the given table id, and takes the draft's tables
+    /// back when its OK applied (decision 602).
     /// </param>
     public EnemyCatalogWindow(
         EnemyCatalogViewModel enemies,

@@ -27,9 +27,6 @@ internal sealed partial class MainViewModel
 
     public DropTableEditingViewModel? DropTableEditing { get; }
 
-    /// <summary>Whether Database > Drop tables... can open its window: false while the content didn't load.</summary>
-    public bool HasDropTableEditing => DropTableEditing is not null;
-
     public CinematicEditingViewModel? CinematicEditing { get; }
 
     /// <summary>Whether Database > Cinematics... can open its window: false while the content didn't load.</summary>

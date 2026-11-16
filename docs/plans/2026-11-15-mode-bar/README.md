@@ -94,7 +94,7 @@ page recipe: [page-recipe.md](page-recipe.md).
 
 ### Stage 2: the six windows as pages (right after stage 1)
 - [x] **WD3. The Quests page** (Editor, about 130 lines) → [slices/WD3.md](slices/WD3.md)
-- [ ] **WD4. The Drop tables page; the Enemies window's Edit... opens it in a dialog** (Editor, about 130 lines) →
+- [x] **WD4. The Drop tables page; the Enemies window's Edit... opens it in a dialog** (Editor, about 130 lines) →
   [slices/WD4.md](slices/WD4.md)
 - [ ] **WD5. The Enemies page** (Editor, about 150 lines) → [slices/WD5.md](slices/WD5.md)
 - [ ] **WD6. The Effect strips page** (Editor, about 130 lines) → [slices/WD6.md](slices/WD6.md)

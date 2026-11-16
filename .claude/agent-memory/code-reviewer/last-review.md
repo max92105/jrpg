@@ -5,17 +5,16 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-enemy-behavior, slice EB7 (Battle/EnemyTacticsView, the Enemies page's Tactics tab, Database menu
-tooltip, map row). 2026-11-16. Round 1.
+Plan 2026-11-15-enemy-behavior, slice EB8 (priority rules: EnemyAction.IsPriority, EnemyTactics.Pick, the
+AbsentWhenFalseFilter row, TacticRuleRow/TacticListViewModel/EnemyTacticsView check box). 2026-11-16. Round 1.
 Verdict: Ready to commit (no Critical, no Warning).
 
-- Suggestion (open, optional): docs/map.md Battle row: the EnemyTacticsView clause is spliced inside EnemyCatalogPage's
-  parenthesis, so "the battle sprite previewed..." now reads as part of the Tactics tab; give EnemyTacticsView its own
-  entry after EnemyCatalogPage's.
-- Follow-up: EnemyCatalogViewModelTests still at 299 lines; the next test there needs a split.
-- Follow-up: BooleanToVisibilityConverter "VisibleWhenTrue" declared locally in 10 views; one key in EditorTheme.
-- Fixed: DatabaseMenu.xaml Enemies tooltip (EB6 follow-up) reworded in this slice.
-- Checked, no finding: every binding path matches TacticListViewModel/TacticRuleRow/EnemyTacticsViewModel/
-  EnemyCatalogViewModel (choices are records, Of returns entries of All); rules rows hold no boxes, so no RowFocus;
-  no local Style, page styles via DynamicResource; probe showed SelectedList.Rules/SelectedList.SelectedRule keeps each
-  list's chosen rule across list switches (no null write-back).
+- Suggestion (open, optional): EnemyTacticsView.xaml Priority tooltip says "While its When holds"; eligibility also
+  needs a usable skill and, with On, someone to aim at; "While it can be chosen" or "While its When holds and it can
+  act".
+- Follow-up: TacticRuleRowTests.cs now 280 lines; the next tests there (EB9/EB10 flags) need a split.
+- Fixed: EB7's map.md suggestion (EnemyTacticsView has its own entry after EnemyCatalogPage's).
+- Dropped (in backlog.md): EnemyCatalogViewModelTests at 299 lines; VisibleWhenTrue converter in 10 views.
+- Checked, no finding: only TacticRuleRow builds EnemyAction in src (no field-by-field copy loses IsPriority); every
+  Core test's FixedSequenceRandom runs out on an unwanted draw (phase test: the start list's priority strike would
+  draw for a single target); record equality covers IsPriority for the Ctrl+Z hand check.

@@ -102,7 +102,7 @@ slices run; IU5 is optional and IU16 merged into IU15.
   lines plus the two relaid files) → [slices/IU1.md](slices/IU1.md)
 
 ### Phase 2: uniques in the game
-- [ ] ADR 0058, unique items as records with fixed affixes (amends ADR 0029). Write it from the README's decisions
+- [x] ADR 0058, unique items as records with fixed affixes (amends ADR 0029). Write it from the README's decisions
   864-872 and 875, recording decisions 681, 866 and 875 as defaults to confirm (the options in design.md, section 4); no
   question is asked.
 - [ ] **IU2. A unique item gives its own piece everywhere: dropped, stocked, given, restored** (Core, about 230 lines)

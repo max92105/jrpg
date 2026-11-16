@@ -3,6 +3,9 @@
 Status: accepted
 Date: 2026-10-28
 
+Amended by ADR 0058: Unique is no longer reserved; a unique is its own item record with fixed affixes, its piece built
+from that record wherever it comes from, a save included, with no save format change.
+
 ## Context
 Gear is a catalog record today: `Items/ItemDefinition` holds a weapon's damage and an item's fixed bonuses, the
 inventory stacks gear by id like potions, and members wear `ItemDefinition`s by slot (ADR 0028). The loot plan rolls a

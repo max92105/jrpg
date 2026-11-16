@@ -4,6 +4,7 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
+using Jrpg.Core.Statuses;
 using Jrpg.Core.Tests.Builders;
 using Jrpg.Core.Tests.Randomness;
 
@@ -114,6 +115,57 @@ public sealed class BattleStatusListTests
         battle.Execute(new SkillCommand(taunt, [chief]));
 
         Assert.True(chief.Statuses.Has(TestStatuses.TauntId));
+    }
+
+    // Decision 800's named change: Burning and Poison are two families, so on one goblin both tick at the end of its
+    // turn (one Poison refreshed the other before records).
+    [Fact]
+    public void Execute_BurningThenPoison_BothTickAtTheEnd()
+    {
+        var burning = new StatusDefinition
+        {
+            Id = "burning_1",
+            Name = "Burning",
+            Description = "",
+            Family = "burning",
+            Parts = [new StatusPart(StatusPartKind.DamageEachTurn, 5)],
+        };
+        var blaze = Skill("blaze", new Effect(EffectKind.GrantStatus, 0, Targeting.SingleEnemy)
+        {
+            Statuses = [new StatusGrant(burning, Turns: 2), TestStatuses.Poison(8, 3)],
+        });
+        var (goblin, battle) = HeroFirstAgainstGoblin(blaze);
+        battle.Execute(new SkillCommand(blaze, [goblin]));
+
+        var events = battle.Execute(new DefendCommand());
+
+        Assert.Equal(
+            [("burning_1", 5), (TestStatuses.PoisonId, 8)],
+            events.OfType<StatusTicked>().Select(ticked => (TestStatuses.IdOf(ticked.Status), ticked.Amount)));
+    }
+
+    // Decision 800: Exposed 50 then Exposed 20 is one Exposed keeping 50, never 70; the goblin defends in between.
+    [Fact]
+    public void Execute_ExposedFiftyThenTwenty_KeepsFifty()
+    {
+        var hex = new Effect(EffectKind.GrantStatus, 0, Targeting.SingleEnemy);
+        var expose = Skill("expose", TestStatuses.Granting(hex, TestStatuses.Exposed(50, 3)));
+        var bolt = Skill("bolt", TestStatuses.Granting(hex, TestStatuses.Exposed(20, 2)));
+        var (goblin, battle) = HeroFirstAgainstGoblin(expose, bolt);
+        battle.Execute(new SkillCommand(expose, [goblin]));
+        battle.Execute(new DefendCommand());
+
+        battle.Execute(new SkillCommand(bolt, [goblin]));
+
+        Assert.Equal(50, TestStatuses.AmountOf(Assert.Single(goblin.Statuses.Active)));
+    }
+
+    // The shuffle (1) puts the hero first.
+    private static (Combatant Goblin, BattleState Battle) HeroFirstAgainstGoblin(params SkillDefinition[] skills)
+    {
+        var goblin = Combatant.FromEnemy(new EnemyDefinitionBuilder().WithStats(maxHp: 100, damage: 20).Build());
+        var hero = Combatant.FromPartyMember(new PartyMemberBuilder().WithSkills(skills).Build());
+        return (goblin, new BattleState([hero, goblin], new Inventory(), new FixedSequenceRandom(1)));
     }
 
     // The shuffle (1) puts the hero first; the next draw is the poison's roll.

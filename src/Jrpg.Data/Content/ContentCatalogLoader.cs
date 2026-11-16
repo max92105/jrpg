@@ -57,14 +57,15 @@ public static class ContentCatalogLoader
     /// <exception cref="ContentValidationException">A file is malformed or breaks a content rule.</exception>
     public static ContentCatalog Load(string contentRoot)
     {
-        var statuses = ReadValidated<IReadOnlyList<StatusDefinition>>(contentRoot, StatusesFile, StatusCatalogValidator.Validate);
-
-        // Read before the skills and items: a skill's or an item's effect names a tiered effect by id, resolved as it
-        // is read (decision 789).
+        // Read before the skills and items: a skill's or an item's effect names a tiered effect and its grants name
+        // statuses, each by id, resolved as it is read (decision 789).
+        var statuses = ReadValidated<IReadOnlyList<StatusDefinition>>(contentRoot, StatusesFile, StatusCatalogValidator.Validate)
+            .ToFrozenDictionary(status => status.Id);
         var tieredEffects = ReadValidated<IReadOnlyList<TieredEffect>>(contentRoot, EffectsFile, EffectCatalogValidator.Validate)
             .ToFrozenDictionary(effect => effect.Id);
         var effectReferenceOptions = ContentJsonOptions.StrictWith(
-            new CatalogReferenceConverter<TieredEffect>(tieredEffects, effect => effect.Id, "effect"));
+            new CatalogReferenceConverter<TieredEffect>(tieredEffects, effect => effect.Id, "effect"),
+            new CatalogReferenceConverter<StatusDefinition>(statuses, status => status.Id, "status"));
         var skills = ReadValidated<IReadOnlyList<SkillDefinition>>(
             contentRoot, SkillsFile, effectReferenceOptions, SkillCatalogValidator.Validate);
         var skillsById = skills.ToFrozenDictionary(skill => skill.Id);
@@ -152,7 +153,7 @@ public static class ContentCatalogLoader
             FieldSprites = fieldSpritesByFile,
             EffectStrips = effectStrips.ToFrozenDictionary(strip => strip.File, StringComparer.Ordinal),
             TieredEffects = tieredEffects,
-            Statuses = statuses.ToFrozenDictionary(status => status.Id),
+            Statuses = statuses,
             Cinematics = cinematics.ToFrozenDictionary(cinematic => cinematic.Id),
         };
     }

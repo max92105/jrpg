@@ -141,12 +141,12 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceR
     {
         if (!rolls.Succeeds(GrantScaling.ChancePermille(grant, target.CurrentStats.CrowdControlResistancePermille)))
         {
-            events.Add(new StatusResisted(target, grant.Kind));
+            events.Add(new StatusResisted(target, grant.Status));
             return;
         }
 
         target.Statuses.Apply(grant);
-        events.Add(new StatusApplied(target, grant.Kind, grant.Turns));
+        events.Add(new StatusApplied(target, grant.Status, grant.Turns));
     }
 
     // Only damage rolls (decision 325): a heal, a revive or a status alone never misses.

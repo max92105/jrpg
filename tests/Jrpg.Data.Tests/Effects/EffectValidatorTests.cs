@@ -8,13 +8,17 @@ namespace Jrpg.Data.Tests.Effects;
 public sealed class EffectValidatorTests
 {
     private static readonly TieredEffect _fire1 = new("fire_1", EffectKind.Damage, 2) { DamageType = DamageType.Fire };
+    private static readonly StatusDefinition _poison = Record("poison", StatusPartKind.DamageEachTurn, 5);
+    private static readonly StatusDefinition _exposed = Record("exposed", StatusPartKind.DamageTakenChange, 20);
+    private static readonly StatusDefinition _guard = Record("guard", StatusPartKind.ResistanceChange, 5);
+    private static readonly StatusDefinition _stun = Record("stun", StatusPartKind.SkipTurn, 0);
 
     public static TheoryData<Effect, string> InvalidTieredEffects => new()
     {
         {
             new Effect(EffectKind.GrantStatus, 0, Targeting.SingleEnemy)
             {
-                Statuses = [new StatusGrant(StatusKind.Poison, 5, 2)],
+                Statuses = [new StatusGrant(_poison, 2)],
                 Tier = _fire1,
             },
             "effect.tier is only for a damage or restoreHp effect (was fire_1 on grantStatus)."
@@ -42,13 +46,13 @@ public sealed class EffectValidatorTests
 
     public static TheoryData<StatusGrant[], string> InvalidStatusLists => new()
     {
-        { [new StatusGrant(StatusKind.Poison, 5, 2), null!], "effect.statuses must not contain a null entry." },
+        { [new StatusGrant(_poison, 2), null!], "effect.statuses must not contain a null entry." },
         {
-            [new StatusGrant(StatusKind.Poison, 5, 2), new StatusGrant(StatusKind.Poison, 8, 3)],
+            [new StatusGrant(_poison, 2), new StatusGrant(_poison, 3)],
             "effect.statuses lists poison twice."
         },
         {
-            [new StatusGrant(StatusKind.Poison, 5, 2), new StatusGrant(StatusKind.Exposed, 20, 0)],
+            [new StatusGrant(_poison, 2), new StatusGrant(_exposed, 0)],
             "effect.statuses[1].turns must be at least 1 (was 0)."
         },
     };
@@ -67,7 +71,7 @@ public sealed class EffectValidatorTests
     {
         var hex = new Effect(EffectKind.GrantStatus, 0, Targeting.SingleEnemy)
         {
-            Statuses = [new StatusGrant(StatusKind.Exposed, 20, 2), new StatusGrant(StatusKind.Poison, 5, 2)],
+            Statuses = [new StatusGrant(_exposed, 2), new StatusGrant(_poison, 2)],
         };
 
         Assert.Null(EffectValidator.FindProblem(hex));
@@ -112,7 +116,7 @@ public sealed class EffectValidatorTests
     {
         var bash = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, DamageType: DamageType.Blunt)
         {
-            Statuses = [new StatusGrant(StatusKind.Stun, Power: 0, Turns: 0)],
+            Statuses = [new StatusGrant(_stun, Turns: 0)],
         };
 
         var problem = EffectValidator.FindProblem(bash);
@@ -149,7 +153,7 @@ public sealed class EffectValidatorTests
     {
         var aura = new Effect(EffectKind.GrantStatus, 0, Targeting.AlliesInRange, Range: -1)
         {
-            Statuses = [new StatusGrant(StatusKind.Guarded, 5, 3)],
+            Statuses = [new StatusGrant(_guard, 3)],
         };
 
         var problem = EffectValidator.FindProblem(aura);
@@ -190,7 +194,7 @@ public sealed class EffectValidatorTests
     {
         var bash = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, DamageType: DamageType.Blunt)
         {
-            Statuses = [new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1) { Chance = 60 }],
+            Statuses = [new StatusGrant(_stun, Turns: 1) { Chance = 60 }],
         };
 
         var problem = EffectValidator.FindProblem(bash);
@@ -201,6 +205,9 @@ public sealed class EffectValidatorTests
     private static Effect BashWithChance(int chance) =>
         new(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, DamageType: DamageType.Blunt)
         {
-            Statuses = [new StatusGrant(StatusKind.Stun, Power: 0, Turns: 1) { Chance = chance }],
+            Statuses = [new StatusGrant(_stun, Turns: 1) { Chance = chance }],
         };
+
+    private static StatusDefinition Record(string id, StatusPartKind kind, int amount) =>
+        new() { Id = id, Name = id, Description = "", Parts = [new StatusPart(kind, amount)] };
 }

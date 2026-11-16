@@ -86,7 +86,7 @@ internal static class EffectValidator
             : null;
     }
 
-    // The serializer lets a null list element through; one kind twice would refresh itself on landing (decision 809).
+    // The serializer lets a null list element through; one status twice would refresh itself on landing (decision 809).
     private static string? FindStatusesProblem(IReadOnlyList<StatusGrant> grants)
     {
         if (grants.Any(grant => grant is null))
@@ -94,10 +94,10 @@ internal static class EffectValidator
             return "effect.statuses must not contain a null entry.";
         }
 
-        var repeated = grants.GroupBy(grant => grant.Kind).FirstOrDefault(group => group.Count() > 1);
+        var repeated = grants.GroupBy(grant => grant.Status.Id).FirstOrDefault(group => group.Count() > 1);
         if (repeated is not null)
         {
-            return $"effect.statuses lists {ContentJsonOptions.EnumName(repeated.Key)} twice.";
+            return $"effect.statuses lists {repeated.Key} twice.";
         }
 
         return grants

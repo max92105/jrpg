@@ -46,10 +46,10 @@ internal static partial class UiTheme
     /// </summary>
     public static Color TurnEnemyHalf { get; } = Over(FromStraightArgb(0xCC8A1C24), TurnBackdrop);
 
-    /// <summary>The rim of a harmful status's mark (Stun, Exposed, Poison): warm red.</summary>
+    /// <summary>The rim of a harmful status's mark (Stun, Exposed, Poison, Burning): warm red.</summary>
     public static Color StatusHarmfulRim { get; } = FromStraightArgb(0xFFE0533D);
 
-    /// <summary>The rim of a helpful status's mark (Guarded, Regen, Taunt): cool blue.</summary>
+    /// <summary>The rim of a helpful status's mark (Guard, Regen, Taunt): cool blue.</summary>
     public static Color StatusHelpfulRim { get; } = FromStraightArgb(0xFF5B8CFF);
 
     /// <summary>The soft floor glow under each ally an aura being aimed would cover: cool blue, see-through.</summary>
@@ -67,7 +67,7 @@ internal static partial class UiTheme
     /// <summary>The floating number on a heal or revive: the bright end of <see cref="BattleHpBar"/>.</summary>
     public static Color FloatingHeal { get; } = FromStraightArgb(0xFF7FD39A);
 
-    /// <summary>The floating number on a Poison tick: purple, like the druid's Decay.</summary>
+    /// <summary>The floating number on a damage tick: purple, like the druid's Decay.</summary>
     public static Color FloatingPoison { get; } = FromStraightArgb(0xFFB27AD6);
 
     /// <summary>The floating number on a crit: red-gold (placeholder, decision 652).</summary>

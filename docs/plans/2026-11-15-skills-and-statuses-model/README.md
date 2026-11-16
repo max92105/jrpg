@@ -103,7 +103,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/R2.md](slices/R2.md)
 - [x] **MS. An effect grants several statuses** (Core + Data + content, about 200 lines) → [slices/MS.md](slices/MS.md)
 - [x] **CH. Every grant has a landing chance** (Core + Data + content, about 110 lines) → [slices/CH.md](slices/CH.md)
-- [ ] **SW. A grant names a status record; `StatusKind` goes** (Core + Data + Game + content, about 260 lines) →
+- [x] **SW. A grant names a status record; `StatusKind` goes** (Core + Data + Game + content, about 260 lines) →
   [slices/SW.md](slices/SW.md)
 
 ### Phase 3: the new status behaviors

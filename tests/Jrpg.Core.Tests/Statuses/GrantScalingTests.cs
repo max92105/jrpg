@@ -15,6 +15,18 @@ public sealed class GrantScalingTests
         Assert.Equal(12, TestStatuses.AmountOf(scaled));
     }
 
+    // Decision 799: every part's amount rises, a negative one too; each rounds toward zero, so -15 at 150 % is -22.
+    [Fact]
+    public void Scaled_PartAmounts_RaisedByStatusPermille()
+    {
+        var resistance = new StatusPart(StatusPartKind.ResistanceChange, 20);
+        var ward = new StatusGrant(Record("ward_1", resistance, new StatusPart(StatusPartKind.DamageTakenChange, -15)), Turns: 3);
+
+        var scaled = GrantScaling.Scaled(ward, statusPermille: 1500, extraTurns: 0);
+
+        Assert.Equal([30, -22], scaled.Status.Parts.Select(part => part.Amount));
+    }
+
     [Fact]
     public void Scaled_OneExtraTurn_AddsATurn()
     {
@@ -47,6 +59,15 @@ public sealed class GrantScalingTests
         Assert.Equal(500, GrantScaling.ChancePermille(TestStatuses.Stun(60, 1), crowdControlResistancePermille: 100));
     }
 
+    // Crowd control resistance reads the part, not the record's id (decision 801).
+    [Fact]
+    public void ChancePermille_SkipTurnRecord_SubtractsCrowdControlResistance()
+    {
+        var daze = new StatusGrant(Record("daze", new StatusPart(StatusPartKind.SkipTurn)), Turns: 1) { Chance = 60 };
+
+        Assert.Equal(500, GrantScaling.ChancePermille(daze, crowdControlResistancePermille: 100));
+    }
+
     [Fact]
     public void ChancePermille_StunBelowResistance_IsZero()
     {
@@ -65,4 +86,7 @@ public sealed class GrantScalingTests
     {
         Assert.Equal(1000, GrantScaling.ChancePermille(TestStatuses.Stun(120, 1), crowdControlResistancePermille: 0));
     }
+
+    private static StatusDefinition Record(string id, params StatusPart[] parts) =>
+        new() { Id = id, Name = id, Description = "", Parts = parts };
 }

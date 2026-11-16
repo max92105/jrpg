@@ -12,6 +12,6 @@ internal enum FloatingNumberTone
     /// <summary>HP restored or revived with, Regen included.</summary>
     Heal,
 
-    /// <summary>HP lost to Poison at the end of a turn.</summary>
+    /// <summary>HP lost to a status's damage tick, Poison's or any other, at the end of a turn.</summary>
     Poison,
 }

@@ -1,5 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
+using Jrpg.Core.Statuses;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Tests.Exploration;
 using Jrpg.Game.Ui;
@@ -108,6 +109,17 @@ public sealed class BattleSoundsTests
         Assert.Equal(
             [new TimedSound(UiSoundFiles.Battle.RegenTick, StartOf(PlaybackBeatKind.Tick))],
             SoundsOf(new StatusTicked(_goblin, TestStatuses.Regen, 5)));
+    }
+
+    // A tick sounds by its part, not its record's name (decision 810).
+    [Fact]
+    public void Of_HealTickOfAnyRecord_IsTheRegenTick()
+    {
+        var bloom = TestStatuses.Record("bloom_1", "Bloom", new StatusPart(StatusPartKind.HealEachTurn, 4));
+
+        Assert.Equal(
+            [new TimedSound(UiSoundFiles.Battle.RegenTick, StartOf(PlaybackBeatKind.Tick))],
+            SoundsOf(new StatusTicked(_goblin, bloom, 4)));
     }
 
     [Fact]

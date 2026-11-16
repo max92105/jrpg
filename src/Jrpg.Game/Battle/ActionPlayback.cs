@@ -12,7 +12,7 @@ namespace Jrpg.Game.Battle;
 /// the impact, each landed effect shows its amount and plays on its target, damage as the action's strip (its own or
 /// its attacker's, decision 678), anything else as a placeholder cue (decision 101), and a granted status shows its
 /// name, a miss "Miss" and a resisted status "Resisted"; whoever fell shows white, then fades on the defeat beat. A
-/// lost turn shows "Stunned" on its beat, Poison and Regen show the HP they took or restored on a tick beat, and an
+/// lost turn shows "Stunned" on its beat, a ticking status shows the HP it took or restored on a tick beat, and an
 /// enemy entering a phase shows "Enraged!" on a beat of its own after all the others (decision 406). An event it
 /// doesn't know throws, so a new mechanic can't be shown silently wrong (ADR 0004). Its sounds follow the beats, as
 /// <see cref="BattleSounds"/> orders them.
@@ -150,7 +150,7 @@ internal sealed class ActionPlayback : ISoundTimeline
 
         var (target, text) = battleEvent switch
         {
-            StatusApplied applied => (applied.Target, messages.Text(StatusNames.IdOf(applied.Status))),
+            StatusApplied applied => (applied.Target, applied.Status.Name),
             HitMissed missed => (missed.Target, messages.Text(MessageIds.BattleMiss)),
             HitBlocked blocked => (blocked.Target, messages.Text(MessageIds.BattleBlocked)),
             StatusResisted resisted => (resisted.Target, messages.Text(MessageIds.BattleResisted)),
@@ -244,7 +244,7 @@ internal sealed class ActionPlayback : ISoundTimeline
 
         var start = StartOfBeatAt(_beats.FindLastIndex(beat => beat.Kind == PlaybackBeatKind.Tick));
         _beatStartOfEvent[_readingIndex] = start;
-        var tone = ticked.Status == StatusKind.Poison ? FloatingNumberTone.Poison : FloatingNumberTone.Heal;
+        var tone = ticked.Status.Has(StatusPartKind.DamageEachTurn) ? FloatingNumberTone.Poison : FloatingNumberTone.Heal;
         _numbers.Add(new FloatingNumber(ticked.Holder, NumberText.Of(ticked.Amount), tone, start));
     }
 

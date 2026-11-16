@@ -1,34 +1,42 @@
 namespace Jrpg.Core.Statuses;
 
-/// <summary>The statuses on one combatant in one battle: at most one of each kind, in the order applied.</summary>
+/// <summary>
+/// The statuses on one combatant in one battle: at most one of each family (decision 800), in the order applied.
+/// </summary>
 public sealed class StatusSet
 {
     private readonly List<ActiveStatus> _active = [];
 
     public IReadOnlyList<ActiveStatus> Active => _active;
 
-    public bool Has(StatusKind kind) => _active.Exists(status => status.Kind == kind);
+    /// <param name="familyKey">A status's <see cref="StatusDefinition.FamilyKey"/>.</param>
+    public bool Has(string familyKey) => _active.Exists(status => status.Status.FamilyKey == familyKey);
+
+    /// <returns>
+    /// The first status held, in the order applied, with a part of <paramref name="kind"/>; else null.
+    /// </returns>
+    public StatusDefinition? FirstWith(StatusPartKind kind) => _active.Find(status => status.Status.Has(kind))?.Status;
 
     /// <summary>
-    /// Adds the status, or refreshes one of the same kind: its turns become the grant's and it keeps the stronger
-    /// power, never stacking (ADR 0021). Either way it is fresh until the turn now playing ends.
+    /// Adds the status, or refreshes the one of its family: it becomes the granted record with the grant's turns,
+    /// keeping part by part the stronger amount of the two, never stacking (ADR 0021, decision 800). Either way it is
+    /// fresh until the turn now playing ends.
     /// </summary>
     internal void Apply(StatusGrant grant)
     {
-        var index = _active.FindIndex(status => status.Kind == grant.Kind);
+        var index = _active.FindIndex(status => status.Status.FamilyKey == grant.Status.FamilyKey);
         if (index < 0)
         {
-            _active.Add(new ActiveStatus(grant.Kind, grant.Power, grant.Turns, IsFresh: true));
+            _active.Add(new ActiveStatus(grant.Status, grant.Turns, IsFresh: true));
             return;
         }
 
-        var power = Math.Max(_active[index].Power, grant.Power);
-        _active[index] = new ActiveStatus(grant.Kind, power, grant.Turns, IsFresh: true);
+        _active[index] = new ActiveStatus(Stronger(_active[index].Status, grant.Status), grant.Turns, IsFresh: true);
     }
 
     /// <summary>The end of the holder's own turn: a fresh status only loses its mark; the rest lose a turn.</summary>
-    /// <returns>The kinds that ran out, in the order they were applied.</returns>
-    internal IReadOnlyList<StatusKind> CountDown()
+    /// <returns>The statuses that ran out, in the order they were applied.</returns>
+    internal IReadOnlyList<StatusDefinition> CountDown()
     {
         for (var index = 0; index < _active.Count; index++)
         {
@@ -36,7 +44,7 @@ public sealed class StatusSet
             _active[index] = status.IsFresh ? status with { IsFresh = false } : status with { TurnsLeft = status.TurnsLeft - 1 };
         }
 
-        var ended = _active.Where(status => status.TurnsLeft == 0).Select(status => status.Kind).ToList();
+        var ended = _active.Where(status => status.TurnsLeft == 0).Select(status => status.Status).ToList();
         _active.RemoveAll(status => status.TurnsLeft == 0);
         return ended;
     }
@@ -51,10 +59,20 @@ public sealed class StatusSet
     }
 
     /// <returns>What was active, in the order it was applied.</returns>
-    internal IReadOnlyList<StatusKind> Clear()
+    internal IReadOnlyList<StatusDefinition> Clear()
     {
-        var cleared = _active.Select(status => status.Kind).ToList();
+        var cleared = _active.Select(status => status.Status).ToList();
         _active.Clear();
         return cleared;
     }
+
+    // The records of one family have the same parts in the same order (decision 797), so they pair up one to one.
+    private static StatusDefinition Stronger(StatusDefinition held, StatusDefinition granted) => granted with
+    {
+        Parts = [.. granted.Parts.Zip(held.Parts, StrongerPart)],
+    };
+
+    // The amount farther from zero is the stronger, a negative one included (decision 800); a tie keeps the granted.
+    private static StatusPart StrongerPart(StatusPart granted, StatusPart held) =>
+        Math.Abs(held.Amount) > Math.Abs(granted.Amount) ? held : granted;
 }

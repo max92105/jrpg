@@ -5,7 +5,6 @@ using Jrpg.Core.Items;
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Stats;
-using Jrpg.Core.Statuses;
 using Jrpg.Data.Content;
 
 namespace Jrpg.Data.Tests.Content;
@@ -184,7 +183,7 @@ public sealed class ContentCatalogLoaderTests
         var stamina = fighter.Resources.Single(resource => resource.Id == "stamina");
         Assert.Equal((6, 3, 1), (stamina.Max, stamina.StartsAt, stamina.Gains.PerTurn));
         var stun = Assert.Single(catalog.Skills["shield_bash"].Effect.Statuses);
-        Assert.Equal(StatusKind.Stun, stun.Kind);
+        Assert.Equal("stun", stun.Status.Id);
         Assert.InRange(stun.Chance, 1, 99);
     }
 
@@ -262,7 +261,7 @@ public sealed class ContentCatalogLoaderTests
         Assert.Equal((EffectKind.RestoreHp, Targeting.Self), (recovery.Kind, recovery.Targeting));
         Assert.Equal(EffectKind.RestoreHp, recovery.Tier?.Kind);
         var regen = Assert.Single(recovery.Statuses);
-        Assert.Equal((StatusKind.Regen, 2), (regen.Kind, regen.Turns));
+        Assert.Equal(("regen_1", 2), (regen.Status.Id, regen.Turns));
     }
 
     // Decision 320: Intelligence shapes a status, so every class but the rogue, whose Power acts through its attack,

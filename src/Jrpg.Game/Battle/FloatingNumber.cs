@@ -44,7 +44,7 @@ internal readonly record struct FloatingNumber(Combatant Target, string Text, Fl
     private static readonly TimeSpan _landing = 6 * _frame;
     private static readonly TimeSpan _life = TimeSpan.FromSeconds(0.57);
 
-    /// <summary>White for damage, red-gold for a crit, green for healing, purple for Poison's tick.</summary>
+    /// <summary>White for damage, red-gold for a crit, green for healing, purple for a damage tick.</summary>
     public static Color ColorOf(FloatingNumberTone tone) => tone switch
     {
         FloatingNumberTone.Damage => UiTheme.TextPrimary,

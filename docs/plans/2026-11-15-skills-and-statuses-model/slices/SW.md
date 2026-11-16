@@ -109,3 +109,19 @@ named change is that Burning and Poison, two families, both tick on one target. 
 - **Note from CH's review:** a dominant force raises a status-only skill's grants by their power, so since CH it no
   longer raises a stun's chance (its power is 0); SW's `Strengthened` raises the record's parts, never the chance, as
   decision 799 says. No status-only stun skill exists in content.
+- **Done, with deviations:** about 310 changed source and content lines and 400 test lines, past the estimate (the
+  six summaries and the comments naming Poison, Regen or Guarded in the Game's feature folder and `Ui/` were reworded
+  with the swap). `TurnSkipped` keeps its field name `Cause` (now a `StatusDefinition`): renaming it to `Status`
+  would have changed seven test lines outside the fixtures, against decision 811. `StatusMarksView`'s rim color moved
+  to a local, so its line fits. `ActionPlayback`'s tone reads `Has(StatusPartKind.DamageEachTurn)`, the same test as
+  the ticking part's kind (one ticking part per status) in 130 columns. The sound test is named
+  `Of_HealTickOfAnyRecord_IsTheRegenTick`, as its class names every test after `BattleSounds.Of`.
+  `StatusSetTests`' `Apply_SameKindAgain_RefreshesTurnsKeepsStrongerPower` and `CountDown_LastTurn_EndsAndReturnsKind`
+  are renamed `Apply_SameStatusAgain_RefreshesTurnsKeepsStrongerAmount` and `CountDown_LastTurn_EndsAndReturnsIt`,
+  their assertions unchanged. Expected values changed by the model: `ContentCatalogLoaderTests` now asserts Shield
+  Bash grants `stun` and Recovery `regen_1` (ids, where they read kinds); `EffectValidatorTests`' "lists poison twice"
+  row grants one record twice, since the rule now compares ids. The marks tests cast a hex Ragnir knows, built in the
+  test, on goblin C, since `StatusSet.Apply` is internal to Core. Simulations: all 43 pass; the Goblin Chief, level 1
+  alone: fighter 91.4 %, mage 16.6 %, cleric 51.4 %, rogue 52.8 %, barbarian 98.6 %, paladin 85.2 %, monk 78.6 %,
+  warlock 24.2 %, druid 43.2 %; a party of 4 wins 100 % at levels 1, 3 and 5. Hand checks 2 and 3 are the
+  developer's to see.

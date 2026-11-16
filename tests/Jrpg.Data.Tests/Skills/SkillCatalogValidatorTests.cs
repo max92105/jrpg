@@ -61,7 +61,15 @@ public sealed class SkillCatalogValidatorTests
     [Fact]
     public void Validate_GrantStatusSkillWithoutTier_Accepted()
     {
-        var exposed = new StatusGrant(StatusKind.Exposed, 50, 3);
+        var exposed = new StatusGrant(
+            new StatusDefinition
+            {
+                Id = "exposed_2",
+                Name = "Exposed",
+                Description = "",
+                Parts = [new StatusPart(StatusPartKind.DamageTakenChange, 50)],
+            },
+            Turns: 3);
         var expose = _heal with
         {
             Effect = new Effect(EffectKind.GrantStatus, Power: 0, Targeting.SingleEnemy) { Statuses = [exposed] },

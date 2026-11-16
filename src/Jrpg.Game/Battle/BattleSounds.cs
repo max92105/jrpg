@@ -64,10 +64,11 @@ internal static class BattleSounds
         return file is null ? null : new TimedSound(file, TimeSpan.Zero);
     }
 
-    private static string TickFileOf(StatusKind status) => status switch
+    // A tick sounds by its part, whatever the record (decision 810): any damage as Poison's, any heal as Regen's.
+    private static string TickFileOf(StatusDefinition status) => status.TickingPart?.Kind switch
     {
-        StatusKind.Poison => UiSoundFiles.Battle.PoisonTick,
-        StatusKind.Regen => UiSoundFiles.Battle.RegenTick,
-        _ => throw new InvalidOperationException($"A ticking {status} has no sound yet."),
+        StatusPartKind.DamageEachTurn => UiSoundFiles.Battle.PoisonTick,
+        StatusPartKind.HealEachTurn => UiSoundFiles.Battle.RegenTick,
+        _ => throw new InvalidOperationException($"{status.Id} ticked without a ticking part."),
     };
 }

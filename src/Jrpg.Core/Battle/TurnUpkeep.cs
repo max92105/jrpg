@@ -6,26 +6,24 @@ namespace Jrpg.Core.Battle;
 internal static class TurnUpkeep
 {
     /// <summary>
-    /// The holder's Poison and Regen take or restore their power in HP, in the order applied; a fresh one ticks too,
-    /// only its countdown waits. Poison isn't a hit, so it ignores resistances and Exposed and sets off no hit trigger.
+    /// Each of the holder's statuses with a ticking part takes or restores its amount in HP, in the order applied; a
+    /// fresh one ticks too, only its countdown waits. A tick isn't a hit, so it ignores resistances and a change in
+    /// damage taken and sets off no hit trigger.
     /// </summary>
     public static void TickStatuses(Combatant holder, IReadOnlyList<Combatant> combatants, List<BattleEvent> events)
     {
         // A fall clears the statuses, so the loop walks a copy.
         foreach (var status in holder.Statuses.Active.ToList())
         {
-            int? amount = status.Kind switch
-            {
-                StatusKind.Poison => holder.Vitals.TakeDamage(status.Power),
-                StatusKind.Regen => holder.Vitals.RestoreHp(status.Power),
-                _ => null,
-            };
-            if (amount is not { } ticked)
+            if (status.Status.TickingPart is not { } part)
             {
                 continue;
             }
 
-            events.Add(new StatusTicked(holder, status.Kind, ticked));
+            var ticked = part.Kind == StatusPartKind.DamageEachTurn
+                ? holder.Vitals.TakeDamage(part.Amount)
+                : holder.Vitals.RestoreHp(part.Amount);
+            events.Add(new StatusTicked(holder, status.Status, ticked));
             if (!holder.IsAlive)
             {
                 EffectLanding.Fall(holder, combatants, events);

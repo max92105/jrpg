@@ -51,7 +51,7 @@ internal sealed class EnemyTargeting(IRandom random)
 
     private Combatant ByTauntRule(Combatant enemy, IReadOnlyList<Combatant> candidates)
     {
-        var taunting = candidates.Where(member => member.Statuses.Has(StatusKind.Taunt)).ToList();
+        var taunting = candidates.Where(member => member.Statuses.FirstWith(StatusPartKind.DrawAttacks) is not null).ToList();
         var targets = taunting.Count > 0 && !ResistsTaunt(enemy) ? taunting : candidates;
         return targets[random.NextBelow(targets.Count)];
     }

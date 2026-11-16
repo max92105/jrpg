@@ -65,10 +65,10 @@ internal sealed class TurnFlow(IReadOnlyList<Combatant> combatants, TurnOrder tu
     private BattlePhase AdvanceToNextActor(List<BattleEvent> events)
     {
         turnOrder.Advance();
-        while (turnOrder.Current.Statuses.Has(StatusKind.Stun))
+        while (turnOrder.Current.Statuses.FirstWith(StatusPartKind.SkipTurn) is { } stun)
         {
             var skipped = turnOrder.Current;
-            events.Add(new TurnSkipped(skipped, StatusKind.Stun));
+            events.Add(new TurnSkipped(skipped, stun));
             RunUpkeep(skipped, events);
             if (OutcomeOf(events) is { } outcome)
             {

@@ -37,6 +37,18 @@ public sealed class ContentCatalogLoaderStatusTests : IDisposable
         Assert.Equal("statuses.json: the file is missing.", exception.Message);
     }
 
+    // A grant names its record by id, resolved as skills.json is read (decision 789).
+    [Fact]
+    public void Load_GrantNamingAnUnknownStatus_RefusesNamingFileAndId()
+    {
+        _content.Replace("skills.json", "\"status\": \"burning_1\"", "\"status\": \"burning_9\"");
+
+        var exception = Assert.Throws<ContentValidationException>(() => ContentCatalogLoader.Load(_content.Path));
+
+        Assert.StartsWith("skills.json", exception.Message, StringComparison.Ordinal);
+        Assert.Contains("no status 'burning_9'.", exception.Message, StringComparison.Ordinal);
+    }
+
     [Fact]
     public void Load_StatusPartWithUnknownKind_RefusesNamingFileAndPath()
     {

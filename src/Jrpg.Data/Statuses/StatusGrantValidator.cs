@@ -11,7 +11,6 @@ internal static class StatusGrantValidator
     /// <param name="index">Its place in the effect's statuses, which the messages name.</param>
     public static string? FindProblem(StatusGrant grant, int index) =>
         grant.Turns < 1 ? $"effect.statuses[{index}].turns must be at least 1 (was {grant.Turns})."
-        : grant.Power < 0 ? $"effect.statuses[{index}].power must be at least 0 (was {grant.Power})."
         : grant.Chance is < 1 or > WholeChance
             ? $"effect.statuses[{index}].chance must be within 1..{WholeChance} (was {grant.Chance})."
         : null;

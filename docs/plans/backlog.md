@@ -280,3 +280,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - Editor marks drawing copied many times: the `Frozen(Brush)` helper (`SequenceMarks`, `SpriteSheetMarks`,
   `CollisionDrawing`, `TilesheetMarks`' `Frozen<T>`) and the clipped `DrawingGroup` pinned by a transparent rectangle
   and frozen (six files); one shared marks-drawing type could hold both (sprite cells plan, SW3 review).
+- `Data/Effects/EffectValidator.FindStatusesProblem` refuses one status id twice in an effect, not two records of one
+  family (`guard_1` and `guard_2`), which then refresh each other on landing; decision 798 allows it today: compare
+  `FamilyKey` if the developer wants that refused (skills and statuses plan, SW review).

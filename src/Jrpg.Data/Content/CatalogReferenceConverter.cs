@@ -5,7 +5,7 @@ namespace Jrpg.Data.Content;
 
 /// <summary>
 /// Reads a content id as the record it names, from a catalog already loaded, and writes a record back as its id
-/// (decision 789): a skill's tiered effect, later a grant's status. The battle then reads records and never a catalog.
+/// (decision 789): a skill's tiered effect, a grant's status. The battle then reads records and never a catalog.
 /// </summary>
 /// <typeparam name="T">The record named.</typeparam>
 /// <param name="records">The catalog the ids name, by id.</param>

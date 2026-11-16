@@ -91,7 +91,8 @@ call or a rename. These cases slipped past it:
 
 - A method rename (sprite cells SC3: StandingCell/WalkCellAt -> StandingFrame/WalkFrameAt) updated the renamed type's
   map.md entry but left a sibling entry on the same row (`SpriteArea`'s "AreaOver, StandingCell, WalkCellAt"); grep the
-  old member names across docs/map.md after every rename.
+  old member names across docs/map.md after every rename. Mode bar WD3: a deleted partial (`MainWindow.QuestEditing`)
+  stayed in map.md's Shell row list of partial files though the Quests row was updated; grep `.<Partial>` there.
 
 **Why:** a comment or doc stating a wrong rule, name or number misleads the next reader.
 

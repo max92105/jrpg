@@ -5,15 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-mode-bar, slice WD2 (Workspaces/IEditedCatalog, CatalogDialog, DialogBounds; Trade/ShopCatalogPage
-replaces ShopCatalogWindow; OpenInDialog in MainWindow.Database). 2026-11-16. Round 1. Verdict: Ready to commit.
-No Critical, no Warning.
+Plan 2026-11-15-mode-bar, slice WD3 (Quests/QuestCatalogPage in CatalogDialog; QuestCatalogViewModel implements
+IEditedCatalog; MainWindow.QuestEditing and HasQuestEditing removed). 2026-11-16. Round 1. Verdict: Ready to commit.
+No Critical.
 
-- Suggestion, open: DialogBounds.FitTo reads owner.Left/Top for a Normal owner; hand-check a Win+Arrow snapped main
-  window (WPF may keep the pre-snap Left/Top), else read RestoreBounds-free bounds another way.
-- Follow-up, open: .claude/rules/editor.md says a dialog's OK greys "through CanApply"; CatalogDialog greys on
-  IEditedCatalog.Problem (the slice note records CanApply's removal), so the rule's wording is stale for pages.
-- Fixed (from WD1): OnDatabaseMenuClicked now throws naming the Header when Tag isn't a known title.
-- Checked: no stale ShopCatalogWindow/"Shops window" in src, tests or live docs (NET1's mention is a done slice);
-  CatalogDialog's OK style is BasedOn; page binds AncestorType=trade:ShopCatalogPage; no SizeToContent on the five
-  FitTo'd windows.
+- Warning, open: docs/map.md:83 (Shell row) still lists `.QuestEditing` among MainWindow's partial files; the file is
+  deleted and OpenQuests lives in `.Database`. Drop it from the list.
+- Follow-up, open (carried from WD2, still true by grep): .claude/rules/editor.md:25 says a dialog's OK greys "through
+  CanApply"; CatalogDialog greys on IEditedCatalog.Problem.
+- Dropped: WD2's DialogBounds snapped-window Suggestion (a hand check of WD2, not carried).
+- Checked: no QuestCatalogWindow/HasQuestEditing/"Quests window" left in src, tests, rules or map (backlog lines 118,
+  124, 126 and ADRs 0032/0045 are history); page binds AncestorType=quests:QuestCatalogPage; Problem notification on a
+  quest change already tested (QuestCatalogViewModelTests:53); Choose/ChosenKey mirror ShopCatalogViewModel.

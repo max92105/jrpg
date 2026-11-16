@@ -62,6 +62,19 @@ public sealed class ContentWriterRepositoryTests : IDisposable
         Assert.Equal(File.ReadAllBytes(_content.PathOf("new-game.json")), File.ReadAllBytes(written));
     }
 
+    // effects.json is written as the writer lays it out, sorted by id, for row 7's Effects window to take it over.
+    [Fact]
+    public void Effects_RepositoryFile_WritesBackUnchanged()
+    {
+        var written = _content.PathOf("effects.written.json");
+
+        var sorted = _catalog.TieredEffects.Values.OrderBy(effect => effect.Id, StringComparer.Ordinal).ToList();
+
+        ContentFileWriter.Write(written, sorted);
+
+        Assert.Equal(File.ReadAllBytes(_content.PathOf("effects.json")), File.ReadAllBytes(written));
+    }
+
     private byte[] CatalogFileBytes() =>
         [.. File.ReadAllBytes(_content.PathOf("tilesheets.json")),
          .. File.ReadAllBytes(_content.PathOf("tiles.json")),

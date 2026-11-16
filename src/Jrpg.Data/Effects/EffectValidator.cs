@@ -1,4 +1,6 @@
 using Jrpg.Core.Effects;
+using Jrpg.Core.Stats;
+using Jrpg.Data.Content;
 using Jrpg.Data.Statuses;
 
 namespace Jrpg.Data.Effects;
@@ -12,7 +14,24 @@ internal static class EffectValidator
         ?? FindHitsProblem(effect)
         ?? FindKindProblem(effect)
         ?? FindDamageTypeProblem(effect)
+        ?? (effect.Tier is { } tier ? FindTierProblem(effect, tier) : null)
         ?? (effect.Status is { } grant ? StatusGrantValidator.FindProblem(grant) : null);
+
+    // A tiered effect only sets a damage's or a heal's amount, and the effect repeats its record's kind and type, which
+    // the record decides (ADR 0056); the effect's own power is left at 0 (decision 792).
+    private static string? FindTierProblem(Effect effect, TieredEffect tier) =>
+        effect.Kind is not (EffectKind.Damage or EffectKind.RestoreHp)
+            ? $"effect.tier is only for a damage or restoreHp effect (was {tier.Id} on {NameOf(effect.Kind)})."
+        : effect.Kind != tier.Kind
+            ? $"effect.kind is {NameOf(effect.Kind)} but {tier.Id} is {NameOf(tier.Kind)}."
+        : effect.DamageType != tier.DamageType
+            ? $"effect.damageType is {NameOf(effect.DamageType)} but {tier.Id} is {NameOf(tier.DamageType)}."
+        : effect.Power != 0 ? $"effect.power must be 0 beside a tiered effect, which sets the amount (was {effect.Power})."
+        : null;
+
+    private static string NameOf(EffectKind kind) => ContentJsonOptions.EnumName(kind);
+
+    private static string NameOf(DamageType? type) => type is { } named ? ContentJsonOptions.EnumName(named) : "none";
 
     private static string? FindPowerProblem(Effect effect)
     {

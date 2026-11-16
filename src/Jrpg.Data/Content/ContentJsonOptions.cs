@@ -17,6 +17,22 @@ internal static class ContentJsonOptions
     public static JsonSerializerOptions Strict { get; } = CreateStrict();
 
     /// <summary>
+    /// A read-only copy of <see cref="Strict"/> with converters added, such as a catalog reference converter for a file
+    /// that names another file's records (decision 789).
+    /// </summary>
+    public static JsonSerializerOptions StrictWith(params JsonConverter[] converters)
+    {
+        var options = new JsonSerializerOptions(Strict);
+        foreach (var converter in converters)
+        {
+            options.Converters.Add(converter);
+        }
+
+        options.MakeReadOnly(populateMissingResolver: true);
+        return options;
+    }
+
+    /// <summary>
     /// An enum value's name as content files spell it, the converter's spelling, for messages that name a value.
     /// </summary>
     public static string EnumName<T>(T value) where T : struct, Enum => EnumNaming.ConvertName(value.ToString());

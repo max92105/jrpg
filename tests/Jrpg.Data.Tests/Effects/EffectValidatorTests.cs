@@ -7,6 +7,46 @@ namespace Jrpg.Data.Tests.Effects;
 
 public sealed class EffectValidatorTests
 {
+    private static readonly TieredEffect _fire1 = new("fire_1", EffectKind.Damage, 2) { DamageType = DamageType.Fire };
+
+    public static TheoryData<Effect, string> InvalidTieredEffects => new()
+    {
+        {
+            new Effect(EffectKind.GrantStatus, 0, Targeting.SingleEnemy, new StatusGrant(StatusKind.Poison, 5, 2))
+            {
+                Tier = _fire1,
+            },
+            "effect.tier is only for a damage or restoreHp effect (was fire_1 on grantStatus)."
+        },
+        {
+            new Effect(EffectKind.RestoreHp, 0, Targeting.SingleAlly) { Tier = _fire1 },
+            "effect.kind is restoreHp but fire_1 is damage."
+        },
+        {
+            new Effect(EffectKind.Damage, 0, Targeting.SingleEnemy, DamageType: DamageType.Ice) { Tier = _fire1 },
+            "effect.damageType is ice but fire_1 is fire."
+        },
+        {
+            new Effect(EffectKind.Damage, 5, Targeting.SingleEnemy, DamageType: DamageType.Fire) { Tier = _fire1 },
+            "effect.power must be 0 beside a tiered effect, which sets the amount (was 5)."
+        },
+    };
+
+    [Theory]
+    [MemberData(nameof(InvalidTieredEffects))]
+    public void FindProblem_InvalidTieredEffect_NamesIt(Effect effect, string problem)
+    {
+        Assert.Equal(problem, EffectValidator.FindProblem(effect));
+    }
+
+    [Fact]
+    public void FindProblem_TieredDamageMatchingItsRecord_Accepted()
+    {
+        var blast = new Effect(EffectKind.Damage, 0, Targeting.SingleEnemy, DamageType: DamageType.Fire) { Tier = _fire1 };
+
+        Assert.Null(EffectValidator.FindProblem(blast));
+    }
+
     [Fact]
     public void FindProblem_GrantStatusWithoutStatus_ReturnsProblem()
     {

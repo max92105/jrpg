@@ -83,7 +83,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   resolved-references rebuild row 7 needs (decision 789); the developer delegated approval, so no question is asked.
 - [x] **T1. A tiered skill deals its user's Power times its record's `perPower`** (Core, about 160 lines) →
   [slices/T1.md](slices/T1.md)
-- [ ] **T2. `effects.json` holds the tiered records and an effect names one by id** (Data + content, about 270 lines
+- [x] **T2. `effects.json` holds the tiered records and an effect names one by id** (Data + content, about 270 lines
   plus about 60 of JSON) → [slices/T2.md](slices/T2.md)
 - [ ] **T3. Enemies have a Power for their tiered skills** (Core + Data, about 170 lines) →
   [slices/T3.md](slices/T3.md)

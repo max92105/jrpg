@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization.Metadata;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Cinematics;
+using Jrpg.Core.Effects;
 using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Quests;
@@ -47,6 +48,9 @@ internal static class AbsentWhenNullFilter
 
         // ADR 0044: only a turned NPC has a facing.
         (typeof(PlacedObject), "facing"),
+
+        // ADR 0056: a heal record has no type.
+        (typeof(TieredEffect), "damageType"),
 
         // ADR 0054: a walk whose facings all read their rows has no sequences, and a facing that reads its row has no
         // sequence of its own.

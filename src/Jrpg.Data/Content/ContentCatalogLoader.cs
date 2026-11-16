@@ -1,7 +1,9 @@
 using System.Collections.Frozen;
+using System.Text.Json;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Cinematics;
 using Jrpg.Core.Content;
+using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
 using Jrpg.Core.Maps;
@@ -13,6 +15,7 @@ using Jrpg.Core.Trade;
 using Jrpg.Data.Battle;
 using Jrpg.Data.Cinematics;
 using Jrpg.Data.Crafting;
+using Jrpg.Data.Effects;
 using Jrpg.Data.Items;
 using Jrpg.Data.Loot;
 using Jrpg.Data.Maps;
@@ -45,12 +48,19 @@ public static class ContentCatalogLoader
     internal const string ObjectsFile = "objects.json";
     internal const string FieldSpritesFile = "field-sprites.json";
     internal const string EffectStripsFile = "effect-strips.json";
+    internal const string EffectsFile = "effects.json";
 
     /// <summary>Loads and validates every content file under <paramref name="contentRoot"/>, referenced files first.</summary>
     /// <exception cref="ContentValidationException">A file is malformed or breaks a content rule.</exception>
     public static ContentCatalog Load(string contentRoot)
     {
-        var skills = ReadValidated<IReadOnlyList<SkillDefinition>>(contentRoot, SkillsFile, SkillCatalogValidator.Validate);
+        // Read first: a skill's or an item's effect names a tiered effect by id, resolved as it is read (decision 789).
+        var tieredEffects = ReadValidated<IReadOnlyList<TieredEffect>>(contentRoot, EffectsFile, EffectCatalogValidator.Validate)
+            .ToFrozenDictionary(effect => effect.Id);
+        var effectReferenceOptions = ContentJsonOptions.StrictWith(
+            new CatalogReferenceConverter<TieredEffect>(tieredEffects, effect => effect.Id, "effect"));
+        var skills = ReadValidated<IReadOnlyList<SkillDefinition>>(
+            contentRoot, SkillsFile, effectReferenceOptions, SkillCatalogValidator.Validate);
         var skillsById = skills.ToFrozenDictionary(skill => skill.Id);
         var classReferences = new ClassReferences(skillsById);
         var classes = ReadValidated<IReadOnlyList<ClassDefinition>>(
@@ -58,7 +68,7 @@ public static class ContentCatalogLoader
         var classIds = classes.Select(classDefinition => classDefinition.Id).ToFrozenSet();
         var rules = ReadValidated<GameRules>(contentRoot, RulesFile, GameRulesValidator.Validate);
         var items = ReadValidated<IReadOnlyList<ItemDefinition>>(
-            contentRoot, ItemsFile, ItemCatalogValidator.Validate);
+            contentRoot, ItemsFile, effectReferenceOptions, ItemCatalogValidator.Validate);
         var itemsById = items.ToFrozenDictionary(item => item.Id);
 
         // rules.json is read before the items, so its crafting block is checked against them only now.
@@ -135,13 +145,18 @@ public static class ContentCatalogLoader
             Quests = questsById,
             FieldSprites = fieldSpritesByFile,
             EffectStrips = effectStrips.ToFrozenDictionary(strip => strip.File, StringComparer.Ordinal),
+            TieredEffects = tieredEffects,
             Cinematics = cinematics.ToFrozenDictionary(cinematic => cinematic.Id),
         };
     }
 
-    private static T ReadValidated<T>(string contentRoot, string fileName, Action<string, T> validate)
+    private static T ReadValidated<T>(string contentRoot, string fileName, Action<string, T> validate) =>
+        ReadValidated(contentRoot, fileName, ContentJsonOptions.Strict, validate);
+
+    private static T ReadValidated<T>(
+        string contentRoot, string fileName, JsonSerializerOptions options, Action<string, T> validate)
     {
-        var content = ContentFileReader.Read<T>(Path.Combine(contentRoot, fileName));
+        var content = ContentFileReader.Read<T>(Path.Combine(contentRoot, fileName), options);
         validate(fileName, content);
         return content;
     }

@@ -1,0 +1,66 @@
+[
+  {
+    "id": "blunt_1",
+    "kind": "damage",
+    "perPower": 2,
+    "damageType": "blunt"
+  },
+  {
+    "id": "blunt_2",
+    "kind": "damage",
+    "perPower": 4,
+    "damageType": "blunt"
+  },
+  {
+    "id": "dark_1",
+    "kind": "damage",
+    "perPower": 2,
+    "damageType": "dark"
+  },
+  {
+    "id": "dark_3",
+    "kind": "damage",
+    "perPower": 9,
+    "damageType": "dark"
+  },
+  {
+    "id": "fire_1",
+    "kind": "damage",
+    "perPower": 2,
+    "damageType": "fire"
+  },
+  {
+    "id": "fire_2",
+    "kind": "damage",
+    "perPower": 4,
+    "damageType": "fire"
+  },
+  {
+    "id": "heal_1",
+    "kind": "restoreHp",
+    "perPower": 2
+  },
+  {
+    "id": "heal_2",
+    "kind": "restoreHp",
+    "perPower": 4
+  },
+  {
+    "id": "light_2",
+    "kind": "damage",
+    "perPower": 4,
+    "damageType": "light"
+  },
+  {
+    "id": "piercing_2",
+    "kind": "damage",
+    "perPower": 4,
+    "damageType": "piercing"
+  },
+  {
+    "id": "slashing_1",
+    "kind": "damage",
+    "perPower": 2,
+    "damageType": "slashing"
+  }
+]

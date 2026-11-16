@@ -1,5 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Cinematics;
+using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
 using Jrpg.Core.Maps;
@@ -55,6 +56,9 @@ public sealed record ContentCatalog
     /// </summary>
     public IReadOnlyDictionary<string, FieldSpriteSheet> FieldSprites { get; init; } =
         new Dictionary<string, FieldSpriteSheet>(StringComparer.Ordinal);
+
+    /// <summary>The tiered effects a skill's damage or heal names, by id (ADR 0056).</summary>
+    public IReadOnlyDictionary<string, TieredEffect> TieredEffects { get; init; } = new Dictionary<string, TieredEffect>();
 
     /// <summary>The effect strips' paces, hit frames and swings by file name, exact case (ADR 0048).</summary>
     public IReadOnlyDictionary<string, EffectStripDefinition> EffectStrips { get; init; } =

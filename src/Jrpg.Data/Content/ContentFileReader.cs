@@ -4,13 +4,17 @@ namespace Jrpg.Data.Content;
 
 internal static class ContentFileReader
 {
-    public static T Read<T>(string path)
+    public static T Read<T>(string path) => Read<T>(path, ContentJsonOptions.Strict);
+
+    /// <param name="path">The content file.</param>
+    /// <param name="options">The strict options, with any catalog reference converters the file needs.</param>
+    public static T Read<T>(string path, JsonSerializerOptions options)
     {
         var fileName = Path.GetFileName(path);
         try
         {
             using var stream = File.OpenRead(path);
-            return JsonSerializer.Deserialize<T>(stream, ContentJsonOptions.Strict)
+            return JsonSerializer.Deserialize<T>(stream, options)
                 ?? throw new ContentValidationException($"{fileName}: the file holds null instead of content.");
         }
         catch (FileNotFoundException exception)

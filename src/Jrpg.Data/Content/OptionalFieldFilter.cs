@@ -13,6 +13,13 @@ internal static class OptionalFieldFilter
     /// <param name="isAbsent">Whether a value is left out of the file.</param>
     public static void SkipWhen(JsonTypeInfo typeInfo, IEnumerable<(Type Type, string Field)> fields, Func<object?, bool> isAbsent)
     {
+        // A record read through a converter, such as a tiered effect named by its id in skills.json (decision 789), has
+        // no fields of its own there.
+        if (typeInfo.Kind != JsonTypeInfoKind.Object)
+        {
+            return;
+        }
+
         foreach (var (type, field) in fields)
         {
             if (typeInfo.Type == type)

@@ -199,12 +199,12 @@ public sealed class MainViewModelTests : IDisposable
     public void Constructor_BrokenContentFile_ShowsTheLoaderMessageAndNoMaps()
     {
         Directory.CreateDirectory(_content.ContentCopy);
-        // The loader reads skills.json first, so a copy holding only that file stops there.
-        File.WriteAllText(Path.Combine(_content.ContentCopy, "skills.json"), "[ {");
+        // The loader reads effects.json first (decision 789), so a copy holding only that file stops there.
+        File.WriteAllText(Path.Combine(_content.ContentCopy, "effects.json"), "[ {");
 
         var viewModel = _content.Open(_content.ContentCopy);
 
-        Assert.StartsWith("skills.json", viewModel.LoadError, StringComparison.Ordinal);
+        Assert.StartsWith("effects.json", viewModel.LoadError, StringComparison.Ordinal);
         Assert.Empty(viewModel.MapIds);
         Assert.Null(viewModel.CurrentMap);
         Assert.Null(viewModel.Painting);

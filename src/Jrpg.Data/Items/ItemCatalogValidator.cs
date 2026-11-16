@@ -16,7 +16,14 @@ internal static class ItemCatalogValidator
 
     public static void Validate(string fileName, IReadOnlyList<ItemDefinition> items) =>
         new ContentListValidator<ItemDefinition>(fileName, "item", item => item.Id)
-            .Validate(items, item => FindProblem(item) ?? OwnEffectStripValidator.FindProblem(item.EffectFile, item.Effect));
+            .Validate(items, item => FindProblem(item) ?? FindTierProblem(item) ?? FindStripProblem(item));
+
+    private static string? FindStripProblem(ItemDefinition item) =>
+        OwnEffectStripValidator.FindProblem(item.EffectFile, item.Effect);
+
+    // A potion heals its number, whoever drinks it (decisions 321, 785).
+    private static string? FindTierProblem(ItemDefinition item) =>
+        item.Effect?.Tier is null ? null : "effect.tier is for skills: an item isn't raised by its user (decision 785).";
 
     private static string? FindProblem(ItemDefinition item)
     {

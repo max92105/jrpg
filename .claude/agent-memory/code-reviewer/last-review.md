@@ -5,14 +5,16 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-mode-bar, slice WD7 (Cinematics/CinematicCatalogPage in CatalogDialog via OpenInDialog; Closed's
-StopTheClock moved to Unloaded; Play still starts the RenderTick; CinematicCatalogViewModel implements IEditedCatalog,
-CanApply removed; HasCinematicEditing removed). 2026-11-16. Round 1. Verdict: Ready to commit. No Critical, no Warning.
+Plan 2026-11-15-mode-bar, slice WD8 (Character sprites window -> Sprites/FieldSpritePage in CatalogDialog via
+OpenInDialog from the NPCs entry; MainWindow.FieldSprites.cs deleted; RenderTick.RunWhileLoaded extracted for the
+Enemies, Effect strips and Character sprites pages; FieldSpriteCatalogViewModel implements IEditedCatalog).
+2026-11-16. Round 1. Verdict: Ready to commit. No Critical, no Warning.
 
-- Follow-up, open: in stage 3 (a page hidden and shown again), Unloaded stops the clock but leaves Preview.IsPlaying
-  true, so the page comes back frozen mid-play until Stop; Unloaded could also stop the preview then.
-- Declined/not applicable (from WD6): the Loaded/Unloaded RenderTick helper; WD7 starts the tick on Play, so no third
-  copy was made.
-- Checked: Unloaded after close only lets a frame or two Advance a discarded preview (silent, no media player:
-  CinematicPreview plays no audio); OnPreviewChanged starts the tick only while IsVisible, so Apply after close can't
-  restart it; no CinematicCatalogWindow / HasCinematicEditing / "Cinematics window" left in src, tests, map, scripts.
+- Suggestion, open: FieldSpritePage.xaml:67 root DockPanel now wraps a single Grid (OK/Cancel and problem line gone).
+- Follow-up, open: page-recipe.md step 3 / line 22 still describes the Loaded/Unloaded pair by hand; name
+  RenderTick.RunWhileLoaded so stage 3 pages don't write a fourth copy.
+- WD7's Cinematics IsPlaying follow-up: dropped, recorded in slices/WS5.md (note from WD7).
+- Checked: the deviation (only the tick released on Unloaded) holds: old OnClosed released the tick, its own CellZoom
+  via _zooming.Zoom = null, and handlers on _sprites/_setup, all created per session by Start() or by the page; no
+  FieldSpriteWindow / MainWindow.FieldSprites / "Character sprites window" / KeepOnDesktop left in src, tests, map,
+  scripts.

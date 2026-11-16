@@ -16,6 +16,7 @@ internal sealed record TacticTargetChoice(TacticTarget? Target, string Label)
         new(TacticTarget.LowestHpFoe, "the foe with the lowest HP"),
         new(TacticTarget.HighestHpFoe, "the foe with the highest HP"),
         new(TacticTarget.LowestHpOnItsSide, "the lowest HP on its side (itself included)"),
+        new(TacticTarget.UnafflictedFoe, "a foe without its statuses"),
     ];
 
     /// <exception cref="InvalidOperationException">

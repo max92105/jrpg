@@ -7,7 +7,7 @@ namespace Jrpg.Core.Tests.Builders;
 /// <summary>
 /// The statuses the tests grant and compare, in one place: the tests build grants, name statuses and read their numbers
 /// only through here, so the status model can change under them with only these bodies following it. Each grant names a
-/// one-part record of its own family (decision 800), built here with the grant's amount.
+/// one-part record of its own family (decision 800), built here with the grant's amount; the poison tiers share one.
 /// </summary>
 internal static class TestStatuses
 {
@@ -34,6 +34,17 @@ internal static class TestStatuses
     /// <summary>The holder loses <paramref name="amount"/> HP at the end of each of its turns.</summary>
     public static StatusGrant Poison(int amount, int turns) =>
         new(Record(PoisonId, new StatusPart(StatusPartKind.DamageEachTurn, amount)), turns);
+
+    /// <summary>
+    /// Poison as content tiers it: the harmful record <c>poison_{tier}</c> of the poison family, losing
+    /// <paramref name="tier"/> HP at the end of each of the holder's turns.
+    /// </summary>
+    public static StatusGrant PoisonTier(int tier, int turns) =>
+        new(Record($"{PoisonId}_{tier}", new StatusPart(StatusPartKind.DamageEachTurn, tier)) with
+        {
+            IsHarmful = true,
+            Family = PoisonId,
+        }, turns);
 
     /// <summary>The holder regains <paramref name="amount"/> HP at the end of each of its turns.</summary>
     public static StatusGrant Regen(int amount, int turns) =>
@@ -89,7 +100,8 @@ internal static class TestStatuses
     /// <summary>The effect, granting <paramref name="grant"/> to each target still standing after it.</summary>
     public static Effect Granting(Effect effect, StatusGrant grant) => effect with { Statuses = [grant] };
 
-    // Harm and name are the game's concern, which these tests never read.
+    // Harm and name are the game's concern, which most tests never read; the poison tiers set the harm that an enemy
+    // aiming at a foe without its statuses reads.
     private static StatusDefinition Record(string id, StatusPart part) =>
         new() { Id = id, Name = id, Description = "", Parts = [part] };
 }

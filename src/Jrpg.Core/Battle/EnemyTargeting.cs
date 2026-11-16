@@ -13,8 +13,8 @@ namespace Jrpg.Core.Battle;
 /// results. A skill that takes every target, or aims at the enemy itself, draws nothing and ignores a taunt; a heal on
 /// one ally goes to the lowest HP share among those its condition found when it reads its own HP or an ally's, else
 /// among all its legal targets, without a draw (decisions 401, 835); any other single target is one draw. A rule with a
-/// target picks without a draw (decision 837) among its candidates, which a taunt among the skill's legal foes narrows
-/// for a pick among foes (decision 838).
+/// target picks among its candidates without a draw (decision 837), or with one draw for a foe without the skill's
+/// statuses; a taunt among the skill's legal foes narrows the candidates for a pick among foes (decision 838).
 /// </summary>
 internal sealed class EnemyTargeting(IRandom random)
 {
@@ -23,7 +23,8 @@ internal sealed class EnemyTargeting(IRandom random)
     public Combatant ForAttack(BattleState battle) => ByTauntRule(battle.CurrentActor, battle.LivingOn(BattleSide.Party));
 
     /// <summary>
-    /// The pick of a rule with a target, after the taunt's roll when a taunter is among the legal foes.
+    /// The pick of a rule with a target, after the taunt's roll when a taunter is among the legal foes; a foe without
+    /// the skill's statuses then draws once among the narrowed candidates.
     /// </summary>
     /// <param name="enemy">The enemy whose turn it is.</param>
     /// <param name="target">The rule's target.</param>
@@ -42,6 +43,7 @@ internal sealed class EnemyTargeting(IRandom random)
             TacticTarget.Self => narrowed.Single(),
             TacticTarget.LowestHpFoe or TacticTarget.LowestHpOnItsSide or TacticTarget.Subject => LowestShareOf(narrowed),
             TacticTarget.HighestHpFoe => HighestShareOf(narrowed),
+            TacticTarget.UnafflictedFoe => narrowed[random.NextBelow(narrowed.Count)],
             _ => throw new ArgumentOutOfRangeException(nameof(target), target, "Unknown tactic target."),
         };
     }

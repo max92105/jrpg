@@ -2,14 +2,16 @@ using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
+using Jrpg.Core.Statuses;
 using Jrpg.Data.Battle;
 using Jrpg.Data.Content;
 using Jrpg.Data.Tests.Content;
 
 namespace Jrpg.Data.Tests.Battle;
 
-// A rule's target against its skill's aim and its trigger (ADR 0057, decision 840): the message names the enemy, the
-// rule's place, the skill and its aim. A rule's flags: the attack can't be once per battle (decision 842).
+// A rule's target against its skill's aim and its trigger (ADR 0057, decision 840), and a foe without its statuses
+// against its grants: the message names the enemy, the rule's place, the skill and its aim. A rule's flags: the attack
+// can't be once per battle (decision 842).
 public sealed class EnemyTacticRuleValidatorTests
 {
     private static readonly EnemyDefinition _goblin = new()
@@ -32,7 +34,13 @@ public sealed class EnemyTacticRuleValidatorTests
 
     private static readonly EnemyReferences _references = new(
         new HashSet<string>(),
-        new[] { Skill("cleave", Targeting.AllEnemies), Skill("mend", Targeting.SingleAlly) }.ToDictionary(skill => skill.Id));
+        new[]
+        {
+            Skill("cleave", Targeting.AllEnemies),
+            Skill("mend", Targeting.SingleAlly),
+            Skill("jab", Targeting.SingleEnemy),
+            PoisonSkill("poison_dart"),
+        }.ToDictionary(skill => skill.Id));
 
     [Fact]
     public void Load_ActionWithOn_ReadsTheTarget()
@@ -100,6 +108,33 @@ public sealed class EnemyTacticRuleValidatorTests
         Assert.Equal("enemies.json: enemy 'goblin': tactics[0] (attack).on: subject needs a when that names someone.", problem);
     }
 
+    // The jab aims at one foe as the target does, so what it lacks is a harmful grant.
+    [Fact]
+    public void Validate_UnafflictedFoeOnAPlainHit_IsRefused()
+    {
+        var problem = ProblemOf(new EnemyAction { SkillId = "jab", Weight = 1, On = TacticTarget.UnafflictedFoe });
+
+        Assert.Equal(
+            "enemies.json: enemy 'goblin': tactics[0] (jab).on: unafflictedFoe needs a skill that grants a harmful status.",
+            problem);
+    }
+
+    [Fact]
+    public void Validate_UnafflictedFoeOnAHeal_NamesTheAim()
+    {
+        var problem = ProblemOf(new EnemyAction { SkillId = "mend", Weight = 1, On = TacticTarget.UnafflictedFoe });
+
+        Assert.Equal(
+            "enemies.json: enemy 'goblin': tactics[0] (mend).on: unafflictedFoe doesn't fit mend, which aims at singleAlly.",
+            problem);
+    }
+
+    [Fact]
+    public void Validate_UnafflictedFoeOnAPoisonSkill_IsAccepted()
+    {
+        Assert.Null(ProblemOf(new EnemyAction { SkillId = "poison_dart", Weight = 1, On = TacticTarget.UnafflictedFoe }));
+    }
+
     [Fact]
     public void Validate_SubjectInAPhase_NamesThePhaseField()
     {
@@ -159,5 +194,20 @@ public sealed class EnemyTacticRuleValidatorTests
         Description = "",
         IconFile = "",
         Effect = new Effect(EffectKind.Damage, 5, targeting),
+    };
+
+    // A single-foe hit granting a harmful status, as content's poison is.
+    private static SkillDefinition PoisonSkill(string id) => Skill(id, Targeting.SingleEnemy) with
+    {
+        Effect = new Effect(EffectKind.Damage, 5, Targeting.SingleEnemy) { Statuses = [new StatusGrant(Poison, 3)] },
+    };
+
+    private static StatusDefinition Poison => new()
+    {
+        Id = "poison",
+        Name = "Poison",
+        Description = "",
+        IsHarmful = true,
+        Parts = [new StatusPart(StatusPartKind.DamageEachTurn, 2)],
     };
 }

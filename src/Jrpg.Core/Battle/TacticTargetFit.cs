@@ -5,7 +5,8 @@ namespace Jrpg.Core.Battle;
 
 /// <summary>
 /// Whether a rule's target can aim its skill, or the attack, after its trigger (decision 840, design.md section 3.3): a
-/// target picks one combatant, so a skill hitting all, or aimed along the formation, fits automatic only.
+/// target picks one combatant, so a skill hitting all, or aimed along the formation, fits automatic only; a foe without
+/// the skill's statuses needs a skill granting a harmful one.
 /// </summary>
 public static class TacticTargetFit
 {
@@ -18,7 +19,7 @@ public static class TacticTargetFit
             return true;
         }
 
-        return AimsFitting(target, action.When).Contains(AimOf(skill));
+        return AimsFitting(target, action.When, skill).Contains(AimOf(skill));
     }
 
     /// <returns>
@@ -26,16 +27,21 @@ public static class TacticTargetFit
     /// </returns>
     public static Targeting AimOf(SkillDefinition? skill) => skill?.Effect.Targeting ?? AttackEffect.Targeting;
 
-    // Without a trigger, "that one" names nobody, so a subject target fits no aim.
-    private static Targeting[] AimsFitting(TacticTarget target, TacticCondition? condition) =>
+    // Without a trigger, "that one" names nobody, so a subject target fits no aim; without a harmful grant, every foe
+    // is without the skill's statuses, so that target would only be a random pick, which automatic already is.
+    private static Targeting[] AimsFitting(TacticTarget target, TacticCondition? condition, SkillDefinition? skill) =>
         target switch
         {
             TacticTarget.Self => [Targeting.Self, Targeting.SingleAlly],
             TacticTarget.LowestHpFoe or TacticTarget.HighestHpFoe => [Targeting.SingleEnemy],
             TacticTarget.LowestHpOnItsSide => [Targeting.SingleAlly],
             TacticTarget.Subject => condition is null ? [] : AimsNaming(TacticConditionKinds.ShapeOf(condition.Kind).Subject),
+            TacticTarget.UnafflictedFoe => GrantsHarm(skill) ? [Targeting.SingleEnemy] : [],
             _ => throw new ArgumentOutOfRangeException(nameof(target), target, "Unknown tactic target."),
         };
+
+    private static bool GrantsHarm(SkillDefinition? skill) =>
+        skill is not null && skill.Effect.Statuses.Any(grant => grant.Status.IsHarmful);
 
     private static Targeting[] AimsNaming(TacticSubject subject) =>
         subject switch

@@ -55,7 +55,7 @@ public sealed class EnemyTactics(IRandom random, IReadOnlyDictionary<string, Ski
 
     private bool HasTarget(EnemyAction action, BattleState battle) =>
         action.On is null
-        || TacticTargetCandidates.For(action, LegalTargetsOf(action, battle), battle.CurrentActor, battle).Count > 0;
+        || TacticTargetCandidates.For(action, SkillOf(action), LegalTargetsOf(action, battle), battle).Count > 0;
 
     private BattleCommand CommandFor(EnemyAction action, BattleState battle)
     {
@@ -75,11 +75,14 @@ public sealed class EnemyTactics(IRandom random, IReadOnlyDictionary<string, Ski
 
     private BattleCommand CommandAimedBy(EnemyAction action, TacticTarget target, BattleState battle)
     {
+        var skill = SkillOf(action);
         var legal = LegalTargetsOf(action, battle);
-        var candidates = TacticTargetCandidates.For(action, legal, battle.CurrentActor, battle);
+        var candidates = TacticTargetCandidates.For(action, skill, legal, battle);
         var chosen = _targeting.ForRule(battle.CurrentActor, target, candidates, legal);
-        return action.SkillId is { } skillId ? new SkillCommand(skills[skillId], [chosen]) : new AttackCommand(chosen);
+        return skill is null ? new AttackCommand(chosen) : new SkillCommand(skill, [chosen]);
     }
+
+    private SkillDefinition? SkillOf(EnemyAction action) => action.SkillId is { } skillId ? skills[skillId] : null;
 
     private IReadOnlyList<Combatant> LegalTargetsOf(EnemyAction action, BattleState battle) =>
         action.SkillId is { } skillId

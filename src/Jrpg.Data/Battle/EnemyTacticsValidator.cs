@@ -1,4 +1,5 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Effects;
 using Jrpg.Core.Skills;
 using Jrpg.Data.Content;
 using static Jrpg.Data.Content.RangeProblems;
@@ -113,9 +114,17 @@ internal static class EnemyTacticsValidator
 
         var label = action.SkillId ?? "attack";
         var named = $"{field} ({label}).on: {ContentJsonOptions.EnumName(target)}";
-        return target == TacticTarget.Subject && action.When is null
-            ? $"{named} needs a when that names someone."
-            : $"{named} doesn't fit {label}, which aims at {ContentJsonOptions.EnumName(TacticTargetFit.AimOf(skill))}.";
+        var aim = TacticTargetFit.AimOf(skill);
+        if (target == TacticTarget.Subject && action.When is null)
+        {
+            return $"{named} needs a when that names someone.";
+        }
+
+        // A foe without its statuses aims at one foe (design.md, section 3.3), so on a skill aimed at one foe it can
+        // only fail on the skill's grants.
+        return target == TacticTarget.UnafflictedFoe && aim == Targeting.SingleEnemy
+            ? $"{named} needs a skill that grants a harmful status."
+            : $"{named} doesn't fit {label}, which aims at {ContentJsonOptions.EnumName(aim)}.";
     }
 
     // Decision 842: a once rule is used up by its skill's use, and the attack, the fallback when nothing is eligible,

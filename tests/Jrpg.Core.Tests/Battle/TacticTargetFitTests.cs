@@ -1,6 +1,8 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Skills;
+using Jrpg.Core.Statuses;
+using Jrpg.Core.Tests.Builders;
 
 namespace Jrpg.Core.Tests.Battle;
 
@@ -34,6 +36,21 @@ public sealed class TacticTargetFitTests
         Assert.Equal(expected, fits);
     }
 
+    // A foe without the skill's statuses needs a single-foe skill granting a harmful status; a guard is a boon.
+    [Theory]
+    [InlineData(TestStatuses.PoisonId, Targeting.SingleEnemy, true)]
+    [InlineData(TestStatuses.PoisonId, Targeting.SingleAlly, false)]
+    [InlineData(null, Targeting.SingleEnemy, false)]
+    [InlineData(TestStatuses.GuardId, Targeting.SingleEnemy, false)]
+    public void Fits_UnafflictedFoeByGrantAndAim_MatchesTheTable(string? grantedId, Targeting aim, bool expected)
+    {
+        var action = new EnemyAction { Weight = 1, On = TacticTarget.UnafflictedFoe };
+
+        var fits = TacticTargetFit.Fits(action, Skill(aim, GrantsOf(grantedId)));
+
+        Assert.Equal(expected, fits);
+    }
+
     // "That one" without a trigger names nobody, whatever the skill aims at.
     [Fact]
     public void Fits_SubjectWithoutCondition_IsFalse()
@@ -54,12 +71,19 @@ public sealed class TacticTargetFitTests
         Assert.All(actions, action => TacticTargetFit.Fits(action, null));
     }
 
-    private static SkillDefinition Skill(Targeting aim) => new()
+    private static StatusGrant[] GrantsOf(string? statusId) => statusId switch
+    {
+        TestStatuses.PoisonId => [TestStatuses.PoisonTier(1, turns: 3)],
+        TestStatuses.GuardId => [TestStatuses.Guard(10, turns: 3)],
+        _ => [],
+    };
+
+    private static SkillDefinition Skill(Targeting aim, params StatusGrant[] grants) => new()
     {
         Id = "skill",
         Name = "Skill",
         Description = "",
         IconFile = "",
-        Effect = new Effect(EffectKind.Damage, 5, aim),
+        Effect = new Effect(EffectKind.Damage, 5, aim) { Statuses = grants },
     };
 }

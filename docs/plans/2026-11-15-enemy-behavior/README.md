@@ -1,5 +1,5 @@
 # Enemy behavior (editor push, roadmap row 8)
-Status: approved, in progress
+Status: retro pending
 
 Drafted on 2026-11-15 from roadmap row 8 of [the editor push](../2026-11-15-editor-push/README.md), its design.md
 section 3.7, decisions 679 and 698 there, and the developer's words: "behavior - way to use these skills in combat. I
@@ -130,7 +130,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 - [x] **EB10. Once per battle** (Core + Data + Editor, about 180 lines) → [slices/EB10.md](slices/EB10.md)
 - [x] **EB11. Triggers: a foe's HP is below, every Nth turn of its own** (Core + Data + Editor, about 290 lines) →
   [slices/EB11.md](slices/EB11.md)
-- [ ] **EB12. Target: a foe without the skill's statuses** (Core + Data + Editor, about 130 lines) →
+- [x] **EB12. Target: a foe without the skill's statuses** (Core + Data + Editor, about 130 lines) →
   [slices/EB12.md](slices/EB12.md)
 
 `slices/EB13.md` and `slices/EB14.md` are superseded stubs from the draft: delete them.

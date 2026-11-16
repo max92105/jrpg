@@ -22,4 +22,10 @@ public enum TacticTarget
 
     /// <summary>The lowest HP share on its side, itself included.</summary>
     LowestHpOnItsSide,
+
+    /// <summary>
+    /// A random foe holding no family of the skill's harmful statuses, so a poisoner spreads its poison instead of
+    /// renewing it on the same foe.
+    /// </summary>
+    UnafflictedFoe,
 }

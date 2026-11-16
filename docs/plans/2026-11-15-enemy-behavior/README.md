@@ -103,7 +103,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 - [x] ADR 0057, enemy rules: triggers, reactions and targets (amends ADR 0034). Write it from decisions 832-848 and
   855-856 with design.md, section 5's options and costs; the developer delegated approval, so the defaults are marked
   in it and no question is asked.
-- [ ] **EB1. Today's choices recorded; a rule names its target: itself, the lowest or highest HP foe, the lowest HP on
+- [x] **EB1. Today's choices recorded; a rule names its target: itself, the lowest or highest HP foe, the lowest HP on
   its side, or whom its condition names** (Core, about 270 lines plus a 70-line replay test first) →
   [slices/EB1.md](slices/EB1.md)
 - [ ] **EB2. `on` in `enemies.json`: loaded, checked against the skill's aim and the trigger, written; which skills an

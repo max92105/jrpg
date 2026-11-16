@@ -104,6 +104,9 @@ internal static class AbsentWhenNullFilter
         // Decision 412: a null skill is the basic attack; a null condition is always.
         (typeof(EnemyAction), "skillId"),
         (typeof(EnemyAction), "when"),
+
+        // Decision 848: most rules aim as their skill does.
+        (typeof(EnemyAction), "on"),
     ];
 
     public static void SkipNullOptionalFields(JsonTypeInfo typeInfo) =>

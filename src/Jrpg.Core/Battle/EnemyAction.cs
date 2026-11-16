@@ -11,4 +11,9 @@ public sealed record EnemyAction
 
     /// <summary>When it may be chosen (decision 402); null is always.</summary>
     public TacticCondition? When { get; init; }
+
+    /// <summary>
+    /// Whom it aims at (decision 834); null aims as the skill or the attack always did (decisions 400, 401).
+    /// </summary>
+    public TacticTarget? On { get; init; }
 }

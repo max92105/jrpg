@@ -83,3 +83,7 @@ Existing guards, unchanged: step 0's replay, `EnemyTacticsTests`, `EnemyTacticCo
 
 ## Verify by hand
 None: the replay test is the check that nothing moved (decision 860).
+
+- **Done, with deviations:** `AbsentWhenNullFilter` gets EB2's `(EnemyAction, "on")` line now, as the writer's
+  identical-bytes test failed on `"on": null`; the predicate is `CanUseSkill`, not `SkillUsable`; a foe-aimed pick is
+  one whose candidates are foes; tests add `HighestHpFoeTie` and a Theory over each candidate filter left with no one.

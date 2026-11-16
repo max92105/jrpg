@@ -71,3 +71,5 @@ skills an enemy can use.
 1. In `content/enemies.json`, add `"on": "subject"` to the Chief's `field_dressing` rule; run the game: it starts.
    Add `"on": "lowestHpFoe"` to `cleave`: the game stops at start naming "enemy 'goblin_chief': tactics[1] (cleave).on:
    lowestHpFoe doesn't fit cleave, which aims at allEnemies.". Revert the file.
+- **Note from EB1:** the `(typeof(EnemyAction), "on")` row of `AbsentWhenNullFilter` landed in EB1 (the identical-bytes
+  test needed it once `On` existed); EB2 keeps the rest of its Data changes.

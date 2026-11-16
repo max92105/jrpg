@@ -6,7 +6,9 @@ namespace Jrpg.Core.Battle;
 /// <summary>
 /// Chooses what an enemy does on its turn (ADR 0034); <see cref="EnemyTargeting"/> aims it. It draws once for the pick,
 /// only when more than one eligible action shares the weight, then what the targeting draws. An enemy without tactics,
-/// or with nothing eligible, attacks without a pick (decisions 403, 412), so it keeps its seeded results.
+/// or with nothing eligible, attacks without a pick (decisions 403, 412), so it keeps its seeded results. A rule with a
+/// target aims by it (decision 834) and is eligible only when it finds someone (decision 836); deciding whether a rule
+/// is eligible never draws.
 /// </summary>
 /// <param name="random">The battle's draws.</param>
 /// <param name="skills">The content's skills, which an enemy's actions name by id.</param>
@@ -36,11 +38,25 @@ public sealed class EnemyTactics(IRandom random, IReadOnlyDictionary<string, Ski
     }
 
     private bool IsEligible(EnemyAction action, BattleState battle) =>
-        (action.When is not { } condition || TacticConditions.Holds(condition, battle.CurrentActor, battle))
-        && (action.SkillId is not { } skillId || battle.CanUse(skills[skillId]));
+        ConditionHolds(action, battle) && CanUseSkill(action, battle) && HasTarget(action, battle);
+
+    private static bool ConditionHolds(EnemyAction action, BattleState battle) =>
+        action.When is not { } condition || TacticConditions.Holds(condition, battle.CurrentActor, battle);
+
+    private bool CanUseSkill(EnemyAction action, BattleState battle) =>
+        action.SkillId is not { } skillId || battle.CanUse(skills[skillId]);
+
+    private bool HasTarget(EnemyAction action, BattleState battle) =>
+        action.On is null
+        || TacticTargetCandidates.For(action, LegalTargetsOf(action, battle), battle.CurrentActor, battle).Count > 0;
 
     private BattleCommand CommandFor(EnemyAction action, BattleState battle)
     {
+        if (action.On is { } target)
+        {
+            return CommandAimedBy(action, target, battle);
+        }
+
         if (action.SkillId is not { } skillId)
         {
             return Attack(battle);
@@ -49,6 +65,19 @@ public sealed class EnemyTactics(IRandom random, IReadOnlyDictionary<string, Ski
         var skill = skills[skillId];
         return new SkillCommand(skill, _targeting.ForSkill(battle, skill, action.When));
     }
+
+    private BattleCommand CommandAimedBy(EnemyAction action, TacticTarget target, BattleState battle)
+    {
+        var legal = LegalTargetsOf(action, battle);
+        var candidates = TacticTargetCandidates.For(action, legal, battle.CurrentActor, battle);
+        var chosen = _targeting.ForRule(battle.CurrentActor, target, candidates, legal);
+        return action.SkillId is { } skillId ? new SkillCommand(skills[skillId], [chosen]) : new AttackCommand(chosen);
+    }
+
+    private IReadOnlyList<Combatant> LegalTargetsOf(EnemyAction action, BattleState battle) =>
+        action.SkillId is { } skillId
+            ? battle.TargetChoiceFor(skills[skillId]).Candidates
+            : battle.TargetChoiceForAttack().Candidates;
 
     private AttackCommand Attack(BattleState battle) => new(_targeting.ForAttack(battle));
 }

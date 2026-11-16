@@ -12,13 +12,38 @@ namespace Jrpg.Core.Battle;
 /// when a taunt might be resisted, so battles without a taunt, and enemies that resist nothing, keep their seeded
 /// results. A skill that takes every target, or aims at the enemy itself, draws nothing and ignores a taunt; a heal on
 /// one ally goes to the lowest HP share among those its condition found, without a draw (decision 401); any other
-/// single target is one draw.
+/// single target is one draw. A rule with a target picks without a draw (decision 837) among its candidates, which a
+/// taunt among the skill's legal foes narrows for a pick among foes (decision 838).
 /// </summary>
 internal sealed class EnemyTargeting(IRandom random)
 {
     private readonly ChanceRolls _rolls = new(random);
 
     public Combatant ForAttack(BattleState battle) => ByTauntRule(battle.CurrentActor, battle.LivingOn(BattleSide.Party));
+
+    /// <summary>
+    /// The pick of a rule with a target, after the taunt's roll when a taunter is among the legal foes.
+    /// </summary>
+    /// <param name="enemy">The enemy whose turn it is.</param>
+    /// <param name="target">The rule's target.</param>
+    /// <param name="candidates">
+    /// Whom the target may aim at (<see cref="TacticTargetCandidates"/>), at least one.
+    /// </param>
+    /// <param name="legal">The skill's or the attack's legal targets now, in battle order.</param>
+    /// <exception cref="ArgumentOutOfRangeException">A target this switch doesn't know.</exception>
+    public Combatant ForRule(
+        Combatant enemy, TacticTarget target, IReadOnlyList<Combatant> candidates, IReadOnlyList<Combatant> legal)
+    {
+        var isAmongFoes = candidates[0].Side != enemy.Side;
+        var narrowed = isAmongFoes ? TauntingOrAll(enemy, legal, candidates) : candidates;
+        return target switch
+        {
+            TacticTarget.Self => narrowed.Single(),
+            TacticTarget.LowestHpFoe or TacticTarget.LowestHpOnItsSide or TacticTarget.Subject => LowestShareOf(narrowed),
+            TacticTarget.HighestHpFoe => HighestShareOf(narrowed),
+            _ => throw new ArgumentOutOfRangeException(nameof(target), target, "Unknown tactic target."),
+        };
+    }
 
     public IReadOnlyList<Combatant> ForSkill(BattleState battle, SkillDefinition skill, TacticCondition? condition)
     {
@@ -44,16 +69,31 @@ internal sealed class EnemyTargeting(IRandom random)
             ? legal
             : legal.Intersect(TacticConditions.CombatantsMeeting(condition, battle.CurrentActor, battle));
 
-    // Cross-multiplied, so nothing rounds; a tie keeps the first in battle order.
+    // Cross-multiplied in long, so nothing rounds or overflows; a tie keeps the first in battle order.
     private static Combatant LowestShareOf(IEnumerable<Combatant> candidates) =>
         candidates.Aggregate((lowest, next) =>
-            next.Vitals.Hp * lowest.Vitals.MaxHp < lowest.Vitals.Hp * next.Vitals.MaxHp ? next : lowest);
+            (long)next.Vitals.Hp * lowest.Vitals.MaxHp < (long)lowest.Vitals.Hp * next.Vitals.MaxHp ? next : lowest);
+
+    // Cross-multiplied in long, so nothing rounds or overflows; a tie keeps the first in battle order.
+    private static Combatant HighestShareOf(IEnumerable<Combatant> candidates) =>
+        candidates.Aggregate((highest, next) =>
+            (long)next.Vitals.Hp * highest.Vitals.MaxHp > (long)highest.Vitals.Hp * next.Vitals.MaxHp ? next : highest);
 
     private Combatant ByTauntRule(Combatant enemy, IReadOnlyList<Combatant> candidates)
     {
-        var taunting = candidates.Where(member => member.Statuses.FirstWith(StatusPartKind.DrawAttacks) is not null).ToList();
-        var targets = taunting.Count > 0 && !ResistsTaunt(enemy) ? taunting : candidates;
+        var targets = TauntingOrAll(enemy, candidates, candidates);
         return targets[random.NextBelow(targets.Count)];
+    }
+
+    // The taunting legal foes replace the candidates unless the enemy shrugs the taunt off, a roll made only when a
+    // legal foe taunts.
+    private IReadOnlyList<Combatant> TauntingOrAll(
+        Combatant enemy, IReadOnlyList<Combatant> legal, IReadOnlyList<Combatant> candidates)
+    {
+        var taunting = legal
+            .Where(member => member.Side != enemy.Side && member.Statuses.FirstWith(StatusPartKind.DrawAttacks) is not null)
+            .ToList();
+        return taunting.Count > 0 && !ResistsTaunt(enemy) ? taunting : candidates;
     }
 
     // A taunt is self-granted, so the enemy rolls at its choice, not at the grant (I2).

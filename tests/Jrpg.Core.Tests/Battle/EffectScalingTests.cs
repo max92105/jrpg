@@ -48,4 +48,39 @@ public sealed class EffectScalingTests
 
         Assert.Equal(new StatusGrant(StatusKind.Poison, Power: 15, Turns: 4), scaled.Status);
     }
+
+    // Decision 784: Power 20 at 200 % damage and a tiered record of 4 per Power give 80; Power's percent would count
+    // Power a second time.
+    [Fact]
+    public void ScaledFor_TieredDamage_IsPowerTimesPerPower()
+    {
+        var tier = new TieredEffect("fire_2", EffectKind.Damage, 4);
+        var blast = new Effect(EffectKind.Damage, 0, Targeting.SingleEnemy) { Tier = tier };
+
+        var scaled = EffectScaling.ScaledFor(blast, StrongCaster);
+
+        Assert.Equal(80, scaled.Power);
+    }
+
+    [Fact]
+    public void ScaledFor_TieredHeal_IsPowerTimesPerPower()
+    {
+        var tier = new TieredEffect("heal_1", EffectKind.RestoreHp, 2);
+        var heal = new Effect(EffectKind.RestoreHp, 0, Targeting.SingleAlly) { Tier = tier };
+
+        var scaled = EffectScaling.ScaledFor(heal, StrongCaster);
+
+        Assert.Equal(40, scaled.Power);
+    }
+
+    // The other side: without a tier, Power's percent still raises the flat value.
+    [Fact]
+    public void ScaledFor_FlatDamageByStrongCaster_IsRaisedByDamagePercent()
+    {
+        var blast = new Effect(EffectKind.Damage, 10, Targeting.SingleEnemy);
+
+        Assert.Equal(20, EffectScaling.ScaledFor(blast, StrongCaster).Power);
+    }
+
+    private static CombatStats StrongCaster => new(0) { Power = 20, DamagePermille = 2000 };
 }

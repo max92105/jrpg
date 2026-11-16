@@ -12,6 +12,12 @@ internal static class DamageFormula
 {
     public const int MinimumDamage = 1;
 
+    /// <summary>
+    /// The most a tiered amount reaches, so <see cref="Calculate"/>'s product (up to about 1.8 x 10^12 times the power)
+    /// stays within a <see cref="long"/> (decision 818).
+    /// </summary>
+    public const int MaxPower = 1_000_000;
+
     /// <summary>The crit factor of a hit that didn't crit: the power as it is.</summary>
     public const int NormalHit = 1000;
 
@@ -54,6 +60,20 @@ internal static class DamageFormula
         var damage = (long)power * critPermille * (Whole - resistance) * (Whole + mitigation.ExtraTakenPermille) * blockedShare
             / (Whole * Whole * Whole * WholePercent);
         return (int)Math.Max(MinimumDamage, damage);
+    }
+
+    /// <summary>
+    /// A tiered effect's amount (ADR 0056): Power times the record's <paramref name="perPower"/> times 1 plus the sum
+    /// of the damage modifiers, rounded down once and held within 0 and <see cref="MaxPower"/>. The developer's Damage
+    /// Test sheet (decision 704): at Power 1, a Low tier (2) with modifiers of 33 % and 440 % gives 11.46, kept as 11.
+    /// </summary>
+    /// <param name="power">The user's Power.</param>
+    /// <param name="perPower">The record's amount per point of Power.</param>
+    /// <param name="modifierPermille">The modifiers' sum in permille; -1000 cancels the amount.</param>
+    public static int TieredAmount(int power, int perPower, int modifierPermille)
+    {
+        var amount = (long)power * perPower * (Whole + modifierPermille) / Whole;
+        return (int)Math.Clamp(amount, 0, MaxPower);
     }
 
     /// <returns>

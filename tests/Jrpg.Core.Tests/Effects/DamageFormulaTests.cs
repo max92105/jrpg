@@ -176,4 +176,26 @@ public sealed class DamageFormulaTests
     {
         Assert.Equal(250, DamageFormula.PenetratedResistance(250, 0));
     }
+
+    // The developer's Damage Test sheet (decision 704): Low (2) at Power 1 with 33 % and 440 %: 2 x 5.73 = 11.46.
+    [Fact]
+    public void TieredAmount_SheetLowAtPowerOneWithFourHundredSeventyThreePercent_IsEleven() =>
+        Assert.Equal(11, DamageFormula.TieredAmount(1, 2, 4730));
+
+    // The sheet's Extreme (58) at Power 500 with the same modifiers: 500 x 58 x 5.73 = 166 170.
+    [Fact]
+    public void TieredAmount_SheetExtremeAtPowerFiveHundredWithFourHundredSeventyThreePercent_Is166170() =>
+        Assert.Equal(166_170, DamageFormula.TieredAmount(500, 58, 4730));
+
+    [Fact]
+    public void TieredAmount_NoModifiers_IsPowerTimesPerPower() => Assert.Equal(30, DamageFormula.TieredAmount(15, 2, 0));
+
+    // The floor: Calculate then gives its minimum 1.
+    [Fact]
+    public void TieredAmount_ModifiersAtMinusOneHundredPercent_IsZero() =>
+        Assert.Equal(0, DamageFormula.TieredAmount(15, 2, -1000));
+
+    [Fact]
+    public void TieredAmount_HugeProduct_HeldAtMaxPower() =>
+        Assert.Equal(DamageFormula.MaxPower, DamageFormula.TieredAmount(int.MaxValue, 1000, 0));
 }

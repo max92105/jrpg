@@ -14,6 +14,12 @@ public sealed record CombatStats(int AttackDamage)
     public int DamagePermille { get; init; } = 1000;
 
     /// <summary>
+    /// The combatant's Power, what a tiered effect multiplies (decision 788): a member's sheet Power, gear included; an
+    /// enemy's content power (read from content from the skills and statuses plan's T3, 0 until then).
+    /// </summary>
+    public int Power { get; init; }
+
+    /// <summary>
     /// The hit chance against 0 dodge, in permille (decision 297): a member's from the sheet, an enemy's from content.
     /// </summary>
     public int AccuracyPermille { get; init; } = 1000;

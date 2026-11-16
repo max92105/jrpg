@@ -5,7 +5,9 @@ namespace Jrpg.Core.Effects;
 
 /// <summary>What a skill or consumable does, how strongly, and to whom.</summary>
 /// <param name="Kind">What it changes.</param>
-/// <param name="Power">How much: HP for damage and healing; unused by a status-only effect.</param>
+/// <param name="Power">
+/// How much: HP for damage and healing; unused by a status-only effect; 0, and unread, when <see cref="Tier"/> is set.
+/// </param>
 /// <param name="Targeting">Whom it may be aimed at.</param>
 /// <param name="Status">Granted to each target still standing after the effect; null when none (ADR 0021).</param>
 /// <param name="Range">For <see cref="Targeting.AlliesInRange"/> only: how many places on each side it reaches.</param>
@@ -21,4 +23,8 @@ public sealed record Effect(
     StatusGrant? Status = null,
     int Range = 0,
     int Hits = 1,
-    DamageType? DamageType = null);
+    DamageType? DamageType = null)
+{
+    /// <summary>The tiered effect a skill's damage or heal names (ADR 0056); null for a flat power.</summary>
+    public TieredEffect? Tier { get; init; }
+}

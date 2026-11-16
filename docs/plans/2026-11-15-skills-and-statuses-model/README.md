@@ -81,7 +81,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 - [x] ADR 0056, damage tiers as an effects catalog. Write it from decisions 782-794, 817 and 818, with design.md,
   section 4's options and costs (the catalog chosen; tiers in `rules.json` and today's flat power refused) and the
   resolved-references rebuild row 7 needs (decision 789); the developer delegated approval, so no question is asked.
-- [ ] **T1. A tiered skill deals its user's Power times its record's `perPower`** (Core, about 160 lines) →
+- [x] **T1. A tiered skill deals its user's Power times its record's `perPower`** (Core, about 160 lines) →
   [slices/T1.md](slices/T1.md)
 - [ ] **T2. `effects.json` holds the tiered records and an effect names one by id** (Data + content, about 270 lines
   plus about 60 of JSON) → [slices/T2.md](slices/T2.md)

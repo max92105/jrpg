@@ -10,14 +10,15 @@ namespace Jrpg.Core.Battle;
 internal static class MemberBattleStats
 {
     /// <summary>
-    /// The sheet's attack damage, damage percent, accuracy, dodge, resistances, lifesteal, penetration and block,
-    /// attacking as the worn weapon's type, or as the rules' unarmed type without one.
+    /// The sheet's attack damage, Power, damage percent, accuracy, dodge, resistances, lifesteal, penetration and
+    /// block, attacking as the worn weapon's type, or as the rules' unarmed type without one.
     /// </summary>
     public static CombatStats Of(PartyMember member)
     {
         var sheet = member.Sheet;
         return new CombatStats(sheet.AttackDamage)
         {
+            Power = sheet.Primaries.Power,
             DamagePermille = sheet.DamagePermille,
             AccuracyPermille = sheet.AccuracyPermille,
             DodgePermille = sheet.DodgePermille,

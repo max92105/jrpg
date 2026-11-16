@@ -5,14 +5,15 @@ using Jrpg.Core.Statuses;
 namespace Jrpg.Core.Battle;
 
 /// <summary>
-/// An effect as its user lands it: Power raises every raw value a member deals, damage and healing alike, and
-/// Intelligence shapes the status it grants (decision 296). A turn readied carries no raw value, so it lands as it is.
+/// An effect as its user lands it: a tiered effect's amount is its user's Power times its record's per-Power (ADR
+/// 0056), and Power's percent raises a flat value only, damage and healing alike (decision 784); Intelligence shapes
+/// the status it grants (decision 296). A turn readied carries no raw value, so it lands as it is.
 /// </summary>
 internal static class EffectScaling
 {
     /// <returns>
-    /// A damage, healing or revive effect with its power put through <see cref="StatFormula.Scaled"/>, and any grant
-    /// through <see cref="GrantScaling.Scaled"/>; others as is.
+    /// A damage, healing or revive effect with its power from its tier, else put through
+    /// <see cref="StatFormula.Scaled"/>, and any grant through <see cref="GrantScaling.Scaled"/>; others as is.
     /// </returns>
     /// <param name="effect">The effect as content wrote it.</param>
     /// <param name="user">The stats of whoever uses it.</param>
@@ -20,11 +21,16 @@ internal static class EffectScaling
     {
         var scaled = effect.Kind switch
         {
-            EffectKind.Damage or EffectKind.RestoreHp or EffectKind.Revive => effect with { Power = StatFormula.Scaled(effect.Power, user.DamagePermille) },
+            EffectKind.Damage or EffectKind.RestoreHp or EffectKind.Revive => effect with { Power = AmountOf(effect, user) },
             _ => effect,
         };
         return scaled.Status is { } grant
             ? scaled with { Status = GrantScaling.Scaled(grant, user.StatusPermille, user.ExtraStatusTurns) }
             : scaled;
     }
+
+    // The damage modifiers' sum is 0 until a status gives one (Weakened, decision 786).
+    private static int AmountOf(Effect effect, CombatStats user) => effect.Tier is { } tier
+        ? DamageFormula.TieredAmount(user.Power, tier.PerPower, modifierPermille: 0)
+        : StatFormula.Scaled(effect.Power, user.DamagePermille);
 }

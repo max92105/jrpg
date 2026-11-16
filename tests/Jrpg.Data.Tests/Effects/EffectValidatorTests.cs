@@ -12,8 +12,9 @@ public sealed class EffectValidatorTests
     public static TheoryData<Effect, string> InvalidTieredEffects => new()
     {
         {
-            new Effect(EffectKind.GrantStatus, 0, Targeting.SingleEnemy, new StatusGrant(StatusKind.Poison, 5, 2))
+            new Effect(EffectKind.GrantStatus, 0, Targeting.SingleEnemy)
             {
+                Statuses = [new StatusGrant(StatusKind.Poison, 5, 2)],
                 Tier = _fire1,
             },
             "effect.tier is only for a damage or restoreHp effect (was fire_1 on grantStatus)."
@@ -39,6 +40,39 @@ public sealed class EffectValidatorTests
         Assert.Equal(problem, EffectValidator.FindProblem(effect));
     }
 
+    public static TheoryData<StatusGrant[], string> InvalidStatusLists => new()
+    {
+        { [new StatusGrant(StatusKind.Poison, 5, 2), null!], "effect.statuses must not contain a null entry." },
+        {
+            [new StatusGrant(StatusKind.Poison, 5, 2), new StatusGrant(StatusKind.Poison, 8, 3)],
+            "effect.statuses lists poison twice."
+        },
+        {
+            [new StatusGrant(StatusKind.Poison, 5, 2), new StatusGrant(StatusKind.Exposed, 20, 0)],
+            "effect.statuses[1].turns must be at least 1 (was 0)."
+        },
+    };
+
+    [Theory]
+    [MemberData(nameof(InvalidStatusLists))]
+    public void FindProblem_InvalidStatusList_NamesIt(StatusGrant[] grants, string problem)
+    {
+        var hex = new Effect(EffectKind.GrantStatus, 0, Targeting.SingleEnemy) { Statuses = grants };
+
+        Assert.Equal(problem, EffectValidator.FindProblem(hex));
+    }
+
+    [Fact]
+    public void FindProblem_TwoDifferentStatuses_Accepted()
+    {
+        var hex = new Effect(EffectKind.GrantStatus, 0, Targeting.SingleEnemy)
+        {
+            Statuses = [new StatusGrant(StatusKind.Exposed, 20, 2), new StatusGrant(StatusKind.Poison, 5, 2)],
+        };
+
+        Assert.Null(EffectValidator.FindProblem(hex));
+    }
+
     [Fact]
     public void FindProblem_TieredDamageMatchingItsRecord_Accepted()
     {
@@ -52,7 +86,7 @@ public sealed class EffectValidatorTests
     {
         var problem = EffectValidator.FindProblem(new Effect(EffectKind.GrantStatus, Power: 0, Targeting.SingleEnemy));
 
-        Assert.Equal("effect.status is required for a grantStatus effect.", problem);
+        Assert.Equal("effect.statuses must list at least one status for a grantStatus effect.", problem);
     }
 
     [Fact]
@@ -76,11 +110,14 @@ public sealed class EffectValidatorTests
     [Fact]
     public void FindProblem_StatusWithZeroTurns_ReturnsProblem()
     {
-        var bash = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 0, Turns: 0), DamageType: DamageType.Blunt);
+        var bash = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, DamageType: DamageType.Blunt)
+        {
+            Statuses = [new StatusGrant(StatusKind.Stun, Power: 0, Turns: 0)],
+        };
 
         var problem = EffectValidator.FindProblem(bash);
 
-        Assert.Equal("effect.status.turns must be at least 1 (was 0).", problem);
+        Assert.Equal("effect.statuses[0].turns must be at least 1 (was 0).", problem);
     }
 
     [Fact]
@@ -110,7 +147,10 @@ public sealed class EffectValidatorTests
     [Fact]
     public void FindProblem_NegativeRange_ReturnsProblem()
     {
-        var aura = new Effect(EffectKind.GrantStatus, 0, Targeting.AlliesInRange, new StatusGrant(StatusKind.Guarded, 5, 3), Range: -1);
+        var aura = new Effect(EffectKind.GrantStatus, 0, Targeting.AlliesInRange, Range: -1)
+        {
+            Statuses = [new StatusGrant(StatusKind.Guarded, 5, 3)],
+        };
 
         var problem = EffectValidator.FindProblem(aura);
 
@@ -132,17 +172,23 @@ public sealed class EffectValidatorTests
     [InlineData(101)]
     public void FindProblem_StunPowerOutsideChance_NamesThePower(int power)
     {
-        var bash = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, power, Turns: 1), DamageType: DamageType.Blunt);
+        var bash = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, DamageType: DamageType.Blunt)
+        {
+            Statuses = [new StatusGrant(StatusKind.Stun, power, Turns: 1)],
+        };
 
         var problem = EffectValidator.FindProblem(bash);
 
-        Assert.Equal($"effect.status.power must be within 1..100 for a stun, its chance to land (was {power}).", problem);
+        Assert.Equal($"effect.statuses[0].power must be within 1..100 for a stun, its chance to land (was {power}).", problem);
     }
 
     [Fact]
     public void FindProblem_DamageWithStatus_ReturnsNull()
     {
-        var bash = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, new StatusGrant(StatusKind.Stun, Power: 60, Turns: 1), DamageType: DamageType.Blunt);
+        var bash = new Effect(EffectKind.Damage, Power: 15, Targeting.SingleEnemy, DamageType: DamageType.Blunt)
+        {
+            Statuses = [new StatusGrant(StatusKind.Stun, Power: 60, Turns: 1)],
+        };
 
         var problem = EffectValidator.FindProblem(bash);
 

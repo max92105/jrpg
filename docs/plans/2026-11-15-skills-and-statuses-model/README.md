@@ -101,7 +101,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/R1.md](slices/R1.md)
 - [x] **R2. Game tests build status events through `TestStatuses`** (tests only, about 90 lines) →
   [slices/R2.md](slices/R2.md)
-- [ ] **MS. An effect grants several statuses** (Core + Data + content, about 200 lines) → [slices/MS.md](slices/MS.md)
+- [x] **MS. An effect grants several statuses** (Core + Data + content, about 200 lines) → [slices/MS.md](slices/MS.md)
 - [ ] **CH. Every grant has a landing chance** (Core + Data + content, about 110 lines) → [slices/CH.md](slices/CH.md)
 - [ ] **SW. A grant names a status record; `StatusKind` goes** (Core + Data + Game + content, about 260 lines) →
   [slices/SW.md](slices/SW.md)

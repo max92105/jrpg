@@ -46,3 +46,10 @@ kind twice and a bad grant, naming its index. `skills.json` writes `"statuses": 
 
 - **Note from R1's review:** `EffectScalingTests`'s `Assert.Equal(poison, scaled)` compares whole `Effect` records;
   once `Statuses` is a list it compares by reference, so compare the list's contents there.
+
+- **Done, with deviations:** `Effect` keeps its other positional parameters (`Range`, `Hits`, `DamageType`); the
+  grant left the positional list and every call naming it moved to `Statuses = [...]`. `Effect.Equals` compares every
+  field and the statuses in order (R1's review note answered: `EffectScalingTests` compares whole effects safely). The
+  Data messages read `effect.statuses[i]....` and "effect.statuses must list at least one status for a grantStatus
+  effect."; `EffectValidatorTests`' four message rows follow them. Hand check: Fire Blast's mark is the developer's
+  to see.

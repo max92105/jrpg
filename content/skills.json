@@ -8,7 +8,7 @@
     "resourceChanges": [ { "resourceId": "mana", "amount": -2 } ],
     "effect": {
       "kind": "damage", "damageType": "fire", "power": 0, "tier": "fire_1", "targeting": "singleEnemy",
-      "status": { "kind": "poison", "power": 5, "turns": 2 }
+      "statuses": [ { "kind": "poison", "power": 5, "turns": 2 } ]
     }
   },
   {
@@ -48,7 +48,7 @@
     "requirements": [ { "resourceId": "faith", "atLeast": 2 } ],
     "effect": {
       "kind": "restoreHp", "power": 0, "tier": "heal_1", "targeting": "self",
-      "status": { "kind": "regen", "power": 6, "turns": 2 }
+      "statuses": [ { "kind": "regen", "power": 6, "turns": 2 } ]
     }
   },
   {
@@ -78,7 +78,7 @@
     "resourceChanges": [ { "resourceId": "stamina", "amount": -3 } ],
     "effect": {
       "kind": "damage", "damageType": "blunt", "power": 0, "tier": "blunt_1", "targeting": "singleEnemy",
-      "status": { "kind": "stun", "power": 60, "turns": 1 }
+      "statuses": [ { "kind": "stun", "power": 60, "turns": 1 } ]
     }
   },
   {
@@ -89,7 +89,7 @@
     "soundFile": "PlaceholderSkillShout.wav",
     "effect": {
       "kind": "grantStatus", "power": 0, "targeting": "self",
-      "status": { "kind": "taunt", "power": 0, "turns": 2 }
+      "statuses": [ { "kind": "taunt", "power": 0, "turns": 2 } ]
     }
   },
   {
@@ -119,7 +119,7 @@
     "resourceChanges": [ { "resourceId": "conviction", "amount": -4 } ],
     "effect": {
       "kind": "grantStatus", "power": 0, "targeting": "alliesInRange", "range": 1,
-      "status": { "kind": "guarded", "power": 20, "turns": 3 }
+      "statuses": [ { "kind": "guarded", "power": 20, "turns": 3 } ]
     }
   },
   {
@@ -131,7 +131,7 @@
     "resourceChanges": [ { "resourceId": "conviction", "amount": -6 } ],
     "effect": {
       "kind": "grantStatus", "power": 0, "targeting": "alliesInRange", "range": 2,
-      "status": { "kind": "guarded", "power": 12, "turns": 3 }
+      "statuses": [ { "kind": "guarded", "power": 12, "turns": 3 } ]
     }
   },
   {
@@ -152,7 +152,7 @@
     "soundFile": "PlaceholderSkillHex.wav",
     "effect": {
       "kind": "grantStatus", "power": 0, "targeting": "singleEnemy",
-      "status": { "kind": "exposed", "power": 50, "turns": 3 }
+      "statuses": [ { "kind": "exposed", "power": 50, "turns": 3 } ]
     }
   },
   {
@@ -164,7 +164,7 @@
     "resourceChanges": [ { "resourceId": "instability", "amount": 2 } ],
     "effect": {
       "kind": "damage", "damageType": "dark", "power": 0, "tier": "dark_1", "targeting": "singleEnemy",
-      "status": { "kind": "exposed", "power": 20, "turns": 2 }
+      "statuses": [ { "kind": "exposed", "power": 20, "turns": 2 } ]
     }
   },
   {
@@ -196,7 +196,7 @@
     "resourceChanges": [ { "resourceId": "growth", "amount": 2 } ],
     "effect": {
       "kind": "grantStatus", "power": 0, "targeting": "singleAlly",
-      "status": { "kind": "regen", "power": 10, "turns": 3 }
+      "statuses": [ { "kind": "regen", "power": 10, "turns": 3 } ]
     }
   },
   {
@@ -208,7 +208,7 @@
     "resourceChanges": [ { "resourceId": "decay", "amount": 2 } ],
     "effect": {
       "kind": "grantStatus", "power": 0, "targeting": "singleEnemy",
-      "status": { "kind": "poison", "power": 8, "turns": 3 }
+      "statuses": [ { "kind": "poison", "power": 8, "turns": 3 } ]
     }
   },
   {
@@ -228,7 +228,7 @@
     "soundFile": "PlaceholderSkillBlunt.wav",
     "effect": {
       "kind": "damage", "damageType": "blunt", "power": 0, "tier": "blunt_1", "targeting": "singleEnemy", "hits": 2,
-      "status": { "kind": "stun", "power": 30, "turns": 1 }
+      "statuses": [ { "kind": "stun", "power": 30, "turns": 1 } ]
     }
   },
   {
@@ -264,7 +264,7 @@
     "soundFile": "PlaceholderSkillBlunt.wav",
     "effect": {
       "kind": "damage", "damageType": "blunt", "power": 0, "tier": "blunt_2", "targeting": "singleEnemy",
-      "status": { "kind": "stun", "power": 40, "turns": 1 }
+      "statuses": [ { "kind": "stun", "power": 40, "turns": 1 } ]
     }
   },
   {
@@ -275,7 +275,7 @@
     "soundFile": "PlaceholderSkillShout.wav",
     "effect": {
       "kind": "grantStatus", "power": 0, "targeting": "allAllies",
-      "status": { "kind": "guarded", "power": 20, "turns": 2 }
+      "statuses": [ { "kind": "guarded", "power": 20, "turns": 2 } ]
     }
   }
 ]

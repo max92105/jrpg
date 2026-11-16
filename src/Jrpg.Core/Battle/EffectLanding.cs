@@ -56,9 +56,12 @@ internal sealed class EffectLanding(IReadOnlyList<Combatant> combatants, ChanceR
             {
                 Fall(target, combatants, events);
             }
-            else if (effect.Status is { } grant && target.IsAlive && hasLanded)
+            else if (target.IsAlive && hasLanded)
             {
-                Grant(grant, target, events);
+                foreach (var grant in effect.Statuses)
+                {
+                    Grant(grant, target, events);
+                }
             }
         }
     }

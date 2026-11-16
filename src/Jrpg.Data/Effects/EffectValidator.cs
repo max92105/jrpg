@@ -1,5 +1,6 @@
 using Jrpg.Core.Effects;
 using Jrpg.Core.Stats;
+using Jrpg.Core.Statuses;
 using Jrpg.Data.Content;
 using Jrpg.Data.Statuses;
 
@@ -15,7 +16,7 @@ internal static class EffectValidator
         ?? FindKindProblem(effect)
         ?? FindDamageTypeProblem(effect)
         ?? (effect.Tier is { } tier ? FindTierProblem(effect, tier) : null)
-        ?? (effect.Status is { } grant ? StatusGrantValidator.FindProblem(grant) : null);
+        ?? FindStatusesProblem(effect.Statuses);
 
     // A tiered effect only sets a damage's or a heal's amount, and the effect repeats its record's kind and type, which
     // the record decides (ADR 0056); the effect's own power is left at 0 (decision 792).
@@ -80,8 +81,27 @@ internal static class EffectValidator
         }
 
         // A grantStatus effect changes nothing else, so without a status it would do nothing.
-        return effect.Kind == EffectKind.GrantStatus && effect.Status is null
-            ? "effect.status is required for a grantStatus effect."
+        return effect.Kind == EffectKind.GrantStatus && effect.Statuses.Count == 0
+            ? "effect.statuses must list at least one status for a grantStatus effect."
             : null;
+    }
+
+    // The serializer lets a null list element through; one kind twice would refresh itself on landing (decision 809).
+    private static string? FindStatusesProblem(IReadOnlyList<StatusGrant> grants)
+    {
+        if (grants.Any(grant => grant is null))
+        {
+            return "effect.statuses must not contain a null entry.";
+        }
+
+        var repeated = grants.GroupBy(grant => grant.Kind).FirstOrDefault(group => group.Count() > 1);
+        if (repeated is not null)
+        {
+            return $"effect.statuses lists {ContentJsonOptions.EnumName(repeated.Key)} twice.";
+        }
+
+        return grants
+            .Select((grant, index) => StatusGrantValidator.FindProblem(grant, index))
+            .FirstOrDefault(problem => problem is not null);
     }
 }

@@ -68,10 +68,15 @@ internal static class BattleScenarios
         IReadOnlyDictionary<string, SkillDefinition> skills, string skillId)
     {
         var skill = skills[skillId];
-        var stun = skill.Effect.Status ?? throw new InvalidOperationException($"{skillId} grants no status.");
+        var stun = skill.Effect.Statuses is [var only]
+            ? only
+            : throw new InvalidOperationException($"{skillId} grants no single status.");
         return new Dictionary<string, SkillDefinition>(skills)
         {
-            [skillId] = skill with { Effect = skill.Effect with { Power = 5, Tier = null, Status = stun with { Power = 100 } } },
+            [skillId] = skill with
+            {
+                Effect = skill.Effect with { Power = 5, Tier = null, Statuses = [stun with { Power = 100 }] },
+            },
         };
     }
 

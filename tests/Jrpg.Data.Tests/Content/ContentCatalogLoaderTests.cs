@@ -183,7 +183,7 @@ public sealed class ContentCatalogLoaderTests
 
         var stamina = fighter.Resources.Single(resource => resource.Id == "stamina");
         Assert.Equal((6, 3, 1), (stamina.Max, stamina.StartsAt, stamina.Gains.PerTurn));
-        Assert.Equal(new StatusGrant(StatusKind.Stun, 60, 1), catalog.Skills["shield_bash"].Effect.Status);
+        Assert.Equal([new StatusGrant(StatusKind.Stun, 60, 1)], catalog.Skills["shield_bash"].Effect.Statuses);
     }
 
     [Fact]
@@ -259,7 +259,8 @@ public sealed class ContentCatalogLoaderTests
         // amount is its tier's (ADR 0056), the developer's to tune, so only the shape is pinned.
         Assert.Equal((EffectKind.RestoreHp, Targeting.Self), (recovery.Kind, recovery.Targeting));
         Assert.Equal(EffectKind.RestoreHp, recovery.Tier?.Kind);
-        Assert.Equal((StatusKind.Regen, 2), (recovery.Status?.Kind, recovery.Status?.Turns));
+        var regen = Assert.Single(recovery.Statuses);
+        Assert.Equal((StatusKind.Regen, 2), (regen.Kind, regen.Turns));
     }
 
     // Decision 320: Intelligence shapes a status, so every class but the rogue, whose Power acts through its attack,
@@ -270,6 +271,8 @@ public sealed class ContentCatalogLoaderTests
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
         var classes = catalog.Classes.Values.Where(characterClass => characterClass.Id != "rogue");
 
-        Assert.All(classes, characterClass => Assert.Contains(characterClass.SkillIds, id => catalog.Skills[id].Effect.Status is not null));
+        Assert.All(
+            classes,
+            characterClass => Assert.Contains(characterClass.SkillIds, id => catalog.Skills[id].Effect.Statuses.Count > 0));
     }
 }

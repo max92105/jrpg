@@ -9,7 +9,6 @@ namespace Jrpg.Core.Effects;
 /// How much: HP for damage and healing; unused by a status-only effect; 0, and unread, when <see cref="Tier"/> is set.
 /// </param>
 /// <param name="Targeting">Whom it may be aimed at.</param>
-/// <param name="Status">Granted to each target still standing after the effect; null when none (ADR 0021).</param>
 /// <param name="Range">For <see cref="Targeting.AlliesInRange"/> only: how many places on each side it reaches.</param>
 /// <param name="Hits">How many times it lands on each target, each hit on its own; above 1 only for damage.</param>
 /// <param name="DamageType">
@@ -20,11 +19,29 @@ public sealed record Effect(
     EffectKind Kind,
     int Power,
     Targeting Targeting,
-    StatusGrant? Status = null,
     int Range = 0,
     int Hits = 1,
     DamageType? DamageType = null)
 {
     /// <summary>The tiered effect a skill's damage or heal names (ADR 0056); null for a flat power.</summary>
     public TieredEffect? Tier { get; init; }
+
+    /// <summary>
+    /// Granted in order to each target still standing after the effect landed (ADR 0021, decision 809); empty for an
+    /// effect granting none.
+    /// </summary>
+    public IReadOnlyList<StatusGrant> Statuses { get; init; } = [];
+
+    public bool Equals(Effect? other) =>
+        other is not null
+        && Kind == other.Kind
+        && Power == other.Power
+        && Targeting == other.Targeting
+        && Range == other.Range
+        && Hits == other.Hits
+        && DamageType == other.DamageType
+        && Tier == other.Tier
+        && Statuses.SequenceEqual(other.Statuses);
+
+    public override int GetHashCode() => HashCode.Combine(Kind, Power, Targeting, Statuses.Count);
 }

@@ -13,7 +13,7 @@ internal static class EffectScaling
 {
     /// <returns>
     /// A damage, healing or revive effect with its power from its tier, else put through
-    /// <see cref="StatFormula.Scaled"/>, and any grant through <see cref="GrantScaling.Scaled"/>; others as is.
+    /// <see cref="StatFormula.Scaled"/>, and every grant through <see cref="GrantScaling.Scaled"/>; others as is.
     /// </returns>
     /// <param name="effect">The effect as content wrote it.</param>
     /// <param name="user">The stats of whoever uses it.</param>
@@ -24,9 +24,11 @@ internal static class EffectScaling
             EffectKind.Damage or EffectKind.RestoreHp or EffectKind.Revive => effect with { Power = AmountOf(effect, user) },
             _ => effect,
         };
-        return scaled.Status is { } grant
-            ? scaled with { Status = GrantScaling.Scaled(grant, user.StatusPermille, user.ExtraStatusTurns) }
-            : scaled;
+        return scaled with
+        {
+            Statuses = [.. scaled.Statuses.Select(
+                grant => GrantScaling.Scaled(grant, user.StatusPermille, user.ExtraStatusTurns))],
+        };
     }
 
     // The damage modifiers' sum is 0 until a status gives one (Weakened, decision 786).

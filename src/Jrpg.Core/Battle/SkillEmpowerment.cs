@@ -14,7 +14,7 @@ internal static class SkillEmpowerment
     /// <param name="skill">The skill, whose resource gains say which forces it feeds.</param>
     /// <param name="effect">The skill's effect as its user lands it (<see cref="EffectScaling"/>), so a dominant force
     /// raises the value Power already raised.</param>
-    /// <returns>The effect, its power raised when a force the skill feeds dominates: the granted status's power for a
+    /// <returns>The effect, its power raised when a force the skill feeds dominates: every granted status's power for a
     /// grant, the effect's own otherwise.</returns>
     public static Effect EffectOf(Combatant actor, SkillDefinition skill, Effect effect)
     {
@@ -23,8 +23,12 @@ internal static class SkillEmpowerment
             return effect;
         }
 
-        return effect is { Kind: EffectKind.GrantStatus, Status: { } grant }
-            ? effect with { Status = grant with { Power = DominanceFormula.Empowered(grant.Power, rule.BonusPercent) } }
+        return effect.Kind == EffectKind.GrantStatus
+            ? effect with
+            {
+                Statuses = [.. effect.Statuses.Select(
+                    grant => grant with { Power = DominanceFormula.Empowered(grant.Power, rule.BonusPercent) })],
+            }
             : effect with { Power = DominanceFormula.Empowered(effect.Power, rule.BonusPercent) };
     }
 

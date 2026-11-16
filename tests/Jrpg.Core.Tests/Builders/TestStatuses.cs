@@ -48,5 +48,5 @@ internal static class TestStatuses
     public static int AmountOf(StatusGrant grant) => grant.Power;
 
     /// <summary>The effect, granting <paramref name="grant"/> to each target still standing after it.</summary>
-    public static Effect Granting(Effect effect, StatusGrant grant) => effect with { Status = grant };
+    public static Effect Granting(Effect effect, StatusGrant grant) => effect with { Statuses = [grant] };
 }

@@ -73,3 +73,6 @@ skills an enemy can use.
    lowestHpFoe doesn't fit cleave, which aims at allEnemies.". Revert the file.
 - **Note from EB1:** the `(typeof(EnemyAction), "on")` row of `AbsentWhenNullFilter` landed in EB1 (the identical-bytes
   test needed it once `On` existed); EB2 keeps the rest of its Data changes.
+- **Done, with deviations:** `TacticTargetFit.AimOf(skill)` is public (Data's message names the attack's aim, and
+  `AttackEffect` is internal); tests add a subject misfit on the attack, a requirement row in `RefusalOf` and
+  `Fits_EveryTargetAfterEveryKind_Answers`; `Load_UnknownOn` asserts the serializer's field path, not its words.

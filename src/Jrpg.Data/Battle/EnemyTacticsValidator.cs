@@ -1,6 +1,6 @@
 using Jrpg.Core.Battle;
-using Jrpg.Core.Effects;
 using Jrpg.Core.Skills;
+using Jrpg.Data.Content;
 using static Jrpg.Data.Content.RangeProblems;
 
 namespace Jrpg.Data.Battle;
@@ -70,17 +70,43 @@ internal static class EnemyTacticsValidator
             ? $"{field} must not be null."
             : AtLeast($"{field}.weight", action.Weight, 1)
                 ?? FindConditionProblem(action.When, $"{field}.when")
-                ?? FindSkillProblem(action.SkillId, field, skills);
+                ?? FindSkillProblem(action.SkillId, field, skills)
+                ?? FindTargetProblem(action, field, skills);
 
     // A percent of 0 or 100 would make an HP condition never or nearly always hold, so content says what it means.
-    private static string? FindConditionProblem(TacticCondition? condition, string field) =>
-        condition switch
+    private static string? FindConditionProblem(TacticCondition? condition, string field)
+    {
+        if (condition is null)
         {
-            null => null,
-            { Kind: TacticConditionKind.AllyFallen, Percent: not 0 } => $"{field}.percent must be left out of allyFallen (was {condition.Percent}).",
-            { Kind: TacticConditionKind.AllyFallen } => null,
-            _ => Within($"{field}.percent", condition.Percent, 1, 99),
+            return null;
+        }
+
+        return TacticConditionKinds.ShapeOf(condition.Kind).Number switch
+        {
+            TacticConditionNumber.Percent => Within($"{field}.percent", condition.Percent, 1, 99),
+            TacticConditionNumber.None when condition.Percent != 0 =>
+                $"{field}.percent must be left out of {ContentJsonOptions.EnumName(condition.Kind)} (was {condition.Percent}).",
+            TacticConditionNumber.None => null,
+            _ => throw new ArgumentOutOfRangeException(nameof(condition), condition.Kind, "Unknown tactic condition number."),
         };
+    }
+
+    // Runs after the skill's own check, so a skill id the action names is known by then.
+    private static string? FindTargetProblem(
+        EnemyAction action, string field, IReadOnlyDictionary<string, SkillDefinition> skills)
+    {
+        var skill = action.SkillId is { } skillId ? skills[skillId] : null;
+        if (action.On is not { } target || TacticTargetFit.Fits(action, skill))
+        {
+            return null;
+        }
+
+        var label = action.SkillId ?? "attack";
+        var named = $"{field} ({label}).on: {ContentJsonOptions.EnumName(target)}";
+        return target == TacticTarget.Subject && action.When is null
+            ? $"{named} needs a when that names someone."
+            : $"{named} doesn't fit {label}, which aims at {ContentJsonOptions.EnumName(TacticTargetFit.AimOf(skill))}.";
+    }
 
     private static string? FindSkillProblem(string? skillId, string field, IReadOnlyDictionary<string, SkillDefinition> skills)
     {
@@ -94,20 +120,13 @@ internal static class EnemyTacticsValidator
             : $"{field}.skillId has unknown skill id '{skillId}'.";
     }
 
-    // Enemies have no class resources (ADR 0019) and no formation (ADR 0023); quick skills must spend a resource, so
-    // the first rule covers them.
-    private static string? FindUsabilityProblem(SkillDefinition skill, string named)
-    {
-        if (skill.ResourceChanges.Count > 0 || skill.Requirements.Count > 0)
+    private static string? FindUsabilityProblem(SkillDefinition skill, string named) =>
+        EnemySkillUse.RefusalOf(skill) switch
         {
-            return $"{named} uses a class resource, and enemies have none.";
-        }
-
-        return skill.Effect.Targeting switch
-        {
-            Targeting.AlliesInRange => $"{named} aims along the party's formation, which enemies have none of.",
-            Targeting.OtherCombatant => $"{named} places a readied turn, a rogue's resource mechanic.",
-            _ => null,
+            null => null,
+            EnemySkillRefusal.UsesClassResource => $"{named} uses a class resource, and enemies have none.",
+            EnemySkillRefusal.AimsAlongFormation => $"{named} aims along the party's formation, which enemies have none of.",
+            EnemySkillRefusal.PlacesReadiedTurn => $"{named} places a readied turn, a rogue's resource mechanic.",
+            { } refusal => throw new ArgumentOutOfRangeException(nameof(skill), refusal, "Unknown enemy skill refusal."),
         };
-    }
 }

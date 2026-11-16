@@ -106,7 +106,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 - [x] **EB1. Today's choices recorded; a rule names its target: itself, the lowest or highest HP foe, the lowest HP on
   its side, or whom its condition names** (Core, about 270 lines plus a 70-line replay test first) →
   [slices/EB1.md](slices/EB1.md)
-- [ ] **EB2. `on` in `enemies.json`: loaded, checked against the skill's aim and the trigger, written; which skills an
+- [x] **EB2. `on` in `enemies.json`: loaded, checked against the skill's aim and the trigger, written; which skills an
   enemy can use moves to Core** (Core + Data, about 290 lines) → [slices/EB2.md](slices/EB2.md)
 
 ### Phase 2: the Tactics tab

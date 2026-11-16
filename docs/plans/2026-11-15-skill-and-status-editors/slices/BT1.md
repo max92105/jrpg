@@ -61,3 +61,5 @@ level. Two Core readings make the battle's internal rule readable; nothing in th
 
 ## Verify by hand
 None: the page comes in BT3.
+- **Note from FX2:** Core's `TieredEffect.AmountAt(power)` (decision 1001) already reads a tier's one hit at a
+  Power, before modifiers; the tier sheet (BT2) builds on it.

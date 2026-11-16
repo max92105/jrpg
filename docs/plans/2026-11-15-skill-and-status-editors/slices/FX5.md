@@ -6,7 +6,7 @@ and 2.6 ("Rebinding, catalog-wide"). Builds on FX1 (`CatalogReferences`), FX2 (`
 ## Goal
 The Statuses page's state without its page: every status in id order then the added ones; Add, Duplicate, New tier
 (decision 985: `poison_2` after `poison_1`, the family kept), Remove only an added one; the families the Family box
-offers; the problem line (the chosen one's own, then another's by id, then Data's: a family whose parts differ, an
+offers; the problem line (a status's own, in list order, then Data's: a family whose parts differ, an
 amount out of range, then what names the statuses over the rebound catalog); the session applied as one step that
 rebinds the catalog, so every skill and item granting an edited status holds the new record.
 

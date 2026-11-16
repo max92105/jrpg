@@ -10,7 +10,7 @@ Database > Effects... opens the `effects.json` page: every tiered effect in id o
 typed (id while new, kind `damage` or `restoreHp`, damage type for a damage, `perPower`), its "Used by" line (the
 draft's skills naming it) and "At Power 10: 20 per hit" line (Core's `DamageFormula.TieredAmount`); Add, Duplicate
 (the copy's id filled with the next tier, `fire_2` after `fire_1`, still editable), Remove only an added one; the
-problem line (the chosen one's own, then another's by id, then Data's, skills included); OK applies the session as one
+problem line (an effect's own, in list order, then Data's, skills included); OK applies the session as one
 `SetTieredEffects` step, everything naming an effect following it. A new or retuned tier is made without JSON.
 
 ## New types
@@ -70,8 +70,22 @@ problem line (the chosen one's own, then another's by id, then Data's, skills in
    per hit".
 2. Per Power 3: the line reads 30; OK, Save all: `git diff content/effects.json` shows `fire_1`'s number only. Run the
    game: Fire Blast hits harder. Ctrl+Z, Save all.
-3. Choose `heal_1`, Kind damage: the problem line names `skills.json` and a healing skill (Data's message), OK greys;
-   Esc.
+3. Choose `heal_1`, Kind damage: the problem line reads `effects.json`'s "a damage effect needs a damageType." (the
+   type box stays empty); pick Damage type fire: it names `skills.json` and a healing skill (Data's message); OK greys
+   throughout; Esc.
 4. Duplicate `fire_2`: the copy reads `fire_3`, its Per Power 4; OK; Database > Skills..., `fireball`'s Tier box
    offers `fire_3`; Esc, then Ctrl+Z takes `fire_3` out.
 5. Run `.claude/scripts/open-editor-windows.ps1`: "Database>Effects...: opened", no `ERROR` or binding-error line.
+- **Done (FX2a, the rules):** `Catalogs/TierIds`, `Effects/TieredEffectViewModel`, `TieredEffectCatalogViewModel`,
+  `TieredEffectEditingViewModel`, their tests and the map lines; no page, menu entry or shell wiring yet (FX2b).
+  Deviations: `DamageFormula` is internal to Core, so the amount line reads Core's new `TieredEffect.AmountAt(power)`
+  (one hit before modifiers and target, through `DamageFormula.TieredAmount`; decision 1001, tested in Core's
+  `TieredEffectTests`). `DuplicateOf` takes the saved ids as a third parameter, for the copy's id problem. Unnumbered
+  choices: Add starts a damage of Core's first type at per-Power 1 (Data's least, a named constant), so only the id is
+  left to type; a damage type is kept while the kind is a heal and written empty, and switching back to damage fills
+  none (as SK6), so hand check 3 now reads `effects.json`'s message first; the per-Power box's problem says "Per
+  Power"; `TierIds.Next` counts the chosen id among the taken ones, counts past int's range in a `long` and ignores a
+  number too big for an int. Size: about 335 Editor lines with their doc comments (the plan's rules about 110) and 7
+  in Core; tests about 520 (Editor 42 tests, Core 3). The problem line is `RecordListProblem`'s, as on every page: an
+  effect's own, in list order, then Data's (the Goal said the chosen one's first; reworded here and in FX5.md).
+  Duplicate on an added effect whose id is still empty gives the copy an empty id rather than `_1`.

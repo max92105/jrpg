@@ -13,4 +13,11 @@ public sealed record TieredEffect(string Id, EffectKind Kind, int PerPower)
 {
     /// <summary>A damage record's type, which the target's resistance meets; null for a heal.</summary>
     public DamageType? DamageType { get; init; }
+
+    /// <summary>
+    /// One hit's amount at that Power before any modifier and target (decision 1001): Power times
+    /// <see cref="PerPower"/>, through <see cref="DamageFormula.TieredAmount"/>, so held within 0 and
+    /// <see cref="DamageFormula.MaxPower"/>. The Effects page's "At Power 10" line reads it.
+    /// </summary>
+    public int AmountAt(int power) => DamageFormula.TieredAmount(power, PerPower, 0);
 }

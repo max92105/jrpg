@@ -282,6 +282,9 @@ Plan-wide:
   the strip tool is opened by script.
 - **997.** No save format change; no game rule changes. Core gains two public readings for the table (BT1), each a
   wrapper over the battle's own rule with a test.
+- **1001.** (taken at FX2: `DamageFormula` is internal to Core) The Effects page's "At Power 10" line reads a third
+  public reading, brought forward from the balance table's: `TieredEffect.AmountAt(int power)`, one hit before
+  modifiers and target through `DamageFormula.TieredAmount`; BT2's tier sheet adds the modifiers when it needs them.
 
 ## Defaults to confirm
 Taken while the developer was away, each his to overturn:

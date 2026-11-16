@@ -48,3 +48,7 @@ Generated PNG probes (verified 2026-11-14, NU2 review): a PowerShell 5.1 script 
 System.Drawing`, `[System.Drawing.Bitmap]::FromFile(...)` and `GetPixel` per column/row prints alpha and colors; a copy of
 an art-src script without its last calls (sed) plus Write-Host lines prints its intermediate values. Found PowerShell's
 `[Math]::Min(1, 0.92)` picks the Int32 overload (returns 1) and LinearGradientBrush tiles past its rectangle.
+
+WPF lifetime fact (probed 2026-11-16, WD5 review, PowerShell -STA): a modal Window closed by DialogResult raises
+Closed, ShowDialog returns, then Unloaded reaches its content's UserControl at the next dispatcher pump; so
+Loaded/Unloaded-paired work stops a few frames after the opener's apply runs, not before it.

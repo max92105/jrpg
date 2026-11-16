@@ -36,6 +36,8 @@ SelectedItem ("" or any value) is not in its ItemsSource leaves the source alone
 But (probed 2026-11-16, SK4, .NET 10 scratch project) on a DataContext switch to a value not in the list the box keeps
 showing the previous item (blank only if the previous was blank or on first load): flag shared boxes over folder
 choices whose records may name a missing file; fix by appending the missing names to the choices.
+A nullable-enum SelectedItem set to null (not in the list, per-item enum arrays) shows blank and writes nothing back
+on switches or close; a SelectedValuePath box over a shared list writes nothing back on switches (SK6, 2026-11-16).
 An ItemsSource set by a style DataTrigger (EW1, 2026-11-15) still shows the locally bound SelectedItem on open, after a
 null-then-set DataContext and on switching: the trigger's late ItemsSource loses nothing.
 

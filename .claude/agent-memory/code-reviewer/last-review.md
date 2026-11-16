@@ -5,15 +5,17 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-items-uniques-affixes, slice IU3 (FixedAffixConverter, UniqueItemRules, loader reads affixes.json
-before items.json, writer's ItemConverters, CheckItems passes content.Affixes, placeholder chiefs_cleaver).
-2026-11-16. Round 1. Verdict: Ready to commit (no Critical, no Warning).
+Plan 2026-11-15-items-uniques-affixes, slice IU4 (GearRepair.RepairAffixes -> FollowRecord / plain / ClampAffixes,
+ShopStockRepair.IsKept keeps a unique with a gone affix, ForgeRefusal.FixedAffixes first in QuoteReroll, PieceName
+names a Unique by its base name). 2026-11-16. Round 1. Verdict: Ready to commit (no Critical, no Warning).
 
-- Follow-up (open, for IU15): ContentWriter.CheckCatalogs runs CheckItems before CheckAffixes, the reverse of the
-  loader's new order; once the Affixes page edits the pool, an affix edited to span 0 with a unique at -1 on it is
-  named as items.json's sign problem instead of affixes.json's range. Swap the two lines in IU15.
-- Checked, no finding: five old validator test files' helpers keep each file's name and every assertion; side-of-zero
-  rule can't meet a 0-spanning range at load (AffixCatalogValidator refuses it, now read first); loader move only puts
-  affixes.json ahead of items/crafting/shops/quests/cinematics, no other pair reordered; int.MinValue tested; null
-  entry tested end to end.
-- IU2's two optional Suggestions dropped (other slice, optional).
+- Suggestion (open, optional): GearRepairTests' IsNotClamped test feeds the same input as ReportsNothing; feed it a
+  non-record piece (e.g. Magic power 3) so it alone proves the record's 9 escapes the clamp.
+- Suggestion (open, optional): the `sturdy` AffixDefinition is now built in two GearRepairTests tests; hoist a field.
+- Follow-up (open): ItemDefinitionBuilder has no AsUnique; the `with { IsUnique = true, FixedAffixes = ... }` block is in
+  about 15 test files.
+- Follow-up (open, for IU15, carried from IU3): ContentWriter.CheckCatalogs runs CheckItems before CheckAffixes, the
+  reverse of the loader's order; swap them in IU15.
+- Checked, no finding: SavedGear unchanged (no save format change); SavedGear.Equals compares affixes by sequence, so
+  the "follows its record" report fires only on a real difference; RepairWorn runs before BonusesOf
+  (SaveGameRepair.cs:80-84) and the worn test's 215 -> 203 fails if the Unique affix were summed (221 max with it).

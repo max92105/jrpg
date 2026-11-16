@@ -8,6 +8,10 @@
       <Setter Property="Width" Value="90" />
       <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
+    <!-- A click into a cost row's box chooses that row, so Add and Remove act on the row being typed in. -->
+    <Style x:Key="CostRow" TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+      <EventSetter Event="PreviewGotKeyboardFocus" Handler="OnCostRowFocused" />
+    </Style>
   </UserControl.Resources>
   <DockPanel>
     <!-- The draft's skills in id order, the ones added this session after them; only those can be removed. -->
@@ -30,7 +34,7 @@
       </ListBox>
     </DockPanel>
 
-    <!-- The chosen skill: its texts and files; its costs, effect and statuses keep their file values until their sections
+    <!-- The chosen skill: its texts, files and costs; its effect and statuses keep their file values until their sections
          exist. Who uses it is read-only: the classes and enemies files name it. -->
     <ScrollViewer Margin="12,0,0,0" VerticalScrollBarVisibility="Auto">
       <StackPanel DataContext="{Binding SelectedSkill}" Style="{StaticResource EnabledWhenChosen}">
@@ -90,6 +94,62 @@
                    Foreground="{StaticResource MutedTextBrush}"
                    Margin="90,2,0,0" />
         <CheckBox Content="Quick" Margin="90,6,0,0" IsChecked="{Binding IsQuick}" ToolTip="Keeps the turn; needs a cost" />
+
+        <!-- Costs as Core holds them: changes (negative spends, positive gains), then needs, never spent. -->
+        <StackPanel DataContext="{Binding Costs}">
+          <TextBlock Text="Costs" FontWeight="Bold" Margin="0,12,0,0" />
+          <TextBlock Text="{Binding SummaryText}" Foreground="{StaticResource MutedTextBrush}" Margin="0,2,0,0" />
+          <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+            <TextBlock Text="Changes" Style="{StaticResource FieldLabel}" VerticalAlignment="Top" />
+            <ListBox Width="320" MinHeight="24" ItemsSource="{Binding Changes}" SelectedItem="{Binding SelectedChange}"
+                     ItemContainerStyle="{StaticResource CostRow}">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal">
+                    <ComboBox Width="220"
+                              ItemsSource="{Binding DataContext.Choices.Resources, RelativeSource={RelativeSource AncestorType=skills:SkillCatalogPage}}"
+                              DisplayMemberPath="Label"
+                              SelectedValuePath="Id"
+                              SelectedValue="{Binding ResourceId}" />
+                    <TextBox Width="60"
+                             Margin="4,0,0,0"
+                             Text="{Binding AmountText, UpdateSourceTrigger=PropertyChanged}"
+                             ToolTip="Negative spends, positive gains" />
+                  </StackPanel>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+            <StackPanel Margin="4,0,0,0">
+              <Button Content="Add" Width="60" Command="{Binding AddChangeCommand}" ToolTip="A change spending 1 of the first resource, after the chosen row" />
+              <Button Content="Remove" Width="60" Margin="0,4,0,0" Command="{Binding RemoveChangeCommand}" />
+            </StackPanel>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+            <TextBlock Text="Needs" Style="{StaticResource FieldLabel}" VerticalAlignment="Top" />
+            <ListBox Width="320" MinHeight="24" ItemsSource="{Binding Needs}" SelectedItem="{Binding SelectedNeed}"
+                     ItemContainerStyle="{StaticResource CostRow}">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal">
+                    <ComboBox Width="220"
+                              ItemsSource="{Binding DataContext.Choices.Resources, RelativeSource={RelativeSource AncestorType=skills:SkillCatalogPage}}"
+                              DisplayMemberPath="Label"
+                              SelectedValuePath="Id"
+                              SelectedValue="{Binding ResourceId}" />
+                    <TextBox Width="60"
+                             Margin="4,0,0,0"
+                             Text="{Binding AtLeastText, UpdateSourceTrigger=PropertyChanged}"
+                             ToolTip="The least its user must hold; never spent" />
+                  </StackPanel>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+            <StackPanel Margin="4,0,0,0">
+              <Button Content="Add" Width="60" Command="{Binding AddNeedCommand}" ToolTip="A need of 1 of the first resource, after the chosen row" />
+              <Button Content="Remove" Width="60" Margin="0,4,0,0" Command="{Binding RemoveNeedCommand}" />
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
         <TextBlock Text="{Binding DataContext.LearnedByText, RelativeSource={RelativeSource AncestorType=skills:SkillCatalogPage}}"
                    TextWrapping="Wrap"
                    Margin="0,12,0,0" />

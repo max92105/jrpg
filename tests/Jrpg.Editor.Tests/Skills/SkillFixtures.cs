@@ -22,7 +22,7 @@ internal static class SkillFixtures
         ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
     /// <summary>A Skills page with nothing in its boxes' folders and no strip record.</summary>
-    public static SkillChoices NoChoices { get; } = new([], [], [], new Dictionary<string, EffectStripDefinition>());
+    public static SkillChoices NoChoices { get; } = new([], [], [], new Dictionary<string, EffectStripDefinition>(), []);
 
     public static TieredEffect Fire1 { get; } = new("fire_1", EffectKind.Damage, 3) { DamageType = DamageType.Fire };
 

@@ -8,9 +8,9 @@ namespace Jrpg.Editor.Skills;
 
 /// <summary>
 /// One skill as the Skills page edits it (ADR 0045): its id (typed while the skill is new, fixed once the draft holds
-/// it, decision 582), name, description, icon, sound, own strip and quick flag as typed. What no box edits yet (its
-/// costs and effect) is carried from the record it came from, so the page never wipes it. <see cref="Problem"/> is only
-/// the typed id's: the rest is Data's rules, which the list shows for every skill at once.
+/// it, decision 582), name, description, icon, sound, own strip, quick flag and costs as typed. What no box edits yet
+/// (its effect) is carried from the record it came from, so the page never wipes it. <see cref="Problem"/> is only the
+/// typed id's and the cost rows': the rest is Data's rules, which the list shows for every skill at once.
 /// </summary>
 internal sealed partial class SkillViewModel : ObservableObject
 {
@@ -22,10 +22,12 @@ internal sealed partial class SkillViewModel : ObservableObject
     // The saved skills' ids: fixed and never removed in a session (decision 581), so read once.
     private readonly IReadOnlyCollection<string> _takenIds;
 
-    private SkillViewModel(SkillDefinition original, string idText, IReadOnlyCollection<string> takenIds)
+    private SkillViewModel(SkillDefinition original, string idText, IReadOnlyCollection<string> takenIds, SkillCosts costs)
     {
         _original = original;
         _takenIds = takenIds;
+        Costs = costs;
+        costs.Changed += (_, _) => Changed?.Invoke(this, EventArgs.Empty);
         IdText = idText;
         Name = original.Name;
         Description = original.Description;
@@ -41,13 +43,21 @@ internal sealed partial class SkillViewModel : ObservableObject
     /// </summary>
     public event EventHandler? Changed;
 
-    public static SkillViewModel From(SkillDefinition skill) => new(skill, skill.Id, []);
+    /// <param name="skill">The record as the draft holds it.</param>
+    /// <param name="firstResourceId">
+    /// The first resource the cost boxes offer, an added row's; empty when none is.
+    /// </param>
+    public static SkillViewModel From(SkillDefinition skill, string firstResourceId) =>
+        new(skill, skill.Id, [], SkillCosts.From(skill, firstResourceId));
 
     /// <summary>A skill added this session: its id left to type, the rest as the starting record has it.</summary>
     /// <param name="start">The record whose fields the new skill starts with; its id is not used.</param>
     /// <param name="takenIds">The saved skills' ids, which the typed id must not take.</param>
-    public static SkillViewModel ForNew(SkillDefinition start, IReadOnlyCollection<string> takenIds) =>
-        new(start, "", takenIds) { IsNew = true };
+    /// <param name="firstResourceId">
+    /// The first resource the cost boxes offer, an added row's; empty when none is.
+    /// </param>
+    public static SkillViewModel ForNew(SkillDefinition start, IReadOnlyCollection<string> takenIds, string firstResourceId) =>
+        new(start, "", takenIds, SkillCosts.From(start, firstResourceId)) { IsNew = true };
 
     /// <summary>
     /// A skill as Add starts it (decision 977): every text and file empty, the given tier's damage on a single enemy,
@@ -57,10 +67,17 @@ internal sealed partial class SkillViewModel : ObservableObject
     /// The content's first damage tier by id; with none, a flat damage of power 1, which Data's message then refuses.
     /// </param>
     /// <param name="takenIds">The saved skills' ids, which the typed id must not take.</param>
-    public static SkillViewModel New(TieredEffect? firstDamageTier, IReadOnlyCollection<string> takenIds) =>
+    /// <param name="firstResourceId">
+    /// The first resource the cost boxes offer, an added row's; empty when none is.
+    /// </param>
+    public static SkillViewModel New(
+        TieredEffect? firstDamageTier,
+        IReadOnlyCollection<string> takenIds,
+        string firstResourceId) =>
         ForNew(
             new SkillDefinition { Id = "", Name = "", Description = "", IconFile = "", Effect = StartingEffect(firstDamageTier) },
-            takenIds);
+            takenIds,
+            firstResourceId);
 
     /// <summary>
     /// A new skill copying the chosen one as typed, its id left to type (decision 585). Copied from the boxes, not
@@ -69,12 +86,15 @@ internal sealed partial class SkillViewModel : ObservableObject
     /// <param name="chosen">The skill chosen in the list, saved or added.</param>
     /// <param name="takenIds">The saved skills' ids, which the typed id must not take.</param>
     public static SkillViewModel DuplicateOf(SkillViewModel chosen, IReadOnlyCollection<string> takenIds) =>
-        ForNew(chosen.TypedRecord(), takenIds);
+        new(chosen.TypedRecord(), "", takenIds, SkillCosts.CopyOf(chosen.Costs)) { IsNew = true };
 
     /// <summary>
     /// True while the skill was added this session: the only time its id can be typed (decision 582).
     /// </summary>
     public bool IsNew { get; private init; }
+
+    /// <summary>Its resource changes and requirements as typed (decision 979).</summary>
+    public SkillCosts Costs { get; }
 
     /// <summary>The id as typed; the page lets it be typed only while <see cref="IsNew"/>.</summary>
     [ObservableProperty]
@@ -109,14 +129,20 @@ internal sealed partial class SkillViewModel : ObservableObject
 
     public string Id => IdText.Trim();
 
-    /// <summary>Why the typed id can't be used; null for a saved skill or a usable id.</summary>
-    public string? Problem => IsNew ? ObjectIds.ProblemOf(Id, _takenIds) : null;
+    /// <summary>
+    /// Why the skill can't be built: the typed id while new, then a cost row's; null when it can.
+    /// </summary>
+    public string? Problem => (IsNew ? ObjectIds.ProblemOf(Id, _takenIds) : null) ?? Costs.Problem;
 
     /// <summary>
-    /// The record it came from with the typed fields over it: the strip trimmed, and none when its box is empty.
+    /// The record it came from with the typed fields over it: the strip trimmed, and none when its box is empty; the
+    /// costs from their rows.
     /// </summary>
     /// <exception cref="InvalidOperationException">There is a <see cref="Problem"/>.</exception>
-    public SkillDefinition ToSkill() => Problem is { } problem ? throw new InvalidOperationException(problem) : TypedRecord();
+    public SkillDefinition ToSkill() =>
+        Problem is { } problem
+            ? throw new InvalidOperationException(problem)
+            : TypedRecord() with { ResourceChanges = Costs.ToChanges(), Requirements = Costs.ToRequirements() };
 
     // A flat power has no type to repeat, and Data refuses a damage without one; Core's first type stands in until the
     // Effect section's box picks another.
@@ -125,6 +151,7 @@ internal sealed partial class SkillViewModel : ObservableObject
             ? new Effect(EffectKind.Damage, FlatStartingPower, Targeting.SingleEnemy, DamageType: Enum.GetValues<DamageType>()[0])
             : new Effect(tier.Kind, 0, Targeting.SingleEnemy, DamageType: tier.DamageType) { Tier = tier };
 
+    // The costs' rows are left out: a duplicate copies them as typed, and only ToSkill reads them.
     private SkillDefinition TypedRecord() =>
         _original with
         {

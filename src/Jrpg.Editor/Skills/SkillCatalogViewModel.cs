@@ -29,6 +29,9 @@ internal sealed partial class SkillCatalogViewModel : ObservableObject, IEditedC
 
     private readonly TieredEffect? _firstDamageTier;
 
+    // An added cost row starts on it; empty when the boxes offer no resource.
+    private readonly string _firstResourceId;
+
     /// <param name="content">
     /// The draft as it is: the skills edited, the tiers Add starts from and who uses them.
     /// </param>
@@ -41,7 +44,13 @@ internal sealed partial class SkillCatalogViewModel : ObservableObject, IEditedC
         _firstDamageTier = content.TieredEffects.Values
             .Where(tier => tier.Kind == EffectKind.Damage)
             .MinBy(tier => tier.Id, StringComparer.Ordinal);
-        Skills = [.. content.Skills.Values.OrderBy(skill => skill.Id, StringComparer.Ordinal).Select(SkillViewModel.From)];
+        _firstResourceId = choices.Resources is [var first, ..] ? first.Id : "";
+        Skills =
+        [
+            .. content.Skills.Values
+                .OrderBy(skill => skill.Id, StringComparer.Ordinal)
+                .Select(skill => SkillViewModel.From(skill, _firstResourceId)),
+        ];
         foreach (var skill in Skills)
         {
             skill.Changed += OnSkillChanged;
@@ -106,7 +115,7 @@ internal sealed partial class SkillCatalogViewModel : ObservableObject, IEditedC
 
     /// <summary>Adds a skill last and chooses it, so its id is the next thing typed.</summary>
     [RelayCommand]
-    private void AddSkill() => Insert(SkillViewModel.New(_firstDamageTier, _savedIds), Skills.Count);
+    private void AddSkill() => Insert(SkillViewModel.New(_firstDamageTier, _savedIds, _firstResourceId), Skills.Count);
 
     /// <summary>Adds a copy of the chosen skill after it, its id left to type (decision 585).</summary>
     [RelayCommand(CanExecute = nameof(HasSelectedSkill))]

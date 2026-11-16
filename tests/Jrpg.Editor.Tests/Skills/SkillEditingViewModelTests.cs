@@ -24,4 +24,17 @@ public sealed class SkillEditingViewModelTests
         Assert.Equal(1, steps);
         Assert.Equal("Thunder", _draft.Current.Skills["bolt"].Name);
     }
+
+    // The cost lists are rebuilt from their rows, so only a comparison by content keeps the step out.
+    [Fact]
+    public void Apply_Untouched_RecordsNoStep()
+    {
+        var steps = 0;
+        _draft.StepRecorded += (_, _) => steps++;
+        var edited = _skillEditing.Start();
+
+        _skillEditing.Apply(edited);
+
+        Assert.Equal(0, steps);
+    }
 }

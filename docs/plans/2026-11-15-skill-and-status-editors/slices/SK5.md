@@ -53,3 +53,7 @@ resources labelled with their classes; a summary line ("Spends 2 mana, gains 1 f
 3. On `power_strike` (a fighter's), add a Changes row and pick Mana: the problem line names `classes.json` (the fighter
    has no mana), OK greys; Remove the row.
 4. Run `.claude/scripts/open-editor-windows.ps1`: no `ERROR` or binding-error line.
+- **Done, with deviations:** code 295 new lines (`SkillCosts` 178) and XAML +61, past the ~200; tests 410. The classes
+  are listed by id, not file order (the catalog's frozen dictionary keeps none), in `AllIn` and in SK3's `LearnedBy`.
+  `AllIn` also lists a resource a skill names that no class has, last, "(no class)"; the `SkillViewModel` factories take
+  the first offered resource; Duplicate copies cost rows as typed; an SK2 test compares costs by content.

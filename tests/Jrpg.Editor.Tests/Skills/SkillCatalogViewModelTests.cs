@@ -135,7 +135,7 @@ public sealed class SkillCatalogViewModelTests
         Assert.Equal("Skill spark is listed twice.", catalog.Problem);
     }
 
-    // No box edits a cost yet, so the record carries the one the mage can't pay.
+    // The record's cost is one the mage can't pay.
     [Fact]
     public void Problem_ClassCantPayAnEditedSkill_IsDataMessage()
     {
@@ -151,6 +151,32 @@ public sealed class SkillCatalogViewModelTests
         Assert.Equal(
             "classes.json: class 'mage': skillIds lists 'bolt', which uses 'stamina', a resource mage doesn't have.",
             catalog.Problem);
+    }
+
+    [Fact]
+    public void Problem_ZeroAmountTyped_IsDataMessage()
+    {
+        var catalog = CatalogOf(SkillFixtures.Bolt);
+
+        catalog.Skills[0].Costs.Changes[0].AmountText = "0";
+
+        Assert.Equal(
+            "skills.json: skill 'bolt': resourceChanges has a 0 amount for 'mana', which does nothing.",
+            catalog.Problem);
+    }
+
+    // Clarity, offered first, isn't the resource the saved bolt names: the added row reads the offered list.
+    [Fact]
+    public void AddSkill_ThenAddChange_StartsOnTheFirstOfferedResource()
+    {
+        var resources = new ResourceChoice[] { new("clarity", "Clarity (mage)"), new("mana", "Mana (mage)") };
+        var content = SkillFixtures.CatalogWithoutUsers([SkillFixtures.Bolt], [SkillFixtures.Fire1]);
+        var catalog = new SkillCatalogViewModel(content, SkillFixtures.NoChoices with { Resources = resources });
+        catalog.AddSkillCommand.Execute(null);
+
+        catalog.SelectedSkill!.Costs.AddChangeCommand.Execute(null);
+
+        Assert.Equal("clarity", catalog.SelectedSkill.Costs.Changes.Single().ResourceId);
     }
 
     [Fact]

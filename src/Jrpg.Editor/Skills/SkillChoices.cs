@@ -19,8 +19,12 @@ namespace Jrpg.Editor.Skills;
 /// strip, then the strips the skills name that it lacks.
 /// </param>
 /// <param name="StripPaces">The draft's effect strip records by file, for the strip's pace line (decision 982).</param>
+/// <param name="Resources">
+/// What the cost boxes offer (decision 979), as <see cref="ResourceChoice.AllIn"/> lists the draft's resources.
+/// </param>
 internal sealed record SkillChoices(
     IReadOnlyList<string> Icons,
     IReadOnlyList<string> Sounds,
     IReadOnlyList<string> EffectImages,
-    IReadOnlyDictionary<string, EffectStripDefinition> StripPaces);
+    IReadOnlyDictionary<string, EffectStripDefinition> StripPaces,
+    IReadOnlyList<ResourceChoice> Resources);

@@ -1,3 +1,4 @@
+using System.Collections.Frozen;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Core.Party;
@@ -11,17 +12,17 @@ public sealed class SkillUsersTests
 {
     private static readonly ContentCatalog _world = SkillFixtures.TestWorld;
 
-    // Listed against their names' order, so a sort by name would fail.
+    // Listed against id order, and named against it, so a sort by name would fail.
     [Fact]
-    public void LearnedBy_TwoClasses_NamesBothInClassOrder()
+    public void LearnedBy_TwoClasses_NamesBothInIdOrder()
     {
         var warlock = _world.Classes["mage"] with { Id = "warlock", Name = "Warlock", SkillIds = ["bolt"] };
-        var mage = _world.Classes["mage"] with { Name = "Mage", SkillIds = ["zap", "bolt"] };
+        var mage = _world.Classes["mage"] with { Name = "Wizard", SkillIds = ["zap", "bolt"] };
         var content = _world with { Classes = ClassesOf(warlock, mage) };
 
         var line = SkillUsers.LearnedBy("bolt", content);
 
-        Assert.Equal("Learned by: Warlock, Mage", line);
+        Assert.Equal("Learned by: Wizard, Warlock", line);
     }
 
     [Fact]
@@ -50,6 +51,19 @@ public sealed class SkillUsersTests
         Assert.Equal("Used by: Goblin Chief", line);
     }
 
+    // Given against id order and named against it, so a sort by name or the given order would fail.
+    [Fact]
+    public void UsedBy_TwoEnemies_NamesBothInIdOrder()
+    {
+        var tactics = new[] { new EnemyAction { SkillId = "bolt", Weight = 1 } };
+        var wolf = _world.Enemies["goblin"] with { Id = "wolf", Name = "Alpha", Tactics = tactics, Phases = [] };
+        var bat = _world.Enemies["goblin"] with { Id = "bat", Name = "Zubat", Tactics = tactics, Phases = [] };
+
+        var line = SkillUsers.UsedBy("bolt", _world with { Enemies = EnemiesOf(wolf, bat) });
+
+        Assert.Equal("Used by: Zubat, Alpha", line);
+    }
+
     [Fact]
     public void UsedBy_NoEnemy_IsEmpty()
     {
@@ -60,9 +74,10 @@ public sealed class SkillUsersTests
         Assert.Equal("", line);
     }
 
-    private static Dictionary<string, ClassDefinition> ClassesOf(params ClassDefinition[] classes) =>
-        classes.ToDictionary(characterClass => characterClass.Id, StringComparer.Ordinal);
+    // Frozen, as the loader keeps them: its order isn't the order the classes were given in.
+    private static FrozenDictionary<string, ClassDefinition> ClassesOf(params ClassDefinition[] classes) =>
+        classes.ToFrozenDictionary(characterClass => characterClass.Id, StringComparer.Ordinal);
 
-    private static Dictionary<string, EnemyDefinition> EnemiesOf(params EnemyDefinition[] enemies) =>
-        enemies.ToDictionary(enemy => enemy.Id, StringComparer.Ordinal);
+    private static FrozenDictionary<string, EnemyDefinition> EnemiesOf(params EnemyDefinition[] enemies) =>
+        enemies.ToFrozenDictionary(enemy => enemy.Id, StringComparer.Ordinal);
 }

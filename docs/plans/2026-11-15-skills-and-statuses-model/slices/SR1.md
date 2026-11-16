@@ -70,3 +70,9 @@ broken one, naming the file and the record. The battle doesn't read it yet: it s
 - In `content/statuses.json`, set `poison_1`'s amount to 0 and run the game: the start stops on "statuses.json:
   status 'poison_1': parts[0]: damageEachTurn's amount must be at least 1 (was 0)." (the prefix is
   `ContentListValidator`'s); revert.
+
+- **Done, with deviations:** `statuses.json` is read first of all the files (the slice said before the skills), so
+  `MainViewModelTests.Constructor_BrokenContentFile_ShowsTheLoaderMessageAndNoMaps` now breaks it. Taunt's
+  description has no apostrophe ("Draws the attacks of every enemy."): the writer escapes one, which the write-back
+  test would refuse. Hand check: the game's start is the developer's to see; the amount 0 refusal is pinned by the
+  validator's rows.

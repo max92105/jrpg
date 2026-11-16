@@ -8,6 +8,7 @@ using Jrpg.Core.Party;
 using Jrpg.Core.Quests;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Sprites;
+using Jrpg.Core.Statuses;
 using Jrpg.Core.Trade;
 
 namespace Jrpg.Core.Content;
@@ -56,6 +57,9 @@ public sealed record ContentCatalog
     /// </summary>
     public IReadOnlyDictionary<string, FieldSpriteSheet> FieldSprites { get; init; } =
         new Dictionary<string, FieldSpriteSheet>(StringComparer.Ordinal);
+
+    /// <summary>The statuses an effect grants, by id (ADR 0055).</summary>
+    public IReadOnlyDictionary<string, StatusDefinition> Statuses { get; init; } = new Dictionary<string, StatusDefinition>();
 
     /// <summary>The tiered effects a skill's damage or heal names, by id (ADR 0056).</summary>
     public IReadOnlyDictionary<string, TieredEffect> TieredEffects { get; init; } = new Dictionary<string, TieredEffect>();

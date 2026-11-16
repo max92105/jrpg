@@ -6,6 +6,7 @@ using Jrpg.Core.Events;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Quests;
 using Jrpg.Core.Sprites;
+using Jrpg.Core.Statuses;
 
 namespace Jrpg.Data.Content;
 
@@ -48,6 +49,9 @@ internal static class AbsentWhenNullFilter
 
         // ADR 0044: only a turned NPC has a facing.
         (typeof(PlacedObject), "facing"),
+
+        // Decision 800: a status without tiers is its own family.
+        (typeof(StatusDefinition), "family"),
 
         // ADR 0056: a heal record has no type.
         (typeof(TieredEffect), "damageType"),

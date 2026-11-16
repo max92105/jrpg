@@ -95,7 +95,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 - [x] ADR 0055, statuses as content records (amends ADR 0021). Write it from decisions 795-812, 816 and 819 (the
   options: records over a closed part list, today's closed kinds with per-skill numbers, instant effects re-run each
   turn (refused, decision 677)); no question is asked.
-- [ ] **SR1. `statuses.json`: the status records and their families, loaded and checked** (Core + Data + content, about
+- [x] **SR1. `statuses.json`: the status records and their families, loaded and checked** (Core + Data + content, about
   290 lines plus about 180 of JSON) → [slices/SR1.md](slices/SR1.md)
 - [ ] **R1. Core tests build statuses through `TestStatuses`** (tests only, about 250 lines, mechanical) →
   [slices/R1.md](slices/R1.md)

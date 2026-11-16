@@ -1,0 +1,99 @@
+using Jrpg.Core.Statuses;
+using Jrpg.Data.Content;
+
+namespace Jrpg.Data.Statuses;
+
+/// <summary>
+/// The rules for <c>statuses.json</c> (ADR 0055): each record named, with at least one part, at most one ticking part
+/// and each kind once, every amount in its kind's range (decision 797); and the records of one family alike, part for
+/// part, so a refresh can keep the stronger of each (decision 800).
+/// </summary>
+internal static class StatusCatalogValidator
+{
+    public static void Validate(string fileName, IReadOnlyList<StatusDefinition> statuses)
+    {
+        new ContentListValidator<StatusDefinition>(fileName, "status", status => status.Id).Validate(statuses, FindProblem);
+        if (FindFamilyProblem(statuses) is { } problem)
+        {
+            throw new ContentValidationException($"{fileName}: {problem}");
+        }
+    }
+
+    private static string? FindProblem(StatusDefinition status)
+    {
+        if (string.IsNullOrWhiteSpace(status.Name))
+        {
+            return "name must not be empty.";
+        }
+
+        if (status.Family is { } family && string.IsNullOrWhiteSpace(family))
+        {
+            return "family must name the statuses it shares, or be left out.";
+        }
+
+        return status.Parts is not { Count: > 0 } ? "parts must list at least one part." : FindPartsProblem(status.Parts);
+    }
+
+    private static string? FindPartsProblem(IReadOnlyList<StatusPart> parts)
+    {
+        var kinds = new HashSet<StatusPartKind>();
+        for (var index = 0; index < parts.Count; index++)
+        {
+            // The serializer lets a null list element through.
+            if (parts[index] is not { } part)
+            {
+                return $"parts[{index}] is null.";
+            }
+
+            if (!kinds.Add(part.Kind))
+            {
+                return $"parts[{index}]: {NameOf(part.Kind)} is listed twice.";
+            }
+
+            if (FindAmountProblem(part, index) is { } problem)
+            {
+                return problem;
+            }
+        }
+
+        // A tick reports one amount and one tone (decision 797).
+        return kinds.Contains(StatusPartKind.DamageEachTurn) && kinds.Contains(StatusPartKind.HealEachTurn)
+            ? "a status ticks once: it can't hold both damageEachTurn and healEachTurn."
+            : null;
+    }
+
+    private static string? FindAmountProblem(StatusPart part, int index)
+    {
+        var field = $"parts[{index}]: {NameOf(part.Kind)}'s amount";
+        return part.Kind switch
+        {
+            StatusPartKind.DamageEachTurn or StatusPartKind.HealEachTurn => RangeProblems.AtLeast(field, part.Amount, 1),
+            StatusPartKind.SkipTurn or StatusPartKind.DrawAttacks =>
+                part.Amount == 0 ? null : $"parts[{index}]: {NameOf(part.Kind)} has no amount (was {part.Amount}).",
+            StatusPartKind.ResistanceChange => part.Amount == 0 ? $"{field} must not be 0." : null,
+            StatusPartKind.DamageTakenChange =>
+                part.Amount is > -100 and not 0 ? null : $"{field} must be above -100 and not 0 (was {part.Amount}).",
+            _ => throw new InvalidOperationException($"No amount rule for {part.Kind}."),
+        };
+    }
+
+    // Each family's records have the same part kinds in the same order as its first record.
+    private static string? FindFamilyProblem(IReadOnlyList<StatusDefinition> statuses)
+    {
+        foreach (var family in statuses.GroupBy(status => status.FamilyKey))
+        {
+            var first = family.First();
+            var unlike = family.FirstOrDefault(status => !KindsOf(status).SequenceEqual(KindsOf(first)));
+            if (unlike is not null)
+            {
+                return $"family '{family.Key}': {unlike.Id}'s parts differ from {first.Id}'s.";
+            }
+        }
+
+        return null;
+    }
+
+    private static IEnumerable<StatusPartKind> KindsOf(StatusDefinition status) => status.Parts.Select(part => part.Kind);
+
+    private static string NameOf(StatusPartKind kind) => ContentJsonOptions.EnumName(kind);
+}

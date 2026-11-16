@@ -75,6 +75,18 @@ public sealed class ContentWriterRepositoryTests : IDisposable
         Assert.Equal(File.ReadAllBytes(_content.PathOf("effects.json")), File.ReadAllBytes(written));
     }
 
+    // statuses.json is written as the writer lays it out, sorted by id, for row 7's Statuses window to take it over.
+    [Fact]
+    public void Statuses_RepositoryFile_WritesBackUnchanged()
+    {
+        var written = _content.PathOf("statuses.written.json");
+        var sorted = _catalog.Statuses.Values.OrderBy(status => status.Id, StringComparer.Ordinal).ToList();
+
+        ContentFileWriter.Write(written, sorted);
+
+        Assert.Equal(File.ReadAllBytes(_content.PathOf("statuses.json")), File.ReadAllBytes(written));
+    }
+
     private byte[] CatalogFileBytes() =>
         [.. File.ReadAllBytes(_content.PathOf("tilesheets.json")),
          .. File.ReadAllBytes(_content.PathOf("tiles.json")),

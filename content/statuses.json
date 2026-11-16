@@ -1,0 +1,128 @@
+[
+  {
+    "id": "burning_1",
+    "name": "Burning",
+    "description": "Loses HP each turn to the flames.",
+    "isHarmful": true,
+    "family": "burning",
+    "parts": [
+      {
+        "kind": "damageEachTurn",
+        "amount": 5
+      }
+    ]
+  },
+  {
+    "id": "exposed_1",
+    "name": "Exposed",
+    "description": "Takes more from every hit.",
+    "isHarmful": true,
+    "family": "exposed",
+    "parts": [
+      {
+        "kind": "damageTakenChange",
+        "amount": 20
+      }
+    ]
+  },
+  {
+    "id": "exposed_2",
+    "name": "Exposed",
+    "description": "Takes more from every hit.",
+    "isHarmful": true,
+    "family": "exposed",
+    "parts": [
+      {
+        "kind": "damageTakenChange",
+        "amount": 50
+      }
+    ]
+  },
+  {
+    "id": "guard_1",
+    "name": "Guard",
+    "description": "Resists every kind of harm better.",
+    "isHarmful": false,
+    "family": "guard",
+    "parts": [
+      {
+        "kind": "resistanceChange",
+        "amount": 12
+      }
+    ]
+  },
+  {
+    "id": "guard_2",
+    "name": "Guard",
+    "description": "Resists every kind of harm better.",
+    "isHarmful": false,
+    "family": "guard",
+    "parts": [
+      {
+        "kind": "resistanceChange",
+        "amount": 20
+      }
+    ]
+  },
+  {
+    "id": "poison_1",
+    "name": "Poison",
+    "description": "Loses HP each turn.",
+    "isHarmful": true,
+    "family": "poison",
+    "parts": [
+      {
+        "kind": "damageEachTurn",
+        "amount": 8
+      }
+    ]
+  },
+  {
+    "id": "regen_1",
+    "name": "Regen",
+    "description": "Regains HP each turn.",
+    "isHarmful": false,
+    "family": "regen",
+    "parts": [
+      {
+        "kind": "healEachTurn",
+        "amount": 6
+      }
+    ]
+  },
+  {
+    "id": "regen_2",
+    "name": "Regen",
+    "description": "Regains HP each turn.",
+    "isHarmful": false,
+    "family": "regen",
+    "parts": [
+      {
+        "kind": "healEachTurn",
+        "amount": 10
+      }
+    ]
+  },
+  {
+    "id": "stun",
+    "name": "Stun",
+    "description": "Loses its turn.",
+    "isHarmful": true,
+    "parts": [
+      {
+        "kind": "skipTurn"
+      }
+    ]
+  },
+  {
+    "id": "taunt",
+    "name": "Taunt",
+    "description": "Draws the attacks of every enemy.",
+    "isHarmful": false,
+    "parts": [
+      {
+        "kind": "drawAttacks"
+      }
+    ]
+  }
+]

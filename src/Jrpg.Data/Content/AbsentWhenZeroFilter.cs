@@ -2,6 +2,7 @@ using System.Text.Json.Serialization.Metadata;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Sprites;
+using Jrpg.Core.Statuses;
 
 namespace Jrpg.Data.Content;
 
@@ -20,6 +21,8 @@ internal static class AbsentWhenZeroFilter
         (typeof(FieldSpriteSheet), "feetPixels"),
         // Decision 586: only the HP condition kinds read a percent; the fallen one leaves it at 0.
         (typeof(TacticCondition), "percent"),
+        // ADR 0055: a skip or a taunt has no number.
+        (typeof(StatusPart), "amount"),
         // Decision 787: only an enemy with tiered skills has a Power.
         (typeof(EnemyDefinition), "power"),
         // ADR 0048: most strips land their hit on their first frame.

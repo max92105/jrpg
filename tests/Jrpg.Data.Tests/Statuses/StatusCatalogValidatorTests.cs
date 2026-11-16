@@ -1,0 +1,107 @@
+using Jrpg.Core.Statuses;
+using Jrpg.Data.Content;
+using Jrpg.Data.Statuses;
+using static Jrpg.Core.Statuses.StatusPartKind;
+
+namespace Jrpg.Data.Tests.Statuses;
+
+// statuses.json's rules (ADR 0055, decision 797), over records built here.
+public sealed class StatusCatalogValidatorTests
+{
+    private const string FileName = "statuses.json";
+
+    private static readonly StatusDefinition _poison = new()
+    {
+        Id = "poison_1",
+        Name = "Poison",
+        Description = "",
+        IsHarmful = true,
+        Family = "poison",
+        Parts = [new StatusPart(DamageEachTurn, 8)],
+    };
+
+    public static TheoryData<StatusDefinition, string> InvalidStatuses => new()
+    {
+        { _poison with { Name = " " }, "name must not be empty." },
+        { _poison with { Family = "" }, "family must name the statuses it shares, or be left out." },
+        { _poison with { Parts = [] }, "parts must list at least one part." },
+        { With(Part(DamageEachTurn, 8), null!), "parts[1] is null." },
+        { With(Part(DamageEachTurn, 0)), "parts[0]: damageEachTurn's amount must be at least 1 (was 0)." },
+        { With(Part(HealEachTurn, 0)), "parts[0]: healEachTurn's amount must be at least 1 (was 0)." },
+        { With(Part(SkipTurn, 5)), "parts[0]: skipTurn has no amount (was 5)." },
+        { With(Part(DrawAttacks, 1)), "parts[0]: drawAttacks has no amount (was 1)." },
+        { With(Part(ResistanceChange, 0)), "parts[0]: resistanceChange's amount must not be 0." },
+        { With(Part(DamageTakenChange, -100)), "parts[0]: damageTakenChange's amount must be above -100 and not 0 (was -100)." },
+        { With(Part(DamageTakenChange, 0)), "parts[0]: damageTakenChange's amount must be above -100 and not 0 (was 0)." },
+        {
+            With(Part(DamageEachTurn, 8), Part(HealEachTurn, 4)),
+            "a status ticks once: it can't hold both damageEachTurn and healEachTurn."
+        },
+        { With(Part(ResistanceChange, 8), Part(ResistanceChange, 4)), "parts[1]: resistanceChange is listed twice." },
+    };
+
+    [Theory]
+    [MemberData(nameof(InvalidStatuses))]
+    public void Validate_InvalidStatus_ThrowsNamingTheStatusAndTheProblem(StatusDefinition status, string problem)
+    {
+        var exception = Assert.Throws<ContentValidationException>(() => Validate(status));
+
+        Assert.Equal($"statuses.json: status 'poison_1': {problem}", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_IdTwice_Throws()
+    {
+        var exception = Assert.Throws<ContentValidationException>(() => Validate(_poison, _poison));
+
+        Assert.Equal("statuses.json: status id 'poison_1' is used more than once.", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_OneFamilyWithOtherPartKinds_Throws()
+    {
+        var unlike = _poison with { Id = "poison_2", Parts = [Part(HealEachTurn, 8)] };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate(_poison, unlike));
+
+        Assert.Equal("statuses.json: family 'poison': poison_2's parts differ from poison_1's.", exception.Message);
+    }
+
+    // Part for part: a refresh compares the parts in order (decision 800).
+    [Fact]
+    public void Validate_OneFamilyWithTheSameKindsInAnotherOrder_Throws()
+    {
+        var first = With(Part(DamageEachTurn, 8), Part(DamageTakenChange, 10));
+        var swapped = first with { Id = "poison_2", Parts = [Part(DamageTakenChange, 10), Part(DamageEachTurn, 8)] };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate(first, swapped));
+
+        Assert.Equal("statuses.json: family 'poison': poison_2's parts differ from poison_1's.", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_DamageEachTurnOfOne_Accepted() =>
+        Assert.Null(Record.Exception(() => Validate(With(Part(DamageEachTurn, 1)))));
+
+    [Fact]
+    public void Validate_DamageTakenChangeOfMinus99_Accepted() =>
+        Assert.Null(Record.Exception(() => Validate(With(Part(DamageTakenChange, -99)))));
+
+    [Fact]
+    public void Validate_NegativeResistanceChange_Accepted() =>
+        Assert.Null(Record.Exception(() => Validate(With(Part(ResistanceChange, -10)))));
+
+    [Fact]
+    public void Validate_TwoRecordsOfOneFamilyWithOtherAmounts_Accepted()
+    {
+        var stronger = _poison with { Id = "poison_2", Parts = [Part(DamageEachTurn, 15)] };
+
+        Assert.Null(Record.Exception(() => Validate(_poison, stronger)));
+    }
+
+    private static void Validate(params StatusDefinition[] statuses) => StatusCatalogValidator.Validate(FileName, statuses);
+
+    private static StatusDefinition With(params StatusPart[] parts) => _poison with { Parts = parts };
+
+    private static StatusPart Part(StatusPartKind kind, int amount) => new(kind, amount);
+}

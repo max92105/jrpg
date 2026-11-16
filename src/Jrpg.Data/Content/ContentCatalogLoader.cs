@@ -11,6 +11,7 @@ using Jrpg.Core.Party;
 using Jrpg.Core.Quests;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Sprites;
+using Jrpg.Core.Statuses;
 using Jrpg.Core.Trade;
 using Jrpg.Data.Battle;
 using Jrpg.Data.Cinematics;
@@ -23,6 +24,7 @@ using Jrpg.Data.Party;
 using Jrpg.Data.Quests;
 using Jrpg.Data.Skills;
 using Jrpg.Data.Sprites;
+using Jrpg.Data.Statuses;
 using Jrpg.Data.Trade;
 
 namespace Jrpg.Data.Content;
@@ -49,12 +51,16 @@ public static class ContentCatalogLoader
     internal const string FieldSpritesFile = "field-sprites.json";
     internal const string EffectStripsFile = "effect-strips.json";
     internal const string EffectsFile = "effects.json";
+    internal const string StatusesFile = "statuses.json";
 
     /// <summary>Loads and validates every content file under <paramref name="contentRoot"/>, referenced files first.</summary>
     /// <exception cref="ContentValidationException">A file is malformed or breaks a content rule.</exception>
     public static ContentCatalog Load(string contentRoot)
     {
-        // Read first: a skill's or an item's effect names a tiered effect by id, resolved as it is read (decision 789).
+        var statuses = ReadValidated<IReadOnlyList<StatusDefinition>>(contentRoot, StatusesFile, StatusCatalogValidator.Validate);
+
+        // Read before the skills and items: a skill's or an item's effect names a tiered effect by id, resolved as it
+        // is read (decision 789).
         var tieredEffects = ReadValidated<IReadOnlyList<TieredEffect>>(contentRoot, EffectsFile, EffectCatalogValidator.Validate)
             .ToFrozenDictionary(effect => effect.Id);
         var effectReferenceOptions = ContentJsonOptions.StrictWith(
@@ -146,6 +152,7 @@ public static class ContentCatalogLoader
             FieldSprites = fieldSpritesByFile,
             EffectStrips = effectStrips.ToFrozenDictionary(strip => strip.File, StringComparer.Ordinal),
             TieredEffects = tieredEffects,
+            Statuses = statuses.ToFrozenDictionary(status => status.Id),
             Cinematics = cinematics.ToFrozenDictionary(cinematic => cinematic.Id),
         };
     }

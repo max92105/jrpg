@@ -67,3 +67,11 @@ use, by name.
 
 ## Verify by hand
 None: nothing shows yet (EB7 shows the boxes).
+- **Done (EB3a, the choices):** the three choice records and `EnemyCatalogViewModel.SkillChoices`,
+  `ConditionChoices` and `TargetChoices`, with their four tests. Deviations: the Use box's list is built by
+  `TacticSkillChoice.AllIn(content)`, as `Skills/StatusChoice.AllIn` builds the grant boxes', so the record holds the
+  attack's words; `ConditionChoices` and `TargetChoices` are auto-properties set to `All` (an expression body is static
+  data, which CA1822 refuses). No tie-break on equal names: two skills with one name read alike in the box in either
+  order. A skill an enemy names is always in `SkillChoices`: Data refuses an enemy naming a skill it can't use, and the
+  Skills page's check (`CatalogProblems.OfSkills`) runs the enemies against the edited skills, so the draft never holds
+  one.

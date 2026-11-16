@@ -2,6 +2,7 @@ using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
 using Jrpg.Data.Art;
@@ -230,7 +231,53 @@ public sealed class EnemyCatalogViewModelTests
         Assert.Equal("bat_alpha", catalog.ChosenKey);
     }
 
+    // Ids in the opposite order to the names, added last name first, so neither the ids nor the draft's order passes.
+    [Fact]
+    public void SkillChoices_AttackFirstThenSkillsByName()
+    {
+        var draft = WithSkills(SkillNamed("aa_wither", "Wither"), SkillNamed("zz_balm", "Balm"));
+
+        var choices = new EnemyCatalogViewModel(draft, _ => []).SkillChoices;
+
+        var names = choices.Skip(1).Select(choice => choice.Name).ToList();
+        Assert.Equal(new TacticSkillChoice("", "Attack"), choices[0]);
+        Assert.Equal(["zz_balm", "aa_wither"], choices.Select(choice => choice.Id).Where(id => id is "zz_balm" or "aa_wither"));
+        Assert.Equal(names.Order(StringComparer.Ordinal), names);
+    }
+
+    [Fact]
+    public void SkillChoices_SkillWithAClassResource_IsNotOffered()
+    {
+        var spending = SkillNamed("rage_strike", "Rage Strike") with { ResourceChanges = [new ResourceChange("rage", -1)] };
+        var draft = WithSkills(SkillNamed("strike", "Strike"), spending);
+
+        var ids = new EnemyCatalogViewModel(draft, _ => []).SkillChoices.Select(choice => choice.Id);
+
+        Assert.Contains("strike", ids);
+        Assert.DoesNotContain("rage_strike", ids);
+    }
+
     // The test world's goblin under each id, the only enemies, so a choice is told apart by its id alone.
     private static ContentCatalog WithEnemies(params string[] ids) =>
         _catalog with { Enemies = ids.ToDictionary(id => id, id => _catalog.Enemies["goblin"] with { Id = id }) };
+
+    private static ContentCatalog WithSkills(params SkillDefinition[] added)
+    {
+        var skills = new Dictionary<string, SkillDefinition>(_catalog.Skills);
+        foreach (var skill in added)
+        {
+            skills[skill.Id] = skill;
+        }
+
+        return _catalog with { Skills = skills };
+    }
+
+    private static SkillDefinition SkillNamed(string id, string name) => new()
+    {
+        Id = id,
+        Name = name,
+        Description = "",
+        IconFile = "",
+        Effect = new Effect(EffectKind.Damage, 4, Targeting.SingleEnemy, DamageType: DamageType.Slashing),
+    };
 }

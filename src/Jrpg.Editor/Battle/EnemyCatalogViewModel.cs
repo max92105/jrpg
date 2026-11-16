@@ -18,14 +18,16 @@ namespace Jrpg.Editor.Battle;
 /// after them; Add starts from the tunable defaults, Duplicate from the chosen one (decision 585); only an added one
 /// can be removed, since encounters name a saved one (decision 581). <see cref="Problem"/> is an enemy's own problem
 /// first, then Data's message for the whole list (decision 580). The draft's drop tables are taken again after a Drop
-/// tables page opened from this one applies (decision 602). An enemy is chosen by its id.
+/// tables page opened from this one applies (decision 602). An enemy is chosen by its id. A rule's boxes offer every
+/// trigger and target, and the skills an enemy can use (decisions 850, 851).
 /// </summary>
 internal sealed partial class EnemyCatalogViewModel : ObservableObject, IEditedCatalog
 {
     private ContentCatalog _content;
 
     /// <param name="content">
-    /// The draft as it is: the enemies edited, and the skills and drop tables they may name.
+    /// The draft as it is: the enemies edited, the skills they may name (those an enemy can use offered in a rule's Use
+    /// box), and the drop tables they may name.
     /// </param>
     /// <param name="artImagesIn">The PNG names of an art folder by name, for the three art boxes.</param>
     public EnemyCatalogViewModel(ContentCatalog content, Func<string, IReadOnlyList<string>> artImagesIn)
@@ -33,6 +35,7 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject, IEditedC
         _content = content;
         ArtChoices = new BattleArtChoices(artImagesIn);
         DropTableChoices = ["", .. content.DropTables.Keys.Order(StringComparer.Ordinal)];
+        SkillChoices = TacticSkillChoice.AllIn(content);
         Enemies = [.. content.Enemies.Values.OrderBy(enemy => enemy.Id, StringComparer.Ordinal).Select(EnemyViewModel.From)];
         foreach (var enemy in Enemies)
         {
@@ -49,6 +52,17 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject, IEditedC
 
     /// <summary>The drop tables an enemy may roll, the empty one for none first, then the draft's by id.</summary>
     public ObservableCollection<string> DropTableChoices { get; }
+
+    /// <summary>
+    /// What a rule's Use box offers, as <see cref="TacticSkillChoice.AllIn"/> lists the draft's skills.
+    /// </summary>
+    public IReadOnlyList<TacticSkillChoice> SkillChoices { get; }
+
+    /// <summary>What a rule's When box offers: every trigger, whatever the rule's skill (decision 850).</summary>
+    public IReadOnlyList<TacticConditionChoice> ConditionChoices { get; } = TacticConditionChoice.All;
+
+    /// <summary>What a rule's On box offers: every target rule, whatever the rule's skill (decision 850).</summary>
+    public IReadOnlyList<TacticTargetChoice> TargetChoices { get; } = TacticTargetChoice.All;
 
     /// <summary>
     /// The three art folders' files, refreshed after an import; which of an enemy's pictures are missing.

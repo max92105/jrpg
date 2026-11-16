@@ -39,7 +39,7 @@ naming the skill). FX5 reuses all of it for statuses. No page yet (FX2).
   - `Rebound_NothingToRebind_KeepsTheSameInstances`.
   - `Rebound_MissingId_ThrowsNamingTheRecordAndId`.
 - `Data.Tests/Content/CatalogProblemsSkillTests`:
-  - `OfTieredEffects_RepositoryEffects_IsNull`.
+  - `OfTieredEffects_TestWorldEffects_IsNull`.
   - `OfTieredEffects_PerPowerZero_NamesTheEffectsFile`.
   - `OfTieredEffects_KindChangedUnderADamageSkill_NamesTheSkillsFileAndSkill`.
 - `Editor.Tests/Catalogs/CatalogDraftTieredEffectTests` (new; `SkillFixtures`):
@@ -52,3 +52,6 @@ naming the skill). FX5 reuses all of it for statuses. No page yet (FX2).
 
 ## Verify by hand
 None: no page changes effects yet (FX2).
+- **Done, with deviations:** code about 110 lines (`CatalogReferences` 70), tests about 210 (the plan said 130): the
+  references tests build their own skill and item (Spark, the Fire Flask) over the test world. `Rebound` rebuilds
+  `Skills` and `Items` as frozen dictionaries, as the loader does.

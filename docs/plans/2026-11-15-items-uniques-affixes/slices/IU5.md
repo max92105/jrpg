@@ -61,3 +61,6 @@ damage or heal (replacing T2's refusal); revive and rest keep a flat power. The 
 - Title > New game, take damage, Menu > Inventory > Potion on a member: preview and heal equal that member's Power
   (Menu > Status) times 2. In a fight, a Bomb deals about the actor's Power times 2 and still plays
   `FireExplosion.png`.
+- **Note from FX1:** once an item names a tier or a status, every catalog the editor tests build over the test world
+  (`SkillFixtures.CatalogWith`, which keeps the test world's items) must hold that record too: the draft's effect and
+  status steps run `CatalogReferences.Rebound`, which throws on an item naming an id the catalog lacks.

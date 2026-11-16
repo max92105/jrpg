@@ -9,7 +9,8 @@ using Jrpg.Data.Content;
 namespace Jrpg.Data.Tests.Content;
 
 // The Skills page's problem line (decision 974): the skills' own rules, then the classes and enemies that name them,
-// checked with the edited skills, since the editor writes neither file.
+// checked with the edited skills, since the editor writes neither file. The Effects page's line (decision 975): the
+// effects' own rules, then the skills over the catalog rebound to the edited effects.
 public sealed class CatalogProblemsSkillTests
 {
     private static readonly ContentCatalog _catalog =
@@ -27,6 +28,8 @@ public sealed class CatalogProblemsSkillTests
             Tier = _catalog.TieredEffects["fire_1"],
         },
     };
+
+    private static readonly TieredEffect _spark1 = new("spark_1", EffectKind.Damage, 2) { DamageType = DamageType.Fire };
 
     [Fact]
     public void OfSkills_TestWorldSkills_IsNull() => Assert.Null(CatalogProblems.OfSkills([.. _catalog.Skills.Values], _catalog));
@@ -64,6 +67,37 @@ public sealed class CatalogProblemsSkillTests
 
         Assert.Equal(
             "enemies.json: enemy 'goblin': tactics[0].skillId 'spark' uses a class resource, and enemies have none.", problem);
+    }
+
+    [Fact]
+    public void OfTieredEffects_TestWorldEffects_IsNull() =>
+        Assert.Null(CatalogProblems.OfTieredEffects([.. _catalog.TieredEffects.Values], _catalog));
+
+    [Fact]
+    public void OfTieredEffects_PerPowerZero_NamesTheEffectsFile()
+    {
+        var effects = _catalog.TieredEffects.Values.Append(_spark1 with { PerPower = 0 }).ToList();
+
+        var problem = CatalogProblems.OfTieredEffects(effects, _catalog);
+
+        Assert.Equal("effects.json: effect 'spark_1': perPower must be within 1..1000 (was 0).", problem);
+    }
+
+    // Only Spark names spark_1, so the skill named is the one the rebinding reached.
+    [Fact]
+    public void OfTieredEffects_KindChangedUnderADamageSkill_NamesTheSkillsFileAndSkill()
+    {
+        var spark = _spark with { Effect = _spark.Effect with { Tier = _spark1 } };
+        var content = _catalog with
+        {
+            Skills = Replaced(_catalog.Skills, spark.Id, spark),
+            TieredEffects = Replaced(_catalog.TieredEffects, _spark1.Id, _spark1),
+        };
+        var heal = _spark1 with { Kind = EffectKind.RestoreHp, DamageType = null };
+
+        var problem = CatalogProblems.OfTieredEffects([.. _catalog.TieredEffects.Values, heal], content);
+
+        Assert.Equal("skills.json: skill 'spark': effect.kind is damage but spark_1 is restoreHp.", problem);
     }
 
     private static Dictionary<string, T> Replaced<T>(IReadOnlyDictionary<string, T> records, string id, T record) =>

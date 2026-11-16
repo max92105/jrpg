@@ -92,6 +92,22 @@ public static class CatalogProblems
         });
 
     /// <summary>
+    /// The first problem in the tiered effects (decision 975): a record's own rule, then the skills' check over the
+    /// content rebound to these records, since a skill repeats its tier's kind and damage type (an effect turned into a
+    /// heal under a damage skill is refused naming the skill); null when the loader would take them.
+    /// </summary>
+    /// <param name="effects">The tiered effects as edited.</param>
+    /// <param name="content">The skills that name the effects, and the classes that name the skills.</param>
+    public static string? OfTieredEffects(IReadOnlyList<TieredEffect> effects, ContentCatalog content) =>
+        FirstProblem(() =>
+        {
+            CheckTieredEffects(effects);
+            var edited = CatalogReferences.Rebound(
+                content with { TieredEffects = effects.ToDictionary(effect => effect.Id, StringComparer.Ordinal) });
+            CheckSkills([.. edited.Skills.Values.OrderBy(skill => skill.Id, StringComparer.Ordinal)], edited);
+        });
+
+    /// <summary>
     /// The checks the loader makes on <c>field-sprites.json</c>, for the writer and the problem line alike.
     /// </summary>
     /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>

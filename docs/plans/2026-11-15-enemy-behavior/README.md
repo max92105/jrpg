@@ -123,7 +123,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 ### Phase 3: priority and reactions
 - [x] **EB8. Priority: an eligible priority rule is chosen before any draw** (Core + Data + Editor, about 160 lines) →
   [slices/EB8.md](slices/EB8.md)
-- [ ] **EB9. Reactions: it was hit, critically hit, hit on a weakness; the enemy's tactic memory** (Core + Data +
+- [x] **EB9. Reactions: it was hit, critically hit, hit on a weakness; the enemy's tactic memory** (Core + Data +
   Editor, about 300 lines) → [slices/EB9.md](slices/EB9.md)
 
 ### Phase 4: more ways to choose (trimmable)

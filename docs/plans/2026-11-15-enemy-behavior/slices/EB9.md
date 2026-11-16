@@ -78,3 +78,6 @@ foe-naming trigger can't empty it.
    In the forest: a goblin hit since its last turn cleaves; one nobody hit attacks. Then make it "When it was
    critically hit: attack on that one" and play until a member crits (the big number): that goblin's next turn hits
    the member who crit it. Ctrl+Z twice, Save all; the diff is empty.
+- **Done, with deviations:** `BattleState.cs` is at 285 (its summary names the note, one line more); the weakness
+  test is a theory with both sides; added `Validate_WasCriticallyHitWithoutAPercent_IsAccepted` and three
+  `TacticMemoryNotesTests` (one foe's two hits noted once, an ally's hit and a heal on an enemy note nothing).

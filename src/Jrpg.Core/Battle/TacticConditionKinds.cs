@@ -14,6 +14,9 @@ public static class TacticConditionKinds
             [TacticConditionKind.OwnHpBelow] = new(TacticSubject.Itself, TacticConditionNumber.Percent),
             [TacticConditionKind.AllyHpBelow] = new(TacticSubject.Allies, TacticConditionNumber.Percent),
             [TacticConditionKind.AllyFallen] = new(TacticSubject.FallenAllies, TacticConditionNumber.None),
+            [TacticConditionKind.WasHit] = new(TacticSubject.Foes, TacticConditionNumber.None, IsReaction: true),
+            [TacticConditionKind.WasCriticallyHit] = new(TacticSubject.Foes, TacticConditionNumber.None, IsReaction: true),
+            [TacticConditionKind.WasHitOnWeakness] = new(TacticSubject.Foes, TacticConditionNumber.None, IsReaction: true),
         }.ToFrozenDictionary();
 
     /// <exception cref="ArgumentOutOfRangeException">A kind the table doesn't hold.</exception>

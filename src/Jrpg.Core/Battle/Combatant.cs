@@ -49,6 +49,9 @@ public sealed class Combatant
     /// <summary>The phase an enemy has reached; null before any. Battle only, never saved.</summary>
     public EnemyPhase? EnemyPhase { get; internal set; }
 
+    /// <summary>Read by enemy tactics only; fresh each battle, as every combatant is.</summary>
+    internal TacticMemory TacticMemory { get; } = new();
+
     /// <summary>Whether this combatant has <paramref name="skill"/> at all, whether or not it can use it now.</summary>
     public bool Knows(SkillDefinition skill) => Skills.Contains(skill) || Enemy?.NamesSkill(skill.Id) == true;
 

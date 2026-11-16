@@ -11,4 +11,13 @@ public enum TacticConditionKind
 
     /// <summary>An ally has fallen.</summary>
     AllyFallen,
+
+    /// <summary>A damage hit landed on the enemy since its last turn, by a foe's action (decision 845).</summary>
+    WasHit,
+
+    /// <summary>A damage hit crit the enemy since its last turn, by a foe's action.</summary>
+    WasCriticallyHit,
+
+    /// <summary>A damage hit landed on the enemy's weakness since its last turn, by a foe's action.</summary>
+    WasHitOnWeakness,
 }

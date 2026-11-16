@@ -2,7 +2,8 @@ namespace Jrpg.Core.Battle;
 
 /// <summary>
 /// Who meets a tactic's condition for an enemy now (decision 402). An ally is another combatant on the enemy's side,
-/// never the enemy itself; "below" is strict, compared in whole numbers so nothing rounds.
+/// never the enemy itself; "below" is strict, compared in whole numbers so nothing rounds. A reaction names the foes
+/// its memory noted since its last turn, fallen ones kept, so a rule's target then keeps the legal ones (decision 839).
 /// </summary>
 internal static class TacticConditions
 {
@@ -13,6 +14,7 @@ internal static class TacticConditions
             TacticConditionKind.OwnHpBelow => IsBelow(enemy, condition.Percent) ? [enemy] : [],
             TacticConditionKind.AllyHpBelow => [.. AlliesOf(enemy, battle).Where(ally => ally.IsAlive && IsBelow(ally, condition.Percent))],
             TacticConditionKind.AllyFallen => [.. AlliesOf(enemy, battle).Where(ally => !ally.IsAlive)],
+            _ when TacticConditionKinds.ShapeOf(condition.Kind).IsReaction => enemy.TacticMemory.Noted(condition.Kind),
             _ => throw new ArgumentOutOfRangeException(nameof(condition), condition.Kind, "Unknown tactic condition."),
         };
 

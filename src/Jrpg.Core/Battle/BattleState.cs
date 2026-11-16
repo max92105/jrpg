@@ -153,7 +153,8 @@ public sealed class BattleState
 
     /// <summary>
     /// The current actor carries out <paramref name="command"/>, then the turn ends; last, while the battle goes on,
-    /// standing enemies enter the phases their HP has reached, after every HP loss of the call (ADR 0034).
+    /// standing enemies enter the phases their HP has reached, after every HP loss of the call (ADR 0034), and the
+    /// enemies' tactic memories note the call's hits (<see cref="TacticMemoryNotes"/>, decision 846).
     /// </summary>
     /// <returns>What happened, in order, starting with <see cref="ActionStarted"/>.</returns>
     /// <exception cref="InvalidOperationException">The battle is over, or the current actor can't give this command.</exception>
@@ -176,6 +177,7 @@ public sealed class BattleState
         if (!IsOver)
         {
             EnemyPhases.EnterReached(Combatants, events);
+            TacticMemoryNotes.Note(events);
         }
 
         return events;

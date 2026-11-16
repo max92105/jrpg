@@ -11,9 +11,10 @@ namespace Jrpg.Core.Battle;
 /// control resistance shrugs the taunt off (decision 324). One random call for the target either way, and one more only
 /// when a taunt might be resisted, so battles without a taunt, and enemies that resist nothing, keep their seeded
 /// results. A skill that takes every target, or aims at the enemy itself, draws nothing and ignores a taunt; a heal on
-/// one ally goes to the lowest HP share among those its condition found, without a draw (decision 401); any other
-/// single target is one draw. A rule with a target picks without a draw (decision 837) among its candidates, which a
-/// taunt among the skill's legal foes narrows for a pick among foes (decision 838).
+/// one ally goes to the lowest HP share among those its condition found when it reads its own HP or an ally's, else
+/// among all its legal targets, without a draw (decisions 401, 835); any other single target is one draw. A rule with a
+/// target picks without a draw (decision 837) among its candidates, which a taunt among the skill's legal foes narrows
+/// for a pick among foes (decision 838).
 /// </summary>
 internal sealed class EnemyTargeting(IRandom random)
 {
@@ -64,10 +65,15 @@ internal sealed class EnemyTargeting(IRandom random)
     }
 
     // The condition and the target agree: a heal picked because a goblin is hurt lands on that goblin (decision 401).
+    // Only its own HP or an ally's narrows (decision 835): a trigger naming foes or the fallen would leave nobody, and
+    // the lowest share of nobody throws.
     private static IEnumerable<Combatant> HealCandidates(IReadOnlyList<Combatant> legal, TacticCondition? condition, BattleState battle) =>
-        condition is null or { Kind: TacticConditionKind.AllyFallen }
-            ? legal
-            : legal.Intersect(TacticConditions.CombatantsMeeting(condition, battle.CurrentActor, battle));
+        condition is { } trigger && NamesWhomAHealReaches(trigger.Kind)
+            ? legal.Intersect(TacticConditions.CombatantsMeeting(trigger, battle.CurrentActor, battle))
+            : legal;
+
+    private static bool NamesWhomAHealReaches(TacticConditionKind kind) =>
+        kind == TacticConditionKind.OwnHpBelow || TacticConditionKinds.ShapeOf(kind).Subject == TacticSubject.Allies;
 
     // Cross-multiplied in long, so nothing rounds or overflows; a tie keeps the first in battle order.
     private static Combatant LowestShareOf(IEnumerable<Combatant> candidates) =>

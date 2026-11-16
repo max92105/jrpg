@@ -5,14 +5,18 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-skill-and-status-editors, slice AN1a (Editor Animation/FramePlayback + FramePlaybackTests,
-FramePlaybackNoticeTests; map row Animation; AN1b note). 2026-11-16. Round 1. Verdict: Ready to commit.
+Plan 2026-11-15-skill-and-status-editors, slice AN1b (Editor Animation/FramePreview + PreviewFrames.OfStrip,
+PreviewFramesTests; EffectStripCatalogPage on the shared control; EffectStripViewModel FrameMilliseconds/HitFrame).
+2026-11-16. Round 1. Verdict: Ready to commit.
 
-- Suggestion (open): no test pins "Play after a mid-frame pause carries on from the paused moment" (pause at 150 ms,
-  play, Advance 60 -> frame 2); a ShowFromStart added to TogglePlaying would pass every test.
-- Suggestion (open): the `_elapsed` comment says the modulo keeps the frame independent of run length; LoopFrameAt's
-  own `% frameCount` already does that; the modulo only bounds the TimeSpan. Reword the why.
-- Suggestion (open): FrameCount summary "From 0: no frames to show..." reads as a range; "0 means no frames...".
-- FX6 Warning (row-chooses-on-focus third copy): fixed, Catalogs/RowFocus attached property.
-- FX6 / FX2b Kind box items: dropped, listed in docs/plans/backlog.md (line ~303).
-- FX6 Family box comment Suggestion: not carried (committed slice, Suggestion only).
+- Warning (open): PreviewFrames.OfStrip's `frameCount <= 0` guard untested since the deleted
+  PreviewLoop_ImageTallerThanWide_IsNone; a taller-than-wide effects image gives FrameCount 0 and without the guard
+  `% 0` throws. Add OfStrip_NoFrames_IsEmpty.
+- Suggestion (open): FramePreview.OnRendering comment says "once per frame"; WPF can raise Rendering twice with the
+  same RenderingTime, which is why `now > last`; say so.
+- Suggestion (open): EffectStripViewModel LengthText/IsListed/ToStrip/HoldsTheLoadedRecord/HitFrameProblem still
+  parse the texts again; read the new FrameMilliseconds/HitFrame.
+- Checked, no finding: partial-frame strip (width not a multiple of height) shows nothing in the preview, but Data's
+  ArtReferenceCheck.AddPartialFrameStrips refuses such a strip, so not raised.
+- AN1a Suggestions: _elapsed comment and FrameCount summary fixed in code; mid-frame pause test not carried
+  (committed slice, Suggestion only).

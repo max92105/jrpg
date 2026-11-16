@@ -5,14 +5,16 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-sprite-cells-and-mirrors, slice SW2 (picking cells, boxes' members, FacingSourceChoice). 2026-11-15.
-Round 1. Verdict: Fix the Criticals, then commit.
+Plan 2026-11-15-sprite-cells-and-mirrors, slice SW3 (window: Shows boxes, picking on the image, SequenceMarks,
+column numbers, PaceText). 2026-11-15. Round 1. Verdict: Ready to commit.
 
-- Critical (open): FacingCycleSetup.OnFacingChanged relays derived notices (IsOnRow/IsOnCells/IsMirror/CellsText) and
-  OnWalkChanged relays PickingFacing/IsAnyFacingOnRow to Problem; a Pick toggle marks the setup edited and clears the
-  catalog's refused-copy line; Data's check runs ~8x per Source change. Relay typed fields only, plus a test.
-- Warning (open): PickCellAt's column bound (x past the last whole column) and y < 0 untested; only the row side is.
-- Warning (open): TogglePickingCommand.NotifyCanExecuteChanged on a Source change and the CellsText relay untested.
-- Suggestion (open): ProblemWithin and ToCycle re-spell IsAnyFacingOnRow's `Source == Row` test.
-- Fixed from SW1: the facing relay's Facing.ToString() is now NameOf's nameof switch.
-- Dropped: PreviewFrameAt with no caller (in docs/plans/backlog.md).
+- Suggestion (open): FieldSpriteWindow.xaml.cs OnWalkChanged comment says the problem line doesn't follow the cells;
+  it does (Walk relays Cells as the facing's name). The real reason: PickingFacing never reaches the setup's notices.
+- Suggestion (open): at the 16 px zoom step, column 1's number overlaps row 1's number on the first frame.
+- Suggestion (open): the pace line sits under the Frame time box, not beside it as the slice says; note it.
+- Follow-up: Frozen(Brush) now in 4 Editor files and the clipped DrawingGroup + transparent pin + Freeze skeleton in 6.
+- Fixed from SW2: relay of typed fields only (OnFacingChanged), PickCellAt column/negative bounds tested,
+  TogglePickingCommand CanExecuteChanged tested.
+- Checked: ButtonBase.OnCommandParameterChanged exists in WindowsDesktop 10.0.12 (metadata probe), so the Pick
+  CheckBox re-queries CanExecute once CommandParameter binds; ToggleButton toggles by SetCurrentValue, keeping the
+  one-way MultiBinding.

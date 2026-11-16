@@ -5,16 +5,19 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-skill-and-status-editors, slice AN5 (Animation/CellStrip, Animation/StripFromCellsViewModel,
-Sprites/CellPicking extracted from FieldSpriteSetupViewModel.PickCellAt and FacingSetup.CellsText). 2026-11-16. Round 1.
-Verdict: Ready to commit (no Critical, no Warning).
+Plan 2026-11-15-skill-and-status-editors, slice AN6 (Animation/StripFromCellsWindow, PreviewFrames.OfCells,
+SpriteSheetMarks.RowAt, the Effect strips page's button, the script's nested entry). 2026-11-16. Round 1.
+Verdict: Ready to commit (no Critical).
 
-- Suggestion (open): PickRow's cut-is-a-problem guard (e.g. ColumnsText "5" on 192 px) has no test; without it the
-  row adds cells of a cut that doesn't split (tests.md: every no-op guard gets a test).
-- Suggestion (open): StripFromCellsProblemTests reaches SixByTwo through `using static` of the other test class; a
-  small shared fixture type (StripFromCellsFixtures) would decouple the two files.
-- Checked, no finding: the extraction matches the old PickCellAt exactly (same < 1 and < 0 guards, Math.Floor, < Columns
-  and < Rows); x == sheet width gives column == Columns, refused (tested at 192 and 64); "con.png" is a regular file on
-  this Windows 11 machine (GetFullPath and a write probe); ".." becomes "...png", valid; replacing an existing file is
-  AN7's (asks before replacing).
-- AN4 carried: its suggestions dropped (committed slice); its hit-frame Follow-up dropped (backlog.md lists it).
+- Warning (open): StripFromCellsWindow.Decoded (xaml.cs:42-57) copies SpriteImageFile.Decode line for line (IsReadable,
+  BitmapImage OnLoad + IgnoreImageCache + Freeze); TileImages.LoadImage is the third copy of the block. Fix: a public
+  path-taking SpriteImageFile read returning null, the window turning null into "not a PNG image.".
+- Warning (open): open-editor-windows.ps1 grew 290 -> 318 lines (verify's 300-line check covers .cs and .xaml only).
+  Fix: Open-EventWindows (or Open-Nested) into a dot-sourced file.
+- Suggestion (open): RowAt's partial-row guard and the X side of the number box (a point right of the number at its
+  height) have no test.
+- Follow-up: TileImages.LoadImage onto the shared read once it exists.
+- Checked, no finding: decode runs in EndInit inside the try (OnLoad closes the file); catch list = GifReader's plus IO;
+  Pick off guarded in the VM (PickCellAt:132, PickRow:145) and tested; no-button path returns and the loop closes the
+  owner dialog; ControlsHelpWindow 129 lines; FieldLabel without BasedOn harmless (the theme has no TextBlock style).
+- AN5 carried: its two suggestions dropped (committed slice).

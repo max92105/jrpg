@@ -3,6 +3,8 @@
 Status: accepted
 Date: 2026-10-24
 
+Amended by ADR 0055: a status is a content record built from parts, and a grant names it.
+
 ## Context
 Several class mechanics put a lasting condition on a combatant for a few turns:
 

@@ -92,7 +92,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/T4.md](slices/T4.md)
 
 ### Phase 2: statuses as records
-- [ ] ADR 0055, statuses as content records (amends ADR 0021). Write it from decisions 795-812, 816 and 819 (the
+- [x] ADR 0055, statuses as content records (amends ADR 0021). Write it from decisions 795-812, 816 and 819 (the
   options: records over a closed part list, today's closed kinds with per-skill numbers, instant effects re-run each
   turn (refused, decision 677)); no question is asked.
 - [ ] **SR1. `statuses.json`: the status records and their families, loaded and checked** (Core + Data + content, about

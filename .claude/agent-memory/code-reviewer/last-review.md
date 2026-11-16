@@ -5,15 +5,11 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-skill-and-status-editors, slice FX2a (the rules half of FX2: Core TieredEffect.AmountAt, Editor
-Catalogs/TierIds, Effects/TieredEffect{,Catalog,Editing}ViewModel; code uncommitted; the page is FX2b). 2026-11-16.
-Round 1. Verdict: Ready to commit.
+Plan 2026-11-15-skill-and-status-editors, slice FX2b (the page half of FX2: Effects/TieredEffectCatalogPage,
+MainViewModel.TieredEffectEditing, MainWindow.Database opener, DatabaseMenu entry, smoke script, map row; FX2a is
+8e7e1df5). 2026-11-16. Round 1. Verdict: Ready to commit.
 
-- Warning (open): TieredEffectCatalogViewModel.Problem reports the first broken effect in list order, not the chosen
-  one's first as FX2.md's Goal (and FX5.md) say; matches every other catalog page, so reword the slices or record it.
-- Suggestion (open): Duplicate on an added effect whose id is still empty gives "_1" (Stem("") is ""); grey Duplicate
-  or give an empty id while the chosen id is empty.
-- Suggestion (open): DuplicateOf builds the record at StartingPerPower then overwrites PerPowerText; a one-line why
-  comment, or a constructor taking the per-Power text.
-- FX1 carried items: OfTieredEffects_TestWorldEffects_IsNull renamed (fixed); CatalogReferences exception doc now
-  names the page rule (fixed); C7 suggestion dropped.
+- Suggestion (open): the list's muted kind and the Kind box print the enum ("RestoreHp") where effects.json and the
+  slice say restoreHp / "a heal"; a small display converter or label record if the developer wants the file's word.
+- FX2a carried items: Problem order (fixed: slice note rewords the Goal and FX5.md); Duplicate on an empty id
+  (fixed: gives an empty id); DuplicateOf placeholder per-Power (fixed: why comment present).

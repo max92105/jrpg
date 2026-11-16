@@ -4,6 +4,7 @@
     "name": "Burning",
     "description": "Loses HP each turn to the flames.",
     "isHarmful": true,
+    "actsAt": "startOfTurn",
     "family": "burning",
     "parts": [
       {
@@ -18,6 +19,7 @@
     "name": "Exposed",
     "description": "Takes more from every hit.",
     "isHarmful": true,
+    "actsAt": "endOfTurn",
     "family": "exposed",
     "parts": [
       {
@@ -31,6 +33,7 @@
     "name": "Exposed",
     "description": "Takes more from every hit.",
     "isHarmful": true,
+    "actsAt": "endOfTurn",
     "family": "exposed",
     "parts": [
       {
@@ -44,6 +47,7 @@
     "name": "Guard",
     "description": "Resists every kind of harm better.",
     "isHarmful": false,
+    "actsAt": "endOfTurn",
     "family": "guard",
     "parts": [
       {
@@ -57,6 +61,7 @@
     "name": "Guard",
     "description": "Resists every kind of harm better.",
     "isHarmful": false,
+    "actsAt": "endOfTurn",
     "family": "guard",
     "parts": [
       {
@@ -70,6 +75,7 @@
     "name": "Poison",
     "description": "Loses HP each turn.",
     "isHarmful": true,
+    "actsAt": "endOfTurn",
     "family": "poison",
     "parts": [
       {
@@ -83,6 +89,7 @@
     "name": "Regen",
     "description": "Regains HP each turn.",
     "isHarmful": false,
+    "actsAt": "endOfTurn",
     "family": "regen",
     "parts": [
       {
@@ -96,6 +103,7 @@
     "name": "Regen",
     "description": "Regains HP each turn.",
     "isHarmful": false,
+    "actsAt": "endOfTurn",
     "family": "regen",
     "parts": [
       {
@@ -109,6 +117,7 @@
     "name": "Stun",
     "description": "Loses its turn.",
     "isHarmful": true,
+    "actsAt": "endOfTurn",
     "parts": [
       {
         "kind": "skipTurn"
@@ -120,6 +129,7 @@
     "name": "Taunt",
     "description": "Draws the attacks of every enemy.",
     "isHarmful": false,
+    "actsAt": "endOfTurn",
     "parts": [
       {
         "kind": "drawAttacks"

@@ -15,7 +15,9 @@ internal enum PlaybackBeatKind
     /// <summary>The caster's spell turns on them, after the impact (decision 194).</summary>
     Backfire,
 
-    /// <summary>A status's tick takes or restores HP at the end of its holder's turn, after the impact.</summary>
+    /// <summary>
+    /// A status's tick takes or restores HP at the start or the end of its holder's turn, after the impact.
+    /// </summary>
     Tick,
 
     /// <summary>An enemy enters a phase, after every other beat of the action (decision 406).</summary>

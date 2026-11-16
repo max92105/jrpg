@@ -233,8 +233,8 @@ internal sealed class ActionPlayback : ISoundTimeline
         _numbers.Add(new FloatingNumber(backfired.Caster, NumberText.Of(backfired.HpLost), FloatingNumberTone.Damage, start));
     }
 
-    // One holder's ticks share a beat after the beat before them; a stunned holder's come after its "Stunned" cue, so
-    // they get a Tick beat of their own. Each number shows when its beat starts.
+    // One holder's ticks share a beat after the beat before them; a stunned holder's end ticks come after its "Stunned"
+    // cue, so they get a Tick beat of their own. Each number shows when its beat starts.
     private void AddTick(StatusTicked ticked)
     {
         if (_beats.FindLast(beat => beat.Kind != PlaybackBeatKind.Defeat)?.Kind != PlaybackBeatKind.Tick)

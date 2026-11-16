@@ -49,3 +49,18 @@ the next actor comes, and a battle it ends ends at once. The countdown stays at 
 ## Verify by hand
 - Run the game, Title > New game, choose Omer, fight the goblins, Fire Blast one: the Burning tick shows as the
   goblin's turn starts, before it attacks; a goblin with 6 HP or less falls to it without attacking.
+- **Done, with deviations:** `StatusTiming` and `StatusDefinition.ActsAt` (declared right after `IsHarmful`, so
+  `statuses.json` writes `"actsAt"` after `"isHarmful"`; compared in `Equals`); `TurnUpkeep.TickStatuses` takes the
+  timing; `TurnFlow.AdvanceToNextActor` loops advance, `StartTurn` (no tick on a readied extra turn; the outcome
+  checked at once), then skips a holder the ticks felled or a stunned one, which runs its upkeep as before; no
+  `SkipsItsTurn` helper was needed, since a fallen holder holds no status and the loop's two guards read plainly.
+  Deviations: `ActionPlayback`'s tick comment now says a stunned holder's *end* ticks follow its "Stunned" cue (a start
+  tick comes before it); `Execute_StartTickFellsTheHolder_TurnPassesToTheNext` asserts the fall, the next goblin as
+  current and the enemy phase, not "no `ActionStarted` for the fallen", which one Execute can never hold; one test
+  more than the slice lists, `ContentCatalogLoaderStatusTests.Load_RepositoryStatuses_BurningActsAtTheStartOfTurn`
+  (decision 805 off the repository's `burning_1`); the Game's `TestStatuses` gains `Burning` for the playback test.
+  The write-back test passes with every record writing `actsAt`. Simulations: all 43 pass; the Goblin Chief's lines
+  are unchanged from TT. The hand check is the developer's to see.
+- **Review:** the family rule also compares `actsAt` (`Validate_OneFamilyWithAnotherTiming_Throws`): a refresh takes the
+  granted record's timing, so a mixed family could tick twice in one turn; `PlaybackBeatKind.Tick`'s summary says start
+  or end.

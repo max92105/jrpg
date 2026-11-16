@@ -3,19 +3,23 @@ using Jrpg.Core.Statuses;
 
 namespace Jrpg.Core.Battle;
 
-/// <summary>The end of a combatant's own turn, before the battle's outcome is checked (ADR 0019, ADR 0021).</summary>
+/// <summary>
+/// What a combatant's statuses and resources do as its own turn starts or ends, before the battle's outcome is checked
+/// (ADR 0019, ADR 0021).
+/// </summary>
 internal static class TurnUpkeep
 {
     /// <summary>
-    /// Each of the holder's statuses with a ticking part takes or restores its amount in HP, in the order applied; a
-    /// fresh one ticks too, only its countdown waits. A tick isn't a hit, so it ignores a change in damage taken and
-    /// sets off no hit trigger; a damage tick with a type meets the holder's resistance to that type, and an untyped
-    /// one meets none (decision 803).
+    /// Each of the holder's statuses acting at <paramref name="timing"/> with a ticking part takes or restores its
+    /// amount in HP, in the order applied; a fresh one ticks too, only its countdown waits. A tick isn't a hit, so it
+    /// ignores a change in damage taken and sets off no hit trigger; a damage tick with a type meets the holder's
+    /// resistance to that type, and an untyped one meets none (decision 803).
     /// </summary>
-    public static void TickStatuses(Combatant holder, IReadOnlyList<Combatant> combatants, List<BattleEvent> events)
+    public static void TickStatuses(
+        Combatant holder, StatusTiming timing, IReadOnlyList<Combatant> combatants, List<BattleEvent> events)
     {
         // A fall clears the statuses, so the loop walks a copy.
-        foreach (var status in holder.Statuses.Active.ToList())
+        foreach (var status in holder.Statuses.Active.Where(active => active.Status.ActsAt == timing).ToList())
         {
             if (status.Status.TickingPart is not { } part)
             {

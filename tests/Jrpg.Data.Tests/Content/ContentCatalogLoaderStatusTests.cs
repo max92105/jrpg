@@ -37,6 +37,15 @@ public sealed class ContentCatalogLoaderStatusTests : IDisposable
         Assert.Contains(burning.Parts, part => (part.Kind, part.DamageType) == (StatusPartKind.DamageEachTurn, DamageType.Fire));
     }
 
+    // Decision 805: Burning acts as its holder's turn starts.
+    [Fact]
+    public void Load_RepositoryStatuses_BurningActsAtTheStartOfTurn()
+    {
+        var burning = ContentCatalogLoader.Load(_content.Path).Statuses["burning_1"];
+
+        Assert.Equal(StatusTiming.StartOfTurn, burning.ActsAt);
+    }
+
     [Fact]
     public void Load_StatusesFileMissing_RefusesNamingIt()
     {
@@ -68,5 +77,16 @@ public sealed class ContentCatalogLoaderStatusTests : IDisposable
 
         Assert.StartsWith("statuses.json at $[", exception.Message, StringComparison.Ordinal);
         Assert.Contains(".parts[0].kind", exception.Message, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public void Load_StatusWithUnknownTiming_RefusesNamingIt()
+    {
+        _content.Replace("statuses.json", "\"actsAt\": \"startOfTurn\"", "\"actsAt\": \"beforeTurn\"");
+
+        var exception = Assert.Throws<ContentValidationException>(() => ContentCatalogLoader.Load(_content.Path));
+
+        Assert.StartsWith("statuses.json at $[", exception.Message, StringComparison.Ordinal);
+        Assert.Contains(".actsAt", exception.Message, StringComparison.Ordinal);
     }
 }

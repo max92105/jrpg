@@ -70,6 +70,21 @@ public sealed class ActionPlaybackPhaseTests
         Assert.Equal(BattlePacing.SkipHold, Assert.Single(playback.Numbers).ShowsAt);
     }
 
+    // The next actor's start tick follows the attack in one Execute (decision 804), so it plays after the impact.
+    [Fact]
+    public void Start_TickOfTheNextActorAfterAnAttack_PlaysItsTickBeat()
+    {
+        var playback = Start(
+        [
+            new ActionStarted(_sarxian, new AttackCommand(_goblin)),
+            new EffectApplied(_goblin, EffectKind.Damage, 13),
+            new StatusTicked(_nextGoblin, TestStatuses.Burning, 5),
+        ]);
+
+        Assert.Equal([PlaybackBeatKind.Impact, PlaybackBeatKind.Tick], playback.Beats.Select(beat => beat.Kind));
+        Assert.Equal((_nextGoblin, BattlePacing.ImpactHold), (playback.Numbers[^1].Target, playback.Numbers[^1].ShowsAt));
+    }
+
     // Two enemies reaching a phase in one call share one beat, as two skipped turns do.
     [Fact]
     public void Start_TwoEnemiesEnterAPhase_ShareOnePhaseBeat()

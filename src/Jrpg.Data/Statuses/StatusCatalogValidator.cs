@@ -91,7 +91,8 @@ internal static class StatusCatalogValidator
         return $"parts[{index}]: damageType is only for damageEachTurn (was {typeName} on {NameOf(part.Kind)}).";
     }
 
-    // Each family's records have the same part kinds and types in the same order as its first record.
+    // Each family's records tick at the same time and have the same part kinds and types in the same order as its first
+    // record: a refresh takes the granted record's timing, so a mixed family could tick twice in one turn.
     private static string? FindFamilyProblem(IReadOnlyList<StatusDefinition> statuses)
     {
         foreach (var family in statuses.GroupBy(status => status.FamilyKey))
@@ -101,6 +102,12 @@ internal static class StatusCatalogValidator
             if (unlike is not null)
             {
                 return $"family '{family.Key}': {unlike.Id}'s parts differ from {first.Id}'s.";
+            }
+
+            var otherTiming = family.FirstOrDefault(status => status.ActsAt != first.ActsAt);
+            if (otherTiming is not null)
+            {
+                return $"family '{family.Key}': {otherTiming.Id} acts at another time than {first.Id}.";
             }
         }
 

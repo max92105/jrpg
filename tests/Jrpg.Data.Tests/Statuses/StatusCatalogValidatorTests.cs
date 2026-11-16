@@ -82,6 +82,17 @@ public sealed class StatusCatalogValidatorTests
         Assert.Equal("statuses.json: family 'poison': poison_2's parts differ from poison_1's.", exception.Message);
     }
 
+    // A refresh takes the granted record's timing: a family ticking at two times could tick twice in one turn.
+    [Fact]
+    public void Validate_OneFamilyWithAnotherTiming_Throws()
+    {
+        var early = _poison with { Id = "poison_2", ActsAt = StatusTiming.StartOfTurn };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate(_poison, early));
+
+        Assert.Equal("statuses.json: family 'poison': poison_2 acts at another time than poison_1.", exception.Message);
+    }
+
     // Part for part: a refresh compares the parts in order (decision 800).
     [Fact]
     public void Validate_OneFamilyWithTheSameKindsInAnotherOrder_Throws()

@@ -3,9 +3,9 @@ using Jrpg.Core.Stats;
 namespace Jrpg.Core.Statuses;
 
 /// <summary>
-/// One status as content describes it (ADR 0055): its words, whether it harms its holder, the family a holder keeps one
-/// of, and the parts it applies while held. Compares its parts in order (decision 795), so two records built apart from
-/// the same parts are equal, as a drop table compares its entries.
+/// One status as content describes it (ADR 0055): its words, whether it harms its holder, when in its holder's turn it
+/// ticks, the family a holder keeps one of, and the parts it applies while held. Compares its parts in order (decision
+/// 795), so two records built apart from the same parts are equal, as a drop table compares its entries.
 /// </summary>
 public sealed record StatusDefinition
 {
@@ -18,6 +18,11 @@ public sealed record StatusDefinition
 
     /// <summary>Whether it hurts its holder, which the game's mark shows; false for a boon.</summary>
     public bool IsHarmful { get; init; }
+
+    /// <summary>
+    /// When its tick acts in its holder's turn (decision 695); moves only the tick, never the countdown.
+    /// </summary>
+    public StatusTiming ActsAt { get; init; } = StatusTiming.EndOfTurn;
 
     /// <summary>The statuses a holder keeps one of (decision 800), such as <c>poison</c>; its id when absent.</summary>
     public string? Family { get; init; }
@@ -48,6 +53,7 @@ public sealed record StatusDefinition
         && Name == other.Name
         && Description == other.Description
         && IsHarmful == other.IsHarmful
+        && ActsAt == other.ActsAt
         && Family == other.Family
         && Parts.SequenceEqual(other.Parts);
 

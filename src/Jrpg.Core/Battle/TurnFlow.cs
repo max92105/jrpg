@@ -4,8 +4,8 @@ namespace Jrpg.Core.Battle;
 
 /// <summary>
 /// How a battle moves from one turn to the next once an action has resolved: the actor's upkeep, the outcome check, and
-/// the advance to the next actor, skipping a stunned one (ADR 0019, ADR 0021). It returns the phase the battle is in
-/// after, and reports what happened as events.
+/// the advance to the next actor, whose start ticks run first, skipping one they felled or a stunned one (ADR 0019, ADR
+/// 0021). It returns the phase the battle is in after, and reports what happened as events.
 /// </summary>
 internal sealed class TurnFlow(IReadOnlyList<Combatant> combatants, TurnOrder turnOrder)
 {
@@ -33,7 +33,7 @@ internal sealed class TurnFlow(IReadOnlyList<Combatant> combatants, TurnOrder tu
             return;
         }
 
-        TurnUpkeep.TickStatuses(holder, combatants, events);
+        TurnUpkeep.TickStatuses(holder, StatusTiming.EndOfTurn, combatants, events);
         if (holder.IsAlive)
         {
             TurnUpkeep.ApplyPerTurnGains(holder, events);
@@ -59,26 +59,50 @@ internal sealed class TurnFlow(IReadOnlyList<Combatant> combatants, TurnOrder tu
         return outcome;
     }
 
-    // A stunned combatant's turn is skipped inside the same Execute, so the screen never sees it as the actor. A lost
+    // Each turn starts with its holder's start ticks, then a stun skips it (decision 804): a holder the ticks felled,
+    // or a stunned one, loses the turn inside the same Execute, so the screen never sees it as the actor. A stunned
     // turn still runs its upkeep, so the stun counts down and the loop ends; a lost extra turn has none, but it is
     // always followed by a cycle turn, which counts down (ADR 0021).
     private BattlePhase AdvanceToNextActor(List<BattleEvent> events)
     {
-        turnOrder.Advance();
-        while (turnOrder.Current.Statuses.FirstWith(StatusPartKind.SkipTurn) is { } stun)
+        while (true)
         {
-            var skipped = turnOrder.Current;
-            events.Add(new TurnSkipped(skipped, stun));
-            RunUpkeep(skipped, events);
+            turnOrder.Advance();
+            if (StartTurn(events) is { } ended)
+            {
+                return ended;
+            }
+
+            var actor = turnOrder.Current;
+            if (!actor.IsAlive)
+            {
+                continue;
+            }
+
+            if (actor.Statuses.FirstWith(StatusPartKind.SkipTurn) is not { } stun)
+            {
+                return PhaseOf(actor);
+            }
+
+            events.Add(new TurnSkipped(actor, stun));
+            RunUpkeep(actor, events);
             if (OutcomeOf(events) is { } outcome)
             {
                 return outcome;
             }
+        }
+    }
 
-            turnOrder.Advance();
+    // A readied extra turn has no start ticks, as it has no upkeep; a tick that ends the battle ends it at once.
+    private BattlePhase? StartTurn(List<BattleEvent> events)
+    {
+        if (turnOrder.IsExtraTurn)
+        {
+            return null;
         }
 
-        return PhaseOf(turnOrder.Current);
+        TurnUpkeep.TickStatuses(turnOrder.Current, StatusTiming.StartOfTurn, combatants, events);
+        return OutcomeOf(events);
     }
 
     private bool AnyoneStandsOn(BattleSide side) => combatants.Any(combatant => combatant.Side == side && combatant.IsAlive);

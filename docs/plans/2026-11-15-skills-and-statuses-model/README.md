@@ -85,7 +85,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/T1.md](slices/T1.md)
 - [x] **T2. `effects.json` holds the tiered records and an effect names one by id** (Data + content, about 270 lines
   plus about 60 of JSON) → [slices/T2.md](slices/T2.md)
-- [ ] **T3. Enemies have a Power for their tiered skills** (Core + Data, about 170 lines) →
+- [x] **T3. Enemies have a Power for their tiered skills** (Core + Data, about 170 lines) →
   [slices/T3.md](slices/T3.md)
 - [ ] **EP. The Enemies window edits an enemy's Power** (Editor, about 100 lines) → [slices/EP.md](slices/EP.md)
 - [ ] **T4. Every skill names its tiered effect** (content + Data + Game, about 220 lines plus `skills.json`) →

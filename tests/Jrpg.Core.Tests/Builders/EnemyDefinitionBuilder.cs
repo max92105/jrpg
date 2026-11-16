@@ -15,6 +15,7 @@ internal sealed class EnemyDefinitionBuilder
     private int _critChance;
     private int _crowdControlResistance;
     private int _accuracy = 100;
+    private int _power;
     private EnemyAction[] _tactics = [];
     private EnemyPhase[] _phases = [];
     private bool _isBoss;
@@ -35,6 +36,12 @@ internal sealed class EnemyDefinitionBuilder
     public EnemyDefinitionBuilder WithDamageType(DamageType damageType)
     {
         _damageType = damageType;
+        return this;
+    }
+
+    public EnemyDefinitionBuilder WithPower(int power)
+    {
+        _power = power;
         return this;
     }
 
@@ -103,6 +110,7 @@ internal sealed class EnemyDefinitionBuilder
         MaxHp = _maxHp,
         Damage = _damage,
         DamageType = _damageType,
+        Power = _power,
         Accuracy = _accuracy,
         Dodge = _dodge,
         CritChance = _critChance,

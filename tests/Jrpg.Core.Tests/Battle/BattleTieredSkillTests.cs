@@ -10,9 +10,9 @@ using Jrpg.Core.Tests.Randomness;
 
 namespace Jrpg.Core.Tests.Battle;
 
-// A tiered skill (ADR 0056) deals its user's Power times its record's per-Power, against one goblin without
-// resistances; the member has 20 Power from the class and 100 % more damage per 100 Power, which a tiered skill ignores
-// (decision 784). The shuffle (1) keeps the member first.
+// A tiered skill (ADR 0056) deals its user's Power times its record's per-Power, between a member and one goblin
+// without resistances; the member has 20 Power from the class and 100 % more damage per 100 Power, which a tiered skill
+// ignores (decision 784). The member's tests shuffle with 1, keeping the member first; the enemy's test with 0.
 public sealed class BattleTieredSkillTests
 {
     private static readonly StatRules _powerRules = TestStatRules.Neutral with { DamagePercentPer100Power = 100 };
@@ -67,6 +67,25 @@ public sealed class BattleTieredSkillTests
         var events = battle.Execute(new SkillCommand(thorns, [goblin]));
 
         Assert.Equal(60, events.OfType<EffectApplied>().Single().Amount);
+    }
+
+    // An enemy's content Power (decision 787): 5 x 2 = 10 against a member without resistances. The shuffle (0) puts
+    // the enemy first.
+    [Fact]
+    public void Execute_EnemyTieredSkill_DealsItsPowerTimesTheTier()
+    {
+        var chief = Combatant.FromEnemy(new EnemyDefinitionBuilder()
+            .WithStats(maxHp: 200, damage: 20)
+            .WithPower(5)
+            .WithTactics(new EnemyAction { SkillId = _bolt.Id, Weight = 1 })
+            .Build());
+        var member = Combatant.FromPartyMember(new PartyMemberBuilder().Build());
+        var battle = new BattleState([member, chief], new Inventory(), new FixedSequenceRandom(0));
+
+        var events = battle.Execute(new SkillCommand(_bolt, [member]));
+
+        Assert.Same(member, events.OfType<EffectApplied>().Single().Target);
+        Assert.Equal(10, events.OfType<EffectApplied>().Single().Amount);
     }
 
     private static (Combatant Goblin, BattleState Battle) Battle(Combatant member, Inventory inventory)

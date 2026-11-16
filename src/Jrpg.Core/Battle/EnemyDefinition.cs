@@ -26,11 +26,18 @@ public sealed record EnemyDefinition
 
     public required int MaxHp { get; init; }
 
-    /// <summary>Its basic attack's raw damage (an enemy has no Power to raise it).</summary>
+    /// <summary>
+    /// Its basic attack's raw damage (Power doesn't raise it: an enemy's Power serves its tiered skills).
+    /// </summary>
     public required int Damage { get; init; }
 
     /// <summary>What the enemy's attack hits as (ADR 0027).</summary>
     public required DamageType DamageType { get; init; }
+
+    /// <summary>
+    /// What its tiered skills multiply (decision 787), 0 to 10 000; 0, left out of the file, for an enemy with none.
+    /// </summary>
+    public int Power { get; init; }
 
     /// <summary>Its hit chance against 0 dodge, a whole percent (decision 299): the base is already in it.</summary>
     public required int Accuracy { get; init; }

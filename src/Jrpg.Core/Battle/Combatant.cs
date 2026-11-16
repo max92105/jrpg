@@ -66,6 +66,7 @@ public sealed class Combatant
         BattleSide.Enemies,
         new CombatStats(enemy.Damage)
         {
+            Power = enemy.Power,
             AttackType = enemy.DamageType,
             AccuracyPermille = StatFormula.PermilleOf(enemy.Accuracy),
             DodgePermille = StatFormula.PermilleOf(enemy.Dodge),

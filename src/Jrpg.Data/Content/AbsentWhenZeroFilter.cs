@@ -20,6 +20,8 @@ internal static class AbsentWhenZeroFilter
         (typeof(FieldSpriteSheet), "feetPixels"),
         // Decision 586: only the HP condition kinds read a percent; the fallen one leaves it at 0.
         (typeof(TacticCondition), "percent"),
+        // Decision 787: only an enemy with tiered skills has a Power.
+        (typeof(EnemyDefinition), "power"),
         // ADR 0048: most strips land their hit on their first frame.
         (typeof(EffectStripDefinition), "hitFrame"),
     ];

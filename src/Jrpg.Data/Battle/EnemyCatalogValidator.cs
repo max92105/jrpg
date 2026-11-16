@@ -1,6 +1,7 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Party;
+using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
 using Jrpg.Data.Maps;
@@ -14,6 +15,9 @@ internal static class EnemyCatalogValidator
     private const int MostAccuracy = 200;
     private const int WholeChance = 100;
 
+    // A bound against overflow: Power times a record's per-Power stays far within an int (decision 818).
+    private const int MostPower = 10_000;
+
     /// <param name="fileName">The file, for messages.</param>
     /// <param name="enemies">The deserialized list.</param>
     /// <param name="references">What an enemy may name.</param>
@@ -23,7 +27,26 @@ internal static class EnemyCatalogValidator
                 ?? FindDropTableProblem(enemy, references.DropTableIds)
                 ?? FindIdleAnimationProblem(enemy.IdleAnimation)
                 ?? EnemyTacticsValidator.FindProblem(enemy.Tactics, "tactics", references.Skills)
-                ?? EnemyTacticsValidator.FindPhasesProblem(enemy.Phases, references.Skills));
+                ?? EnemyTacticsValidator.FindPhasesProblem(enemy.Phases, references.Skills)
+                ?? FindPowerProblem(enemy, references.Skills));
+
+    // A tiered skill multiplies its user's Power, so an enemy using one with none would deal nothing (decision 787).
+    // Checked after the tactics, which refuse a null action or an unknown skill first.
+    private static string? FindPowerProblem(EnemyDefinition enemy, IReadOnlyDictionary<string, SkillDefinition> skills)
+    {
+        if (Within("power", enemy.Power, 0, MostPower) is { } range)
+        {
+            return range;
+        }
+
+        // The first in its tactics, then its phases', so the message names the same skill every load.
+        var tiered = enemy.Power > 0
+            ? null
+            : enemy.Tactics.Concat(enemy.Phases.SelectMany(phase => phase.Tactics))
+                .Select(action => action.SkillId)
+                .FirstOrDefault(id => id is not null && skills.TryGetValue(id, out var skill) && skill.Effect.Tier is not null);
+        return tiered is null ? null : $"power must be at least 1: its skill '{tiered}' names a tiered effect (was 0).";
+    }
 
     private static string? FindDropTableProblem(EnemyDefinition enemy, IReadOnlySet<string> dropTableIds) =>
         enemy.DropTableId is { } id && !dropTableIds.Contains(id) ? $"dropTableId has unknown drop table id '{id}'." : null;

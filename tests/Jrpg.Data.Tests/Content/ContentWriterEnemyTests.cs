@@ -125,6 +125,24 @@ public sealed class ContentWriterEnemyTests : IDisposable
         Assert.Equal(before, File.ReadAllBytes(_content.PathOf("enemies.json")));
     }
 
+    [Fact]
+    public void WriteEnemies_PowerZero_LeavesItOut()
+    {
+        _writer.WriteMapCatalogs(WithEnemies(_catalog.Enemies["goblin"] with { Power = 0 }));
+
+        Assert.False(WrittenEnemies()["goblin"].AsObject().ContainsKey("power"));
+    }
+
+    [Fact]
+    public void WriteEnemies_PowerFive_WritesItAfterDamageType()
+    {
+        _writer.WriteMapCatalogs(WithEnemies(_catalog.Enemies["goblin"] with { Power = 5 }));
+
+        var keys = WrittenEnemies()["goblin"].AsObject().Select(field => field.Key).ToList();
+        Assert.Equal(keys.IndexOf("damageType") + 1, keys.IndexOf("power"));
+        Assert.Equal(5, (int?)WrittenEnemies()["goblin"]["power"]);
+    }
+
     private ContentCatalog WithEnemies(params EnemyDefinition[] enemies)
     {
         var all = new Dictionary<string, EnemyDefinition>(_catalog.Enemies);

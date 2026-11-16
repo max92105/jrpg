@@ -5,10 +5,11 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-skills-and-statuses-model, slice R2 (tests only: Game.Tests Battle/TestStatuses, 26 event sites in six
-files converted, 5870 tests before and after). 2026-11-15. Round 1. Verdict: Ready to commit. No findings.
+Plan 2026-11-15-skills-and-statuses-model, slice MS (Effect.Statuses list, decision 809). 2026-11-15. Round 1.
+Verdict: Ready to commit. No findings.
 
-- Checked: 26 sites counted per file match the slice (8/4/3/3/7/1); only StatusMarksViewTests' InlineData still names
-  StatusKind members (slice-sanctioned); removed usings were each file's only StatusKind need; rewraps only.
-- R1 suggestion (event-match predicates in Core tests, optional) and R1 Follow-up (EffectScalingTests whole-Effect
-  compare, for MS) not carried: different slice; the Follow-up belongs to MS's review.
+- Checked: LandOn's else-if keeps the old guard (standing, landed) with the loop inside; SkillEmpowerment's GrantStatus
+  branch with an empty list is unreachable (validator refuses it); `"statuses": null` refused by
+  RespectNullableAnnotations, null elements by FindStatusesProblem; no `"status"` key left in content/; the miss test
+  discriminates (goblin 40 HP survives a 10-power hit, so a landed hit would grant).
+- R1 Follow-up (EffectScalingTests whole-Effect compare) answered by Effect.Equals comparing the list in order: fixed.

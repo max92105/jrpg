@@ -5,12 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-skills-and-statuses-model, slice T4 (19 skills.json effects tiered, goblin_chief power 5,
-SkillCatalogValidator.FindTierProblem, "attack damage" caption, ContentCatalogLoaderSkillTierTests new,
-BattleScenarios Shield Bash flat 5). 2026-11-15. Round 1. Verdict: Ready to commit.
+Plan 2026-11-15-skills-and-statuses-model, slice SR1 (statuses.json: StatusDefinition/StatusPart/StatusPartKind,
+StatusCatalogValidator, ContentCatalog.Statuses, loader reads statuses.json first, write-back test). 2026-11-15.
+Round 1. Verdict: Ready to commit.
 
-- Suggestion (open, optional): BattleScenarios.WithSoftSureStun, "Soft" says little; WithFlatSureStun names what it does.
-- Checked: all 19 tiers match design 3.1's table; ui/MessageIds caption; no "% damage" or "N HP" wording left;
-  BattleState scales (tier) before SkillEmpowerment, so empowerment still raises a tiered amount; the Editor has no
-  skill editing, so the new rule can't strand an editor-made skill; only goblin_chief uses skills.
-- EP: no findings carried.
+- Suggestion (open, optional): ContentCatalogLoader.cs:62 "Read first:" above effects.json is no longer first since
+  statuses.json is read above it; say "Read before the skills and items:".
+- Suggestion (open, optional): no test for one family's records with the same kinds in another order (the validator's
+  SequenceEqual is order-sensitive by decision; pin it).
+- Checked: content matches design 3.3 (ten records, families, amounts); no Core.Statuses -> Core.Content cycle;
+  enum converter refuses integers, so FindAmountProblem's default arm is unreachable from JSON; Amount absent reads 0
+  and the validator refuses it for ticks.
+- T4: no findings carried (Soft/Flat stun suggestion was optional, dropped).

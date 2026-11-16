@@ -1,4 +1,3 @@
-using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Jrpg.Core.Geometry;
@@ -50,10 +49,7 @@ internal sealed partial class FacingSetup(Facing facing) : ObservableObject
     /// <summary>
     /// "4 cells: (1, 3) (2, 3) (3, 3) (2, 3)": column then row, counted from 1 as the image numbers them.
     /// </summary>
-    public string CellsText =>
-        $"{Cells.Count} {(Cells.Count == 1 ? "cell" : "cells")}"
-        + (Cells.Count == 0 ? "" : ": " + string.Join(' ', Cells.Select(cell => string.Create(
-            CultureInfo.InvariantCulture, $"({cell.Column + 1}, {cell.Row + 1})"))));
+    public string CellsText => CellPicking.Line(Cells);
 
     /// <summary>
     /// Adds a picked cell at the end of the sequence; the same cell again is a repeat (decision 772).

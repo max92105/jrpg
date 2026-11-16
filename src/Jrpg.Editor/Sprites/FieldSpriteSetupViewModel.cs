@@ -145,16 +145,10 @@ internal sealed partial class FieldSpriteSetupViewModel : ObservableObject
     /// <param name="y">The point's distance from the image's top edge, in image pixels.</param>
     public void PickCellAt(double x, double y)
     {
-        if (Walk.PickingFacing is not { } picking || FrameWidth < 1 || FrameHeight < 1 || x < 0 || y < 0)
+        if (Walk.PickingFacing is { } picking
+            && CellPicking.CellAt((x, y), (FrameWidth, FrameHeight), (Columns, Rows)) is { } cell)
         {
-            return;
-        }
-
-        var column = Math.Floor(x / FrameWidth);
-        var row = Math.Floor(y / FrameHeight);
-        if (column < Columns && row < Rows)
-        {
-            picking.AddCell(new SpriteCell((int)column, (int)row));
+            picking.AddCell(cell);
         }
     }
 

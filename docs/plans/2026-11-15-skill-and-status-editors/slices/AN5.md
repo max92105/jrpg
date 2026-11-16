@@ -44,3 +44,6 @@ value. The tool holds no catalog session: what it writes is a file and a typed r
 
 ## Verify by hand
 None: the window comes in AN6.
+- **Done, with deviations:** code 271 lines (CellStrip 16, StripFromCellsViewModel 217, Sprites/CellPicking 38, the
+  sprite setup's PickCellAt and FacingSetup.CellsText now calling it: the cell under a point and the picks' line, not a
+  second copy), tests 543 in two files (StripFromCellsViewModelTests, StripFromCellsProblemTests); map rows named.

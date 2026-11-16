@@ -5,7 +5,7 @@ using System.Windows.Media;
 namespace Jrpg.Editor.Sprites;
 
 /// <summary>
-/// Drawn over a sprite sheet in the Character sprites window: its frame grid, each row's number from 1 on the left edge
+/// Drawn over a sprite sheet in the Character sprites page: its frame grid, each row's number from 1 on the left edge
 /// (decision 568) and each column's from 1 centered on the top edge (decision 773), so rows and picked cells are read
 /// off the image. Line widths are set in screen pixels at the shown scale, as the tile browser's marks are.
 /// </summary>

@@ -1,8 +1,8 @@
 namespace Jrpg.Editor.Sprites;
 
 /// <summary>
-/// One row of the Character sprites window's list: an image in the field-sprite folder, set up or not; or a record
-/// whose image the folder lacks (decision 442), listed so it can be re-imported.
+/// One row of the Character sprites page's list: an image in the field-sprite folder, set up or not; or a record whose
+/// image the folder lacks (decision 442), listed so it can be re-imported.
 /// </summary>
 /// <param name="File">The image's file name in the field-sprite folder, the record's key.</param>
 /// <param name="IsSetUp">Whether a record describes the image.</param>

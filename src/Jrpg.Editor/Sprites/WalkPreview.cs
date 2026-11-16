@@ -10,7 +10,7 @@ namespace Jrpg.Editor.Sprites;
 /// <summary>
 /// The four facings walking side by side as the game draws them (ADR 0043): each frame at its record's scale over a 48
 /// px cell outline, feet on the outline's bottom, so the feet line is set by eye; a mirrored facing flipped left to
-/// right (ADR 0054). Reads Core's walk frame for the time, as the game's player drawing does; one per window,
+/// right (ADR 0054). Reads Core's walk frame for the time, as the game's player drawing does; one per page or window,
 /// remembering the frames drawn last so a render tick redraws only when a frame moved on.
 /// </summary>
 internal sealed class WalkPreview

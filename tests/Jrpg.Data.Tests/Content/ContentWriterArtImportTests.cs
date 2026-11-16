@@ -7,7 +7,7 @@ namespace Jrpg.Data.Tests.Content;
 
 /// <summary>
 /// One image import for every art folder but the tilesheets, each with its folder's own check: what the editor's
-/// Character sprites window and plan 2's enemy art use.
+/// Character sprites page and plan 2's enemy art use.
 /// </summary>
 public sealed class ContentWriterArtImportTests : IDisposable
 {

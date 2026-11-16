@@ -1,8 +1,11 @@
+using System.Windows;
+using System.Windows.Controls;
 using Jrpg.Editor.Hosting;
 
 namespace Jrpg.Editor.Tests.Hosting;
 
-// A window's per-frame work stopped when it throws (ADR 0050), its frames raised by the test: no render pass needed.
+// A window's or a page's per-frame work stopped when it throws (ADR 0050), its frames raised by the test: no render
+// pass needed; and a page's work run while it is loaded.
 public sealed class RenderTickTests
 {
     [Fact]
@@ -59,6 +62,45 @@ public sealed class RenderTickTests
             tick.Start();
 
             tick.Stop();
+
+            runsAfter = tick.IsRunning;
+        });
+
+        Assert.False(runsAfter);
+    }
+
+    // The page's Loaded and Unloaded raised by the test: no window needed.
+    [Fact]
+    public void RunWhileLoaded_PageLoaded_RunsTheWork()
+    {
+        var runs = false;
+
+        StaThread.Run(() =>
+        {
+            var (tick, page) = (new RenderTick((_, _) => { }, _ => { }), new Border());
+            tick.RunWhileLoaded(page);
+
+            page.RaiseEvent(new RoutedEventArgs(FrameworkElement.LoadedEvent));
+
+            runs = tick.IsRunning;
+            tick.Stop();
+        });
+
+        Assert.True(runs);
+    }
+
+    [Fact]
+    public void RunWhileLoaded_PageUnloaded_StopsTheWork()
+    {
+        var runsAfter = true;
+
+        StaThread.Run(() =>
+        {
+            var (tick, page) = (new RenderTick((_, _) => { }, _ => { }), new Border());
+            tick.RunWhileLoaded(page);
+            page.RaiseEvent(new RoutedEventArgs(FrameworkElement.LoadedEvent));
+
+            page.RaiseEvent(new RoutedEventArgs(FrameworkElement.UnloadedEvent));
 
             runsAfter = tick.IsRunning;
         });

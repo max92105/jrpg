@@ -30,3 +30,6 @@ images built in the test as the base file's:
 **The developer's** (the page shows Mana Seed sheets): NPCs > Character sprites... opens at the main window's size;
 change a facing's cells, OK; New NPC's preview walks with it; Ctrl+Z takes it back. Agents run only the script and
 read its lines: "NPCs>Character sprites...: opened", no `ERROR`, no binding-error line.
+- **Done, with deviations:** only the tick goes on `Unloaded` (zoom, view model: the page's own); third tick copy as
+  `RenderTick.RunWhileLoaded`, 2 tests; `Choose_RecordWithoutImage_ChoosesIt` added; tests' `window` renamed `sprites`;
+  `CanEditFieldSprites` kept (the NPCs entry reads it). Page 180 + 181 lines, `MainWindow.Database.cs` 168.

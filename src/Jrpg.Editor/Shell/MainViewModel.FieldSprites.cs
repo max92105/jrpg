@@ -8,7 +8,7 @@ using Jrpg.Editor.Tiles;
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// NPCs > Character sprites...: the window's start and apply over the draft, and its Import... through Data, asking
+/// NPCs > Character sprites...: the page's start and apply over the draft, and its Import... through Data, asking
 /// before replacing an image, the outcome in the status bar as the tilesheet import's.
 /// </summary>
 internal sealed partial class MainViewModel
@@ -38,7 +38,7 @@ internal sealed partial class MainViewModel
         return result;
     }
 
-    // The folder's readable images and their sizes, read when the window opens, never cached: an import changes them.
+    // The folder's readable images and their sizes, read when the page opens, never cached: an import changes them.
     private FieldSpriteEditingViewModel CreateFieldSpriteEditing() =>
         new(
             Content!,

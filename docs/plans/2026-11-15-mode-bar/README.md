@@ -99,7 +99,7 @@ page recipe: [page-recipe.md](page-recipe.md).
 - [x] **WD5. The Enemies page** (Editor, about 150 lines) → [slices/WD5.md](slices/WD5.md)
 - [x] **WD6. The Effect strips page** (Editor, about 130 lines) → [slices/WD6.md](slices/WD6.md)
 - [x] **WD7. The Cinematics page** (Editor, about 140 lines) → [slices/WD7.md](slices/WD7.md)
-- [ ] **WD8. The Character sprites page** (Editor, about 150 lines) → [slices/WD8.md](slices/WD8.md)
+- [x] **WD8. The Character sprites page** (Editor, about 150 lines) → [slices/WD8.md](slices/WD8.md)
 
 ### Stage 3: the mode bar (row 11's rank, after rows 7-10)
 - [ ] **WS1. The mode bar: World and Database, the Database mode an empty page; World's menus, tool bar, map keys,

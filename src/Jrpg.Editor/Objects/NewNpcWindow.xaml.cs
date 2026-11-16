@@ -10,7 +10,7 @@ namespace Jrpg.Editor.Objects;
 /// <summary>
 /// The New NPC and Change NPC sprite dialog. OK hands the id and sprite to the window's apply step, which returns false
 /// when nothing was made (a field has a problem), and the dialog then stays open. The chosen sprite walks its four
-/// facings at the editor's animation time, as the Character sprites window shows it.
+/// facings at the editor's animation time, as the Character sprites page shows it.
 /// </summary>
 internal sealed partial class NewNpcWindow : Window
 {

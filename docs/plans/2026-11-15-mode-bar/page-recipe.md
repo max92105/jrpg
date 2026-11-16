@@ -19,7 +19,7 @@ A page is a user control over its catalog view model. Until WS5 it opens in `Wor
      page sees what was typed;
    - a binding reaching the page's own DataContext names the page type (`AncestorType=trade:ShopCatalogPage`), never
      `UserControl` (a page may hold user controls of its own) nor `Window`;
-   - only per-frame work needs the `Loaded`/`Unloaded` pair: `RenderTick` started on `Loaded`, stopped on `Unloaded`;
+   - only per-frame work needs the `Loaded`/`Unloaded` pair: `RenderTick.RunWhileLoaded(this)` starts it on `Loaded`, stops it on `Unloaded`;
      everything else is set up in the constructor;
    - dialogs it opens (file dialogs, the GIF options) are owned by `Window.GetWindow(this)` in stages 1-2 and by the
      main window once it calls into the shell (decision 940); a handler reads the values it needs before any call that

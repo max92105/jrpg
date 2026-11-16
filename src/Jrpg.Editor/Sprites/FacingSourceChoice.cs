@@ -1,7 +1,7 @@
 namespace Jrpg.Editor.Sprites;
 
 /// <summary>
-/// One entry of a facing's Shows box in the Character sprites window (decision 771): a source and its words.
+/// One entry of a facing's Shows box in the Character sprites page (decision 771): a source and its words.
 /// </summary>
 /// <param name="Source">What the facing reads when the entry is chosen.</param>
 /// <param name="Label">The entry's words.</param>

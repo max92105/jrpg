@@ -32,7 +32,7 @@ public sealed class FieldSpriteCopySetupTests
         [Short] = (384, 96),
     };
 
-    private readonly FieldSpriteCatalogViewModel _window;
+    private readonly FieldSpriteCatalogViewModel _sprites;
 
     public FieldSpriteCopySetupTests()
     {
@@ -52,71 +52,71 @@ public sealed class FieldSpriteCopySetupTests
         var sheets = new Dictionary<string, FieldSpriteSheet>(_catalog.FieldSprites, StringComparer.Ordinal);
         sheets[Placeholder] = bought;
         var draft = new CatalogDraft(_catalog with { FieldSprites = sheets });
-        _window = new FieldSpriteCatalogViewModel(draft, () => [Placeholder, Player, Bought, Wide, Short], file => _sizes[file]);
-        _window.Chosen = _window.Choices.Single(choice => choice.File == Bought);
+        _sprites = new FieldSpriteCatalogViewModel(draft, () => [Placeholder, Player, Bought, Wide, Short], file => _sizes[file]);
+        _sprites.Chosen = _sprites.Choices.Single(choice => choice.File == Bought);
     }
 
     [Fact]
     public void CopySetupFrom_SameSizedSheet_CopiesEveryField()
     {
-        _window.CopySetupFrom(Placeholder);
+        _sprites.CopySetupFrom(Placeholder);
 
-        var setup = _window.Setup!;
+        var setup = _sprites.Setup!;
         Assert.Equal((4, 7, 32, 32), (setup.Columns, setup.Rows, setup.FrameWidth, setup.FrameHeight));
         Assert.Equal((3, 2), (setup.Scale, setup.FeetPixels));
         Assert.Equal((4, 150), (setup.Walk.Frames, setup.Walk.FrameMilliseconds));
-        Assert.Null(_window.Problem);
+        Assert.Null(_sprites.Problem);
     }
 
     // The player's 48 px layout splits a 384 x 96 image into 8 x 2 frames, but its walk reads rows up to the fourth.
     [Fact]
     public void CopySetupFrom_WalkRowsPastThisImage_ShowsTheSetupProblem()
     {
-        _window.Chosen = _window.Choices.Single(choice => choice.File == Short);
+        _sprites.Chosen = _sprites.Choices.Single(choice => choice.File == Short);
 
-        _window.CopySetupFrom(Player);
+        _sprites.CopySetupFrom(Player);
 
-        Assert.Equal("The up row must be within 1..2 (was 4).", _window.Problem);
+        Assert.Equal("The up row must be within 1..2 (was 4).", _sprites.Problem);
     }
 
     // 144 px isn't a whole number of 32 px frames: the copy takes nothing and says why until the next edit.
     [Fact]
     public void CopySetupFrom_FrameSizeNotSplittingThisImage_RefusesAndSaysSo()
     {
-        _window.Chosen = _window.Choices.Single(choice => choice.File == Wide);
+        _sprites.Chosen = _sprites.Choices.Single(choice => choice.File == Wide);
 
-        _window.CopySetupFrom(Placeholder);
+        _sprites.CopySetupFrom(Placeholder);
 
-        Assert.Equal("144 x 288 px doesn't split into 32 x 32 px frames.", _window.Problem);
-        Assert.Equal((4, 1), (_window.Setup!.Columns, _window.Setup.Scale));
+        Assert.Equal("144 x 288 px doesn't split into 32 x 32 px frames.", _sprites.Problem);
+        Assert.Equal((4, 1), (_sprites.Setup!.Columns, _sprites.Setup.Scale));
     }
 
     [Fact]
     public void CopySetupFrom_RefusedCopy_ProblemClearsOnTheNextEdit()
     {
-        _window.Chosen = _window.Choices.Single(choice => choice.File == Wide);
-        _window.CopySetupFrom(Placeholder);
+        _sprites.Chosen = _sprites.Choices.Single(choice => choice.File == Wide);
+        _sprites.CopySetupFrom(Placeholder);
 
-        _window.Setup!.Scale = 2;
+        _sprites.Setup!.Scale = 2;
 
-        Assert.Null(_window.Problem);
+        Assert.Null(_sprites.Problem);
     }
 
     // Decision 570 copies the walk whole: a facing's mirror goes with it (ADR 0054).
     [Fact]
     public void CopySetupFrom_SourceWithMirror_CopiesIt()
     {
-        _window.CopySetupFrom(Placeholder);
+        _sprites.CopySetupFrom(Placeholder);
 
-        var right = _window.Setup!.Walk.Right;
+        var right = _sprites.Setup!.Walk.Right;
         Assert.Equal((FacingSource.Mirror, Facing.Left), (right.Source, right.MirrorOf));
     }
 
     [Fact]
     public void CopySources_ExcludeTheChosenFile()
     {
-        _window.Chosen = _window.Choices.Single(choice => choice.File == Player);
+        _sprites.Chosen = _sprites.Choices.Single(choice => choice.File == Player);
 
-        Assert.Equal([Placeholder], _window.CopySources);
+        Assert.Equal([Placeholder], _sprites.CopySources);
     }
 }

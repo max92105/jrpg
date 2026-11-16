@@ -15,7 +15,7 @@ namespace Jrpg.Editor.Shell;
 /// <summary>
 /// The Database menu's dispatch: an entry's title runs its opener (decision 938), which edits its catalog of the draft
 /// at the main window's size (decision 930); OK applies the whole session as one undo step (ADR 0045, decision 591).
-/// Each entry opens a page in the catalog dialog.
+/// Each entry opens a page in the catalog dialog, as NPCs > Character sprites... does from outside the menu.
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -150,5 +150,19 @@ internal sealed partial class MainWindow
         var artRoot = _viewModel.ArtRoot;
         OpenInDialog("Effect strips", effectStripEditing.Start, effectStripEditing.Apply, edited => new EffectStripCatalogPage(
             edited, file => SpriteImageFile.LoadFrom(artRoot, ArtFolders.Effects, file), animationTime));
+    }
+
+    // The sprite records (decision 569); the page's Import... copies images through the view model, whose import event
+    // drops the replaced pictures as the tilesheet import's does.
+    private void OnCharacterSpritesClicked(object sender, RoutedEventArgs e)
+    {
+        if (_viewModel.FieldSpriteEditing is not { } fieldSpriteEditing || _viewModel.AnimationTime is not { } animationTime)
+        {
+            return;
+        }
+
+        var artRoot = _viewModel.ArtRoot;
+        OpenInDialog("Character sprites", fieldSpriteEditing.Start, fieldSpriteEditing.Apply, edited => new FieldSpritePage(
+            edited, artRoot, animationTime, _viewModel.ImportFieldSprites));
     }
 }

@@ -7,7 +7,7 @@ using Jrpg.Core.Sprites;
 namespace Jrpg.Editor.Sprites;
 
 /// <summary>
-/// One facing of a walk as the Character sprites window types it (ADR 0054): its row, kept and saved whatever it reads
+/// One facing of a walk as the Character sprites page types it (ADR 0054): its row, kept and saved whatever it reads
 /// (decision 767), and what it reads: the row, a sequence of cells or the mirror of another facing. The cells and the
 /// mirror are kept while another source is chosen, so switching back loses nothing.
 /// </summary>
@@ -21,7 +21,7 @@ internal sealed partial class FacingSetup(Facing facing) : ObservableObject
     public partial FacingSource Source { get; set; }
 
     /// <summary>
-    /// The facing's row from 0 (the window counts from 1, decision 568); read only on <see cref="FacingSource.Row"/>.
+    /// The facing's row from 0 (the page counts from 1, decision 568); read only on <see cref="FacingSource.Row"/>.
     /// </summary>
     [ObservableProperty]
     public partial int Row { get; set; }

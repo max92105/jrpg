@@ -2,18 +2,20 @@ using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Sprites;
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Sprites;
 
 /// <summary>
-/// The Character sprites window's state (decisions 569, 570): every image in the field-sprite folder, set up or not,
-/// then every record whose image is missing; the chosen image's setup, each opened setup kept while the window is open;
-/// Copy setup from another set-up image; the problem that greys OK; and the records changed, for one undo step. A setup
-/// counts (for OK and the records) once it was edited, or its image imported in this window with a guess that fits:
+/// The Character sprites page's state (decisions 569, 570): every image in the field-sprite folder, set up or not, then
+/// every record whose image is missing; the chosen image's setup, each opened setup kept while the page is open; Copy
+/// setup from another set-up image; the problem that greys its host's OK; and the records changed, for one undo step. A
+/// setup counts (for OK and the records) once it was edited, or its image imported in this page with a guess that fits:
 /// choosing an image already in the folder and leaving it makes no record, but an import means "set this up". Reads no
-/// file itself: the folder's listing and an image's size come in as lookups.
+/// file itself: the folder's listing and an image's size come in as lookups. An image is chosen by its file, a record
+/// whose image is missing included.
 /// </summary>
-internal sealed partial class FieldSpriteCatalogViewModel : ObservableObject
+internal sealed partial class FieldSpriteCatalogViewModel : ObservableObject, IEditedCatalog
 {
     private readonly CatalogDraft _catalog;
     private readonly Func<IReadOnlyList<string>> _listFiles;
@@ -75,6 +77,10 @@ internal sealed partial class FieldSpriteCatalogViewModel : ObservableObject
             return other is null ? null : $"{other.File}: {other.Problem}";
         }
     }
+
+    public string? ChosenKey => Chosen?.File;
+
+    public void Choose(string key) => Chosen = Choices.FirstOrDefault(choice => choice.File == key) ?? Chosen;
 
     /// <summary>
     /// Copies another image's layout onto the chosen one (decision 570): its frame size as this image's columns and
@@ -162,7 +168,7 @@ internal sealed partial class FieldSpriteCatalogViewModel : ObservableObject
         return setup;
     }
 
-    // Any change to a setup makes it count, ends a refused copy's line and feeds the window's problem.
+    // Any change to a setup makes it count, ends a refused copy's line and feeds the page's problem.
     private void OnSetupChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (sender is FieldSpriteSetupViewModel setup)

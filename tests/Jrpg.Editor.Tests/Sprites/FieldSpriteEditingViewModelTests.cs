@@ -4,7 +4,7 @@ using Jrpg.Editor.Sprites;
 
 namespace Jrpg.Editor.Tests.Sprites;
 
-// The Character sprites window starts from the draft and its whole session is one undo step (decision 569).
+// The Character sprites page starts from the draft and its whole session is one undo step (decision 569).
 public sealed class FieldSpriteEditingViewModelTests
 {
     private const string Player = "player.png";
@@ -18,11 +18,11 @@ public sealed class FieldSpriteEditingViewModelTests
     [Fact]
     public void Apply_EditedSetup_IsOneUndoStep()
     {
-        var window = _editing.Start();
-        window.Chosen = window.Choices.Single(choice => choice.File == Player);
-        window.Setup!.Scale = 2;
+        var sprites = _editing.Start();
+        sprites.Chosen = sprites.Choices.Single(choice => choice.File == Player);
+        sprites.Setup!.Scale = 2;
 
-        _editing.Apply(window);
+        _editing.Apply(sprites);
 
         Assert.Equal(2, _draft.Current.FieldSprites[Player].Scale);
         _draft.Undo();
@@ -33,10 +33,10 @@ public sealed class FieldSpriteEditingViewModelTests
     [Fact]
     public void Apply_Unchanged_RecordsNoStep()
     {
-        var window = _editing.Start();
-        window.Chosen = window.Choices.Single(choice => choice.File == Player);
+        var sprites = _editing.Start();
+        sprites.Chosen = sprites.Choices.Single(choice => choice.File == Player);
 
-        _editing.Apply(window);
+        _editing.Apply(sprites);
 
         Assert.False(_draft.CanUndo);
     }

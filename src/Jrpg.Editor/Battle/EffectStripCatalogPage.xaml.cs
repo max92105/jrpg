@@ -40,9 +40,7 @@ internal sealed partial class EffectStripCatalogPage : UserControl
         (_loadImage, _animationTime) = (loadImage, animationTime);
         strips.PropertyChanged += OnStripsChanged;
         WatchChosenStrip();
-        // WPF may raise Loaded twice, which Start ignores while it runs; a page shown again after Unloaded plays again.
-        Loaded += (_, _) => _renderTick.Start();
-        Unloaded += (_, _) => _renderTick.Stop();
+        _renderTick.RunWhileLoaded(this);
     }
 
     private void OnStripsChanged(object? sender, PropertyChangedEventArgs e)

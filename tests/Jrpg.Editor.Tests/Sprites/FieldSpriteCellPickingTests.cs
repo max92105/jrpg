@@ -6,9 +6,9 @@ using Jrpg.Editor.Sprites;
 
 namespace Jrpg.Editor.Tests.Sprites;
 
-// Picking cells on the Character sprites window's image (decision 772): a point in image pixels adds the cell under it
-// to the picking facing's sequence. On a 100 x 130 px image cut in 4 x 4 frames of 25 x 32 px, so the bottom 2 px
-// belong to no frame.
+// Picking cells on the Character sprites page's image (decision 772): a point in image pixels adds the cell under it to
+// the picking facing's sequence. On a 100 x 130 px image cut in 4 x 4 frames of 25 x 32 px, so the bottom 2 px belong
+// to no frame.
 public sealed class FieldSpriteCellPickingTests
 {
     private static readonly ContentCatalog _catalog =

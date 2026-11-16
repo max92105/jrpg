@@ -1,14 +1,15 @@
 using System.Runtime.ExceptionServices;
+using System.Windows;
 using System.Windows.Media;
 using System.Windows.Threading;
 
 namespace Jrpg.Editor.Hosting;
 
 /// <summary>
-/// A window's work on each frame WPF draws (<see cref="CompositionTarget.Rendering"/>), stopped when it throws. A
-/// handler that threw inside the render pass would throw again on every frame, and WPF would paint nothing: the editor
-/// stayed open but blank (found at ADR 0050's hand check). So a throw stops this tick, whose animation or preview
-/// freezes, and is raised again outside the render pass, where the unexpected-error box takes it once.
+/// A window's or a page's work on each frame WPF draws (<see cref="CompositionTarget.Rendering"/>), stopped when it
+/// throws. A handler that threw inside the render pass would throw again on every frame, and WPF would paint nothing:
+/// the editor stayed open but blank (found at ADR 0050's hand check). So a throw stops this tick, whose animation or
+/// preview freezes, and is raised again outside the render pass, where the unexpected-error box takes it once.
 /// </summary>
 internal sealed class RenderTick
 {
@@ -47,6 +48,16 @@ internal sealed class RenderTick
             IsRunning = false;
             CompositionTarget.Rendering -= OnFrame;
         }
+    }
+
+    /// <summary>
+    /// Runs the work from each time the page loads to the next time it unloads. WPF may raise Loaded twice, which
+    /// <see cref="Start"/> ignores while it runs; a page shown again after Unloaded plays again.
+    /// </summary>
+    public void RunWhileLoaded(FrameworkElement page)
+    {
+        page.Loaded += (_, _) => Start();
+        page.Unloaded += (_, _) => Stop();
     }
 
     /// <summary>One frame: the work, or the stop and the report when it throws.</summary>

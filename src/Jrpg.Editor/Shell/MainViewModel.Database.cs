@@ -14,7 +14,7 @@ namespace Jrpg.Editor.Shell;
 /// <summary>
 /// The Database menu's pages over the draft (ADR 0045, decision 583): the shops, the drop tables, the enemies, the
 /// cinematics (ADR 0046) and the effect strips (decision 659), beside the quests; and the image import the Enemies page
-/// and the Character sprites window share, through Data, asking first when it would replace an image.
+/// and the Character sprites page share, through Data, asking first when it would replace an image.
 /// </summary>
 internal sealed partial class MainViewModel
 {
@@ -62,7 +62,7 @@ internal sealed partial class MainViewModel
                 : lengths[voice] = WavDuration.Read(Path.Combine(_audioRoot, AudioFolders.Voices, voice)));
     }
 
-    // An image the folder holds but can't be read is left out, as the Character sprites window's: its size is unknown.
+    // An image the folder holds but can't be read is left out, as the Character sprites page's: its size is unknown.
     private EffectStripEditingViewModel CreateEffectStripEditing() =>
         new(
             Content!,

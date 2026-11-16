@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -12,12 +13,12 @@ using Microsoft.Win32;
 namespace Jrpg.Editor.Sprites;
 
 /// <summary>
-/// The Character sprites window (decisions 568-570): the images on the left, the chosen one in the middle with its
-/// frame grid, its setup on the right with the four facings walking at the editor's animation time. While a facing
-/// picks, a click on the image adds the frame under it, and the image numbers that facing's cells (decision 772). OK
-/// applies the session as one undo step, greyed while a problem shows; Cancel drops it.
+/// The Character sprites page (decisions 568-570): the images on the left, the chosen one in the middle with its frame
+/// grid, its setup on the right with the four facings walking at the editor's animation time while the page is shown.
+/// While a facing picks, a click on the image adds the frame under it, and the image numbers that facing's cells
+/// (decision 772). Its host shows the problem line and keeps or drops the session.
 /// </summary>
-internal sealed partial class FieldSpriteWindow : Window
+internal sealed partial class FieldSpritePage : UserControl
 {
     private readonly RenderTick _renderTick;
     private readonly FieldSpriteCatalogViewModel _sprites;
@@ -25,7 +26,6 @@ internal sealed partial class FieldSpriteWindow : Window
     private readonly TileAnimationTime _animationTime;
     private readonly Func<IReadOnlyList<string>, SheetImportResult> _import;
     private readonly CellZoom _zoom = new((int)Maps.MapDrawing.CellPixels);
-    private readonly ZoomedScroller _zooming;
     private readonly WalkPreview _preview = new();
     private FieldSpriteSetupViewModel? _setup;
     private BitmapSource? _sheet;
@@ -34,13 +34,13 @@ internal sealed partial class FieldSpriteWindow : Window
     // The chosen setup's record while it has no problem, built once per change so a render tick only compares cells.
     private FieldSpriteSheet? _previewSheet;
 
-    /// <param name="sprites">The window's state.</param>
+    /// <param name="sprites">The page's state, from <see cref="FieldSpriteEditingViewModel.Start"/>.</param>
     /// <param name="artRoot">The <c>art</c> folder, where the images are read from.</param>
     /// <param name="animationTime">The editor's animation time, which the preview walks on.</param>
     /// <param name="import">
     /// Copies chosen images into the field-sprite art and says what it did; the shell drops the replaced pictures.
     /// </param>
-    public FieldSpriteWindow(
+    public FieldSpritePage(
         FieldSpriteCatalogViewModel sprites,
         string artRoot,
         TileAnimationTime animationTime,
@@ -48,29 +48,13 @@ internal sealed partial class FieldSpriteWindow : Window
     {
         InitializeComponent();
         _renderTick = new RenderTick(OnRendering);
-
-        // At most the screen's work area: at 175 % display scaling 1120 px is wider than the screen, and centering on
-        // the editor cut the window's sides.
-        Width = Math.Min(Width, SystemParameters.WorkArea.Width);
-        Height = Math.Min(Height, SystemParameters.WorkArea.Height);
-        Loaded += (_, _) => KeepOnDesktop();
         DataContext = _sprites = sprites;
         (_artRoot, _animationTime, _import) = (artRoot, animationTime, import);
         ZoomBar.DataContext = _zoom;
-        _zooming = new ZoomedScroller(ImageScroller, DrawSheet, () => _scale) { Zoom = _zoom };
+        _ = new ZoomedScroller(ImageScroller, DrawSheet, () => _scale) { Zoom = _zoom };
         sprites.PropertyChanged += OnSpritesChanged;
-        _renderTick.Start();
-        Closed += OnClosed;
+        _renderTick.RunWhileLoaded(this);
         ShowChosen();
-    }
-
-    // Centering on an editor snapped to half a screen, or on a second monitor, can still push a side off the desktop.
-    private void KeepOnDesktop()
-    {
-        var right = SystemParameters.VirtualScreenLeft + SystemParameters.VirtualScreenWidth - ActualWidth;
-        var bottom = SystemParameters.VirtualScreenTop + SystemParameters.VirtualScreenHeight - ActualHeight;
-        Left = Math.Max(SystemParameters.VirtualScreenLeft, Math.Min(Left, right));
-        Top = Math.Max(SystemParameters.VirtualScreenTop, Math.Min(Top, bottom));
     }
 
     private void OnSpritesChanged(object? sender, PropertyChangedEventArgs e)
@@ -78,10 +62,6 @@ internal sealed partial class FieldSpriteWindow : Window
         if (e.PropertyName == nameof(FieldSpriteCatalogViewModel.Setup))
         {
             ShowChosen();
-        }
-        else if (e.PropertyName == nameof(FieldSpriteCatalogViewModel.Problem))
-        {
-            OkButton.IsEnabled = _sprites.Problem is null;
         }
     }
 
@@ -102,7 +82,6 @@ internal sealed partial class FieldSpriteWindow : Window
         }
 
         _sheet = _setup is null ? null : SpriteImageFile.Load(_artRoot, _setup.File);
-        OkButton.IsEnabled = _sprites.Problem is null;
         DrawSheet();
         DrawPreview();
     }
@@ -173,6 +152,7 @@ internal sealed partial class FieldSpriteWindow : Window
         Preview.Source = _previewSheet is { } sheet ? _preview.Draw(sheet, _sheet!, _animationTime.Elapsed) : null;
     }
 
+    // The dialog hosting the page owns the file dialog (the mode bar plan's page recipe).
     private void OnImportClicked(object sender, RoutedEventArgs e)
     {
         var dialog = new OpenFileDialog
@@ -181,7 +161,7 @@ internal sealed partial class FieldSpriteWindow : Window
             Filter = "PNG images (*.png)|*.png",
             Multiselect = true,
         };
-        if (dialog.ShowDialog(this) != true)
+        if (dialog.ShowDialog(Window.GetWindow(this)) != true)
         {
             return;
         }
@@ -196,21 +176,6 @@ internal sealed partial class FieldSpriteWindow : Window
         if (CopySourceBox.SelectedItem is string file)
         {
             _sprites.CopySetupFrom(file);
-        }
-    }
-
-    // OK is greyed while a problem shows, so a click always applies.
-    private void OnOkClicked(object sender, RoutedEventArgs e) => DialogResult = true;
-
-    private void OnClosed(object? sender, EventArgs e)
-    {
-        _renderTick.Stop();
-        _zooming.Zoom = null;
-        _sprites.PropertyChanged -= OnSpritesChanged;
-        if (_setup is not null)
-        {
-            _setup.PropertyChanged -= OnSetupChanged;
-            _setup.Walk.PropertyChanged -= OnWalkChanged;
         }
     }
 }

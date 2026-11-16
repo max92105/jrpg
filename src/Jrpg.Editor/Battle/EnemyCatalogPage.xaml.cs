@@ -50,9 +50,7 @@ internal sealed partial class EnemyCatalogPage : UserControl
         enemies.PropertyChanged += OnEnemiesChanged;
         enemies.ArtChoices.PropertyChanged += (_, _) => ReadAndShowArt();
         WatchChosenArt(null);
-        // WPF may raise Loaded twice, which Start ignores while it runs; a page shown again after Unloaded plays again.
-        Loaded += (_, _) => _renderTick.Start();
-        Unloaded += (_, _) => _renderTick.Stop();
+        _renderTick.RunWhileLoaded(this);
     }
 
     // The dialog hosting the page owns what it opens (the mode bar plan's page recipe).

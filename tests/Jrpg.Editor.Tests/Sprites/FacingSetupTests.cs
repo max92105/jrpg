@@ -4,8 +4,8 @@ using Jrpg.Editor.Sprites;
 
 namespace Jrpg.Editor.Tests.Sprites;
 
-// One facing as the Character sprites window types it (ADR 0054): what it gives the record, and the window's own
-// problems against a 4 x 4 cut (decision 778), counting only what the facing reads.
+// One facing as the Character sprites page types it (ADR 0054): what it gives the record, and the page's own problems
+// against a 4 x 4 cut (decision 778), counting only what the facing reads.
 public sealed class FacingSetupTests
 {
     [Fact]

@@ -6,7 +6,7 @@ using Jrpg.Core.Sprites;
 namespace Jrpg.Editor.Sprites;
 
 /// <summary>
-/// Drawn over a sprite sheet in the Character sprites window (decision 773): the picking facing's cells, each outlined
+/// Drawn over a sprite sheet in the Character sprites page (decision 773): the picking facing's cells, each outlined
 /// and numbered in pick order at its frame's bottom-right, a repeated cell showing each of its numbers ("2, 4"). Lines
 /// and numbers keep their screen size at the shown scale, as <see cref="SpriteSheetMarks"/> does.
 /// </summary>

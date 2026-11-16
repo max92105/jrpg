@@ -6,7 +6,7 @@ using Jrpg.Editor.Sprites;
 namespace Jrpg.Editor.Tests.Sprites;
 
 /// <summary>
-/// The Character sprites window's list and setups (decisions 569, 570) over the test world's two records, with the
+/// The Character sprites page's list and setups (decisions 569, 570) over the test world's two records, with the
 /// folder's listing and the image sizes faked: the player's and placeholder's 384 x 288 sheets, and a bought 128 x 224
 /// image not set up yet.
 /// </summary>
@@ -35,66 +35,66 @@ public sealed class FieldSpriteCatalogViewModelTests
     {
         _files = [Bought, Placeholder];
 
-        var window = Open();
+        var sprites = Open();
 
         string[] labels = [$"{Bought} (not set up)", Placeholder, $"{Player} (image missing)"];
-        Assert.Equal(labels, window.Choices.Select(choice => choice.Label));
+        Assert.Equal(labels, sprites.Choices.Select(choice => choice.Label));
     }
 
     [Fact]
     public void Choose_SetUpImage_StartsFromItsRecord()
     {
-        var window = Open();
+        var sprites = Open();
 
-        window.Chosen = window.Choices.Single(choice => choice.File == Player);
+        sprites.Chosen = sprites.Choices.Single(choice => choice.File == Player);
 
-        Assert.Equal((8, 6, 1), (window.Setup!.Columns, window.Setup.Rows, window.Setup.Scale));
+        Assert.Equal((8, 6, 1), (sprites.Setup!.Columns, sprites.Setup.Rows, sprites.Setup.Scale));
     }
 
     [Fact]
     public void Choose_NewImage_StartsFromTheGuess()
     {
-        var window = Open();
+        var sprites = Open();
 
-        window.Chosen = window.Choices.Single(choice => choice.File == Bought);
+        sprites.Chosen = sprites.Choices.Single(choice => choice.File == Bought);
 
-        Assert.Equal((4, 7), (window.Setup!.Columns, window.Setup.Rows));
-        Assert.Null(window.Problem);
+        Assert.Equal((4, 7), (sprites.Setup!.Columns, sprites.Setup.Rows));
+        Assert.Null(sprites.Problem);
     }
 
     [Fact]
     public void Choose_ImageMissing_HasNoSetup()
     {
         _files = [Placeholder];
-        var window = Open();
+        var sprites = Open();
 
-        window.Chosen = window.Choices.Single(choice => choice.File == Player);
+        sprites.Chosen = sprites.Choices.Single(choice => choice.File == Player);
 
-        Assert.Null(window.Setup);
+        Assert.Null(sprites.Setup);
     }
 
     [Fact]
     public void Choose_BackToEditedImage_KeepsItsEdits()
     {
-        var window = Open();
-        window.Chosen = window.Choices.Single(choice => choice.File == Player);
-        window.Setup!.Scale = 2;
+        var sprites = Open();
+        sprites.Chosen = sprites.Choices.Single(choice => choice.File == Player);
+        sprites.Setup!.Scale = 2;
 
-        window.Chosen = window.Choices.Single(choice => choice.File == Placeholder);
-        window.Chosen = window.Choices.Single(choice => choice.File == Player);
+        sprites.Chosen = sprites.Choices.Single(choice => choice.File == Placeholder);
+        sprites.Chosen = sprites.Choices.Single(choice => choice.File == Player);
 
-        Assert.Equal(2, window.Setup!.Scale);
+        Assert.Equal(2, sprites.Setup!.Scale);
     }
 
     [Fact]
     public void ToSheets_OneImageEdited_ReturnsOnlyIt()
     {
-        var window = Open();
-        window.Chosen = window.Choices.Single(choice => choice.File == Placeholder);
-        window.Chosen = window.Choices.Single(choice => choice.File == Player);
-        window.Setup!.Scale = 2;
+        var sprites = Open();
+        sprites.Chosen = sprites.Choices.Single(choice => choice.File == Placeholder);
+        sprites.Chosen = sprites.Choices.Single(choice => choice.File == Player);
+        sprites.Setup!.Scale = 2;
 
-        var sheet = Assert.Single(window.ToSheets());
+        var sheet = Assert.Single(sprites.ToSheets());
 
         Assert.Equal((Player, 2), (sheet.File, sheet.Scale));
     }
@@ -102,26 +102,26 @@ public sealed class FieldSpriteCatalogViewModelTests
     [Fact]
     public void Problem_OtherEditedImageBroken_NamesItsFile()
     {
-        var window = Open();
-        window.Chosen = window.Choices.Single(choice => choice.File == Player);
-        window.Setup!.Scale = 0;
+        var sprites = Open();
+        sprites.Chosen = sprites.Choices.Single(choice => choice.File == Player);
+        sprites.Setup!.Scale = 0;
 
-        window.Chosen = window.Choices.Single(choice => choice.File == Placeholder);
+        sprites.Chosen = sprites.Choices.Single(choice => choice.File == Placeholder);
 
         Assert.Equal(
-            $"{Player}: field-sprites.json: field sprite '{Player}': scale must be within 1..8 (was 0).", window.Problem);
+            $"{Player}: field-sprites.json: field sprite '{Player}': scale must be within 1..8 (was 0).", sprites.Problem);
     }
 
-    // The problem reaches the window whichever setup changed, so OK follows every edit (the editor rule on notes).
+    // The problem reaches the page's host whichever setup changed, so OK follows every edit (the editor rule on notes).
     [Fact]
     public void Problem_SetupEdited_RaisesTheChange()
     {
-        var window = Open();
-        window.Chosen = window.Choices.Single(choice => choice.File == Player);
+        var sprites = Open();
+        sprites.Chosen = sprites.Choices.Single(choice => choice.File == Player);
         var raised = new List<string?>();
-        window.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+        sprites.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
 
-        window.Setup!.Scale = 0;
+        sprites.Setup!.Scale = 0;
 
         Assert.Contains(nameof(FieldSpriteCatalogViewModel.Problem), raised);
     }
@@ -130,38 +130,38 @@ public sealed class FieldSpriteCatalogViewModelTests
     public void RefreshAfterImport_NewImage_ListsAndChoosesIt()
     {
         _files = [Placeholder, Player];
-        var window = Open();
+        var sprites = Open();
         _files = [Placeholder, Player, Bought];
 
-        window.RefreshAfterImport([Bought]);
+        sprites.RefreshAfterImport([Bought]);
 
-        Assert.Equal($"{Bought} (not set up)", window.Chosen?.Label);
-        Assert.Equal(4, window.Setup!.Columns);
+        Assert.Equal($"{Bought} (not set up)", sprites.Chosen?.Label);
+        Assert.Equal(4, sprites.Setup!.Columns);
     }
 
     // A replaced image may have another size: its setup opens anew from the new size, not the old guess.
     [Fact]
     public void RefreshAfterImport_ReplacedImage_ReopensItsSetup()
     {
-        var window = Open();
-        window.Chosen = window.Choices.Single(choice => choice.File == Bought);
-        Assert.Equal(32, window.Setup!.FrameWidth);
+        var sprites = Open();
+        sprites.Chosen = sprites.Choices.Single(choice => choice.File == Bought);
+        Assert.Equal(32, sprites.Setup!.FrameWidth);
         _sizes[Bought] = (96, 128);
 
-        window.RefreshAfterImport([Bought]);
+        sprites.RefreshAfterImport([Bought]);
 
-        Assert.Equal(24, window.Setup!.FrameWidth);
+        Assert.Equal(24, sprites.Setup!.FrameWidth);
     }
 
     // Choosing a new image and leaving it makes no record (a saved record can't be removed, decision 569).
     [Fact]
     public void ToSheets_NewImageChosenButUntouched_IsEmpty()
     {
-        var window = Open();
+        var sprites = Open();
 
-        window.Chosen = window.Choices.Single(choice => choice.File == Bought);
+        sprites.Chosen = sprites.Choices.Single(choice => choice.File == Bought);
 
-        Assert.Empty(window.ToSheets());
+        Assert.Empty(sprites.ToSheets());
     }
 
     // The guess for a 102 px wide image doesn't split it: the setup says so, but a setup nobody edited never greys OK.
@@ -169,12 +169,12 @@ public sealed class FieldSpriteCatalogViewModelTests
     public void Problem_NewImageUntouchedWithABadGuess_DoesNotGreyOk()
     {
         _files = [Placeholder, Player, "odd.png"];
-        var window = Open();
+        var sprites = Open();
 
-        window.Chosen = window.Choices.Single(choice => choice.File == "odd.png");
+        sprites.Chosen = sprites.Choices.Single(choice => choice.File == "odd.png");
 
-        Assert.Equal("102 px doesn't split into 4 columns.", window.Setup!.Problem);
-        Assert.Null(window.Problem);
+        Assert.Equal("102 px doesn't split into 4 columns.", sprites.Setup!.Problem);
+        Assert.Null(sprites.Problem);
     }
 
     // An import means "set this up": OK keeps the guess even when nothing was touched (the merchant bug).
@@ -182,12 +182,12 @@ public sealed class FieldSpriteCatalogViewModelTests
     public void ToSheets_ImportedImageUntouched_ReturnsItsGuess()
     {
         _files = [Placeholder, Player];
-        var window = Open();
+        var sprites = Open();
         _files = [Placeholder, Player, Bought];
 
-        window.RefreshAfterImport([Bought]);
+        sprites.RefreshAfterImport([Bought]);
 
-        var sheet = Assert.Single(window.ToSheets());
+        var sheet = Assert.Single(sprites.ToSheets());
         Assert.Equal((Bought, 32, 32), (sheet.File, sheet.FrameWidth, sheet.FrameHeight));
     }
 
@@ -197,14 +197,14 @@ public sealed class FieldSpriteCatalogViewModelTests
     public void Problem_ImportedImageWithABadGuess_DoesNotGreyOk()
     {
         _files = [Placeholder, Player];
-        var window = Open();
+        var sprites = Open();
         _files = [Placeholder, Player, "odd.png"];
 
-        window.RefreshAfterImport(["odd.png"]);
+        sprites.RefreshAfterImport(["odd.png"]);
 
-        Assert.Equal("102 px doesn't split into 4 columns.", window.Setup!.Problem);
-        Assert.Null(window.Problem);
-        Assert.Empty(window.ToSheets());
+        Assert.Equal("102 px doesn't split into 4 columns.", sprites.Setup!.Problem);
+        Assert.Null(sprites.Problem);
+        Assert.Empty(sprites.ToSheets());
     }
 
     // Once the bad guess is edited, the import counts like any edited setup.
@@ -212,15 +212,15 @@ public sealed class FieldSpriteCatalogViewModelTests
     public void ToSheets_ImportedBadGuessThenFixed_ReturnsTheFix()
     {
         _files = [Placeholder, Player];
-        var window = Open();
+        var sprites = Open();
         _files = [Placeholder, Player, "odd.png"];
-        window.RefreshAfterImport(["odd.png"]);
+        sprites.RefreshAfterImport(["odd.png"]);
 
-        window.Setup!.Columns = 3;
-        window.Setup.Rows = 7;
-        window.Setup.Walk.Frames = 3;
+        sprites.Setup!.Columns = 3;
+        sprites.Setup.Rows = 7;
+        sprites.Setup.Walk.Frames = 3;
 
-        var sheet = Assert.Single(window.ToSheets());
+        var sheet = Assert.Single(sprites.ToSheets());
         Assert.Equal(("odd.png", 34, 32), (sheet.File, sheet.FrameWidth, sheet.FrameHeight));
     }
 
@@ -228,13 +228,13 @@ public sealed class FieldSpriteCatalogViewModelTests
     [Fact]
     public void RefreshAfterImport_NothingCopied_KeepsTheChoiceAndCountsNothing()
     {
-        var window = Open();
-        window.Chosen = window.Choices.Single(choice => choice.File == Bought);
+        var sprites = Open();
+        sprites.Chosen = sprites.Choices.Single(choice => choice.File == Bought);
 
-        window.RefreshAfterImport([]);
+        sprites.RefreshAfterImport([]);
 
-        Assert.Equal(Bought, window.Chosen?.File);
-        Assert.Empty(window.ToSheets());
+        Assert.Equal(Bought, sprites.Chosen?.File);
+        Assert.Empty(sprites.ToSheets());
     }
 
     private FieldSpriteCatalogViewModel Open() =>

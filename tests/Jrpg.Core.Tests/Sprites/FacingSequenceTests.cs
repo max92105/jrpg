@@ -4,7 +4,7 @@ using Jrpg.Core.Sprites;
 
 namespace Jrpg.Core.Tests.Sprites;
 
-// A sequence compares by its cells in order (decision 769): the Character sprites window's changed-record check and the
+// A sequence compares by its cells in order (decision 769): the Character sprites page's changed-record check and the
 // editor's frame cache compare whole sheets, each built with its own lists.
 public sealed class FacingSequenceTests
 {

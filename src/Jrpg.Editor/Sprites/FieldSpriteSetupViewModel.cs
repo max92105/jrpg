@@ -11,7 +11,7 @@ using Jrpg.Editor.Tiles;
 namespace Jrpg.Editor.Sprites;
 
 /// <summary>
-/// One sprite image's setup as the Character sprites window edits it (ADR 0043): the cut typed as columns and rows with
+/// One sprite image's setup as the Character sprites page edits it (ADR 0043): the cut typed as columns and rows with
 /// the frame size they give shown read-only (the tile Cut panel's rule, <see cref="GridCut"/>), the walk, the draw
 /// scale and the feet line; what stops OK, as the loader would say it; the record it gives and its preview's frame.
 /// </summary>

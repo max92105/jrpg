@@ -5,8 +5,8 @@ using Jrpg.Editor.Sprites;
 
 namespace Jrpg.Editor.Tests.Sprites;
 
-// A walk as the Character sprites window types it (ADR 0054): read from a record and given back whole, its frames
-// checked against the columns only while a facing reads its row (decision 767).
+// A walk as the Character sprites page types it (ADR 0054): read from a record and given back whole, its frames checked
+// against the columns only while a facing reads its row (decision 767).
 public sealed class FacingCycleSetupTests
 {
     // Down on row 0, Up a sequence over row 5, Left on row 1, Right mirroring Left over row 2.

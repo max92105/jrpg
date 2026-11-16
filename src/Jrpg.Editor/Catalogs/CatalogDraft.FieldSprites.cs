@@ -2,7 +2,7 @@ using Jrpg.Core.Sprites;
 
 namespace Jrpg.Editor.Catalogs;
 
-/// <summary>The field sprite records (ADR 0043), edited by the Character sprites window (decision 569).</summary>
+/// <summary>The field sprite records (ADR 0043), edited by the Character sprites page (decision 569).</summary>
 internal sealed partial class CatalogDraft
 {
     /// <summary>

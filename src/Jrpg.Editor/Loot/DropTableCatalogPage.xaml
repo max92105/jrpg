@@ -4,7 +4,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:loot="clr-namespace:Jrpg.Editor.Loot">
   <UserControl.Resources>
-    <!-- The Enemies window keeps its own, 70 wide: two copies, so this one stays local. -->
+    <!-- The Enemies page keeps its own, 70 wide: two copies, so this one stays local. -->
     <Style x:Key="NumberBox" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
       <Setter Property="Width" Value="50" />
       <Setter Property="Margin" Value="4,0,0,0" />
@@ -34,7 +34,7 @@
         <TextBlock Text="{Binding DataContext.RolledBy, RelativeSource={RelativeSource AncestorType=loot:DropTableCatalogPage}}"
                    Foreground="{StaticResource MutedTextBrush}"
                    Margin="60,4,0,0"
-                   ToolTip="The saved and applied enemies; an open Enemies window's unapplied choices aren't counted" />
+                   ToolTip="The saved and applied enemies; an open Enemies page's unapplied choices aren't counted" />
         <TextBlock Text="Entries, in roll order" FontWeight="Bold" Margin="0,8,0,0" />
         <StackPanel Orientation="Horizontal" Margin="6,4,0,2">
           <TextBlock Text="#" Width="30" />

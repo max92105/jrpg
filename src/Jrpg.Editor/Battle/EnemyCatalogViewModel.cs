@@ -9,17 +9,18 @@ using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Events;
 using Jrpg.Editor.Tiles;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Battle;
 
 /// <summary>
-/// Every enemy as the Enemies window edits it (ADR 0045): the draft's enemies in id order, the ones added this session
+/// Every enemy as the Enemies page edits it (ADR 0045): the draft's enemies in id order, the ones added this session
 /// after them; Add starts from the tunable defaults, Duplicate from the chosen one (decision 585); only an added one
 /// can be removed, since encounters name a saved one (decision 581). <see cref="Problem"/> is an enemy's own problem
 /// first, then Data's message for the whole list (decision 580). The draft's drop tables are taken again after a Drop
-/// tables window opened from this one applies (decision 602).
+/// tables page opened from this one applies (decision 602). An enemy is chosen by its id.
 /// </summary>
-internal sealed partial class EnemyCatalogViewModel : ObservableObject
+internal sealed partial class EnemyCatalogViewModel : ObservableObject, IEditedCatalog
 {
     private ContentCatalog _content;
 
@@ -43,7 +44,7 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject
 
     public ObservableCollection<EnemyViewModel> Enemies { get; }
 
-    /// <summary>The damage types the window's box offers, from Core's list so a type added appears.</summary>
+    /// <summary>The damage types the page's box offers, from Core's list so a type added appears.</summary>
     public IReadOnlyList<DamageType> DamageTypes { get; } = Enum.GetValues<DamageType>();
 
     /// <summary>The drop tables an enemy may roll, the empty one for none first, then the draft's by id.</summary>
@@ -66,8 +67,9 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject
         RecordListProblem.FirstOf(Enemies, enemy => enemy.Id, enemy => enemy.Problem, "Enemy")
         ?? CatalogProblems.OfEnemies([.. Enemies.Select(enemy => enemy.ToEnemy())], _content);
 
-    /// <summary>Whether OK may apply the session: no problem shows.</summary>
-    public bool CanApply => Problem is null;
+    public string? ChosenKey => SelectedEnemy?.Id;
+
+    public void Choose(string key) => SelectedEnemy = Enemies.FirstOrDefault(enemy => enemy.Id == key) ?? SelectedEnemy;
 
     /// <summary>
     /// After an Import... beside an art box: the folders are read again, and the last file copied is picked in that box
@@ -109,7 +111,7 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject
     }
 
     /// <exception cref="InvalidOperationException">
-    /// There is a <see cref="Problem"/>; the window applies only without one.
+    /// There is a <see cref="Problem"/>; the page's host applies only without one.
     /// </exception>
     public IReadOnlyList<EnemyDefinition> ToEnemies() =>
         Problem is { } problem ? throw new InvalidOperationException(problem) : [.. Enemies.Select(enemy => enemy.ToEnemy())];
@@ -155,10 +157,5 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject
         }
     }
 
-    // The problem line and OK's state read the same thing.
-    private void RaiseProblemChanged()
-    {
-        OnPropertyChanged(nameof(Problem));
-        OnPropertyChanged(nameof(CanApply));
-    }
+    private void RaiseProblemChanged() => OnPropertyChanged(nameof(Problem));
 }

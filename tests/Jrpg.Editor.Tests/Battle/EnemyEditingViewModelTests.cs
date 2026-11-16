@@ -5,7 +5,7 @@ using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Tests.Battle;
 
-// The Enemies window starts from the draft and its whole session is one undo step (decision 591).
+// The Enemies page starts from the draft and its whole session is one undo step (decision 591).
 public sealed class EnemyEditingViewModelTests
 {
     private readonly CatalogDraft _draft = new(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")));
@@ -49,7 +49,7 @@ public sealed class EnemyEditingViewModelTests
         Assert.False(_draft.CanUndo);
     }
 
-    // The window reads the draft when it opens, so a table added before is offered, after the saved ones by id.
+    // The page reads the draft when it opens, so a table added before is offered, after the saved ones by id.
     [Fact]
     public void Start_AfterSetDropTables_OffersTheNewTable()
     {

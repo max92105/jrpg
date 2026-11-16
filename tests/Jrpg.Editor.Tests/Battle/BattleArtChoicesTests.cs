@@ -6,7 +6,7 @@ using Jrpg.Editor.Battle;
 
 namespace Jrpg.Editor.Tests.Battle;
 
-// The three art folders as the Enemies window's boxes offer them: read through the shell's lookup, read again after an
+// The three art folders as the Enemies page's boxes offer them: read through the shell's lookup, read again after an
 // import, and the pictures an enemy names that its folder lacks (decision 442).
 public sealed class BattleArtChoicesTests
 {

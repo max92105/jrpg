@@ -4,7 +4,7 @@ using Jrpg.Data.Art;
 namespace Jrpg.Editor.Battle;
 
 /// <summary>
-/// The files the Enemies window's three art boxes offer (decision 589's picker pattern): the battlers, portraits and
+/// The files the Enemies page's three art boxes offer (decision 589's picker pattern): the battlers, portraits and
 /// effects folders as they are, read through a lookup the shell gives, and read again after an import.
 /// </summary>
 internal sealed partial class BattleArtChoices : ObservableObject

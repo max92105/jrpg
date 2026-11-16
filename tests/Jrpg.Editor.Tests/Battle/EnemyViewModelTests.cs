@@ -7,8 +7,8 @@ using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Tests.Battle;
 
-// One enemy as the Enemies window edits it (ADR 0045): numbers as typed, the id fixed once saved, and everything the
-// form doesn't edit carried through from the record, a duplicate included (decision 585).
+// One enemy as the Enemies page edits it (ADR 0045): numbers as typed, the id fixed once saved, and everything the form
+// doesn't edit carried through from the record, a duplicate included (decision 585).
 public sealed class EnemyViewModelTests
 {
     private static readonly ContentCatalog _catalog =

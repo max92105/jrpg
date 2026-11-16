@@ -5,9 +5,9 @@ using Jrpg.Data.Art;
 namespace Jrpg.Editor.Sprites;
 
 /// <summary>
-/// A sprite image of an art folder read whole for a window's own drawing (the field sprites, the Enemies window's
+/// A sprite image of an art folder read whole for the editor's own drawing (the field sprites, the Enemies page's
 /// battle sprite), or at a width for a preview (the Cinematics window's still); read again each time, since an import
-/// may replace it.
+/// may replace the file.
 /// </summary>
 internal static class SpriteImageFile
 {

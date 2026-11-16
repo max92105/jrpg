@@ -11,7 +11,7 @@ using Jrpg.Editor.Tiles;
 
 namespace Jrpg.Editor.Tests.Battle;
 
-// The Enemies window's list (ADR 0045): the draft's enemies in id order, Duplicate after the chosen one (decision 585),
+// The Enemies page's list (ADR 0045): the draft's enemies in id order, Duplicate after the chosen one (decision 585),
 // only a new enemy removable (decision 581), and the problem line ending with Data's message (decision 580).
 public sealed class EnemyCatalogViewModelTests
 {
@@ -60,7 +60,6 @@ public sealed class EnemyCatalogViewModelTests
 
         Assert.Same(catalog.Enemies[^1], catalog.SelectedEnemy);
         Assert.Equal($"Enemy #{catalog.Enemies.Count}: The id must not be empty.", catalog.Problem);
-        Assert.False(catalog.CanApply);
     }
 
     [Fact]
@@ -83,7 +82,6 @@ public sealed class EnemyCatalogViewModelTests
 
         Assert.Equal(count, catalog.Enemies.Count);
         Assert.Null(catalog.Problem);
-        Assert.True(catalog.CanApply);
     }
 
     [Fact]
@@ -97,7 +95,6 @@ public sealed class EnemyCatalogViewModelTests
 
         Assert.Equal("enemies.json: enemy 'goblin': dodge must be within 0..50 (was 51).", catalog.Problem);
         Assert.Contains(nameof(EnemyCatalogViewModel.Problem), notified);
-        Assert.Contains(nameof(EnemyCatalogViewModel.CanApply), notified);
     }
 
     // T3's rule reaches the line through Data: the goblin uses a tiered skill built here with no Power.
@@ -200,4 +197,40 @@ public sealed class EnemyCatalogViewModelTests
             enemies,
             enemy => Assert.Equal(_catalog.Enemies[enemy.Id] with { Tactics = enemy.Tactics, Phases = enemy.Phases }, enemy));
     }
+
+    [Fact]
+    public void Choose_KnownId_ChoosesIt()
+    {
+        var catalog = new EnemyCatalogViewModel(WithEnemies("bat", "wolf"), _ => []);
+
+        catalog.Choose("wolf");
+
+        Assert.Equal("wolf", catalog.SelectedEnemy!.Id);
+    }
+
+    [Fact]
+    public void Choose_UnknownId_KeepsTheChoice()
+    {
+        var catalog = new EnemyCatalogViewModel(WithEnemies("bat", "wolf"), _ => []);
+        catalog.Choose("wolf");
+
+        catalog.Choose("dragon");
+
+        Assert.Equal("wolf", catalog.SelectedEnemy!.Id);
+    }
+
+    [Fact]
+    public void ChosenKey_DuplicatedEnemy_IsItsTypedId()
+    {
+        var catalog = new EnemyCatalogViewModel(WithEnemies("bat", "wolf"), _ => []);
+        catalog.DuplicateEnemyCommand.Execute(null);
+
+        catalog.SelectedEnemy!.Id = "bat_alpha";
+
+        Assert.Equal("bat_alpha", catalog.ChosenKey);
+    }
+
+    // The test world's goblin under each id, the only enemies, so a choice is told apart by its id alone.
+    private static ContentCatalog WithEnemies(params string[] ids) =>
+        _catalog with { Enemies = ids.ToDictionary(id => id, id => _catalog.Enemies["goblin"] with { Id = id }) };
 }

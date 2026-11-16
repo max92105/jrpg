@@ -15,7 +15,7 @@ namespace Jrpg.Editor.Shell;
 /// <summary>
 /// The Database menu's dispatch: an entry's title runs its opener (decision 938), which edits its catalog of the draft
 /// at the main window's size (decision 930); OK applies the whole session as one undo step (ADR 0045, decision 591).
-/// Quests..., Shops... and Drop tables... open a page in the catalog dialog; Effect strips..., Enemies... and
+/// Quests..., Shops..., Drop tables... and Enemies... open a page in the catalog dialog; Effect strips... and
 /// Cinematics... still open their own windows.
 /// </summary>
 internal sealed partial class MainWindow
@@ -78,7 +78,7 @@ internal sealed partial class MainWindow
     }
 
     // The Drop tables page in the catalog dialog over the owner, on the chosen table; its OK applies its own undo step
-    // at once, so a window under it can take the new tables (decision 602). Returns whether it applied.
+    // at once, so a page under it can take the new tables (decision 602). Returns whether it applied.
     private bool EditDropTables(Window owner, string chosenTableId)
     {
         if (_viewModel.DropTableEditing is not { } dropTableEditing)
@@ -106,28 +106,20 @@ internal sealed partial class MainWindow
             return;
         }
 
-        var edited = enemyEditing.Start();
-        var window = new EnemyCatalogWindow(
+        var art = new EnemyArtSources(
+            _viewModel.ImportArtImages,
+            file => SpriteImageFile.LoadFrom(_viewModel.ArtRoot, ArtFolders.Battlers, file),
+            animationTime);
+        OpenInDialog("Enemies", enemyEditing.Start, enemyEditing.Apply, edited => new EnemyCatalogPage(
             edited,
-            new EnemyArtSources(
-                _viewModel.ImportArtImages,
-                file => SpriteImageFile.LoadFrom(_viewModel.ArtRoot, ArtFolders.Battlers, file),
-                animationTime),
+            art,
             (owner, tableId) =>
             {
                 if (EditDropTables(owner, tableId))
                 {
                     enemyEditing.RefreshDropTables(edited);
                 }
-            })
-        {
-            Owner = this,
-        };
-        DialogBounds.FitTo(window, this);
-        if (window.ShowDialog() == true)
-        {
-            enemyEditing.Apply(edited);
-        }
+            }));
     }
 
     // The preview decodes each still at the preview's width, a sixteenth of the pixels of a 1920 px picture.

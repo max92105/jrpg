@@ -30,3 +30,6 @@ tables dialog over the Enemies dialog (WD4), the nested refresh kept (decision 6
 Agents may run it (battlers are generated art). The script: "Database>Enemies...: opened", the idle loop playing in
 the preview. In the editor: change an enemy's HP, Edit... beside Drop table, add a table, OK, pick it in the box, OK:
 Ctrl+Z takes back the enemies' step, then the table's. Close the Enemies dialog during a loop: no `RenderTick` report.
+- **Done, with deviations:** `CanApply` removed (the window was its only reader): three asserts on it dropped and
+  `TakeDropTables_Always_RaisesProblemAndCanApply` renamed `TakeDropTables_Always_RaisesProblem`; the test file was 203
+  lines, now 236; the Battle, Loot, Catalogs and Sprites comments' "Enemies window" say "Enemies page".

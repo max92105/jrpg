@@ -22,9 +22,6 @@ internal sealed partial class MainViewModel
 
     public EnemyEditingViewModel? EnemyEditing { get; }
 
-    /// <summary>Whether Database > Enemies... can open its window: false while the content didn't load.</summary>
-    public bool HasEnemyEditing => EnemyEditing is not null;
-
     public DropTableEditingViewModel? DropTableEditing { get; }
 
     public CinematicEditingViewModel? CinematicEditing { get; }

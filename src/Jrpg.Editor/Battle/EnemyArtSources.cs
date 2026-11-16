@@ -5,7 +5,7 @@ using Jrpg.Editor.Tiles;
 namespace Jrpg.Editor.Battle;
 
 /// <summary>
-/// What the Enemies window's Art tab copies pictures in with, reads its battle sprite from and plays its loop on.
+/// What the Enemies page's Art tab copies pictures in with, reads its battle sprite from and plays its loop on.
 /// </summary>
 /// <param name="Import">
 /// Copies chosen images into an art folder, by folder name, a GIF for the battlers as a strip by the options, and says

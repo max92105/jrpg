@@ -7,8 +7,8 @@ using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Tests.Battle;
 
-// The Enemies window after a Drop tables page opened from it applied (decision 602): new tables are offered in place,
-// no enemy's choice changes, and the problem line checks against the new tables.
+// The Enemies page after a Drop tables page opened from it applied (decision 602): new tables are offered in place, no
+// enemy's choice changes, and the problem line checks against the new tables.
 public sealed class EnemyDropTableRefreshTests
 {
     private static readonly ContentCatalog _testWorld =
@@ -60,7 +60,7 @@ public sealed class EnemyDropTableRefreshTests
     }
 
     [Fact]
-    public void TakeDropTables_Always_RaisesProblemAndCanApply()
+    public void TakeDropTables_Always_RaisesProblem()
     {
         var catalog = new EnemyCatalogViewModel(WithGoblinRolling(_goblin), _ => []);
         var notified = new List<string?>();
@@ -69,7 +69,6 @@ public sealed class EnemyDropTableRefreshTests
         catalog.TakeDropTables(WithGoblinRolling(_goblin, Table("slime")));
 
         Assert.Contains(nameof(EnemyCatalogViewModel.Problem), notified);
-        Assert.Contains(nameof(EnemyCatalogViewModel.CanApply), notified);
     }
 
     [Fact]

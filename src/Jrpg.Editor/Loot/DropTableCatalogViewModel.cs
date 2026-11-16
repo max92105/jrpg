@@ -91,8 +91,8 @@ internal sealed partial class DropTableCatalogViewModel : ObservableObject, IEdi
         Problem is { } problem ? throw new InvalidOperationException(problem) : [.. Tables.Select(table => table.ToTable())];
 
     /// <summary>
-    /// The enemy's table when the page opens from the Enemies window's Edit...; an enemy with none passes "", which
-    /// keeps the first chosen.
+    /// The enemy's table when the page opens from the Enemies page's Edit...; an enemy with none passes "", which keeps
+    /// the first chosen.
     /// </summary>
     public void Choose(string key) => SelectedTable = Tables.FirstOrDefault(table => table.Id == key) ?? SelectedTable;
 

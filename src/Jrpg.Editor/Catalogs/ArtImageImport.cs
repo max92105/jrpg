@@ -10,9 +10,9 @@ namespace Jrpg.Editor.Catalogs;
 /// <summary>
 /// Copies images into an art folder through Data, which refuses what the game couldn't use (a field sprite too small
 /// for its record, an effect strip that isn't whole square frames, decision 590); as <see cref="SheetImport"/>, a file
-/// copy and not a catalog step, so it isn't undone. Serves the Character sprites and Enemies windows' Import.... A GIF
-/// for the battlers or the effects becomes a strip of its name first (ADR 0047), through the same checks, a battle
-/// sprite's loop in the result.
+/// copy and not a catalog step, so it isn't undone. Serves the Character sprites window's and the Enemies page's
+/// Import.... A GIF for the battlers or the effects becomes a strip of its name first (ADR 0047), through the same
+/// checks, a battle sprite's loop in the result.
 /// </summary>
 /// <param name="writer">Writes into the content folder.</param>
 /// <param name="catalog">The records an image is checked against, unsaved ones included.</param>

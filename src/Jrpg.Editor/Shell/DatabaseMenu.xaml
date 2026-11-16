@@ -8,8 +8,8 @@
        the title the main window opens it by; the theme's style is set above, since an implicit style skips a subclass. -->
   <MenuItem Header="Quests..." Tag="Quests" />
   <MenuItem Header="Shops..." Tag="Shops" ToolTip="Each shop's name and the priced items it sells, in order; the shopkeeper preset's shop box offers them." />
-  <MenuItem Header="Drop tables..." Tag="Drop tables" ToolTip="Each table's items, chances and quantities; the Enemies window's Drop table box offers them." />
+  <MenuItem Header="Drop tables..." Tag="Drop tables" ToolTip="Each table's items, chances and quantities; the Enemies page's Drop table box offers them." />
   <MenuItem Header="Effect strips..." Tag="Effect strips" IsEnabled="{Binding HasEffectStripEditing}" ToolTip="Each effects image's frame time, the frame its hit lands on and the swing an Attack plays first." />
   <MenuItem Header="Cinematics..." Tag="Cinematics" IsEnabled="{Binding HasCinematicEditing}" ToolTip="Each cinematic's stills in order, their seconds, subtitles, voices and zoom, and its music." />
-  <MenuItem Header="Enemies..." Tag="Enemies" IsEnabled="{Binding HasEnemyEditing}" ToolTip="Each enemy's numbers, resistances, rewards and pictures; tactics and phases stay in enemies.json, encounters in encounters.json." />
+  <MenuItem Header="Enemies..." Tag="Enemies" ToolTip="Each enemy's numbers, resistances, rewards and pictures; tactics and phases stay in enemies.json, encounters in encounters.json." />
 </MenuItem>

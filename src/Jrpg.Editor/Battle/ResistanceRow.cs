@@ -6,7 +6,7 @@ namespace Jrpg.Editor.Battle;
 
 /// <summary>
 /// One damage type's resistance as typed, a whole percent (ADR 0027); one row per <see cref="DamageType"/>, so a type
-/// added to Core appears in the window (design key decision 3). The range is Data's rule, shown by the list.
+/// added to Core appears on the page (design key decision 3). The range is Data's rule, shown by the list.
 /// </summary>
 internal sealed partial class ResistanceRow : ObservableObject
 {

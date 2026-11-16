@@ -6,8 +6,8 @@ using Jrpg.Editor.Tiles;
 
 namespace Jrpg.Editor.Tests.Battle;
 
-// After an Import... beside an art box, the Enemies window reads the folders again and picks the file copied last in
-// that box for the chosen enemy (EN7's hand check: "it is picked").
+// After an Import... beside an art box, the Enemies page reads the folders again and picks the file copied last in that
+// box for the chosen enemy (EN7's hand check: "it is picked").
 public sealed class EnemyCatalogImportTests
 {
     private static readonly ContentCatalog _catalog =

@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Jrpg.Core.Maps;
@@ -12,12 +13,12 @@ using Microsoft.Win32;
 namespace Jrpg.Editor.Battle;
 
 /// <summary>
-/// The Enemies window (ADR 0045): enemies on the left, the chosen one's Stats and Art tabs on the right. OK applies the
-/// session as one undo step, greyed while a problem shows; Cancel drops it. The art tab's marks and battle sprite
-/// preview follow the chosen enemy, its pictures and the folders; an animated sprite's loop plays on the editor's
-/// animation clock, one frame of the strip at a time.
+/// The Enemies page (ADR 0045): enemies on the left, the chosen one's Stats and Art tabs on the right. Its host shows
+/// the problem line and keeps or drops the session. The art tab's marks and battle sprite preview follow the chosen
+/// enemy, its pictures and the folders; an animated sprite's loop plays on the editor's animation clock, one frame of
+/// the strip at a time, while the page is shown.
 /// </summary>
-internal sealed partial class EnemyCatalogWindow : Window
+internal sealed partial class EnemyCatalogPage : UserControl
 {
     private readonly RenderTick _renderTick;
     private readonly EnemyCatalogViewModel _enemies;
@@ -31,13 +32,13 @@ internal sealed partial class EnemyCatalogWindow : Window
     private TileAnimation? _loop;
     private int? _shownFrame;
 
-    /// <param name="enemies">The window's state.</param>
+    /// <param name="enemies">The page's state.</param>
     /// <param name="art">What the Art tab imports with, reads the battle sprite from and plays its loop on.</param>
     /// <param name="editDropTables">
-    /// Opens the Drop tables page in a dialog over the given window on the given table id, and takes the draft's tables
-    /// back when its OK applied (decision 602).
+    /// Opens the Drop tables page in a dialog over the given window, the page's own, on the given table id, and takes
+    /// the draft's tables back when its OK applied (decision 602).
     /// </param>
-    public EnemyCatalogWindow(
+    public EnemyCatalogPage(
         EnemyCatalogViewModel enemies,
         EnemyArtSources art,
         Action<Window, string> editDropTables)
@@ -49,9 +50,13 @@ internal sealed partial class EnemyCatalogWindow : Window
         enemies.PropertyChanged += OnEnemiesChanged;
         enemies.ArtChoices.PropertyChanged += (_, _) => ReadAndShowArt();
         WatchChosenArt(null);
-        _renderTick.Start();
-        Closed += (_, _) => _renderTick.Stop();
+        // WPF may raise Loaded twice, which Start ignores while it runs; a page shown again after Unloaded plays again.
+        Loaded += (_, _) => _renderTick.Start();
+        Unloaded += (_, _) => _renderTick.Stop();
     }
+
+    // The dialog hosting the page owns what it opens (the mode bar plan's page recipe).
+    private Window HostWindow => Window.GetWindow(this);
 
     // Another enemy chosen: its pictures are watched instead, so the battle sprite is read only when one changes.
     private void OnEnemiesChanged(object? sender, PropertyChangedEventArgs e)
@@ -154,7 +159,7 @@ internal sealed partial class EnemyCatalogWindow : Window
             Filter = ArtImageImport.TakesGifs(artFolder) ? "Images (*.png;*.gif)|*.png;*.gif" : "PNG images (*.png)|*.png",
             Multiselect = true,
         };
-        if (dialog.ShowDialog(this) != true)
+        if (dialog.ShowDialog(HostWindow) != true)
         {
             return;
         }
@@ -179,7 +184,7 @@ internal sealed partial class EnemyCatalogWindow : Window
         }
 
         var options = new GifImportOptionsViewModel(HeightOf(gif));
-        return GifImportWindow.Ask(this, options) ? options.ToOptions() : null;
+        return GifImportWindow.Ask(HostWindow, options) ? options.ToOptions() : null;
     }
 
     // For the dialog's note only: a GIF that can't be read or opened leaves the note empty; the import then names it
@@ -198,8 +203,5 @@ internal sealed partial class EnemyCatalogWindow : Window
 
     // The button sits in the chosen enemy's panel, greyed while none is chosen.
     private void OnEditDropTablesClicked(object sender, RoutedEventArgs e) =>
-        _editDropTables(this, _enemies.SelectedEnemy!.DropTableId);
-
-    // OK is greyed while a problem shows, so a click always applies.
-    private void OnOkClicked(object sender, RoutedEventArgs e) => DialogResult = true;
+        _editDropTables(HostWindow, _enemies.SelectedEnemy!.DropTableId);
 }

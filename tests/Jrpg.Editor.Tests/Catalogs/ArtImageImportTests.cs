@@ -7,7 +7,7 @@ using Jrpg.Editor.Tests.Tiles;
 namespace Jrpg.Editor.Tests.Catalogs;
 
 /// <summary>
-/// Import... in the Character sprites and Enemies windows: the test world's records over an empty content folder.
+/// Import... of the Character sprites window and Enemies page: the test world's records over an empty content folder.
 /// </summary>
 public sealed class ArtImageImportTests : IDisposable
 {

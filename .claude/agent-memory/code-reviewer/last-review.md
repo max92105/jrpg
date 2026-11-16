@@ -5,10 +5,12 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-skills-and-statuses-model, slice EP (EnemyViewModel.PowerText, Power row in EnemyCatalogWindow,
-EnemyViewModelTests +4, EnemyCatalogViewModelTests +2). 2026-11-15. Round 1. Verdict: Ready to commit.
+Plan 2026-11-15-skills-and-statuses-model, slice T4 (19 skills.json effects tiered, goblin_chief power 5,
+SkillCatalogValidator.FindTierProblem, "attack damage" caption, ContentCatalogLoaderSkillTierTests new,
+BattleScenarios Shield Bash flat 5). 2026-11-15. Round 1. Verdict: Ready to commit.
 
-- No findings.
-- Checked: New() goes through the constructor from `_blank` (Power 0), so PowerText is never null; ToEnemy only runs
-  once FirstNumberProblem is null, so the `!` on Parse(PowerText) is safe; XAML row uses existing FieldLabel/NumberBox.
-- T3 items: BattleTieredSkillTests header suggestion fixed (line 15 now names both shuffles).
+- Suggestion (open, optional): BattleScenarios.WithSoftSureStun, "Soft" says little; WithFlatSureStun names what it does.
+- Checked: all 19 tiers match design 3.1's table; ui/MessageIds caption; no "% damage" or "N HP" wording left;
+  BattleState scales (tier) before SkillEmpowerment, so empowerment still raises a tiered amount; the Editor has no
+  skill editing, so the new rule can't strand an editor-made skill; only goblin_chief uses skills.
+- EP: no findings carried.

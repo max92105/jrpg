@@ -46,3 +46,6 @@ New `Editor.Tests/Battle/TacticListViewModelTests` (actions and phases built in 
 
 ## Verify by hand
 None: nothing shows yet (EB7).
+- **Done, with deviations:** 32 tests, the relays in a second file (`TacticListRulesChangedTests`); new
+  `SectionRowProblem.FirstInField` and `ListOrder.Renumber` (the third loop, drop tables and cinematics now use it); a
+  phase's `Field` starts "phases[0].tactics" until its owner sets it; a phase's last rule can be removed (Data refuses).

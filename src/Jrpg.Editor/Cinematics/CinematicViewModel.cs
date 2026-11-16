@@ -148,11 +148,5 @@ internal sealed partial class CinematicViewModel : ObservableObject
         StillsChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    private void Renumber()
-    {
-        for (var index = 0; index < Stills.Count; index++)
-        {
-            Stills[index].Number = index + 1;
-        }
-    }
+    private void Renumber() => ListOrder.Renumber(Stills, (row, index) => row.Number = index + 1);
 }

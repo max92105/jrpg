@@ -112,7 +112,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 ### Phase 2: the Tactics tab
 - [x] **EB3. One rule as typed, and what its boxes offer** (Editor, about 280 lines; split point named) →
   [slices/EB3.md](slices/EB3.md)
-- [ ] **EB4. One list of rules: add after the chosen one, remove, move; a phase's threshold** (Editor, about 200
+- [x] **EB4. One list of rules: add after the chosen one, remove, move; a phase's threshold** (Editor, about 200
   lines) → [slices/EB4.md](slices/EB4.md)
 - [ ] **EB5. An enemy's lists: from the start and each phase, phases added and removed** (Editor, about 170 lines) →
   [slices/EB5.md](slices/EB5.md)

@@ -140,11 +140,5 @@ internal sealed partial class DropTableViewModel : ObservableObject
     }
 
     // Each row shows its position, which Data's messages name.
-    private void Renumber()
-    {
-        for (var index = 0; index < Entries.Count; index++)
-        {
-            Entries[index].Index = index;
-        }
-    }
+    private void Renumber() => ListOrder.Renumber(Entries, (row, index) => row.Index = index);
 }

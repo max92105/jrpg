@@ -41,3 +41,5 @@ New `Editor.Tests/Battle/EnemyTacticsViewModelTests` (enemies built in the test 
 
 ## Verify by hand
 None: nothing shows yet (EB7).
+- **Note from EB4:** `ForPhase` and `NewPhase` start a list's `Field` as "phases[0].tactics": set every phase's from its
+  place after `From`, `AddPhase` and `RemovePhase`. A list raises `RulesChanged`, not its own `Problem`, on a rule typed.

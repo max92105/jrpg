@@ -33,6 +33,9 @@ average's `(x + 1) * step` passing the source edge (53x100 to 192 throws).
 
 WPF binding fact (probed 2026-11-13, NP1 review, PowerShell -STA + XamlReader): a non-editable ComboBox whose bound
 SelectedItem ("" or any value) is not in its ItemsSource leaves the source alone on load and close: no null write-back.
+But (probed 2026-11-16, SK4, .NET 10 scratch project) on a DataContext switch to a value not in the list the box keeps
+showing the previous item (blank only if the previous was blank or on first load): flag shared boxes over folder
+choices whose records may name a missing file; fix by appending the missing names to the choices.
 An ItemsSource set by a style DataTrigger (EW1, 2026-11-15) still shows the locally bound SelectedItem on open, after a
 null-then-set DataContext and on switching: the trigger's late ItemsSource loses nothing.
 

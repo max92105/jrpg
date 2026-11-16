@@ -101,11 +101,20 @@ public sealed class EnemyTacticsValidatorTests
         content.Replace(
             "skills.json",
             "\"id\": \"fire_blast\"",
-            "\"id\": \"test_strike\", \"name\": \"Strike\", \"description\": \"\", \"iconFile\": \"Attack.png\", \"soundFile\": \"PlaceholderSkillBlunt.wav\", \"effect\": { \"kind\": \"damage\", \"damageType\": \"blunt\", \"power\": 5, \"targeting\": \"singleEnemy\" } }, { \"id\": \"fire_blast\"");
+            """
+            "id": "test_strike", "name": "Strike", "description": "", "iconFile": "Attack.png",
+            "soundFile": "PlaceholderSkillBlunt.wav",
+            "effect": { "kind": "damage", "damageType": "blunt", "power": 0, "tier": "blunt_1", "targeting": "singleEnemy" }
+            }, { "id": "fire_blast"
+            """);
+
+        // A tiered skill multiplies its user's Power (decision 787).
         content.Replace(
             "enemies.json",
             "\"id\": \"goblin\",",
-            "\"id\": \"goblin\", \"tactics\": [ { \"weight\": 4 }, { \"skillId\": \"test_strike\", \"weight\": 2 } ],");
+            """
+            "id": "goblin", "power": 1, "tactics": [ { "weight": 4 }, { "skillId": "test_strike", "weight": 2 } ],
+            """);
 
         var catalog = ContentCatalogLoader.Load(content.Path);
 

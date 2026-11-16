@@ -33,7 +33,8 @@ public sealed class AttributeCaptionsTests
 
         var captions = AttributeCaptions.Of(primaries, _rules, [], RepositoryScreenText.Text.Messages);
 
-        string[] expected = ["+15 % damage", "+5 % crit, +4 % dodge", "+6 % status", "+14 % HP, +3 % phys. res.", "+2 % magic res."];
+        string[] expected =
+            ["+15 % attack damage", "+5 % crit, +4 % dodge", "+6 % status", "+14 % HP, +3 % phys. res.", "+2 % magic res."];
         Assert.Equal(expected, captions);
     }
 
@@ -59,6 +60,6 @@ public sealed class AttributeCaptionsTests
         var captions = AttributeCaptions.Of(primaries, _rules, [], RepositoryScreenText.Text.Messages);
 
         Assert.Equal("-1 % magic res.", captions[4]);
-        Assert.Equal("+0 % damage", captions[0]);
+        Assert.Equal("+0 % attack damage", captions[0]);
     }
 }

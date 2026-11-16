@@ -98,6 +98,7 @@ public sealed class ContentWriterEnemyTests : IDisposable
         var healer = _catalog.Enemies["goblin"] with
         {
             Id = "goblin_healer",
+            Power = 5,
             Tactics = [new EnemyAction { Weight = 4 }, cleaveWhenAllyHurt],
         };
 

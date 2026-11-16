@@ -48,10 +48,11 @@ internal static class BattleScenarios
         new Dictionary<string, EffectStripDefinition>();
 
     /// <summary>
-    /// The repository's skills, with Shield Bash's stun a sure one, so a scenario's stun lands without a draw; a member
+    /// The repository's skills, with Shield Bash's stun a sure one and its hit a flat 5 instead of its tier, so a
+    /// scenario's stun lands without a draw on a goblin the tier would fell at a member's Power (ADR 0056); a member
     /// recruited here knows this copy, so play it from here, not from the catalog.
     /// </summary>
-    public static IReadOnlyDictionary<string, SkillDefinition> Skills { get; } = WithSureStun(Catalog.Skills, "shield_bash");
+    public static IReadOnlyDictionary<string, SkillDefinition> Skills { get; } = WithFlatSureStun(Catalog.Skills, "shield_bash");
 
     /// <summary>
     /// A member of the repository's content as they join: level 1, with their class's numbers under
@@ -63,13 +64,14 @@ internal static class BattleScenarios
         return PartyMember.Recruit(definition, Catalog.ClassOf(definition), Skills, CertainRules);
     }
 
-    private static Dictionary<string, SkillDefinition> WithSureStun(IReadOnlyDictionary<string, SkillDefinition> skills, string skillId)
+    private static Dictionary<string, SkillDefinition> WithFlatSureStun(
+        IReadOnlyDictionary<string, SkillDefinition> skills, string skillId)
     {
         var skill = skills[skillId];
         var stun = skill.Effect.Status ?? throw new InvalidOperationException($"{skillId} grants no status.");
         return new Dictionary<string, SkillDefinition>(skills)
         {
-            [skillId] = skill with { Effect = skill.Effect with { Status = stun with { Power = 100 } } },
+            [skillId] = skill with { Effect = skill.Effect with { Power = 5, Tier = null, Status = stun with { Power = 100 } } },
         };
     }
 

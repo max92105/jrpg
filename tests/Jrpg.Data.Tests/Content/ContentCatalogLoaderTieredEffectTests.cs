@@ -5,10 +5,10 @@ using Jrpg.Data.Content;
 namespace Jrpg.Data.Tests.Content;
 
 // effects.json loads first and a skill's effect names a record by id, resolved as skills.json is read (decision 789),
-// on a copy of the repository's content with Fire Blast's effect edited here.
+// on a copy of the repository's content with Fire Blast's tier changed here.
 public sealed class ContentCatalogLoaderTieredEffectTests : IDisposable
 {
-    private const string FireBlastFlatPower = "\"kind\": \"damage\", \"damageType\": \"fire\", \"power\": 15,";
+    private const string FireBlastTier = "\"power\": 0, \"tier\": \"fire_1\", \"targeting\": \"singleEnemy\",";
 
     private readonly CopiedContentRoot _content = new("tiered-effects", "content");
 
@@ -17,11 +17,11 @@ public sealed class ContentCatalogLoaderTieredEffectTests : IDisposable
     [Fact]
     public void Load_SkillNamingATieredEffect_HoldsTheRecord()
     {
-        NameTier("fire_1");
+        NameTier("fire_2");
 
         var catalog = ContentCatalogLoader.Load(_content.Path);
 
-        Assert.Same(catalog.TieredEffects["fire_1"], catalog.Skills["fire_blast"].Effect.Tier);
+        Assert.Same(catalog.TieredEffects["fire_2"], catalog.Skills["fire_blast"].Effect.Tier);
     }
 
     [Fact]
@@ -66,6 +66,6 @@ public sealed class ContentCatalogLoaderTieredEffectTests : IDisposable
         Assert.Equal("effects.json: the file is missing.", exception.Message);
     }
 
-    private void NameTier(string id) => _content.Replace(
-        "skills.json", FireBlastFlatPower, $"\"kind\": \"damage\", \"damageType\": \"fire\", \"power\": 0, \"tier\": \"{id}\",");
+    private void NameTier(string id) =>
+        _content.Replace("skills.json", FireBlastTier, $"\"power\": 0, \"tier\": \"{id}\", \"targeting\": \"singleEnemy\",");
 }

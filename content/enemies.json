@@ -37,6 +37,7 @@
     "maxHp": 240,
     "damage": 12,
     "damageType": "piercing",
+    "power": 5,
     "accuracy": 80,
     "dodge": 0,
     "critChance": 5,

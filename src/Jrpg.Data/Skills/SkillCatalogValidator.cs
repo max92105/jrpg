@@ -34,8 +34,17 @@ internal static class SkillCatalogValidator
         return FindResourceChangeProblem(skill.ResourceChanges)
             ?? FindRequirementProblem(skill.Requirements)
             ?? EffectValidator.FindProblem(skill.Effect)
+            ?? FindTierProblem(skill.Effect)
             ?? (string.IsNullOrWhiteSpace(skill.SoundFile) ? "soundFile must name a sound." : null);
     }
+
+    // A skill's damage or heal is tiered (ADR 0056), so a new skill can't slip back to a flat power; a revive or a
+    // status-only skill names none.
+    private static string? FindTierProblem(Effect effect) =>
+        effect.Kind is EffectKind.Damage or EffectKind.RestoreHp && effect.Tier is null
+            ? "effect.tier is required for a skill's damage or restoreHp effect: its amount is its user's Power times the "
+                + "record's perPower (decision 704)."
+            : null;
 
     private static string? FindResourceChangeProblem(IReadOnlyList<ResourceChange> changes)
     {

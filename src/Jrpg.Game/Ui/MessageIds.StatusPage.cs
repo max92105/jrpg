@@ -21,7 +21,10 @@ internal static partial class MessageIds
     /// <summary>The Status page's section of the five primaries, beside the profile.</summary>
     public const string StatusAttributes = "status_attributes";
 
-    /// <summary>What Power gives, beside it, each value signed: "{damage} % damage".</summary>
+    /// <summary>
+    /// What Power gives, beside it, each value signed: "{damage} % attack damage", since its percent no longer raises a
+    /// tiered skill (decision 793).
+    /// </summary>
     public const string StatusPowerGives = "status_power_gives";
 
     /// <summary>What Agility gives: "{crit} % crit, {dodge} % dodge".</summary>

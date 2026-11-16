@@ -255,8 +255,11 @@ public sealed class ContentCatalogLoaderTests
 
         var recovery = catalog.Skills["recovery"].Effect;
 
-        // Developer decision 22: Recovery heals 30 HP on its user; it does not restore MP. Decision 320 adds its Regen.
-        Assert.Equal(new Effect(EffectKind.RestoreHp, Power: 30, Targeting.Self, new StatusGrant(StatusKind.Regen, Power: 6, Turns: 2)), recovery);
+        // Developer decision 22: Recovery heals its user; it does not restore MP. Decision 320 adds its Regen. The
+        // amount is its tier's (ADR 0056), the developer's to tune, so only the shape is pinned.
+        Assert.Equal((EffectKind.RestoreHp, Targeting.Self), (recovery.Kind, recovery.Targeting));
+        Assert.Equal(EffectKind.RestoreHp, recovery.Tier?.Kind);
+        Assert.Equal((StatusKind.Regen, 2), (recovery.Status?.Kind, recovery.Status?.Turns));
     }
 
     // Decision 320: Intelligence shapes a status, so every class but the rogue, whose Power acts through its attack,

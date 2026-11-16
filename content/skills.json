@@ -7,7 +7,7 @@
     "soundFile": "PlaceholderSkillFire.wav",
     "resourceChanges": [ { "resourceId": "mana", "amount": -2 } ],
     "effect": {
-      "kind": "damage", "damageType": "fire", "power": 15, "targeting": "singleEnemy",
+      "kind": "damage", "damageType": "fire", "power": 0, "tier": "fire_1", "targeting": "singleEnemy",
       "status": { "kind": "poison", "power": 5, "turns": 2 }
     }
   },
@@ -19,7 +19,7 @@
     "soundFile": "PlaceholderSkillFire.wav",
     "effectFile": "FireExplosion.png",
     "resourceChanges": [ { "resourceId": "mana", "amount": -5 } ],
-    "effect": { "kind": "damage", "damageType": "fire", "power": 20, "targeting": "allEnemies" }
+    "effect": { "kind": "damage", "damageType": "fire", "power": 0, "tier": "fire_1", "targeting": "allEnemies" }
   },
   {
     "id": "meteor",
@@ -28,37 +28,37 @@
     "iconFile": "Attack.png",
     "soundFile": "PlaceholderSkillFire.wav",
     "resourceChanges": [ { "resourceId": "mana", "amount": -9 } ],
-    "effect": { "kind": "damage", "damageType": "fire", "power": 60, "targeting": "singleEnemy" }
+    "effect": { "kind": "damage", "damageType": "fire", "power": 0, "tier": "fire_2", "targeting": "singleEnemy" }
   },
   {
     "id": "heal",
     "name": "Heal",
-    "description": "Restores 15 HP to one ally.",
+    "description": "Restores HP to one ally.",
     "iconFile": "",
     "soundFile": "PlaceholderSkillMend.wav",
     "requirements": [ { "resourceId": "faith", "atLeast": 1 } ],
-    "effect": { "kind": "restoreHp", "power": 15, "targeting": "singleAlly" }
+    "effect": { "kind": "restoreHp", "power": 0, "tier": "heal_1", "targeting": "singleAlly" }
   },
   {
     "id": "recovery",
     "name": "Recovery",
-    "description": "Restores 30 HP to its user, then keeps mending them for two turns.",
+    "description": "Restores its user's HP, then keeps mending them for two turns.",
     "iconFile": "",
     "soundFile": "PlaceholderSkillMend.wav",
     "requirements": [ { "resourceId": "faith", "atLeast": 2 } ],
     "effect": {
-      "kind": "restoreHp", "power": 30, "targeting": "self",
+      "kind": "restoreHp", "power": 0, "tier": "heal_1", "targeting": "self",
       "status": { "kind": "regen", "power": 6, "turns": 2 }
     }
   },
   {
     "id": "heal_all",
     "name": "Heal All",
-    "description": "Restores 50 HP to every ally.",
+    "description": "Restores HP to every ally.",
     "iconFile": "",
     "soundFile": "PlaceholderSkillMend.wav",
     "requirements": [ { "resourceId": "faith", "atLeast": 4 } ],
-    "effect": { "kind": "restoreHp", "power": 50, "targeting": "allAllies" }
+    "effect": { "kind": "restoreHp", "power": 0, "tier": "heal_2", "targeting": "allAllies" }
   },
   {
     "id": "power_strike",
@@ -67,7 +67,7 @@
     "iconFile": "Attack.png",
     "soundFile": "PlaceholderSkillSlash.wav",
     "resourceChanges": [ { "resourceId": "stamina", "amount": -2 } ],
-    "effect": { "kind": "damage", "damageType": "slashing", "power": 35, "targeting": "singleEnemy" }
+    "effect": { "kind": "damage", "damageType": "slashing", "power": 0, "tier": "slashing_1", "targeting": "singleEnemy" }
   },
   {
     "id": "shield_bash",
@@ -77,7 +77,7 @@
     "soundFile": "PlaceholderSkillBlunt.wav",
     "resourceChanges": [ { "resourceId": "stamina", "amount": -3 } ],
     "effect": {
-      "kind": "damage", "damageType": "blunt", "power": 15, "targeting": "singleEnemy",
+      "kind": "damage", "damageType": "blunt", "power": 0, "tier": "blunt_1", "targeting": "singleEnemy",
       "status": { "kind": "stun", "power": 60, "turns": 1 }
     }
   },
@@ -99,7 +99,7 @@
     "iconFile": "Attack.png",
     "soundFile": "PlaceholderSkillBlunt.wav",
     "resourceChanges": [ { "resourceId": "ferocity", "amount": -6 } ],
-    "effect": { "kind": "damage", "damageType": "blunt", "power": 70, "targeting": "singleEnemy" }
+    "effect": { "kind": "damage", "damageType": "blunt", "power": 0, "tier": "blunt_2", "targeting": "singleEnemy" }
   },
   {
     "id": "smite",
@@ -108,7 +108,7 @@
     "iconFile": "Attack.png",
     "soundFile": "PlaceholderSkillLight.wav",
     "resourceChanges": [ { "resourceId": "conviction", "amount": -3 } ],
-    "effect": { "kind": "damage", "damageType": "light", "power": 40, "targeting": "singleEnemy" }
+    "effect": { "kind": "damage", "damageType": "light", "power": 0, "tier": "light_2", "targeting": "singleEnemy" }
   },
   {
     "id": "aura_of_protection",
@@ -163,7 +163,7 @@
     "soundFile": "PlaceholderSkillDark.wav",
     "resourceChanges": [ { "resourceId": "instability", "amount": 2 } ],
     "effect": {
-      "kind": "damage", "damageType": "dark", "power": 20, "targeting": "singleEnemy",
+      "kind": "damage", "damageType": "dark", "power": 0, "tier": "dark_1", "targeting": "singleEnemy",
       "status": { "kind": "exposed", "power": 20, "turns": 2 }
     }
   },
@@ -175,7 +175,7 @@
     "soundFile": "PlaceholderSkillDark.wav",
     "resourceChanges": [ { "resourceId": "instability", "amount": 3 } ],
     "requirements": [ { "resourceId": "instability", "atLeast": 4 } ],
-    "effect": { "kind": "damage", "damageType": "dark", "power": 25, "targeting": "allEnemies" }
+    "effect": { "kind": "damage", "damageType": "dark", "power": 0, "tier": "dark_1", "targeting": "allEnemies" }
   },
   {
     "id": "chaos_lance",
@@ -185,7 +185,7 @@
     "soundFile": "PlaceholderSkillDark.wav",
     "resourceChanges": [ { "resourceId": "instability", "amount": 4 } ],
     "requirements": [ { "resourceId": "instability", "atLeast": 7 } ],
-    "effect": { "kind": "damage", "damageType": "dark", "power": 70, "targeting": "singleEnemy" }
+    "effect": { "kind": "damage", "damageType": "dark", "power": 0, "tier": "dark_3", "targeting": "singleEnemy" }
   },
   {
     "id": "rejuvenate",
@@ -218,7 +218,7 @@
     "iconFile": "Attack.png",
     "soundFile": "PlaceholderSkillSlash.wav",
     "resourceChanges": [ { "resourceId": "growth", "amount": -3 }, { "resourceId": "decay", "amount": -3 } ],
-    "effect": { "kind": "damage", "damageType": "piercing", "power": 45, "targeting": "allEnemies" }
+    "effect": { "kind": "damage", "damageType": "piercing", "power": 0, "tier": "piercing_2", "targeting": "allEnemies" }
   },
   {
     "id": "palm_strike",
@@ -227,7 +227,7 @@
     "iconFile": "Attack.png",
     "soundFile": "PlaceholderSkillBlunt.wav",
     "effect": {
-      "kind": "damage", "damageType": "blunt", "power": 10, "targeting": "singleEnemy", "hits": 2,
+      "kind": "damage", "damageType": "blunt", "power": 0, "tier": "blunt_1", "targeting": "singleEnemy", "hits": 2,
       "status": { "kind": "stun", "power": 30, "turns": 1 }
     }
   },
@@ -238,7 +238,7 @@
     "iconFile": "Attack.png",
     "soundFile": "PlaceholderSkillBlunt.wav",
     "resourceChanges": [ { "resourceId": "chakra", "amount": -3 } ],
-    "effect": { "kind": "damage", "damageType": "blunt", "power": 8, "targeting": "singleEnemy", "hits": 4 }
+    "effect": { "kind": "damage", "damageType": "blunt", "power": 0, "tier": "blunt_1", "targeting": "singleEnemy", "hits": 4 }
   },
   {
     "id": "cleave",
@@ -246,7 +246,7 @@
     "description": "A wide swing that hits the whole party. Placeholder: the developer writes the real skill.",
     "iconFile": "Attack.png",
     "soundFile": "PlaceholderSkillSlash.wav",
-    "effect": { "kind": "damage", "damageType": "slashing", "power": 10, "targeting": "allEnemies" }
+    "effect": { "kind": "damage", "damageType": "slashing", "power": 0, "tier": "slashing_1", "targeting": "allEnemies" }
   },
   {
     "id": "field_dressing",
@@ -254,7 +254,7 @@
     "description": "Binds one ally's wounds. Placeholder: the developer writes the real skill.",
     "iconFile": "Attack.png",
     "soundFile": "PlaceholderSkillMend.wav",
-    "effect": { "kind": "restoreHp", "power": 25, "targeting": "singleAlly" }
+    "effect": { "kind": "restoreHp", "power": 0, "tier": "heal_2", "targeting": "singleAlly" }
   },
   {
     "id": "crushing_blow",
@@ -263,7 +263,7 @@
     "iconFile": "Attack.png",
     "soundFile": "PlaceholderSkillBlunt.wav",
     "effect": {
-      "kind": "damage", "damageType": "blunt", "power": 24, "targeting": "singleEnemy",
+      "kind": "damage", "damageType": "blunt", "power": 0, "tier": "blunt_2", "targeting": "singleEnemy",
       "status": { "kind": "stun", "power": 40, "turns": 1 }
     }
   },

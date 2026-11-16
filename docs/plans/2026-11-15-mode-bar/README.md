@@ -1,5 +1,5 @@
 # Workspaces: the mode bar (the editor push's row 11)
-Status: approved
+Status: approved, in progress
 
 Drafted on 2026-11-15 from the editor push's row 11 ([roadmap](../2026-11-15-editor-push/README.md), decisions 683, 693,
 694; [design 3.1](../2026-11-15-editor-push/design.md)). The developer: "the editor became more than just a map editor.
@@ -87,7 +87,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 page recipe: [page-recipe.md](page-recipe.md).
 
 ### Stage 1: the dialog and the menu (right after row 6, before row 7's first window slice)
-- [ ] **WD1. The Database menu in its own file, `Shell/DatabaseMenu.xaml`, its clicks caught on the menu** (Editor,
+- [x] **WD1. The Database menu in its own file, `Shell/DatabaseMenu.xaml`, its clicks caught on the menu** (Editor,
   about 80 lines, a move) → [slices/WD1.md](slices/WD1.md)
 - [ ] **WD2. `CatalogDialog` and the Shops page: one dialog at the main window's size hosting a page; the six other
   windows open at that size too** (Editor, about 230 lines) → [slices/WD2.md](slices/WD2.md)

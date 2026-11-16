@@ -1,4 +1,3 @@
-using System.Windows;
 using Jrpg.Editor.Quests;
 
 namespace Jrpg.Editor.Shell;
@@ -9,7 +8,7 @@ namespace Jrpg.Editor.Shell;
 /// </summary>
 internal sealed partial class MainWindow
 {
-    private void OnEditQuestsClicked(object sender, RoutedEventArgs e)
+    private void OpenQuests()
     {
         if (_viewModel.QuestEditing is not { } questEditing)
         {

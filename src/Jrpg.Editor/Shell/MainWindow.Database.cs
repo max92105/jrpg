@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Jrpg.Data.Art;
 using Jrpg.Editor.Battle;
@@ -10,12 +11,36 @@ using Jrpg.Editor.Trade;
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// Database > Shops..., Drop tables..., Effect strips..., Enemies... and Cinematics...: each window edits its catalog
-/// of the draft, and OK applies the whole session as one undo step (ADR 0045, decision 591), as the Quests window does.
+/// The Database menu's dispatch: an entry's title runs its opener (decision 938). Shops..., Drop tables..., Effect
+/// strips..., Enemies... and Cinematics...: each window edits its catalog of the draft, and OK applies the whole
+/// session as one undo step (ADR 0045, decision 591), as the Quests window does.
 /// </summary>
 internal sealed partial class MainWindow
 {
-    private void OnEditShopsClicked(object sender, RoutedEventArgs e)
+    private Dictionary<string, Action> CreateDatabaseOpeners() => new()
+    {
+        ["Quests"] = OpenQuests,
+        ["Shops"] = OpenShops,
+        ["Drop tables"] = () => _ = EditDropTables(this, ""),
+        ["Effect strips"] = OpenEffectStrips,
+        ["Cinematics"] = OpenCinematics,
+        ["Enemies"] = OpenEnemies,
+    };
+
+    // Only an entry raises Click, never the Database header. An entry without a known title is a typo in
+    // DatabaseMenu.xaml: thrown, so the smoke script shows it as an ERROR.
+    private void OnDatabaseMenuClicked(object sender, RoutedEventArgs e)
+    {
+        var entry = (MenuItem)e.OriginalSource;
+        if (entry.Tag is not string title || !_databaseOpeners.TryGetValue(title, out var open))
+        {
+            throw new InvalidOperationException($"The Database menu's '{entry.Header}' entry has no known title.");
+        }
+
+        open();
+    }
+
+    private void OpenShops()
     {
         if (_viewModel.ShopEditing is not { } shopEditing)
         {
@@ -28,8 +53,6 @@ internal sealed partial class MainWindow
             shopEditing.Apply(edited);
         }
     }
-
-    private void OnEditDropTablesClicked(object sender, RoutedEventArgs e) => _ = EditDropTables(this, "");
 
     // The Drop tables window over the owner, on the chosen table; its OK applies its own undo step at once, so a window
     // under it can take the new tables (decision 602). Returns whether it applied.
@@ -51,7 +74,7 @@ internal sealed partial class MainWindow
         return true;
     }
 
-    private void OnEditEnemiesClicked(object sender, RoutedEventArgs e)
+    private void OpenEnemies()
     {
         if (_viewModel.EnemyEditing is not { } enemyEditing || _viewModel.AnimationTime is not { } animationTime)
         {
@@ -82,7 +105,7 @@ internal sealed partial class MainWindow
     }
 
     // The preview decodes each still at the preview's width, a sixteenth of the pixels of a 1920 px picture.
-    private void OnEditCinematicsClicked(object sender, RoutedEventArgs e)
+    private void OpenCinematics()
     {
         if (_viewModel.CinematicEditing is not { } cinematicEditing)
         {
@@ -101,7 +124,7 @@ internal sealed partial class MainWindow
             SpriteImageFile.LoadAtWidth(artRoot, ArtFolders.Cinematics, file, (int)CinematicCatalogWindow.PreviewWidth);
     }
 
-    private void OnEditEffectStripsClicked(object sender, RoutedEventArgs e)
+    private void OpenEffectStrips()
     {
         if (_viewModel.EffectStripEditing is not { } effectStripEditing || _viewModel.AnimationTime is not { } animationTime)
         {

@@ -1,0 +1,15 @@
+<MenuItem x:Class="Jrpg.Editor.Shell.DatabaseMenu"
+          x:ClassModifier="internal"
+          xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+          xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+          Style="{StaticResource {x:Type MenuItem}}"
+          Header="Database">
+  <!-- Its own file so each Database editor adds its entry here, not to the main window (decision 938). An entry's Tag is
+       the title the main window opens it by; the theme's style is set above, since an implicit style skips a subclass. -->
+  <MenuItem Header="Quests..." Tag="Quests" IsEnabled="{Binding HasQuestEditing}" />
+  <MenuItem Header="Shops..." Tag="Shops" IsEnabled="{Binding HasShopEditing}" ToolTip="Each shop's name and the priced items it sells, in order; the shopkeeper preset's shop box offers them." />
+  <MenuItem Header="Drop tables..." Tag="Drop tables" IsEnabled="{Binding HasDropTableEditing}" ToolTip="Each table's items, chances and quantities; the Enemies window's Drop table box offers them." />
+  <MenuItem Header="Effect strips..." Tag="Effect strips" IsEnabled="{Binding HasEffectStripEditing}" ToolTip="Each effects image's frame time, the frame its hit lands on and the swing an Attack plays first." />
+  <MenuItem Header="Cinematics..." Tag="Cinematics" IsEnabled="{Binding HasCinematicEditing}" ToolTip="Each cinematic's stills in order, their seconds, subtitles, voices and zoom, and its music." />
+  <MenuItem Header="Enemies..." Tag="Enemies" IsEnabled="{Binding HasEnemyEditing}" ToolTip="Each enemy's numbers, resistances, rewards and pictures; tactics and phases stay in enemies.json, encounters in encounters.json." />
+</MenuItem>

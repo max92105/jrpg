@@ -31,3 +31,6 @@ None new: the entries' behavior is unchanged and window code isn't tested headle
 Agents may run it: `dotnet build src/Jrpg.Editor`, then `open-editor-windows.ps1`: the six `Database>...` entries
 "opened" with the same screenshots as before, no `ERROR`, no binding-error line (EW0). In the editor, each Database
 entry's tooltip shows.
+- **Done, with deviations:** `DatabaseMenu` sets the theme's `MenuItem` style itself (an implicit style skips a
+  subclass); the openers' dictionary is built by `CreateDatabaseOpeners`; `OpenQuests` stays in `.QuestEditing` (WD3
+  deletes the file). The smoke script opened all six entries and caught the test error, no `ERROR`.

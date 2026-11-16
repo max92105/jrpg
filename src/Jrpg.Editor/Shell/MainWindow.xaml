@@ -86,14 +86,7 @@
         <MenuItem Header="Character sprites..." Click="OnCharacterSpritesClicked" IsEnabled="{Binding CanEditFieldSprites}" ToolTip="Import, cut and animate character sheets; New NPC uses them." />
         <MenuItem Header="Change NPC sprite..." Click="OnChangeNpcSpriteClicked" IsEnabled="{Binding NpcSpriteChange.CanChange, FallbackValue=False}" ToolTip="Give the chosen NPC object another set-up sprite; every placed copy follows. Ctrl+Z undoes it." />
       </MenuItem>
-      <MenuItem Header="Database">
-        <MenuItem Header="Quests..." Click="OnEditQuestsClicked" IsEnabled="{Binding HasQuestEditing}" />
-        <MenuItem Header="Shops..." Click="OnEditShopsClicked" IsEnabled="{Binding HasShopEditing}" ToolTip="Each shop's name and the priced items it sells, in order; the shopkeeper preset's shop box offers them." />
-        <MenuItem Header="Drop tables..." Click="OnEditDropTablesClicked" IsEnabled="{Binding HasDropTableEditing}" ToolTip="Each table's items, chances and quantities; the Enemies window's Drop table box offers them." />
-        <MenuItem Header="Effect strips..." Click="OnEditEffectStripsClicked" IsEnabled="{Binding HasEffectStripEditing}" ToolTip="Each effects image's frame time, the frame its hit lands on and the swing an Attack plays first." />
-        <MenuItem Header="Cinematics..." Click="OnEditCinematicsClicked" IsEnabled="{Binding HasCinematicEditing}" ToolTip="Each cinematic's stills in order, their seconds, subtitles, voices and zoom, and its music." />
-        <MenuItem Header="Enemies..." Click="OnEditEnemiesClicked" IsEnabled="{Binding HasEnemyEditing}" ToolTip="Each enemy's numbers, resistances, rewards and pictures; tactics and phases stay in enemies.json, encounters in encounters.json." />
-      </MenuItem>
+      <local:DatabaseMenu MenuItem.Click="OnDatabaseMenuClicked" />
       <MenuItem Header="Map">
         <MenuItem Header="Go to map..." Command="Find" InputGestureText="Ctrl+M" />
         <MenuItem Header="Back to previous map" Command="{Binding Navigation.GoBackCommand}" InputGestureText="Alt+Left" />

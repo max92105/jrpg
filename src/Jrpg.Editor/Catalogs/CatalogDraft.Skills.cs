@@ -1,12 +1,13 @@
 using Jrpg.Core.Effects;
 using Jrpg.Core.Skills;
+using Jrpg.Core.Statuses;
 using Jrpg.Data.Content;
 
 namespace Jrpg.Editor.Catalogs;
 
 /// <summary>
-/// The battle model the Skills and Effects pages edit (decision 815): the skills, and the tiered effects they name,
-/// each as one undo step.
+/// The battle model the Skills, Effects and Statuses pages edit (decision 815): the skills, and the tiered effects and
+/// statuses they name, each as one undo step.
 /// </summary>
 internal sealed partial class CatalogDraft
 {
@@ -44,6 +45,25 @@ internal sealed partial class CatalogDraft
         Do(new CatalogEdit(
             catalog => CatalogReferences.Rebound(catalog with { TieredEffects = after }),
             catalog => CatalogReferences.Rebound(catalog with { TieredEffects = before })));
+    }
+
+    /// <summary>
+    /// Replaces the statuses as one undo step whose do and undo both rebind the catalog, so every skill and item
+    /// granting a status follows it (decision 975); nothing when they are the same by content, parts in order (decision
+    /// 795). No undo refusal, for the tiered effects' reason.
+    /// </summary>
+    public void SetStatuses(IReadOnlyList<StatusDefinition> statuses)
+    {
+        var before = Current.Statuses;
+        var after = statuses.ToDictionary(status => status.Id, StringComparer.Ordinal);
+        if (HasSameRecords(before, after, EqualityComparer<StatusDefinition>.Default.Equals))
+        {
+            return;
+        }
+
+        Do(new CatalogEdit(
+            catalog => CatalogReferences.Rebound(catalog with { Statuses = after }),
+            catalog => CatalogReferences.Rebound(catalog with { Statuses = before })));
     }
 
     // Records compare lists by reference: the with-copy compares every field but the cost lists, the lists by content;

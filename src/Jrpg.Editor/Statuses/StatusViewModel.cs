@@ -132,6 +132,12 @@ internal sealed partial class StatusViewModel : ObservableObject
     public string Id => IdText.Trim();
 
     /// <summary>
+    /// The family a holder keeps one of, as typed: the family box, else the typed id, as
+    /// <see cref="StatusDefinition.FamilyKey"/> reads the record; empty while both are.
+    /// </summary>
+    public string FamilyKey => AbsentWhenEmpty(FamilyText) ?? Id;
+
+    /// <summary>
     /// "Used by: rot, venom", the draft's skills granting the record, by id, or "Used by no skill"; a new status is
     /// granted by none.
     /// </summary>

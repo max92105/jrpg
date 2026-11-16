@@ -97,14 +97,32 @@ public static class CatalogProblems
     /// heal under a damage skill is refused naming the skill); null when the loader would take them.
     /// </summary>
     /// <param name="effects">The tiered effects as edited.</param>
-    /// <param name="content">The skills that name the effects, and the classes that name the skills.</param>
+    /// <param name="content">
+    /// The skills and items that name the effects, rebound to the edited list, and the classes that name the skills.
+    /// </param>
     public static string? OfTieredEffects(IReadOnlyList<TieredEffect> effects, ContentCatalog content) =>
         FirstProblem(() =>
         {
             CheckTieredEffects(effects);
-            var edited = CatalogReferences.Rebound(
+            CheckReboundSkills(
                 content with { TieredEffects = effects.ToDictionary(effect => effect.Id, StringComparer.Ordinal) });
-            CheckSkills([.. edited.Skills.Values.OrderBy(skill => skill.Id, StringComparer.Ordinal)], edited);
+        });
+
+    /// <summary>
+    /// The first problem in the statuses (decision 975): a record's own rule or a family whose records differ, then the
+    /// skills' check over the content rebound to these records, so a rule tying a skill to the statuses it grants is
+    /// checked with the edited ones; null when the loader would take them.
+    /// </summary>
+    /// <param name="statuses">The statuses as edited.</param>
+    /// <param name="content">
+    /// The skills and items that grant the statuses, rebound to the edited list, and the classes that name the skills.
+    /// </param>
+    public static string? OfStatuses(IReadOnlyList<StatusDefinition> statuses, ContentCatalog content) =>
+        FirstProblem(() =>
+        {
+            CheckStatuses(statuses);
+            CheckReboundSkills(
+                content with { Statuses = statuses.ToDictionary(status => status.Id, StringComparer.Ordinal) });
         });
 
     /// <summary>
@@ -180,6 +198,14 @@ public static class CatalogProblems
     /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
     internal static void CheckStatuses(IReadOnlyList<StatusDefinition> statuses) =>
         StatusCatalogValidator.Validate(ContentCatalogLoader.StatusesFile, statuses);
+
+    // A skill holds the records it names, not their ids (decision 789), so the skills are checked with the edited
+    // records only once they point at them.
+    private static void CheckReboundSkills(ContentCatalog edited)
+    {
+        var rebound = CatalogReferences.Rebound(edited);
+        CheckSkills([.. rebound.Skills.Values.OrderBy(skill => skill.Id, StringComparer.Ordinal)], rebound);
+    }
 
     // The loader's refusal as a line, or null when it would take the catalog.
     private static string? FirstProblem(Action check)

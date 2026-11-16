@@ -56,3 +56,6 @@ None: the page comes in FX6.
 - **Note from FX4:** `StatusViewModel.DuplicateOf(chosen, nextId, takenIds)` copies the boxes and part rows as
   typed; Duplicate passes "", New tier then sets the copy's `FamilyText` to the chosen one's key (its `FamilyText`, else
   its typed `Id`). `From(status, skills)` takes the draft's skills for the Used by line.
+- **Done, with deviations:** code 199 lines, tests 437 (the plan said 100 and 110). `OfStatuses_TestWorldStatuses_IsNull`
+  (it loads the test world); `CatalogProblems.CheckReboundSkills`, shared with `OfTieredEffects`;
+  `StatusViewModel.FamilyKey`; `Families` raised on a choice, never per typed letter; `StatusEditingViewModelTests`.

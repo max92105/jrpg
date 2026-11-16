@@ -4,13 +4,14 @@ using Jrpg.Core.Effects;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
+using Jrpg.Core.Statuses;
 using Jrpg.Data.Content;
 
 namespace Jrpg.Data.Tests.Content;
 
 // The Skills page's problem line (decision 974): the skills' own rules, then the classes and enemies that name them,
-// checked with the edited skills, since the editor writes neither file. The Effects page's line (decision 975): the
-// effects' own rules, then the skills over the catalog rebound to the edited effects.
+// checked with the edited skills, since the editor writes neither file. The Effects and Statuses pages' lines (decision
+// 975): the records' own rules, then the skills over the catalog rebound to the edited records.
 public sealed class CatalogProblemsSkillTests
 {
     private static readonly ContentCatalog _catalog =
@@ -98,6 +99,43 @@ public sealed class CatalogProblemsSkillTests
         var problem = CatalogProblems.OfTieredEffects([.. _catalog.TieredEffects.Values, heal], content);
 
         Assert.Equal("skills.json: skill 'spark': effect.kind is damage but spark_1 is restoreHp.", problem);
+    }
+
+    [Fact]
+    public void OfStatuses_TestWorldStatuses_IsNull() =>
+        Assert.Null(CatalogProblems.OfStatuses([.. _catalog.Statuses.Values], _catalog));
+
+    [Fact]
+    public void OfStatuses_DamageTickZero_NamesTheFileAndStatus()
+    {
+        var statuses = StatusesWithPoison1Ticking(0);
+
+        var problem = CatalogProblems.OfStatuses(statuses, _catalog);
+
+        Assert.Equal("statuses.json: status 'poison_1': parts[0]: damageEachTurn's amount must be at least 1 (was 0).", problem);
+    }
+
+    // The review's C7: no Data rule reads a granted status's parts yet, so the skill breaks a rule of its own (chance
+    // 0); the message proves the statuses' check runs the skills, over the catalog rebound to the edited poison_1.
+    [Fact]
+    public void OfStatuses_SkillGrantingTheEditedStatusBreaksARule_IsTheSkillsMessage()
+    {
+        var spark = _spark with
+        {
+            Effect = _spark.Effect with { Statuses = [new StatusGrant(_catalog.Statuses["poison_1"], 2) { Chance = 0 }] },
+        };
+        var content = _catalog with { Skills = Replaced(_catalog.Skills, spark.Id, spark) };
+
+        var problem = CatalogProblems.OfStatuses(StatusesWithPoison1Ticking(12), content);
+
+        Assert.Equal("skills.json: skill 'spark': effect.statuses[0].chance must be within 1..100 (was 0).", problem);
+    }
+
+    private static List<StatusDefinition> StatusesWithPoison1Ticking(int amount)
+    {
+        var poison1 = _catalog.Statuses["poison_1"];
+        var retuned = poison1 with { Parts = [poison1.Parts[0] with { Amount = amount }] };
+        return [.. _catalog.Statuses.Values.Select(status => status.Id == retuned.Id ? retuned : status)];
     }
 
     private static Dictionary<string, T> Replaced<T>(IReadOnlyDictionary<string, T> records, string id, T record) =>

@@ -64,3 +64,5 @@ damage or heal (replacing T2's refusal); revive and rest keep a flat power. The 
 - **Note from FX1:** once an item names a tier or a status, every catalog the editor tests build over the test world
   (`SkillFixtures.CatalogWith`, which keeps the test world's items) must hold that record too: the draft's effect and
   status steps run `CatalogReferences.Rebound`, which throws on an item naming an id the catalog lacks.
+- **Note from FX5:** `OfTieredEffects` and `OfStatuses` both check the skills through the private
+  `CatalogProblems.CheckReboundSkills(edited)`: the item check goes there once and covers both pages.

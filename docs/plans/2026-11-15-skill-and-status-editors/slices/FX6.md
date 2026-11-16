@@ -45,3 +45,6 @@ None new (draw and wiring): `StatusCatalogViewModelTests` and `StatusViewModelTe
 - **Note from FX4:** a part's Damage type box binds `DamageTypeChoices` as items and `SelectedDamageTypeChoice` as
   `SelectedItem` ("(none: ignores resistances)" first, `poison_1`'s); a new stat change's Stat box is blank until
   picked. The map's Editor `Statuses` row exists (FX4): the page joins it.
+- **Note from FX5:** `Families` is raised when another status is chosen (an add, a copy and a removal choose one),
+  never while a family is typed, so the editable Family box keeps its text; a family typed on one status is offered
+  once another is chosen. Hand check 3 reads "statuses.json: family 'poison': poison_2's parts differ from poison_1's."

@@ -1,5 +1,5 @@
 # Enemy behavior (editor push, roadmap row 8)
-Status: approved
+Status: approved, in progress
 
 Drafted on 2026-11-15 from roadmap row 8 of [the editor push](../2026-11-15-editor-push/README.md), its design.md
 section 3.7, decisions 679 and 698 there, and the developer's words: "behavior - way to use these skills in combat. I
@@ -100,7 +100,7 @@ One line per slice; each slice's goal, types, tests and hand checks are in its f
 a slice is done and write its deviations in the slice file. Tunables, design and risks: [design.md](design.md).
 
 ### Phase 1: a rule names its target
-- [ ] ADR 0057, enemy rules: triggers, reactions and targets (amends ADR 0034). Write it from decisions 832-848 and
+- [x] ADR 0057, enemy rules: triggers, reactions and targets (amends ADR 0034). Write it from decisions 832-848 and
   855-856 with design.md, section 5's options and costs; the developer delegated approval, so the defaults are marked
   in it and no question is asked.
 - [ ] **EB1. Today's choices recorded; a rule names its target: itself, the lowest or highest HP foe, the lowest HP on

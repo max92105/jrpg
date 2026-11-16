@@ -3,6 +3,9 @@
 Status: accepted
 Date: 2026-11-01
 
+Amended by ADR 0057: an action becomes a rule that may name its target, answer reactions on its next turn, win by
+priority before the draw and be used once per battle.
+
 ## Context
 Every enemy only attacks (`Battle/EnemyTactics`: a random living member, or a taunting one; question 224). Battles need
 enemies that use the party's kind of skills, and a boss whose behavior changes as it is hurt, all written in content.

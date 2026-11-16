@@ -49,3 +49,6 @@ time (a replaced row keeps its swing and its hit frame below the new frames, els
 2. Again, OK this time, Save all: `effect-strips.json` holds `TestSlash.png` at 70 ms. Ctrl+Z, Save all.
 3. Delete `content/art/effects/TestSlash.png`.
 4. Run `.claude/scripts/open-editor-windows.ps1`: no `ERROR` or binding-error line.
+- **Note from AN2:** `ForEffectStrips` goes beside `ForBattleSprites`: the constructor is private, the factories set
+  `IsPaceTyped` or `PaceNote` by `init`; pick its several-GIF note (`ForBattleSprites` says "each keeps its own pace").
+  `GifConversion.PaceNoteOf` already words "the typed 110 ms"; `EffectNoteOf` can follow it.

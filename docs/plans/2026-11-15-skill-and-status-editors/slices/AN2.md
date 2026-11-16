@@ -67,3 +67,6 @@ in Effect strips" (decision 639 kept there). Cancel writes nothing.
 6. Import... into effects `art-src/gifs/FireExplosion.gif`: the pace box greys with "set its pace in Effect strips";
    Cancel.
 7. Run `.claude/scripts/open-editor-windows.ps1`: no `ERROR` or binding-error line.
+- **Done, with deviations:** view model 102 lines, window 86 + 46 XAML, Enemies page 189 (`GifOptionsFor`); tests:
+  view model 218, `ComposedGifTests` 70 (a 0-width or 0-height canvas refused), `GifConversionTests` 65; a typed pace's
+  note drops "frame times differed"; several enemy effect GIFs say "set their pace in Effect strips"; the note wraps.

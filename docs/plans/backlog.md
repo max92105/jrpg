@@ -304,3 +304,8 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   (`Statuses/StatusPartRow.Kinds`) show the enums' C# names (`RestoreHp`, `DamageEachTurn`) where the files say
   `restoreHp`, `damageEachTurn`: one choice type or display converter spelling them as the files do would serve both
   (skill and status editors plan, FX2b and FX6 reviews).
+- `Editor/Battle/EffectStripViewModel` (`LengthText`, `IsListed`, `ToStrip`, `HoldsTheLoadedRecord`,
+  `HitFrameProblem`) still parses its texts with `TypedNumber.Parse` where AN1b's `FrameMilliseconds` and `HitFrame`
+  hold the numbers (skill and status editors plan, AN1b review).
+- `Editor/GifImport/GifConversion.Prepared` divides by a 0 height in `FrameScaler.WidthAt` when a GIF's screen
+  descriptor says 0 x 0: refuse it as `ComposedGif.Read` does since AN2 (AN2 review).

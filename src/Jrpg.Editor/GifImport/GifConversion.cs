@@ -7,9 +7,9 @@ namespace Jrpg.Editor.GifImport;
 
 /// <summary>
 /// One GIF into a strip (ADR 0047): read, made whole, its background cleared when asked, scaled to the chosen height,
-/// and written as a PNG of the GIF's name into a fresh temporary folder. A battle sprite's strip carries its loop; an
-/// attack effect's frames are each padded to a square and play at the effects' own pace, the GIF's time dropped
-/// (decision 639). It runs on an STA thread, as WPF imaging needs.
+/// and written as a PNG of the GIF's name into a fresh temporary folder. A battle sprite's strip carries its loop, at
+/// the pace typed in the dialog or the GIF's most common delay; an attack effect's frames are each padded to a square
+/// and play at the effects' own pace, the GIF's time dropped (decision 639). WPF imaging needs an STA thread.
 /// </summary>
 internal static class GifConversion
 {
@@ -23,9 +23,10 @@ internal static class GifConversion
     {
         var gif = Prepared(gifPath, options);
         var stripPath = Written(gifPath, path => FrameStrip.WritePng(gif.Frames, gif.FrameWidth, options.BattleHeight, path));
-        var frameTime = GifFrameTiming.FrameMilliseconds(gif.Stored);
+        var frameTime = options.FrameMilliseconds ?? GifFrameTiming.FrameMilliseconds(gif.Stored);
         var loop = new TileAnimation { FrameCount = gif.Frames.Count, FrameMilliseconds = frameTime };
-        return new ConvertedGif(stripPath, loop, LoopNoteOf(loop, (gif.FrameWidth, options.BattleHeight), gif.Stored));
+        var size = $"{loop.FrameCount} frames of {gif.FrameWidth} x {options.BattleHeight} px";
+        return new ConvertedGif(stripPath, loop, $"{size}, {PaceNoteOf(options.FrameMilliseconds, gif.Stored)}");
     }
 
     /// <exception cref="InvalidDataException">
@@ -70,12 +71,19 @@ internal static class GifConversion
         }
     }
 
-    private static string LoopNoteOf(TileAnimation loop, (int Width, int Height) frame, IReadOnlyList<GifFrame> stored)
+    // "the typed 110 ms" for a pace the developer set while watching the GIF play (decision 987), whatever its delays;
+    // else "100 ms", and when the delays differed, that this is the most common (decision 632).
+    private static string PaceNoteOf(int? typedFrameMilliseconds, IReadOnlyList<GifFrame> stored)
     {
-        var note = $"{loop.FrameCount} frames of {frame.Width} x {frame.Height} px, {loop.FrameMilliseconds} ms";
+        if (typedFrameMilliseconds is { } typed)
+        {
+            return $"the typed {typed} ms";
+        }
+
+        var frameTime = GifFrameTiming.FrameMilliseconds(stored);
         return GifFrameTiming.AreDelaysEqual(stored)
-            ? note
-            : $"{note}; the GIF's frame times differed, {loop.FrameMilliseconds} ms is the most common";
+            ? $"{frameTime} ms"
+            : $"{frameTime} ms; the GIF's frame times differed, {frameTime} ms is the most common";
     }
 
     // "12 frames, 0.96 s; effects play at 80 ms a frame unless effect-strips.json lists them, the GIF's 60 ms dropped"

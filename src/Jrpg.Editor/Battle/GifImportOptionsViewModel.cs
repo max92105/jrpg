@@ -6,8 +6,9 @@ using Jrpg.Editor.GifImport;
 namespace Jrpg.Editor.Battle;
 
 /// <summary>
-/// The GIF import's dialog as typed (decisions 637, 638): the battle height each frame is scaled to, with a note on
-/// whether that keeps pixel art crisp, and whether the top-left color is a background to clear.
+/// The GIF import's dialog as typed (decisions 637, 638, 987): the battle height each frame is scaled to, with a note
+/// on whether that keeps pixel art crisp, whether the top-left color is a background to clear, and the frame time the
+/// first chosen GIF plays at, typed only where the import keeps it. Built by one factory per place that imports GIFs.
 /// </summary>
 internal sealed partial class GifImportOptionsViewModel : ObservableObject
 {
@@ -15,15 +16,23 @@ internal sealed partial class GifImportOptionsViewModel : ObservableObject
     private const int LowestHeight = 16;
     private const int HighestHeight = 1024;
 
-    private readonly int? _gifHeight;
+    // Data refuses a loop under 1 ms a frame.
+    private const int LowestFrameMilliseconds = 1;
 
-    /// <param name="gifHeight">The first GIF's canvas height, for the note; null when it can't be read.</param>
-    public GifImportOptionsViewModel(int? gifHeight)
+    // The box's pace when the first GIF can't be read, as a GIF's unusable delay plays (decision 632); the import then
+    // refuses that GIF, so this pace only fills the box.
+    private const int UnreadFrameMilliseconds = 100;
+
+    private GifImportOptionsViewModel(ComposedGif? gif)
     {
-        _gifHeight = gifHeight;
+        Gif = gif;
         HeightText = TypedNumber.Text(GifImportOptions.Default.BattleHeight);
         RemovesBackground = GifImportOptions.Default.RemovesBackground;
+        FrameMillisecondsText = TypedNumber.Text(gif?.FrameMilliseconds ?? UnreadFrameMilliseconds);
     }
+
+    /// <summary>The first chosen GIF, which the dialog plays; null when it can't be read.</summary>
+    public ComposedGif? Gif { get; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Problem), nameof(CanApply), nameof(FactorNote))]
@@ -32,8 +41,27 @@ internal sealed partial class GifImportOptionsViewModel : ObservableObject
     [ObservableProperty]
     public partial bool RemovesBackground { get; set; }
 
-    public string? Problem =>
-        TypedHeight() is null ? $"Battle height must be a whole number from {LowestHeight} to {HighestHeight}." : null;
+    /// <summary>Filled with the GIF's most common delay; editable only while <see cref="IsPaceTyped"/>.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(Problem), nameof(CanApply), nameof(FrameMilliseconds))]
+    public partial string FrameMillisecondsText { get; set; }
+
+    /// <summary>Whether the typed pace is the imported loop's: a battle sprite's, one GIF at a time.</summary>
+    public bool IsPaceTyped { get; private init; }
+
+    /// <summary>Why the pace box is greyed; empty while it is typed.</summary>
+    public string PaceNote { get; private init; } = "";
+
+    /// <summary>The pace box as a number from 1, for the preview; null while it isn't one.</summary>
+    public int? FrameMilliseconds =>
+        TypedNumber.Parse(FrameMillisecondsText) is { } frameTime and >= LowestFrameMilliseconds ? frameTime : null;
+
+    public string? Problem => (TypedHeight(), IsPaceTyped, FrameMilliseconds) switch
+    {
+        (null, _, _) => $"Battle height must be a whole number from {LowestHeight} to {HighestHeight}.",
+        (_, true, null) => $"Frame time must be a whole number from {LowestFrameMilliseconds}.",
+        _ => null,
+    };
 
     public bool CanApply => Problem is null;
 
@@ -41,15 +69,32 @@ internal sealed partial class GifImportOptionsViewModel : ObservableObject
     /// "2x the GIF's 64 px: crisp", or "softened" off a whole factor; empty without a height to compare.
     /// </summary>
     public string FactorNote =>
-        _gifHeight is { } source && TypedHeight() is { } height
+        Gif is { Height: var source } && TypedHeight() is { } height
             ? $"{((double)height / source).ToString("0.##", CultureInfo.InvariantCulture)}x the GIF's {source} px: "
                 + (FrameScaler.IsWholeFactor(source, height) ? "crisp" : "softened")
             : "";
 
+    /// <summary>
+    /// Battle sprites: one GIF's loop takes the typed pace; several each keep their own (decision 987).
+    /// </summary>
+    /// <param name="first">The first chosen GIF; null when it can't be read.</param>
+    /// <param name="gifCount">How many GIFs were chosen, at least one.</param>
+    public static GifImportOptionsViewModel ForBattleSprites(ComposedGif? first, int gifCount) =>
+        gifCount == 1 ? new(first) { IsPaceTyped = true } : new(first) { PaceNote = "each keeps its own pace" };
+
+    /// <summary>
+    /// Attack effects from the Enemies page, whose GIF's pace is dropped (decisions 639, 988): the pace box is greyed.
+    /// </summary>
+    /// <param name="first">The first chosen GIF; null when it can't be read.</param>
+    /// <param name="gifCount">How many GIFs were chosen, at least one.</param>
+    public static GifImportOptionsViewModel ForEnemyEffects(ComposedGif? first, int gifCount) =>
+        new(first) { PaceNote = gifCount == 1 ? "set its pace in Effect strips" : "set their pace in Effect strips" };
+
+    /// <summary>The typed pace is carried only while <see cref="IsPaceTyped"/>.</summary>
     /// <exception cref="InvalidOperationException">There is a <see cref="Problem"/>; OK is greyed then.</exception>
     public GifImportOptions ToOptions() =>
-        TypedHeight() is { } height
-            ? new GifImportOptions(height, RemovesBackground)
+        TypedHeight() is { } height && CanApply
+            ? new GifImportOptions(height, RemovesBackground) { FrameMilliseconds = IsPaceTyped ? FrameMilliseconds : null }
             : throw new InvalidOperationException(Problem);
 
     private int? TypedHeight() =>

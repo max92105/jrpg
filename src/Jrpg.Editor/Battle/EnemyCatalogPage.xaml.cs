@@ -1,10 +1,10 @@
 using System.ComponentModel;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Jrpg.Core.Maps;
+using Jrpg.Data.Art;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.GifImport;
 using Jrpg.Editor.Hosting;
@@ -162,7 +162,7 @@ internal sealed partial class EnemyCatalogPage : UserControl
             return;
         }
 
-        if (AskGifOptions(artFolder, dialog.FileNames) is not { } options)
+        if (GifOptionsFor(artFolder, dialog.FileNames) is not { } options)
         {
             return;
         }
@@ -172,32 +172,16 @@ internal sealed partial class EnemyCatalogPage : UserControl
         _enemies.TakeImport(artFolder, result);
     }
 
-    // A GIF asks its height and background first (decisions 637, 638); null when cancelled.
-    private GifImportOptions? AskGifOptions(string artFolder, string[] paths)
+    // A GIF asks its height, background and pace first (decisions 637, 638, 987), the pace typed for a battle sprite,
+    // an effect's dropped (decision 639); null when cancelled. A folder that takes no GIF refuses one at the import.
+    // The arms are ArtImageImport.TakesGifs' folders: a folder added there needs its own arm here, or its GIFs import
+    // without the dialog.
+    private GifImportOptions? GifOptionsFor(string artFolder, string[] paths) => artFolder switch
     {
-        var gif = paths.FirstOrDefault(path => Path.GetExtension(path).Equals(".gif", StringComparison.OrdinalIgnoreCase));
-        if (!ArtImageImport.TakesGifs(artFolder) || gif is null)
-        {
-            return GifImportOptions.Default;
-        }
-
-        var options = new GifImportOptionsViewModel(HeightOf(gif));
-        return GifImportWindow.Ask(HostWindow, options) ? options.ToOptions() : null;
-    }
-
-    // For the dialog's note only: a GIF that can't be read or opened leaves the note empty; the import then names it
-    // among its refusals.
-    private static int? HeightOf(string gifPath)
-    {
-        try
-        {
-            return GifReader.Read(gifPath).Height;
-        }
-        catch (Exception exception) when (exception is InvalidDataException or IOException or UnauthorizedAccessException)
-        {
-            return null;
-        }
-    }
+        ArtFolders.Battlers => GifImportWindow.AskFor(HostWindow, paths, GifImportOptionsViewModel.ForBattleSprites),
+        ArtFolders.Effects => GifImportWindow.AskFor(HostWindow, paths, GifImportOptionsViewModel.ForEnemyEffects),
+        _ => GifImportOptions.Default,
+    };
 
     // The button sits in the chosen enemy's panel, greyed while none is chosen.
     private void OnEditDropTablesClicked(object sender, RoutedEventArgs e) =>

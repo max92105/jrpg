@@ -38,6 +38,21 @@ public sealed class PreviewFramesTests
         StaThread.Run(() => Assert.Empty(PreviewFrames.OfStrip(StripOf([Red, Green], Side), 0)));
     }
 
+    // Two 3 x 2 frames of pixels, one red and one green, as a GIF is composed for the import dialog.
+    [Fact]
+    public void OfPixels_TwoFrames_ImagesOfTheirSize()
+    {
+        StaThread.Run(() =>
+        {
+            uint[][] pixels = [Enumerable.Repeat(Red, 6).ToArray(), Enumerable.Repeat(Green, 6).ToArray()];
+
+            var frames = PreviewFrames.OfPixels(pixels, 3, 2);
+
+            Assert.Equal([Red, Green], frames.Select(FirstPixel));
+            Assert.All(frames, frame => Assert.Equal((3, 2, true), (frame.PixelWidth, frame.PixelHeight, frame.IsFrozen)));
+        });
+    }
+
     // Each color a square frame of the given side, left to right.
     private static BitmapSource StripOf(uint[] colors, int side)
     {

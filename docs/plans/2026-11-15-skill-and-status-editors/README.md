@@ -140,7 +140,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 - [x] **AN1a. The preview's playback rules** (Editor, about 140 lines) → [slices/AN1a.md](slices/AN1a.md)
 - [x] **AN1b. The shared preview control, first in the Effect strips page** (Editor, about 140 lines) →
   [slices/AN1b.md](slices/AN1b.md)
-- [ ] **AN2. The GIF import plays the GIF before it writes, its pace editable for a battle sprite** (Editor, about 220
+- [x] **AN2. The GIF import plays the GIF before it writes, its pace editable for a battle sprite** (Editor, about 220
   lines) → [slices/AN2.md](slices/AN2.md)
 - [ ] **AN4. The Effect strips page imports PNGs and GIFs, an effect GIF's pace becoming its row's** (Editor, about
   200 lines) → [slices/AN4.md](slices/AN4.md)

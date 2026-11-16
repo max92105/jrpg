@@ -119,7 +119,7 @@ slices run; IU5 is optional and IU16 merged into IU15.
 ### Phase 3: the Items page
 - [x] **IU6. One item as the Items page types it: the general fields and the sale line** (Editor, about 220 lines) →
   [slices/IU6.md](slices/IU6.md)
-- [ ] **IU7. The Items list and its undo step: add by category, unique included, duplicate, remove while new** (Editor
+- [x] **IU7. The Items list and its undo step: add by category, unique included, duplicate, remove while new** (Editor
   + Data, about 220 lines) → [slices/IU7.md](slices/IU7.md)
 - [ ] **IU8. Database > Items opens the Items page** (Editor, about 190 lines) → [slices/IU8.md](slices/IU8.md)
 - [ ] **IU9. An undo removing an item a map gives is refused** (Editor, about 120 lines) →

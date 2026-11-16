@@ -12,7 +12,10 @@ namespace Jrpg.Editor.Tests.Items;
 /// </summary>
 internal static class ItemFixtures
 {
-    /// <summary>A heal used from the menu, with its own strip: every general field away from its default.</summary>
+    /// <summary>
+    /// A heal used from the menu: every general field away from its default. It has no strip of its own, which Data
+    /// allows only on a damaging effect (decision 707), so the list's problem line starts empty.
+    /// </summary>
     public static ItemDefinition Tonic { get; } = new()
     {
         Id = "tonic",
@@ -23,7 +26,6 @@ internal static class ItemFixtures
         IsUsableFromMenu = true,
         Effect = new Effect(EffectKind.RestoreHp, 12, Targeting.SingleAlly),
         Price = 30,
-        EffectFile = "TonicStrip.png",
     };
 
     public static ItemDefinition CopperVest { get; } = new()

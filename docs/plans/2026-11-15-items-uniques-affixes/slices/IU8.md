@@ -55,3 +55,6 @@ equipment, a unique or a consumable shows its general fields only.
   `"isUnique": true` in id order; its category shows "Unique" and can't be changed. Ctrl+Z, Save all: it's gone.
 - **Note from IU6:** until IU13, a unique's "Sells for" line is the share of its base price only, not of its piece
   value with the fixed affixes' gold: don't read it as the shop's figure at the hand check.
+- **Note from IU7:** the four Add buttons bind `AddItemCommand` with `CommandParameter="{x:Static items:ItemCategory.X}"`
+  (the toolkit's `RelayCommand<ItemCategory>` throws on a string parameter); the others are `DuplicateCommand` and
+  `RemoveItemCommand`; `Problem` is already raised when `SelectedItem` changes (the chosen item's problem comes first).

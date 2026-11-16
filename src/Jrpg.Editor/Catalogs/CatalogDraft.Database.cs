@@ -1,13 +1,14 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Cinematics;
+using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
 using Jrpg.Core.Trade;
 
 namespace Jrpg.Editor.Catalogs;
 
 /// <summary>
-/// The catalogs the Database windows edit (ADR 0045): the shops, the enemies, the drop tables, the cinematics and the
-/// effect strips, the whole session of each window recorded as one undo step.
+/// The catalogs the Database windows edit (ADR 0045): the shops, the enemies, the drop tables, the cinematics, the
+/// effect strips and the items, the whole session of each window recorded as one undo step.
 /// </summary>
 internal sealed partial class CatalogDraft
 {
@@ -89,6 +90,23 @@ internal sealed partial class CatalogDraft
         }
 
         Do(new CatalogEdit(catalog => catalog with { Enemies = after }, catalog => catalog with { Enemies = before }));
+    }
+
+    /// <summary>
+    /// Replaces the items as one undo step (decision 877); nothing when they are the same by content, a unique's fixed
+    /// affixes in order included. No undo refusal yet: shops and drop tables naming an added item came in later steps,
+    /// undone first, and the refusal for one a map's event gives is decision 883's, still to come.
+    /// </summary>
+    public void SetItems(IReadOnlyList<ItemDefinition> items)
+    {
+        var before = Current.Items;
+        var after = items.ToDictionary(item => item.Id, StringComparer.Ordinal);
+        if (HasSameRecords(before, after, EqualityComparer<ItemDefinition>.Default.Equals))
+        {
+            return;
+        }
+
+        Do(new CatalogEdit(catalog => catalog with { Items = after }, catalog => catalog with { Items = before }));
     }
 
     // A window's session changed nothing when it hands back the same ids and each record the same by content, so an OK

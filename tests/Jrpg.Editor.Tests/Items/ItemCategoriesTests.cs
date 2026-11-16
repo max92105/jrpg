@@ -35,4 +35,15 @@ public sealed class ItemCategoriesTests
 
         Assert.Equal(ItemCategory.Consumable, category);
     }
+
+    // Each Add button's record is read back as the category it names, so the page shows its new item's forms.
+    [Fact]
+    public void StartingRecord_EachCategory_IsOfThatCategory()
+    {
+        var categories = Enum.GetValues<ItemCategory>();
+
+        var readBack = categories.Select(category => ItemCategories.Of(ItemCategories.StartingRecord(category)));
+
+        Assert.Equal(categories, readBack);
+    }
 }

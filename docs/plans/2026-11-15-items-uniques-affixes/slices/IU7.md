@@ -58,3 +58,6 @@ nothing when nothing changed.
 - **Note from IU6:** the list relays `ItemViewModel.Changed` (typed boxes only); `ItemFixtures.Catalog` is the test
   world's items plus the five fixtures, so sort and problem tests pick the fixtures by id; a new item's id is checked
   against no taken id in `ItemViewModel` (as `EnemyViewModel`): a saved id retyped is the list's or Data's problem.
+- **Done, with deviations:** `CatalogProblems.cs` was at 257, so `OfItems` and IU1's `CheckItems` went to a new `.Items`
+  partial; the fixture tonic lost its own strip (Data refuses `effectFile` on a heal, decision 707, so the list started
+  on a problem); six tests added beyond the list (chosen item's problem first, its relay, bounds, greyed Duplicate).

@@ -2,7 +2,6 @@ using Jrpg.Core.Battle;
 using Jrpg.Core.Cinematics;
 using Jrpg.Core.Content;
 using Jrpg.Core.Effects;
-using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Sprites;
@@ -10,9 +9,7 @@ using Jrpg.Core.Statuses;
 using Jrpg.Core.Trade;
 using Jrpg.Data.Battle;
 using Jrpg.Data.Cinematics;
-using Jrpg.Data.Crafting;
 using Jrpg.Data.Effects;
-using Jrpg.Data.Items;
 using Jrpg.Data.Loot;
 using Jrpg.Data.Party;
 using Jrpg.Data.Skills;
@@ -27,7 +24,7 @@ namespace Jrpg.Data.Content;
 /// line says exactly what the save and the game's start would say and no editor rule copies a content rule. The
 /// writer's checks run the same methods, so the two can't drift.
 /// </summary>
-public static class CatalogProblems
+public static partial class CatalogProblems
 {
     /// <summary>
     /// The first problem in the field sprite records (ADR 0043): a record's own rule, or an object or the new game
@@ -201,32 +198,6 @@ public static class CatalogProblems
     /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
     internal static void CheckStatuses(IReadOnlyList<StatusDefinition> statuses) =>
         StatusCatalogValidator.Validate(ContentCatalogLoader.StatusesFile, statuses);
-
-    /// <summary>
-    /// Every check the loader makes that reads <c>items.json</c> (decision 863), in its order: the items' own rules,
-    /// then the Forge's materials in <c>rules.json</c>, the shops' prices, the drop tables' stacks and the new game's
-    /// starting items, each against these items.
-    /// </summary>
-    /// <param name="items">The items as they will be written.</param>
-    /// <param name="content">
-    /// The affix pool the uniques name, and the rules, shops, drop tables and new game that name the items.
-    /// </param>
-    /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
-    internal static void CheckItems(IReadOnlyList<ItemDefinition> items, ContentCatalog content)
-    {
-        ItemCatalogValidator.Validate(ContentCatalogLoader.ItemsFile, items, content.Affixes);
-        var byId = items.ToDictionary(item => item.Id, StringComparer.Ordinal);
-        CraftingRulesValidator.Validate(ContentCatalogLoader.RulesFile, content.Rules.Crafting, byId);
-        // By id, as the files are written, so the first problem named is the one the loader would name.
-        ShopCatalogValidator.Validate(
-            ContentCatalogLoader.ShopsFile, [.. content.Shops.Values.OrderBy(shop => shop.Id, StringComparer.Ordinal)], byId);
-        DropTableCatalogValidator.Validate(
-            ContentCatalogLoader.DropTablesFile,
-            [.. content.DropTables.Values.OrderBy(table => table.Id, StringComparer.Ordinal)],
-            byId);
-        var newGameReferences = new NewGameReferences(content.PartyMembers.Keys.ToHashSet(), byId, content.Maps);
-        NewGameValidator.Validate(ContentCatalogLoader.NewGameFile, content.NewGame, newGameReferences);
-    }
 
     /// <summary>The loader's checks on <c>affixes.json</c>, for the writer and the problem line alike.</summary>
     /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>

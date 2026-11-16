@@ -1,6 +1,8 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Cinematics;
 using Jrpg.Core.Content;
+using Jrpg.Core.Crafting;
+using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
 using Jrpg.Core.Trade;
 using Jrpg.Data.Content;
@@ -133,6 +135,51 @@ public sealed class CatalogProblemsTests
 
         Assert.Equal(
             "cinematics.json: cinematic 'intro': stills[0]: zoom endPercent must be within 100..150 (was 151).", problem);
+    }
+
+    [Fact]
+    public void OfItems_ValidItems_IsNull() => Assert.Null(CatalogProblems.OfItems([.. _catalog.Items.Values], _catalog));
+
+    [Fact]
+    public void OfItems_MaterialStackBelowTheForgesCost_NamesRulesJson()
+    {
+        var problem = OfItemsWithAForgeOfOre(rerollQuantity: 3);
+
+        Assert.Equal("rules.json: crafting.rerollCost[0]: quantity must be within 1..2 (was 3).", problem);
+    }
+
+    // The accepted bound: a cost of a whole stack loads.
+    [Fact]
+    public void OfItems_MaterialStackAtTheForgesCost_IsNull() => Assert.Null(OfItemsWithAForgeOfOre(rerollQuantity: 2));
+
+    // The test world's items and a material of the test's own, stacking to 2, that every Forge list names.
+    private static string? OfItemsWithAForgeOfOre(int rerollQuantity)
+    {
+        var ore = new ItemDefinition
+        {
+            Id = "ore",
+            Name = "Ore",
+            Description = "",
+            IconFile = "Ore.png",
+            MaxStack = 2,
+            IsUsableFromMenu = false,
+            IsMaterial = true,
+        };
+        IReadOnlyList<InventoryEntry> one = [new InventoryEntry("ore", 1)];
+        var crafting = new CraftingRules
+        {
+            Salvage = new Dictionary<Rarity, IReadOnlyList<InventoryEntry>>
+            {
+                [Rarity.Common] = one,
+                [Rarity.Magic] = one,
+                [Rarity.Rare] = one,
+            },
+            UpgradeCosts = new Dictionary<Rarity, IReadOnlyList<InventoryEntry>> { [Rarity.Magic] = one, [Rarity.Rare] = one },
+            RerollCost = [new InventoryEntry("ore", rerollQuantity)],
+        };
+        var content = _catalog with { Rules = _catalog.Rules with { Crafting = crafting } };
+
+        return CatalogProblems.OfItems([.. _catalog.Items.Values, ore], content);
     }
 
     private static CinematicDefinition IntroZoomingTo(int endPercent) => new()

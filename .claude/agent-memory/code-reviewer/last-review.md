@@ -5,18 +5,18 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-skill-and-status-editors, slice AN1b (Editor Animation/FramePreview + PreviewFrames.OfStrip,
-PreviewFramesTests; EffectStripCatalogPage on the shared control; EffectStripViewModel FrameMilliseconds/HitFrame).
-2026-11-16. Round 1. Verdict: Ready to commit.
+Plan 2026-11-15-skill-and-status-editors, slice AN2 (GifImport/ComposedGif, GifImportOptions.FrameMilliseconds,
+GifConversion PaceNoteOf, PreviewFrames.OfPixels, GifImportOptionsViewModel factories, GifImportWindow.AskFor +
+FramePreview, EnemyCatalogPage.GifOptionsFor). 2026-11-16. Round 1. Verdict: Ready to commit.
 
-- Warning (open): PreviewFrames.OfStrip's `frameCount <= 0` guard untested since the deleted
-  PreviewLoop_ImageTallerThanWide_IsNone; a taller-than-wide effects image gives FrameCount 0 and without the guard
-  `% 0` throws. Add OfStrip_NoFrames_IsEmpty.
-- Suggestion (open): FramePreview.OnRendering comment says "once per frame"; WPF can raise Rendering twice with the
-  same RenderingTime, which is why `now > last`; say so.
-- Suggestion (open): EffectStripViewModel LengthText/IsListed/ToStrip/HoldsTheLoadedRecord/HitFrameProblem still
-  parse the texts again; read the new FrameMilliseconds/HitFrame.
-- Checked, no finding: partial-frame strip (width not a multiple of height) shows nothing in the preview, but Data's
-  ArtReferenceCheck.AddPartialFrameStrips refuses such a strip, so not raised.
-- AN1a Suggestions: _elapsed comment and FrameCount summary fixed in code; mid-frame pause test not carried
-  (committed slice, Suggestion only).
+- Warning (open, unprobed): a GIF whose screen descriptor reads 0 wide or high (GifReader takes the stored ushort)
+  composes to empty frames; GifImportWindow.ShowGif's BitmapSource.Create(0, ...) (or BackgroundRemoval frames[0][0])
+  throws in the window's constructor, outside AskFor's catch. Fix: ComposedGif.Read throws InvalidDataException on an
+  empty canvas.
+- Suggestion (open): test ComposedGif.Read on a one-frame GIF (its doc and the slice state it is read).
+- Suggestion (open): GifImportWindow.xaml comment "the box stays the only one" unclear.
+- Suggestion (open): EnemyCatalogPage.GifOptionsFor's switch repeats ArtImageImport.TakesGifs' folder list.
+- Checked, no finding: catch covers composing (GifFrameComposer/GifFrameTiming can't throw past GifReader's checks);
+  other-folder branch equals the old `!TakesGifs || no gif` -> Default.
+- AN1b carried: OfStrip_NoFrames_IsEmpty fixed; FramePreview Rendering comment fixed; EffectStripViewModel re-parsing
+  texts still open (Follow-up, committed slice).

@@ -6,6 +6,7 @@ using Jrpg.Editor.Battle;
 using Jrpg.Editor.Cinematics;
 using Jrpg.Editor.Loot;
 using Jrpg.Editor.Quests;
+using Jrpg.Editor.Skills;
 using Jrpg.Editor.Sprites;
 using Jrpg.Editor.Trade;
 using Jrpg.Editor.Workspaces;
@@ -25,6 +26,7 @@ internal sealed partial class MainWindow
         ["Shops"] = OpenShops,
         ["Drop tables"] = () => _ = EditDropTables(this, ""),
         ["Effect strips"] = OpenEffectStrips,
+        ["Skills"] = OpenSkills,
         ["Cinematics"] = OpenCinematics,
         ["Enemies"] = OpenEnemies,
     };
@@ -150,6 +152,16 @@ internal sealed partial class MainWindow
         var artRoot = _viewModel.ArtRoot;
         OpenInDialog("Effect strips", effectStripEditing.Start, effectStripEditing.Apply, edited => new EffectStripCatalogPage(
             edited, file => SpriteImageFile.LoadFrom(artRoot, ArtFolders.Effects, file), animationTime));
+    }
+
+    private void OpenSkills()
+    {
+        if (_viewModel.SkillEditing is not { } skillEditing)
+        {
+            return;
+        }
+
+        OpenInDialog("Skills", skillEditing.Start, skillEditing.Apply, edited => new SkillCatalogPage(edited));
     }
 
     // The sprite records (decision 569); the page's Import... copies images through the view model, whose import event

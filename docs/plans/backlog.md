@@ -294,3 +294,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   check) (mode bar plan, WD3).
 - `.claude/rules/editor.md`'s dialog line says OK greys "through `CanApply`"; a page in `Workspaces/CatalogDialog`
   greys it on `IEditedCatalog.Problem`: name both at the mode bar plan's retro (WD2, WD3 reviews).
+- `Editor/Cinematics/CinematicCatalogPage`'s Music box shows the previous cinematic's track when the chosen one's
+  track is missing from its folder (WPF keeps a stale display; `MissingNote` names the file): list the missing tracks
+  after the folder's, as the Skills page does since SK4 (skill and status editors plan, SK4 review).

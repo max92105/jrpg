@@ -119,7 +119,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/SK2.md](slices/SK2.md)
 - [x] **SK3. The skill list: Add, Duplicate, Remove, who uses a skill, the strip's pace, `IEditedCatalog`** (Editor,
   about 230 lines) → [slices/SK3.md](slices/SK3.md)
-- [ ] **SK4. Database > Skills...: the page** (Editor + script, about 170 lines) → [slices/SK4.md](slices/SK4.md)
+- [x] **SK4. Database > Skills...: the page** (Editor + script, about 170 lines) → [slices/SK4.md](slices/SK4.md)
 - [ ] **SK5. A skill's costs as resource rows** (Editor, about 200 lines) → [slices/SK5.md](slices/SK5.md)
 - [ ] **SK6. A skill's effect: tier, kind, targeting, hits** (Editor, about 240 lines) → [slices/SK6.md](slices/SK6.md)
 - [ ] **SK7. The statuses a skill grants, with turns and chance** (Editor, about 180 lines) →

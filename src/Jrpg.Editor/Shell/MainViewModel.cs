@@ -17,6 +17,7 @@ using Jrpg.Editor.Maps;
 using Jrpg.Editor.Objects;
 using Jrpg.Editor.Objects.Composing;
 using Jrpg.Editor.Quests;
+using Jrpg.Editor.Skills;
 using Jrpg.Editor.Tiles;
 using Jrpg.Editor.Trade;
 
@@ -99,6 +100,7 @@ internal sealed partial class MainViewModel : ObservableObject
             EnemyEditing = new EnemyEditingViewModel(Content, folder => ArtFolders.ImagesIn(ArtRoot, folder));
             FieldSpriteEditing = CreateFieldSpriteEditing();
             EffectStripEditing = CreateEffectStripEditing();
+            SkillEditing = new SkillEditingViewModel(Content, ReadSkillChoices);
             NpcSpriteChange = new NpcSpriteChange(Content, Placing.Browser);
             if (MapIds.Count > 0)
             {

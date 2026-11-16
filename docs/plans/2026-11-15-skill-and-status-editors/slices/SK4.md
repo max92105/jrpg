@@ -50,3 +50,6 @@ None new (draw and wiring): `SkillCatalogViewModelTests` holds the rules (page r
    line.
 - **Note from SK3:** the shell builds `SkillChoices` (icons, sounds, effects images, `EffectStrips`) for
   `SkillEditingViewModel`; tests build pages over `SkillFixtures.CatalogWithoutUsers` with `SkillFixtures.NoChoices`.
+- **Done, with deviations:** the Id box greys once saved (as Shops); a new `SkillFileChoices` (5 tests) lists each file
+  box's empty entry, the folder's files, then the files the skills name that it lacks (review Warning: a box over a
+  value not listed showed the previous skill's file); Sound gets the empty entry too, a new skill's before one is picked.

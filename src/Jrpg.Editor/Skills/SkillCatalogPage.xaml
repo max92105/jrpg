@@ -1,0 +1,102 @@
+<UserControl x:Class="Jrpg.Editor.Skills.SkillCatalogPage"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:skills="clr-namespace:Jrpg.Editor.Skills">
+  <UserControl.Resources>
+    <Style x:Key="FieldLabel" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+      <Setter Property="Width" Value="90" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+  </UserControl.Resources>
+  <DockPanel>
+    <!-- The draft's skills in id order, the ones added this session after them; only those can be removed. -->
+    <DockPanel DockPanel.Dock="Left" Width="220">
+      <TextBlock DockPanel.Dock="Top" Text="Skills" FontWeight="Bold" />
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
+        <Button Content="Add" Width="50" Command="{Binding AddSkillCommand}" ToolTip="A damage skill on the first damage tier, last in the list" />
+        <Button Content="Duplicate" Width="70" Margin="4,0,0,0" Command="{Binding DuplicateSkillCommand}" ToolTip="A copy of the chosen skill after it, its id to type" />
+        <Button Content="Remove" Width="60" Margin="4,0,0,0" Command="{Binding RemoveSkillCommand}" ToolTip="Only a skill added this session; classes and enemies name a saved one" />
+      </StackPanel>
+      <ListBox ItemsSource="{Binding Skills}" SelectedItem="{Binding SelectedSkill}" Margin="0,4,0,0">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Text="{Binding Id}" />
+              <TextBlock Text="{Binding Name}" Foreground="{StaticResource MutedTextBrush}" Margin="6,0,0,0" />
+            </StackPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+
+    <!-- The chosen skill: its texts and files; its costs, effect and statuses keep their file values until their sections
+         exist. Who uses it is read-only: the classes and enemies files name it. -->
+    <ScrollViewer Margin="12,0,0,0" VerticalScrollBarVisibility="Auto">
+      <StackPanel DataContext="{Binding SelectedSkill}" Style="{StaticResource EnabledWhenChosen}">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="Id" Style="{StaticResource FieldLabel}" />
+          <TextBox Width="240"
+                   Text="{Binding IdText, UpdateSourceTrigger=PropertyChanged}"
+                   IsEnabled="{Binding IsNew}"
+                   ToolTip="Lowercase letters, digits and _; fixed once saved, since classes and enemies name it" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Name" Style="{StaticResource FieldLabel}" />
+          <TextBox Width="240" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Description" Style="{StaticResource FieldLabel}" VerticalAlignment="Top" />
+          <TextBox Width="400"
+                   Height="40"
+                   TextWrapping="Wrap"
+                   VerticalScrollBarVisibility="Auto"
+                   Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="Shown while choosing the skill; it may be empty" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Icon" Style="{StaticResource FieldLabel}" />
+          <ComboBox Width="240"
+                    ItemsSource="{Binding DataContext.Choices.Icons, RelativeSource={RelativeSource AncestorType=skills:SkillCatalogPage}}"
+                    SelectedItem="{Binding IconFile}"
+                    ToolTip="An image in the icons folder; the empty entry for none" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Sound" Style="{StaticResource FieldLabel}" />
+          <ComboBox Width="240"
+                    ItemsSource="{Binding DataContext.Choices.Sounds, RelativeSource={RelativeSource AncestorType=skills:SkillCatalogPage}}"
+                    SelectedItem="{Binding SoundFile}"
+                    ToolTip="A sound in the audio effects folder, played as its action starts; empty only until a new skill gets one" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Strip" Style="{StaticResource FieldLabel}" />
+          <ComboBox Width="240"
+                    ItemsSource="{Binding DataContext.Choices.EffectImages, RelativeSource={RelativeSource AncestorType=skills:SkillCatalogPage}}"
+                    SelectedItem="{Binding EffectFile}"
+                    ToolTip="The effects strip its action plays instead of the actor's attack strip">
+            <ComboBox.ItemTemplate>
+              <DataTemplate>
+                <TextBlock x:Name="File" Text="{Binding}" />
+                <DataTemplate.Triggers>
+                  <DataTrigger Binding="{Binding}" Value="">
+                    <Setter TargetName="File" Property="Text" Value="(the actor's attack strip)" />
+                  </DataTrigger>
+                </DataTemplate.Triggers>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+        </StackPanel>
+        <TextBlock Text="{Binding DataContext.StripPaceText, RelativeSource={RelativeSource AncestorType=skills:SkillCatalogPage}}"
+                   Foreground="{StaticResource MutedTextBrush}"
+                   Margin="90,2,0,0" />
+        <CheckBox Content="Quick" Margin="90,6,0,0" IsChecked="{Binding IsQuick}" ToolTip="Keeps the turn; needs a cost" />
+        <TextBlock Text="{Binding DataContext.LearnedByText, RelativeSource={RelativeSource AncestorType=skills:SkillCatalogPage}}"
+                   TextWrapping="Wrap"
+                   Margin="0,12,0,0" />
+        <TextBlock Text="{Binding DataContext.UsedByText, RelativeSource={RelativeSource AncestorType=skills:SkillCatalogPage}}"
+                   TextWrapping="Wrap"
+                   Margin="0,4,0,0" />
+      </StackPanel>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

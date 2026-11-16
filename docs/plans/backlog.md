@@ -297,6 +297,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Editor/Cinematics/CinematicCatalogPage`'s Music box shows the previous cinematic's track when the chosen one's
   track is missing from its folder (WPF keeps a stale display; `MissingNote` names the file): list the missing tracks
   after the folder's, as the Skills page does since SK4 (skill and status editors plan, SK4 review).
-- `X.Insert(SelectedX is null ? X.Count : X.IndexOf(SelectedX) + 1, row)`, "insert after the chosen row", is written in
-  seven places (Cinematics, Events, Loot, Quests, Trade, twice in `Skills/SkillCosts`): one
-  `Events/ListOrder.InsertAfter` would replace them (skill and status editors plan, SK5 review).
+- `X.Insert(SelectedX is null ? X.Count : X.IndexOf(SelectedX) + 1, row)`, "insert after the chosen row": since
+  SK7 `Events/ListOrder.InsertAfter` does it (the Skills page's costs and grants); five copies remain to replace with it
+  (Cinematics, Events, Loot, Quests, Trade) (skill and status editors plan, SK5 review).

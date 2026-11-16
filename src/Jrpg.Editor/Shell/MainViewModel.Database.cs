@@ -78,7 +78,9 @@ internal sealed partial class MainViewModel
             SkillFileChoices.Of(ArtFolders.ImagesIn(ArtRoot, ArtFolders.Effects), skills.Select(skill => skill.EffectFile ?? "")),
             current.EffectStrips,
             ResourceChoice.AllIn(current),
-            TierChoice.AllIn(current));
+            TierChoice.AllIn(current),
+            StatusChoice.AllIn(current),
+            current.Statuses);
     }
 
     // An image the folder holds but can't be read is left out, as the Character sprites page's: its size is unknown.

@@ -21,9 +21,6 @@ internal static class SkillFixtures
     public static ContentCatalog TestWorld { get; } =
         ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
-    /// <summary>A Skills page with nothing in its boxes' folders and no strip record.</summary>
-    public static SkillChoices NoChoices { get; } = new([], [], [], new Dictionary<string, EffectStripDefinition>(), [], []);
-
     public static TieredEffect Fire1 { get; } = new("fire_1", EffectKind.Damage, 3) { DamageType = DamageType.Fire };
 
     public static StatusDefinition Poison1 { get; } = new()
@@ -34,6 +31,20 @@ internal static class SkillFixtures
         IsHarmful = true,
         Parts = [new StatusPart(StatusPartKind.DamageEachTurn, 4)],
     };
+
+    /// <summary>
+    /// A Skills page whose only offer is the poison_1 status, which Bolt grants: nothing in its boxes' folders, no
+    /// strip record, resource or tier.
+    /// </summary>
+    public static SkillChoices PoisonOnlyChoices { get; } = new(
+        [],
+        [],
+        [],
+        new Dictionary<string, EffectStripDefinition>(),
+        [],
+        [],
+        [new StatusChoice(Poison1.Id, "poison_1: Poison")],
+        new Dictionary<string, StatusDefinition> { [Poison1.Id] = Poison1 });
 
     public static SkillDefinition Bolt { get; } = new()
     {

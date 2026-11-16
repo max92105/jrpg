@@ -104,7 +104,8 @@ internal sealed partial class SkillCosts : ObservableObject
     /// number (was 'x')."; null when every row can.
     /// </summary>
     public string? Problem =>
-        FirstProblem("Changes", Changes, row => row.Problem) ?? FirstProblem("Needs", Needs, row => row.Problem);
+        SectionRowProblem.FirstOf("Changes", Changes, row => row.Problem)
+        ?? SectionRowProblem.FirstOf("Needs", Needs, row => row.Problem);
 
     /// <exception cref="InvalidOperationException">A change row has a problem.</exception>
     public IReadOnlyList<ResourceChange> ToChanges() => [.. Changes.Select(row => row.ToChange())];
@@ -118,18 +119,11 @@ internal sealed partial class SkillCosts : ObservableObject
     private static string JoinPresent(string separator, params string[] parts) =>
         string.Join(separator, parts.Where(part => part.Length > 0));
 
-    private static string? FirstProblem<T>(string list, ObservableCollection<T> rows, Func<T, string?> problemOf)
-    {
-        var index = rows.ToList().FindIndex(row => problemOf(row) is not null);
-        return index < 0 ? null : $"{list} row {index + 1}: {problemOf(rows[index])}";
-    }
-
-    // After the chosen row, or last when none is chosen.
     [RelayCommand]
     private void AddChange()
     {
         var row = new ResourceChangeRow(_firstResourceId, TypedNumber.Text(NewChangeAmount));
-        Changes.Insert(SelectedChange is null ? Changes.Count : Changes.IndexOf(SelectedChange) + 1, row);
+        ListOrder.InsertAfter(Changes, row, SelectedChange);
         SelectedChange = row;
     }
 
@@ -142,7 +136,7 @@ internal sealed partial class SkillCosts : ObservableObject
     private void AddNeed()
     {
         var row = new ResourceNeedRow(_firstResourceId, TypedNumber.Text(NewNeedAtLeast));
-        Needs.Insert(SelectedNeed is null ? Needs.Count : Needs.IndexOf(SelectedNeed) + 1, row);
+        ListOrder.InsertAfter(Needs, row, SelectedNeed);
         SelectedNeed = row;
     }
 

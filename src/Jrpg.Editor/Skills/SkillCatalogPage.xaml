@@ -8,9 +8,10 @@
       <Setter Property="Width" Value="90" />
       <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
-    <!-- A click into a cost row's box chooses that row, so Add and Remove act on the row being typed in. -->
-    <Style x:Key="CostRow" TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
-      <EventSetter Event="PreviewGotKeyboardFocus" Handler="OnCostRowFocused" />
+    <!-- A click into a cost or grant row's box chooses that row, so Add, Remove and the moves act on the row being typed
+         in. -->
+    <Style x:Key="TypedRow" TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+      <EventSetter Event="PreviewGotKeyboardFocus" Handler="OnTypedRowFocused" />
     </Style>
   </UserControl.Resources>
   <DockPanel>
@@ -34,8 +35,8 @@
       </ListBox>
     </DockPanel>
 
-    <!-- The chosen skill: its texts, files, costs and effect; the statuses its effect grants keep their file values until
-         their section exists. Who uses it is read-only: the classes and enemies files name it. -->
+    <!-- The chosen skill: its texts, files, costs, effect and the statuses it grants. Who uses it is read-only: the
+         classes and enemies files name it. -->
     <ScrollViewer Margin="12,0,0,0" VerticalScrollBarVisibility="Auto">
       <StackPanel DataContext="{Binding SelectedSkill}" Style="{StaticResource EnabledWhenChosen}">
         <StackPanel Orientation="Horizontal">
@@ -102,7 +103,7 @@
           <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
             <TextBlock Text="Changes" Style="{StaticResource FieldLabel}" VerticalAlignment="Top" />
             <ListBox Width="320" MinHeight="24" ItemsSource="{Binding Changes}" SelectedItem="{Binding SelectedChange}"
-                     ItemContainerStyle="{StaticResource CostRow}">
+                     ItemContainerStyle="{StaticResource TypedRow}">
               <ListBox.ItemTemplate>
                 <DataTemplate>
                   <StackPanel Orientation="Horizontal">
@@ -127,7 +128,7 @@
           <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
             <TextBlock Text="Needs" Style="{StaticResource FieldLabel}" VerticalAlignment="Top" />
             <ListBox Width="320" MinHeight="24" ItemsSource="{Binding Needs}" SelectedItem="{Binding SelectedNeed}"
-                     ItemContainerStyle="{StaticResource CostRow}">
+                     ItemContainerStyle="{StaticResource TypedRow}">
               <ListBox.ItemTemplate>
                 <DataTemplate>
                   <StackPanel Orientation="Horizontal">
@@ -197,6 +198,42 @@
             <TextBox Width="60"
                      Text="{Binding HitsText, UpdateSourceTrigger=PropertyChanged}"
                      ToolTip="Times it lands on each target; above 1 only for damage" />
+          </StackPanel>
+        </StackPanel>
+        <!-- The statuses the effect grants, in the order they land: each with its turns and its chance before resistance. -->
+        <StackPanel DataContext="{Binding Grants}">
+          <TextBlock Text="Statuses" FontWeight="Bold" Margin="0,12,0,0" />
+          <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+            <ListBox Width="410" MinHeight="24" ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}"
+                     ItemContainerStyle="{StaticResource TypedRow}">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal">
+                    <ComboBox Width="220"
+                              ItemsSource="{Binding DataContext.Choices.Statuses, RelativeSource={RelativeSource AncestorType=skills:SkillCatalogPage}}"
+                              DisplayMemberPath="Line"
+                              SelectedValuePath="Id"
+                              SelectedValue="{Binding StatusId}" />
+                    <TextBox Width="40"
+                             Margin="4,0,0,0"
+                             Text="{Binding TurnsText, UpdateSourceTrigger=PropertyChanged}"
+                             ToolTip="How many of the holder's turns it lasts, at least 1" />
+                    <TextBlock Text="turns" Margin="4,0,0,0" VerticalAlignment="Center" />
+                    <TextBox Width="40"
+                             Margin="8,0,0,0"
+                             Text="{Binding ChanceText, UpdateSourceTrigger=PropertyChanged}"
+                             ToolTip="The percent it lands with before Intelligence and resistance, 1 to 100" />
+                    <TextBlock Text="%" Margin="4,0,0,0" VerticalAlignment="Center" />
+                  </StackPanel>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+            <StackPanel Margin="4,0,0,0">
+              <Button Content="Add" Width="60" Command="{Binding AddRowCommand}" ToolTip="The first status for 1 turn at 100 %, after the chosen row" />
+              <Button Content="Remove" Width="60" Margin="0,4,0,0" Command="{Binding RemoveRowCommand}" />
+              <Button Content="Up" Width="60" Margin="0,4,0,0" Command="{Binding MoveUpCommand}" />
+              <Button Content="Down" Width="60" Margin="0,4,0,0" Command="{Binding MoveDownCommand}" />
+            </StackPanel>
           </StackPanel>
         </StackPanel>
         <TextBlock Text="{Binding DataContext.LearnedByText, RelativeSource={RelativeSource AncestorType=skills:SkillCatalogPage}}"

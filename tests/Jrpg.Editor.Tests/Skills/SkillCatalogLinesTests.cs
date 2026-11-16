@@ -12,7 +12,7 @@ public sealed class SkillCatalogLinesTests
     public void StripPaceText_ListedStrip_ReadsItsPaceAndHit()
     {
         var pace = new EffectStripDefinition { File = "BoltStrip.png", FrameMilliseconds = 60, HitFrame = 2 };
-        var choices = SkillFixtures.NoChoices with { StripPaces = ById(pace.File, pace) };
+        var choices = SkillFixtures.PoisonOnlyChoices with { StripPaces = ById(pace.File, pace) };
 
         var catalog = new SkillCatalogViewModel(Catalog(), choices);
 
@@ -22,7 +22,7 @@ public sealed class SkillCatalogLinesTests
     [Fact]
     public void StripPaceText_UnlistedStrip_SaysUnlisted()
     {
-        var catalog = new SkillCatalogViewModel(Catalog(), SkillFixtures.NoChoices);
+        var catalog = new SkillCatalogViewModel(Catalog(), SkillFixtures.PoisonOnlyChoices);
 
         Assert.Equal("80 ms, hit on frame 1, unlisted (Database > Effect strips)", catalog.StripPaceText);
     }
@@ -30,7 +30,7 @@ public sealed class SkillCatalogLinesTests
     [Fact]
     public void StripPaceText_NoStrip_IsEmpty()
     {
-        var catalog = new SkillCatalogViewModel(Catalog(), SkillFixtures.NoChoices);
+        var catalog = new SkillCatalogViewModel(Catalog(), SkillFixtures.PoisonOnlyChoices);
 
         catalog.SelectedSkill!.EffectFile = " ";
 
@@ -40,7 +40,7 @@ public sealed class SkillCatalogLinesTests
     [Fact]
     public void StripPaceText_StripTyped_IsRaised()
     {
-        var catalog = new SkillCatalogViewModel(Catalog(), SkillFixtures.NoChoices);
+        var catalog = new SkillCatalogViewModel(Catalog(), SkillFixtures.PoisonOnlyChoices);
         var notified = new List<string?>();
         catalog.PropertyChanged += (_, e) => notified.Add(e.PropertyName);
 
@@ -52,7 +52,7 @@ public sealed class SkillCatalogLinesTests
     [Fact]
     public void SelectedSkill_Chosen_RaisesItsLines()
     {
-        var catalog = new SkillCatalogViewModel(Catalog(), SkillFixtures.NoChoices);
+        var catalog = new SkillCatalogViewModel(Catalog(), SkillFixtures.PoisonOnlyChoices);
         var notified = new List<string?>();
         catalog.PropertyChanged += (_, e) => notified.Add(e.PropertyName);
 
@@ -68,7 +68,9 @@ public sealed class SkillCatalogLinesTests
     {
         var mage = SkillFixtures.TestWorld.Classes["mage"] with { Name = "Mage", SkillIds = ["bolt"] };
 
-        var catalog = new SkillCatalogViewModel(Catalog() with { Classes = ById(mage.Id, mage) }, SkillFixtures.NoChoices);
+        var catalog = new SkillCatalogViewModel(
+            Catalog() with { Classes = ById(mage.Id, mage) },
+            SkillFixtures.PoisonOnlyChoices);
 
         Assert.Equal("Learned by: Mage", catalog.LearnedByText);
     }
@@ -76,7 +78,7 @@ public sealed class SkillCatalogLinesTests
     [Fact]
     public void LearnedByText_NewSkill_IsEmpty()
     {
-        var catalog = new SkillCatalogViewModel(Catalog(), SkillFixtures.NoChoices);
+        var catalog = new SkillCatalogViewModel(Catalog(), SkillFixtures.PoisonOnlyChoices);
 
         catalog.AddSkillCommand.Execute(null);
 
@@ -88,7 +90,9 @@ public sealed class SkillCatalogLinesTests
     {
         var chief = EnemyNaming("bolt");
 
-        var catalog = new SkillCatalogViewModel(Catalog() with { Enemies = ById(chief.Id, chief) }, SkillFixtures.NoChoices);
+        var catalog = new SkillCatalogViewModel(
+            Catalog() with { Enemies = ById(chief.Id, chief) },
+            SkillFixtures.PoisonOnlyChoices);
 
         Assert.Equal("Used by: Goblin Chief", catalog.UsedByText);
     }
@@ -98,7 +102,9 @@ public sealed class SkillCatalogLinesTests
     public void UsedByText_NewSkillTypedAsAnEnemysSkill_IsEmpty()
     {
         var chief = EnemyNaming("spark");
-        var catalog = new SkillCatalogViewModel(Catalog() with { Enemies = ById(chief.Id, chief) }, SkillFixtures.NoChoices);
+        var catalog = new SkillCatalogViewModel(
+            Catalog() with { Enemies = ById(chief.Id, chief) },
+            SkillFixtures.PoisonOnlyChoices);
 
         catalog.AddSkillCommand.Execute(null);
         catalog.SelectedSkill!.IdText = "spark";

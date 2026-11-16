@@ -2,7 +2,9 @@ using System.Collections.ObjectModel;
 
 namespace Jrpg.Editor.Events;
 
-/// <summary>Reordering and removing in the event dialog's lists, as their Up, Down and Remove buttons do.</summary>
+/// <summary>
+/// Adding, reordering and removing in the editor's lists, as their Add, Up, Down and Remove buttons do.
+/// </summary>
 internal static class ListOrder
 {
     /// <summary>Moves an item up (negative) or down; it stays put at either end.</summary>
@@ -15,6 +17,11 @@ internal static class ListOrder
             items.Move(from, to);
         }
     }
+
+    /// <summary>Puts an item right after the chosen one, or last when none is chosen.</summary>
+    public static void InsertAfter<T>(ObservableCollection<T> items, T item, T? chosen)
+        where T : class =>
+        items.Insert(chosen is null ? items.Count : items.IndexOf(chosen) + 1, item);
 
     /// <summary>Removes an item.</summary>
     /// <returns>The item to select next: the one that took its place, else the one before, or null when none is left.</returns>

@@ -61,7 +61,7 @@ public sealed class SkillCatalogViewModelTests
     public void AddSkill_TierBoxEmpty_StartsAFlatDamage()
     {
         var content = SkillFixtures.CatalogWithoutUsers([], [SkillFixtures.Fire1]);
-        var catalog = new SkillCatalogViewModel(content, SkillFixtures.NoChoices);
+        var catalog = new SkillCatalogViewModel(content, SkillFixtures.PoisonOnlyChoices);
 
         catalog.AddSkillCommand.Execute(null);
         catalog.SelectedSkill!.IdText = "spark";
@@ -161,7 +161,7 @@ public sealed class SkillCatalogViewModelTests
             Classes = new Dictionary<string, ClassDefinition> { ["mage"] = mage },
         };
 
-        var catalog = new SkillCatalogViewModel(content, SkillFixtures.NoChoices);
+        var catalog = new SkillCatalogViewModel(content, SkillFixtures.PoisonOnlyChoices);
 
         Assert.Equal(
             "classes.json: class 'mage': skillIds lists 'bolt', which uses 'stamina', a resource mage doesn't have.",
@@ -202,7 +202,7 @@ public sealed class SkillCatalogViewModelTests
     {
         var resources = new ResourceChoice[] { new("clarity", "Clarity (mage)"), new("mana", "Mana (mage)") };
         var content = SkillFixtures.CatalogWithoutUsers([SkillFixtures.Bolt], [SkillFixtures.Fire1]);
-        var catalog = new SkillCatalogViewModel(content, SkillFixtures.NoChoices with { Resources = resources });
+        var catalog = new SkillCatalogViewModel(content, SkillFixtures.PoisonOnlyChoices with { Resources = resources });
         catalog.AddSkillCommand.Execute(null);
 
         catalog.SelectedSkill!.Costs.AddChangeCommand.Execute(null);
@@ -273,5 +273,5 @@ public sealed class SkillCatalogViewModelTests
 
     // The page's Tier box over the content's records, which Add starts from.
     private static SkillCatalogViewModel WithTheTierBox(ContentCatalog content) =>
-        new(content, SkillFixtures.NoChoices with { Tiers = TierChoice.AllIn(content) });
+        new(content, SkillFixtures.PoisonOnlyChoices with { Tiers = TierChoice.AllIn(content) });
 }

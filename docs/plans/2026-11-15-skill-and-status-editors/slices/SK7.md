@@ -51,3 +51,6 @@ needing one) show as its message. From this slice the page edits every field of 
    run the game and use Shield Bash: the goblin burns. Ctrl+Z, Save all.
 3. Type 0 in a chance: Data's "chance must be within 1..100" line, OK greys.
 4. Run `.claude/scripts/open-editor-windows.ps1`: no `ERROR` or binding-error line.
+- **Done, with deviations:** code 219 new lines (`SkillGrants` 114), +68 changed, XAML +44; tests 381 new, +127 changed.
+  `SkillGrants` keeps the draft's records, so `ToGrants()` takes none; taken ids an init property (4-parameter cap); no
+  "no status picked" problem (Add greys); `ListOrder.InsertAfter` and `SectionRowProblem` extracted; a sibling test file.

@@ -5,14 +5,14 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-mode-bar, slice WD6 (Battle/EffectStripCatalogPage in CatalogDialog via OpenInDialog; RenderTick on
-Loaded/Unloaded; EffectStripCatalogViewModel implements IEditedCatalog, CanApply removed; HasEffectStripEditing
-removed). 2026-11-16. Round 1. Verdict: Ready to commit. No Critical, no Warning.
+Plan 2026-11-15-mode-bar, slice WD7 (Cinematics/CinematicCatalogPage in CatalogDialog via OpenInDialog; Closed's
+StopTheClock moved to Unloaded; Play still starts the RenderTick; CinematicCatalogViewModel implements IEditedCatalog,
+CanApply removed; HasCinematicEditing removed). 2026-11-16. Round 1. Verdict: Ready to commit. No Critical, no Warning.
 
-- Suggestion, open: the Loaded/Unloaded RenderTick wiring and its comment are now identical in EnemyCatalogPage.xaml.cs
-  and EffectStripCatalogPage.xaml.cs; WD7 (Cinematics) would make a third copy: give RenderTick a method tying it to
-  an element's Loaded/Unloaded before then.
-- Fixed (from WD5): EnemyCatalogPage.xaml.cs comment on Start after Unloaded reworded.
-- Fixed (from WD5): art-src/README.md now says "the Enemies page's Import...".
-- Checked: no EffectStripCatalogWindow / HasEffectStripEditing / CanApply on the effect strips left in src, tests, map,
-  rules, smoke script; CatalogDialog greys OK on Problem and shows the problem line; Choose falls back to SelectedStrip.
+- Follow-up, open: in stage 3 (a page hidden and shown again), Unloaded stops the clock but leaves Preview.IsPlaying
+  true, so the page comes back frozen mid-play until Stop; Unloaded could also stop the preview then.
+- Declined/not applicable (from WD6): the Loaded/Unloaded RenderTick helper; WD7 starts the tick on Play, so no third
+  copy was made.
+- Checked: Unloaded after close only lets a frame or two Advance a discarded preview (silent, no media player:
+  CinematicPreview plays no audio); OnPreviewChanged starts the tick only while IsVisible, so Apply after close can't
+  restart it; no CinematicCatalogWindow / HasCinematicEditing / "Cinematics window" left in src, tests, map, scripts.

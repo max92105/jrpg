@@ -5,9 +5,12 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-skill-and-status-editors, slice FX4 (Editor/Statuses/StatusPartRow, StatusViewModel;
-SectionRowProblem moved Skills/ -> Catalogs/; notes in FX5, FX6). 2026-11-16. Round 1. Verdict: Ready to commit.
+Plan 2026-11-15-skill-and-status-editors, slice FX5 (Data CatalogProblems.OfStatuses + private CheckReboundSkills;
+CatalogDraft.SetStatuses; Editor/Statuses StatusCatalogViewModel, StatusEditingViewModel, StatusViewModel.FamilyKey).
+2026-11-16. Round 1. Verdict: Ready to commit.
 
-- Warning (open): StatusPartRow.DamageTypes offers no "none" entry, so a typed tick can't go back to typeless (decision
-  803, poison_1); asked to rule: fix in the row (a choice record with a none entry first, TierChoice-style), not FX6.
-- FX2b carried Suggestion (open, developer's call): the Effects page prints enum names (RestoreHp) not the file's word.
+- FX4 Warning (fixed): StatusPartRow damage type now has a "none" entry (DamageTypeChoice).
+- Suggestion (open): no test pins that typing a family does NOT raise Families (the FX6 combo contract).
+- Suggestion (open): OfStatuses' `content` param doc omits the items the rebinding reads.
+- FX2b carried Follow-up (open, developer's call): Effects page Kind box lists EffectKind enum values (RestoreHp),
+  not the file's word; not in backlog.

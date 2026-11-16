@@ -12,10 +12,10 @@ using Jrpg.Editor.Hosting;
 namespace Jrpg.Editor.Battle;
 
 /// <summary>
-/// The Enemies page (ADR 0045): enemies on the left, the chosen one's Stats and Art tabs on the right. Its host shows
-/// the problem line and keeps or drops the session. The art tab's marks and battle sprite preview follow the chosen
-/// enemy, its pictures and the folders; an animated sprite's loop plays on the editor's animation clock, one frame of
-/// the strip at a time, while the page is shown.
+/// The Enemies page (ADR 0045): enemies on the left, the chosen one's Stats, Art and Tactics tabs on the right. Its
+/// host shows the problem line and keeps or drops the session. The art tab's marks and battle sprite preview follow the
+/// chosen enemy, its pictures and the folders; an animated sprite's loop plays on the editor's animation clock, one
+/// frame of the strip at a time, while the page is shown.
 /// </summary>
 internal sealed partial class EnemyCatalogPage : UserControl
 {

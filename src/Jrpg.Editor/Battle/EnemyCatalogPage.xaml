@@ -26,7 +26,7 @@
       <ListBox ItemsSource="{Binding Enemies}" SelectedItem="{Binding SelectedEnemy}" DisplayMemberPath="Label" Margin="0,4,0,0" />
     </DockPanel>
 
-    <!-- The chosen enemy in two tabs: its numbers and rewards, then its pictures. -->
+    <!-- The chosen enemy in three tabs: its numbers and rewards, its pictures, then its rules. -->
     <DockPanel Margin="12,0,0,0" DataContext="{Binding SelectedEnemy}" Style="{StaticResource EnabledWhenChosen}">
       <TabControl>
         <TabItem Header="Stats">
@@ -190,6 +190,10 @@
               <TextBlock x:Name="BattlerSizeText" Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0" />
             </StackPanel>
           </DockPanel>
+        </TabItem>
+
+        <TabItem Header="Tactics">
+          <battle:EnemyTacticsView DataContext="{Binding Tactics}" />
         </TabItem>
       </TabControl>
     </DockPanel>

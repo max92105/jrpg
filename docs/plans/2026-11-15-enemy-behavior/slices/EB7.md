@@ -60,3 +60,5 @@ at its capture.
    was narrowed.
 - **Note from EB6:** the Database menu's Enemies... tooltip (`Shell/DatabaseMenu.xaml`) still says "tactics and phases
   stay in enemies.json": reword it with the tab.
+- **Done:** as planned; the page's `FieldLabel` and `NumberBox` are reached as `DynamicResource` (the tab loads apart
+  from the page, as `Shell/StatusBand` does), and the number box is collapsed while no rule is chosen.

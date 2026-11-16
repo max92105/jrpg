@@ -14,5 +14,5 @@
   <MenuItem Header="Effects..." Tag="Effects" ToolTip="effects.json: fire_1, heal_2...; an image's pace is Effect strips" />
   <MenuItem Header="Statuses..." Tag="Statuses" ToolTip="Poison, Stun, Guard...: each status's parts, family and timing; skills grant them with turns and a chance." />
   <MenuItem Header="Cinematics..." Tag="Cinematics" ToolTip="Each cinematic's stills in order, their seconds, subtitles, voices and zoom, and its music." />
-  <MenuItem Header="Enemies..." Tag="Enemies" ToolTip="Each enemy's numbers, resistances, rewards and pictures; tactics and phases stay in enemies.json, encounters in encounters.json." />
+  <MenuItem Header="Enemies..." Tag="Enemies" ToolTip="Each enemy's numbers, resistances, rewards, pictures, and its rules and phases on the Tactics tab; encounters stay in encounters.json." />
 </MenuItem>

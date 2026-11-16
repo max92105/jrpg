@@ -1,0 +1,112 @@
+<UserControl x:Class="Jrpg.Editor.Battle.EnemyTacticsView"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:battle="clr-namespace:Jrpg.Editor.Battle">
+  <UserControl.Resources>
+    <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
+  </UserControl.Resources>
+  <!-- The FieldLabel and NumberBox styles are the Enemies page's, found up the tree once the tab is shown. -->
+  <Grid Margin="8">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="180" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <!-- The lists: from the start, then each phase; the chosen phase's threshold and the skills the rules name. -->
+    <DockPanel Grid.Column="0">
+      <TextBlock DockPanel.Dock="Top" Text="Lists" FontWeight="Bold" />
+      <StackPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
+        <StackPanel Orientation="Horizontal" IsEnabled="{Binding SelectedList.IsPhase, FallbackValue=False}">
+          <TextBlock Text="Threshold" Width="70" VerticalAlignment="Center" />
+          <TextBox Width="50"
+                   Text="{Binding SelectedList.ThresholdText, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="The phase starts once the enemy's HP is below this percent of its most" />
+          <TextBlock Text="%" Margin="4,0,0,0" VerticalAlignment="Center" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+          <Button Content="Add phase"
+                  Width="80"
+                  Command="{Binding AddPhaseCommand}"
+                  ToolTip="A phase after the last, at half its threshold, with one attack rule" />
+          <Button Content="Remove phase"
+                  Width="92"
+                  Margin="4,0,0,0"
+                  Command="{Binding RemovePhaseCommand}"
+                  ToolTip="The chosen phase and its rules; the list from the start stays" />
+        </StackPanel>
+        <TextBlock Text="{Binding SkillsUsedLine}"
+                   Foreground="{StaticResource MutedTextBrush}"
+                   TextWrapping="Wrap"
+                   Margin="0,8,0,0"
+                   ToolTip="The skills the rules name, which are the enemy's skills" />
+      </StackPanel>
+      <ListBox ItemsSource="{Binding Lists}"
+               SelectedItem="{Binding SelectedList}"
+               DisplayMemberPath="Label"
+               Margin="0,4,0,0" />
+    </DockPanel>
+
+    <!-- The chosen list's rules as numbered sentences, Data's tactics[i], then the chosen rule's boxes. -->
+    <DockPanel Grid.Column="1" Margin="12,0,0,0">
+      <TextBlock DockPanel.Dock="Top" Text="Rules" FontWeight="Bold" />
+      <StackPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
+        <StackPanel Orientation="Horizontal">
+          <Button Content="Add"
+                  Width="60"
+                  Command="{Binding SelectedList.AddRuleCommand}"
+                  ToolTip="Always: attack on automatic, weight 1, after the chosen rule" />
+          <Button Content="Remove" Width="60" Margin="4,0,0,0" Command="{Binding SelectedList.RemoveRuleCommand}" />
+          <Button Content="Up" Width="60" Margin="4,0,0,0" Command="{Binding SelectedList.MoveRuleUpCommand}" />
+          <Button Content="Down" Width="60" Margin="4,0,0,0" Command="{Binding SelectedList.MoveRuleDownCommand}" />
+        </StackPanel>
+
+        <!-- Every trigger and target is offered whatever the others hold; a pair that doesn't fit is on the problem
+             line (decision 850). -->
+        <StackPanel Margin="0,8,0,0"
+                    DataContext="{Binding SelectedList.SelectedRule}"
+                    Style="{StaticResource EnabledWhenChosen}">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="When" Style="{DynamicResource FieldLabel}" />
+            <ComboBox Width="260"
+                      ItemsSource="{Binding DataContext.ConditionChoices, RelativeSource={RelativeSource AncestorType=battle:EnemyCatalogPage}}"
+                      DisplayMemberPath="Label"
+                      SelectedItem="{Binding When}" />
+            <TextBox Style="{DynamicResource NumberBox}"
+                     Margin="6,2,0,2"
+                     Text="{Binding NumberText, UpdateSourceTrigger=PropertyChanged}"
+                     Visibility="{Binding IsNumberShown, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}" />
+            <TextBlock Text="{Binding NumberUnit}" Margin="4,0,0,0" VerticalAlignment="Center" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Use" Style="{DynamicResource FieldLabel}" />
+            <ComboBox Width="260"
+                      ItemsSource="{Binding DataContext.SkillChoices, RelativeSource={RelativeSource AncestorType=battle:EnemyCatalogPage}}"
+                      DisplayMemberPath="Name"
+                      SelectedValuePath="Id"
+                      SelectedValue="{Binding SkillId}"
+                      ToolTip="The attack, or a skill an enemy can use: no class resource, no formation aim, no readied turn" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="On" Style="{DynamicResource FieldLabel}" />
+            <ComboBox Width="260"
+                      ItemsSource="{Binding DataContext.TargetChoices, RelativeSource={RelativeSource AncestorType=battle:EnemyCatalogPage}}"
+                      DisplayMemberPath="Label"
+                      SelectedItem="{Binding On}"
+                      ToolTip="Who the rule aims at within the skill's aim; automatic aims as the skill does" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Weight" Style="{DynamicResource FieldLabel}" />
+            <TextBox Style="{DynamicResource NumberBox}"
+                     Text="{Binding WeightText, UpdateSourceTrigger=PropertyChanged}"
+                     ToolTip="Its share of the draw among the rules whose When holds" />
+          </StackPanel>
+        </StackPanel>
+      </StackPanel>
+      <ListBox ItemsSource="{Binding SelectedList.Rules}"
+               SelectedItem="{Binding SelectedList.SelectedRule}"
+               DisplayMemberPath="Sentence"
+               Margin="0,4,0,0" />
+    </DockPanel>
+  </Grid>
+</UserControl>

@@ -315,3 +315,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Editor/Shell/MainViewModel.SheetImport.cs` keeps its own replace question ("tilesheet art", the folder being
   `tilesheets`) and its own refresh and status report, which AN7's `ConfirmsReplacing` and `ReportArtImport` now
   serve for the art images (AN7 review).
+- `tests/Jrpg.Editor.Tests/Battle/EnemyCatalogViewModelTests.cs` is at 299 lines: split it (the problem-line tests to
+  their own file) before the next test lands there (enemy behavior plan, EB6 and EB7 reviews).
+- Ten editor views declare their own `BooleanToVisibilityConverter x:Key="VisibleWhenTrue"`: one key in
+  `Shell/EditorTheme.xaml` would serve them all (EB7 review).

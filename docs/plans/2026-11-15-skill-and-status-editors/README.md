@@ -117,7 +117,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   the relay alone, then about 190 lines) → [slices/SK1.md](slices/SK1.md)
 - [x] **SK2. A skill's texts and files as typed, and the draft's skills step** (Data + Editor, about 200 lines) →
   [slices/SK2.md](slices/SK2.md)
-- [ ] **SK3. The skill list: Add, Duplicate, Remove, who uses a skill, the strip's pace, `IEditedCatalog`** (Editor,
+- [x] **SK3. The skill list: Add, Duplicate, Remove, who uses a skill, the strip's pace, `IEditedCatalog`** (Editor,
   about 230 lines) → [slices/SK3.md](slices/SK3.md)
 - [ ] **SK4. Database > Skills...: the page** (Editor + script, about 170 lines) → [slices/SK4.md](slices/SK4.md)
 - [ ] **SK5. A skill's costs as resource rows** (Editor, about 200 lines) → [slices/SK5.md](slices/SK5.md)

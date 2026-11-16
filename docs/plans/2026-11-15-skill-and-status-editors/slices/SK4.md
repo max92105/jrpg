@@ -48,3 +48,5 @@ None new (draw and wiring): `SkillCatalogViewModelTests` holds the rules (page r
    needs a resource cost in resourceChanges..."), OK greys; untick it and the line clears.
 5. Run `.claude/scripts/open-editor-windows.ps1`: "Database>Skills...: opened", no `ERROR` line and no binding-error
    line.
+- **Note from SK3:** the shell builds `SkillChoices` (icons, sounds, effects images, `EffectStrips`) for
+  `SkillEditingViewModel`; tests build pages over `SkillFixtures.CatalogWithoutUsers` with `SkillFixtures.NoChoices`.

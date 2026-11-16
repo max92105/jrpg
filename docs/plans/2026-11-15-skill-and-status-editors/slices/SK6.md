@@ -61,3 +61,6 @@ message. The grants keep their file values until SK7.
 3. Tier none, Kind damage, Damage type ice, Power 12: OK lights (a flat damage); Cancel.
 4. `aura_of_protection`: Range enabled with its number; Targeting single ally: Range greys.
 5. Run `.claude/scripts/open-editor-windows.ps1`: no `ERROR` or binding-error line.
+- **Note from SK3:** with no damage tier, `SkillViewModel.New` starts a flat damage of power 1 typed as Core's first
+  damage type (Data needs one); Data refuses a skill's damage without a tier (decision 704), so check step 3's "OK
+  lights".

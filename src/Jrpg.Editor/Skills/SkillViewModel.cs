@@ -1,5 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
+using Jrpg.Core.Effects;
 using Jrpg.Core.Skills;
+using Jrpg.Core.Stats;
 using Jrpg.Editor.Objects;
 
 namespace Jrpg.Editor.Skills;
@@ -12,6 +14,9 @@ namespace Jrpg.Editor.Skills;
 /// </summary>
 internal sealed partial class SkillViewModel : ObservableObject
 {
+    // A new skill's power when the content has no damage tier to start from: a flat damage that deals something.
+    private const int FlatStartingPower = 1;
+
     private readonly SkillDefinition _original;
 
     // The saved skills' ids: fixed and never removed in a session (decision 581), so read once.
@@ -43,6 +48,28 @@ internal sealed partial class SkillViewModel : ObservableObject
     /// <param name="takenIds">The saved skills' ids, which the typed id must not take.</param>
     public static SkillViewModel ForNew(SkillDefinition start, IReadOnlyCollection<string> takenIds) =>
         new(start, "", takenIds) { IsNew = true };
+
+    /// <summary>
+    /// A skill as Add starts it (decision 977): every text and file empty, the given tier's damage on a single enemy,
+    /// so the id, name and sound are what is left to type.
+    /// </summary>
+    /// <param name="firstDamageTier">
+    /// The content's first damage tier by id; with none, a flat damage of power 1, which Data's message then refuses.
+    /// </param>
+    /// <param name="takenIds">The saved skills' ids, which the typed id must not take.</param>
+    public static SkillViewModel New(TieredEffect? firstDamageTier, IReadOnlyCollection<string> takenIds) =>
+        ForNew(
+            new SkillDefinition { Id = "", Name = "", Description = "", IconFile = "", Effect = StartingEffect(firstDamageTier) },
+            takenIds);
+
+    /// <summary>
+    /// A new skill copying the chosen one as typed, its id left to type (decision 585). Copied from the boxes, not
+    /// through <see cref="ToSkill"/>, so a half-typed skill duplicates too.
+    /// </summary>
+    /// <param name="chosen">The skill chosen in the list, saved or added.</param>
+    /// <param name="takenIds">The saved skills' ids, which the typed id must not take.</param>
+    public static SkillViewModel DuplicateOf(SkillViewModel chosen, IReadOnlyCollection<string> takenIds) =>
+        ForNew(chosen.TypedRecord(), takenIds);
 
     /// <summary>
     /// True while the skill was added this session: the only time its id can be typed (decision 582).
@@ -89,19 +116,26 @@ internal sealed partial class SkillViewModel : ObservableObject
     /// The record it came from with the typed fields over it: the strip trimmed, and none when its box is empty.
     /// </summary>
     /// <exception cref="InvalidOperationException">There is a <see cref="Problem"/>.</exception>
-    public SkillDefinition ToSkill() =>
-        Problem is { } problem
-            ? throw new InvalidOperationException(problem)
-            : _original with
-            {
-                Id = Id,
-                Name = Name.Trim(),
-                Description = Description,
-                IconFile = IconFile,
-                SoundFile = SoundFile,
-                EffectFile = EffectFile.Trim() is { Length: > 0 } strip ? strip : null,
-                IsQuick = IsQuick,
-            };
+    public SkillDefinition ToSkill() => Problem is { } problem ? throw new InvalidOperationException(problem) : TypedRecord();
+
+    // A flat power has no type to repeat, and Data refuses a damage without one; Core's first type stands in until the
+    // Effect section's box picks another.
+    private static Effect StartingEffect(TieredEffect? tier) =>
+        tier is null
+            ? new Effect(EffectKind.Damage, FlatStartingPower, Targeting.SingleEnemy, DamageType: Enum.GetValues<DamageType>()[0])
+            : new Effect(tier.Kind, 0, Targeting.SingleEnemy, DamageType: tier.DamageType) { Tier = tier };
+
+    private SkillDefinition TypedRecord() =>
+        _original with
+        {
+            Id = Id,
+            Name = Name.Trim(),
+            Description = Description,
+            IconFile = IconFile,
+            SoundFile = SoundFile,
+            EffectFile = EffectFile.Trim() is { Length: > 0 } strip ? strip : null,
+            IsQuick = IsQuick,
+        };
 
     partial void OnIdTextChanged(string value) => Changed?.Invoke(this, EventArgs.Empty);
 

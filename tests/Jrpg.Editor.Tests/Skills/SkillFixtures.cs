@@ -1,10 +1,13 @@
+using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Core.Effects;
+using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
 using Jrpg.Core.Statuses;
 using Jrpg.Data.Content;
+using Jrpg.Editor.Skills;
 
 namespace Jrpg.Editor.Tests.Skills;
 
@@ -14,8 +17,12 @@ namespace Jrpg.Editor.Tests.Skills;
 /// </summary>
 internal static class SkillFixtures
 {
-    private static readonly ContentCatalog _testWorld =
+    /// <summary>The test world's catalog, whose classes and enemies a test picks by id to build its own.</summary>
+    public static ContentCatalog TestWorld { get; } =
         ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
+
+    /// <summary>A Skills page with nothing in its boxes' folders and no strip record.</summary>
+    public static SkillChoices NoChoices { get; } = new([], [], [], new Dictionary<string, EffectStripDefinition>());
 
     public static TieredEffect Fire1 { get; } = new("fire_1", EffectKind.Damage, 3) { DamageType = DamageType.Fire };
 
@@ -50,10 +57,21 @@ internal static class SkillFixtures
         IReadOnlyList<SkillDefinition> skills,
         IReadOnlyList<TieredEffect> tiers,
         IReadOnlyList<StatusDefinition> statuses) =>
-        _testWorld with
+        TestWorld with
         {
             Skills = skills.ToDictionary(skill => skill.Id, StringComparer.Ordinal),
             TieredEffects = tiers.ToDictionary(tier => tier.Id, StringComparer.Ordinal),
             Statuses = statuses.ToDictionary(status => status.Id, StringComparer.Ordinal),
+        };
+
+    /// <summary>
+    /// <see cref="CatalogWith"/> with poison_1 and no class or enemy: the test world's name skills these catalogs lack,
+    /// which Data's check would report; a test of who uses a skill adds its own.
+    /// </summary>
+    public static ContentCatalog CatalogWithoutUsers(IReadOnlyList<SkillDefinition> skills, IReadOnlyList<TieredEffect> tiers) =>
+        CatalogWith(skills, tiers, [Poison1]) with
+        {
+            Classes = new Dictionary<string, ClassDefinition>(),
+            Enemies = new Dictionary<string, EnemyDefinition>(),
         };
 }

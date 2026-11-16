@@ -64,3 +64,6 @@ line (the chosen skill's own, then another's named by id, then Data's for the wh
 None: the page comes in SK4.
 - **Note from SK2:** a new skill is made by `SkillViewModel.ForNew(start, takenIds)`, the saved skills' ids passed once
   (they can't change in a session); `New(firstDamageTier)` and `DuplicateOf(chosen)` pass the catalog's ids.
+- **Done, with deviations:** `New` and `DuplicateOf` take the saved ids as a second parameter (SK2's note); `Problem` is
+  `ShopCatalogViewModel`'s (first wrong skill in list order, not the chosen one first); the pace line follows every typed
+  change; the flat damage's type is Core's first. 697 lines (`wc -l`): 249 source, 448 tests (the lines in a sibling).

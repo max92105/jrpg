@@ -5,16 +5,17 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-enemy-behavior, slice EB3b (second commit of EB3: Editor/Battle/TacticRuleRow, TacticRuleRowTests,
-map.md Battle row, EB3.md Done note). 2026-11-16. Round 1.
+Plan 2026-11-15-enemy-behavior, slice EB4 (Editor/Battle/TacticListViewModel, SectionRowProblem.FirstInField,
+TacticListViewModelTests, TacticListRulesChangedTests, map.md Battle row, EB4/EB5 notes). 2026-11-16. Round 1.
 Verdict: Ready to commit (no Critical, no Warning).
 
-- EB3a's open item (`Of` without caller or test): fixed, TacticRuleRow.From calls both and the From test pins them
-  with Assert.Same.
-- Suggestion (open, optional): the reflection theory Problem_NumberBoxTyped_IsRaisedWithTheSentence could be two
-  plain facts; judged acceptable (public property, nameof-guarded).
-- Suggestion (open, optional): Sentence prints NumberText raw, so an empty or space-padded box reads "below  %";
-  trimming in WhenWords would tidy it (the Problem line already names the empty box).
-- Checked, no finding: Problem order weight then percent; hidden box never written (percent 0); From's
-  `Percent: > 0` pinned by From_KindWithoutNumber; fixtures differ from New's defaults; every relay tested; CopyOf
-  never calls ToAction (editor.md); NumberUnit's throwing arm is the enum switch's required default.
+- Suggestion (open, optional): Label prints an emptied threshold as "Below  % HP"; TacticRuleRow.ShownNumber shows
+  "?" for the same case, so "Below ? % HP" would match.
+- Suggestion (open, optional): no test removes a phase's last rule (allowed by design: Data's
+  "phases[i].tactics must not be empty." reaches the page through EnemyCatalogViewModel.Problem -> OfEnemies, EB6).
+- Follow-up: the Renumber loop is now in DropTableViewModel, CinematicViewModel (1-based Number) and
+  TacticListViewModel; a ListOrder.Renumber(rows, set) could hold it.
+- Checked, no finding: list Problem not raised on a row edit is recorded in the EB5 note; Index/Sentence notices
+  filtered; Move keeps one watch (tested); RulesChanged raised before Label/Problem notices but Problem is computed;
+  FirstOf output unchanged; ToPhase throws for the start list and on a problem.
+- EB3b's suggestions (Sentence "?" for an empty box): fixed in EB3b (ShownNumber).

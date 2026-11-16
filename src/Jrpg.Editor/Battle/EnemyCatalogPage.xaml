@@ -128,7 +128,6 @@
                 <Button Content="Edit..." Width="60" Margin="4,0,0,0" Click="OnEditDropTablesClicked" ToolTip="Create or edit drop tables; a table added there is offered here" />
               </StackPanel>
               <CheckBox Content="Boss: the party can't run" Margin="0,6,0,0" IsChecked="{Binding IsBoss}" />
-              <TextBlock Text="{Binding TacticsSummary}" Foreground="{StaticResource MutedTextBrush}" Margin="0,10,0,0" TextWrapping="Wrap" />
             </StackPanel>
           </ScrollViewer>
         </TabItem>

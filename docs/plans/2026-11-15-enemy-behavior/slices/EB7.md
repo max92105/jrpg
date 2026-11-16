@@ -58,3 +58,5 @@ at its capture.
    and `"on": "subject"`, nothing else changed. Ctrl+Z, Save all again: the diff is empty.
 7. Both columns fit the page at the editor's usual size without a horizontal scroll bar; if not, the Done note says what
    was narrowed.
+- **Note from EB6:** the Database menu's Enemies... tooltip (`Shell/DatabaseMenu.xaml`) still says "tactics and phases
+  stay in enemies.json": reword it with the tab.

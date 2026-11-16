@@ -161,8 +161,9 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject, IEditedC
         RaiseProblemChanged();
     }
 
-    // Every field of an enemy is typed, so each change may move the problem line; the lines it raises for its own label
-    // and problem come with the field's change and are skipped.
+    // Every field of an enemy is typed, its rules included (one Tactics notice per rule typed or list changed), so each
+    // change may move the problem line; the lines it raises for its own label and problem come with the field's change
+    // and are skipped.
     private void OnEnemyChanged(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName is not (nameof(EnemyViewModel.Label) or nameof(EnemyViewModel.Problem)))

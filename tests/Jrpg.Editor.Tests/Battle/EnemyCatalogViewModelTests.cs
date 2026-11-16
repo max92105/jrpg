@@ -98,6 +98,22 @@ public sealed class EnemyCatalogViewModelTests
         Assert.Contains(nameof(EnemyCatalogViewModel.Problem), notified);
     }
 
+    // A rule reaches the list as the enemy's Tactics notice, which the list doesn't skip; the rule is added first so
+    // the test needs no rule from the content.
+    [Fact]
+    public void Problem_RuleTyped_IsRaised()
+    {
+        var catalog = new EnemyCatalogViewModel(_catalog, _ => []);
+        var rules = catalog.SelectedEnemy!.Tactics.Lists[0];
+        rules.AddRuleCommand.Execute(null);
+        var notified = new List<string?>();
+        catalog.PropertyChanged += (_, e) => notified.Add(e.PropertyName);
+
+        rules.SelectedRule!.WeightText = "x";
+
+        Assert.Contains(nameof(EnemyCatalogViewModel.Problem), notified);
+    }
+
     // T3's rule reaches the line through Data: the goblin uses a tiered skill built here with no Power.
     [Fact]
     public void Problem_TieredSkillWithPowerZero_ShowsDataMessage()

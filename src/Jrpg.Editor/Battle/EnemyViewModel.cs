@@ -8,10 +8,9 @@ namespace Jrpg.Editor.Battle;
 
 /// <summary>
 /// One enemy as the Enemies page edits it (ADR 0045): its id (typed while new, fixed once the draft holds it, decision
-/// 582), name, numbers, resistances, rewards and art as typed. What no form edits yet (its tactics and phases) is
-/// carried from the record it came from, so the page never wipes it; a duplicate carries it too (decision 585).
-/// <see cref="Problem"/> is the typed id's or a box that isn't a number, the art's loop boxes last; the ranges are
-/// Data's rules, shown by the list.
+/// 582), name, numbers, resistances, rewards, art and rules as typed, each written over the record it came from; a
+/// duplicate copies them as typed (decision 585). <see cref="Problem"/> is the typed id's or a box that isn't a number,
+/// the art's loop boxes, then the first rule's; the ranges are Data's rules, shown by the list.
 /// </summary>
 internal sealed partial class EnemyViewModel : ObservableObject
 {
@@ -36,7 +35,8 @@ internal sealed partial class EnemyViewModel : ObservableObject
 
     private readonly EnemyDefinition _original;
 
-    private EnemyViewModel(EnemyDefinition original, string id)
+    // The rules come in built, since a duplicate copies the chosen one's boxes rather than reading a record.
+    private EnemyViewModel(EnemyDefinition original, string id, EnemyTacticsViewModel tactics)
     {
         _original = original;
         Id = id;
@@ -55,20 +55,22 @@ internal sealed partial class EnemyViewModel : ObservableObject
         ReadRewards(original);
         Art = new EnemyArtViewModel(original);
         Art.PropertyChanged += (_, _) => OnPropertyChanged(nameof(Art));
+        Tactics = tactics;
+        Tactics.Changed += OnTacticsChanged;
     }
 
-    public static EnemyViewModel From(EnemyDefinition enemy) => new(enemy, enemy.Id);
+    public static EnemyViewModel From(EnemyDefinition enemy) => new(enemy, enemy.Id, EnemyTacticsViewModel.From(enemy));
 
     /// <summary>An enemy with nothing typed yet, from the tunable defaults.</summary>
-    public static EnemyViewModel New() => new(_blank, "") { IsNew = true };
+    public static EnemyViewModel New() => new(_blank, "", EnemyTacticsViewModel.From(_blank)) { IsNew = true };
 
     /// <summary>
-    /// A new enemy copying the chosen one as typed, its id left to type (decision 585); its tactics come along. Copied
-    /// from the boxes, not the record, so a half-typed enemy duplicates too.
+    /// A new enemy copying the chosen one as typed, its rules as typed too, its id left to type (decision 585). Copied
+    /// from the boxes, not the record, so a half-typed enemy or rule duplicates too.
     /// </summary>
     public static EnemyViewModel DuplicateOf(EnemyViewModel chosen)
     {
-        var copy = new EnemyViewModel(chosen._original, "")
+        var copy = new EnemyViewModel(chosen._original, "", EnemyTacticsViewModel.CopyOf(chosen.Tactics))
         {
             IsNew = true,
             Name = chosen.Name,
@@ -145,22 +147,15 @@ internal sealed partial class EnemyViewModel : ObservableObject
     [ObservableProperty]
     public partial bool IsBoss { get; set; }
 
-    /// <summary>
-    /// The Stats tab's line on what no form edits yet (the forms are later work): "Tactics and phases: edited in
-    /// enemies.json (3 actions, 1 phases)".
-    /// </summary>
-    public string TacticsSummary =>
-        $"Tactics and phases: edited in enemies.json ({_original.Tactics.Count} actions, {_original.Phases.Count} phases)";
-
     /// <summary>The list's line: "goblin: Goblin", or a placeholder while a new enemy has no id.</summary>
     public string Label => Id.Length > 0 ? $"{Id}: {Name}" : "(new enemy)";
 
-    /// <summary>Why the typed id or a number can't be read; null when the record can be built.</summary>
+    /// <summary>Why the typed id, a number or a rule can't be read; null when the record can be built.</summary>
     public string? Problem =>
         (IsNew ? ObjectIds.ProblemOf(Id, []) : null) ?? FirstNumberProblem() ?? FirstResistanceProblem() ?? FirstGoldProblem()
-        ?? Art.Problem;
+        ?? Art.Problem ?? Tactics.Problem;
 
-    /// <summary>The record it came from with the edited fields over it.</summary>
+    /// <summary>The record it came from with every field as typed over it, its rules rebuilt from their rows.</summary>
     /// <exception cref="InvalidOperationException">There is a <see cref="Problem"/>.</exception>
     public EnemyDefinition ToEnemy() =>
         Problem is { } problem
@@ -182,6 +177,8 @@ internal sealed partial class EnemyViewModel : ObservableObject
                 Gold = TypedGold(),
                 DropTableId = TypedDropTable(),
                 IsBoss = IsBoss,
+                Tactics = Tactics.ToTactics(),
+                Phases = Tactics.ToPhases(),
             });
 
     // In the form's order, so the problem names the first box the eye reaches.

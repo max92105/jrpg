@@ -45,3 +45,6 @@ phases: edited in enemies.json" line goes.
 ## Verify by hand
 1. Run the editor, Database > Enemies, choose `goblin_chief`, leave the page or apply it unchanged: nothing shows as
    unsaved, and Ctrl+Z takes back whatever was done before, not the page.
+- **Done, with deviations:** the constructor takes the built rules (Duplicate passes `CopyOf`), so no `CopyTacticsFrom`;
+  `Apply_Unchanged_RecordsNothing` renamed the slice's `Apply_UntouchedSession_*`; `ToEnemy_MaxHpEdited_*` re-pinned
+  too; three tests more (a phase's threshold written, the Tactics notice, the target written apart from its undo).

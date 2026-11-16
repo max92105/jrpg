@@ -7,8 +7,8 @@ using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Tests.Battle;
 
-// One enemy as the Enemies page edits it (ADR 0045): numbers as typed, the id fixed once saved, and everything the form
-// doesn't edit carried through from the record, a duplicate included (decision 585).
+// One enemy as the Enemies page edits it (ADR 0045): numbers and rules as typed, the id fixed once saved, and a
+// duplicate copying the boxes as typed (decision 585).
 public sealed class EnemyViewModelTests
 {
     private static readonly ContentCatalog _catalog =
@@ -32,16 +32,21 @@ public sealed class EnemyViewModelTests
         Assert.Null(enemy.Problem);
     }
 
+    // The rules are rebuilt from their rows, so they equal the record's by content. A phase compares its list by
+    // reference, so each phase's threshold and rules are compared apart, phase by phase.
     [Fact]
     public void ToEnemy_Unchanged_EqualsTheRecord()
     {
         var enemy = EnemyViewModel.From(Chief).ToEnemy();
 
         Assert.Equal(Chief with { Tactics = enemy.Tactics, Phases = enemy.Phases }, enemy);
-        Assert.Same(Chief.Tactics, enemy.Tactics);
-        Assert.Same(Chief.Phases, enemy.Phases);
+        Assert.Equal(Chief.Tactics, enemy.Tactics);
+        Assert.Equal(Chief.Phases.Select(phase => phase.BelowHpPercent), enemy.Phases.Select(phase => phase.BelowHpPercent));
+        Assert.All(Chief.Phases.Zip(enemy.Phases), pair => Assert.Equal(pair.First.Tactics, pair.Second.Tactics));
     }
 
+    // The rules are rebuilt from their rows into new lists, which a record compares by reference, so they are compared
+    // by content apart, as in ToEnemy_Unchanged_EqualsTheRecord.
     [Fact]
     public void ToEnemy_MaxHpEdited_ChangesOnlyIt()
     {
@@ -49,7 +54,10 @@ public sealed class EnemyViewModelTests
 
         enemy.MaxHpText = " 45 ";
 
-        Assert.Equal(Goblin with { MaxHp = 45 }, enemy.ToEnemy());
+        var built = enemy.ToEnemy();
+        Assert.Equal(Goblin with { MaxHp = 45, Tactics = built.Tactics, Phases = built.Phases }, built);
+        Assert.Equal(Goblin.Tactics, built.Tactics);
+        Assert.Equal(Goblin.Phases.SelectMany(phase => phase.Tactics), built.Phases.SelectMany(phase => phase.Tactics));
     }
 
     [Fact]
@@ -183,19 +191,66 @@ public sealed class EnemyViewModelTests
         Assert.Equal(-3, enemy.ToEnemy().Damage);
     }
 
-    // The tests' own tactics and phase over the goblin: three actions, one phase.
     [Fact]
-    public void TacticsSummary_ThreeActionsOnePhase_CountsThem()
+    public void ToEnemy_RuleWeightTyped_BuildsTheNewWeight()
     {
-        EnemyAction attack = new() { Weight = 1 };
-        var chief = _catalog.Enemies["goblin"] with
-        {
-            Tactics = [attack, attack, attack],
-            Phases = [new EnemyPhase { BelowHpPercent = 50, Tactics = [attack] }],
-        };
+        var enemy = EnemyViewModel.From(WithRules(new EnemyAction { Weight = 4 }));
 
-        var summary = EnemyViewModel.From(chief).TacticsSummary;
+        enemy.Tactics.Lists[0].Rules[0].WeightText = "7";
 
-        Assert.Equal("Tactics and phases: edited in enemies.json (3 actions, 1 phases)", summary);
+        Assert.Equal(7, Assert.Single(enemy.ToEnemy().Tactics).Weight);
     }
+
+    // The record's phase starts below 50 %, so a carried phase would keep it.
+    [Fact]
+    public void ToEnemy_PhaseThresholdTyped_BuildsTheNewThreshold()
+    {
+        var enemy = EnemyViewModel.From(WithRules(new EnemyAction { Weight = 4 }) with
+        {
+            Phases = [new EnemyPhase { BelowHpPercent = 50, Tactics = [new EnemyAction { Weight = 2 }] }],
+        });
+
+        enemy.Tactics.Lists[1].ThresholdText = "30";
+
+        Assert.Equal(30, Assert.Single(enemy.ToEnemy().Phases).BelowHpPercent);
+    }
+
+    [Fact]
+    public void Problem_RuleWeightNotANumber_NamesTheRule()
+    {
+        var enemy = EnemyViewModel.From(WithRules(new EnemyAction { Weight = 4 }, new EnemyAction { Weight = 2 }));
+
+        enemy.Tactics.Lists[0].Rules[1].WeightText = "x";
+
+        Assert.Equal("tactics[1]: Weight must be a whole number (was 'x').", enemy.Problem);
+    }
+
+    // The list reads the enemy, not its rules: one Tactics notice for the change, and the problem line again.
+    [Fact]
+    public void Tactics_RuleWeightTyped_NotifiesTacticsAndProblem()
+    {
+        var enemy = EnemyViewModel.From(WithRules(new EnemyAction { Weight = 4 }));
+        List<string?> notified = [];
+        enemy.PropertyChanged += (_, e) => notified.Add(e.PropertyName);
+
+        enemy.Tactics.Lists[0].Rules[0].WeightText = "5";
+
+        Assert.Equal([nameof(EnemyViewModel.Tactics), nameof(EnemyViewModel.Problem)], notified);
+    }
+
+    // Copied from the boxes, so a rule that can't be built yet duplicates as typed instead of throwing.
+    [Fact]
+    public void DuplicateOf_HalfTypedRule_CopiesItAsTyped()
+    {
+        var typed = EnemyViewModel.From(WithRules(new EnemyAction { Weight = 4 }));
+        typed.Tactics.Lists[0].Rules[0].WeightText = "x";
+
+        var copy = EnemyViewModel.DuplicateOf(typed);
+
+        Assert.Equal("x", copy.Tactics.Lists[0].Rules[0].WeightText);
+        Assert.NotSame(typed.Tactics, copy.Tactics);
+    }
+
+    // The goblin with the test's own rules from the start and no phase.
+    private static EnemyDefinition WithRules(params EnemyAction[] rules) => Goblin with { Tactics = rules, Phases = [] };
 }

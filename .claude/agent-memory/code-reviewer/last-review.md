@@ -5,18 +5,20 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-skill-and-status-editors, slice AN2 (GifImport/ComposedGif, GifImportOptions.FrameMilliseconds,
-GifConversion PaceNoteOf, PreviewFrames.OfPixels, GifImportOptionsViewModel factories, GifImportWindow.AskFor +
-FramePreview, EnemyCatalogPage.GifOptionsFor). 2026-11-16. Round 1. Verdict: Ready to commit.
+Plan 2026-11-15-skill-and-status-editors, slice AN4 (EffectStripCatalogViewModel.TakeImport/ImportLineOf, Strips and
+SwingChoices ObservableCollections, EffectStripCatalogPage Import..., GifImportOptionsViewModel.ForEffectStrips,
+GifConversion.ConvertToEffect loop + PacedEffectNoteOf, Catalogs/ArtImageFileDialog). 2026-11-16. Round 1.
+Verdict: Ready to commit (no Critical, no Warning).
 
-- Warning (open, unprobed): a GIF whose screen descriptor reads 0 wide or high (GifReader takes the stored ushort)
-  composes to empty frames; GifImportWindow.ShowGif's BitmapSource.Create(0, ...) (or BackgroundRemoval frames[0][0])
-  throws in the window's constructor, outside AskFor's catch. Fix: ComposedGif.Read throws InvalidDataException on an
-  empty canvas.
-- Suggestion (open): test ComposedGif.Read on a one-frame GIF (its doc and the slice state it is read).
-- Suggestion (open): GifImportWindow.xaml comment "the box stays the only one" unclear.
-- Suggestion (open): EnemyCatalogPage.GifOptionsFor's switch repeats ArtImageImport.TakesGifs' folder list.
-- Checked, no finding: catch covers composing (GifFrameComposer/GifFrameTiming can't throw past GifReader's checks);
-  other-folder branch equals the old `!TakesGifs || no gif` -> Default.
-- AN1b carried: OfStrip_NoFrames_IsEmpty fixed; FramePreview Rendering comment fixed; EffectStripViewModel re-parsing
-  texts still open (Follow-up, committed slice).
+- Suggestion (open): TakeImportedImage's insert index counts rows with FrameCount not null; a short why comment
+  (missing-image rows sit after every folder row) would help.
+- Suggestion (open): PacedEffectNoteOf says "OK writes its record" even at a typed 80 ms, the unlisted pace, which
+  OK writes no record for.
+- Follow-up: replacing an effect image with fewer frames, then Cancel, leaves the draft's record with a hit frame past
+  the strip (ArtReferenceCheck.AddHitFramesPastTheirStrip refuses at the game's start); by decision 988, also via the
+  Enemies page's effects import.
+- Checked, no finding: decision 988 holds structurally (the VM holds the immutable ContentCatalog; ImportArtImages
+  touches no record, only Art.Refresh); size lookup re-reads the PNG; dialog titles/filters unchanged for Enemies and
+  Character sprites (TakesGifs(FieldSprites) false).
+- AN2 carried: ComposedGif 0-wide Warning fixed (ComposedGif.Read throws); EffectStripViewModel re-parsing dropped
+  (backlog lists it); AN2 suggestions dropped (committed slice).

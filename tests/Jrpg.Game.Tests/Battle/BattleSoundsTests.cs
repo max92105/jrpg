@@ -1,6 +1,5 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
-using Jrpg.Core.Statuses;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Tests.Exploration;
 using Jrpg.Game.Ui;
@@ -70,13 +69,17 @@ public sealed class BattleSoundsTests
     [Fact]
     public void Of_StatusResisted_IsResisted()
     {
-        Assert.Equal([new TimedSound(UiSoundFiles.Battle.Resisted, _impact)], SoundsOf(new StatusResisted(_goblin, StatusKind.Stun)));
+        Assert.Equal(
+            [new TimedSound(UiSoundFiles.Battle.Resisted, _impact)],
+            SoundsOf(new StatusResisted(_goblin, TestStatuses.Stun)));
     }
 
     [Fact]
     public void Of_StatusApplied_IsTheStatusSound()
     {
-        Assert.Equal([new TimedSound(UiSoundFiles.Battle.StatusApplied, _impact)], SoundsOf(new StatusApplied(_goblin, StatusKind.Stun, 1)));
+        Assert.Equal(
+            [new TimedSound(UiSoundFiles.Battle.StatusApplied, _impact)],
+            SoundsOf(new StatusApplied(_goblin, TestStatuses.Stun, 1)));
     }
 
     [Fact]
@@ -94,19 +97,23 @@ public sealed class BattleSoundsTests
     [Fact]
     public void Of_PoisonTicked_IsThePoisonTickAtTheTickBeat()
     {
-        Assert.Equal([new TimedSound(UiSoundFiles.Battle.PoisonTick, StartOf(PlaybackBeatKind.Tick))], SoundsOf(new StatusTicked(_goblin, StatusKind.Poison, 5)));
+        Assert.Equal(
+            [new TimedSound(UiSoundFiles.Battle.PoisonTick, StartOf(PlaybackBeatKind.Tick))],
+            SoundsOf(new StatusTicked(_goblin, TestStatuses.Poison, 5)));
     }
 
     [Fact]
     public void Of_RegenTicked_IsTheRegenTick()
     {
-        Assert.Equal([new TimedSound(UiSoundFiles.Battle.RegenTick, StartOf(PlaybackBeatKind.Tick))], SoundsOf(new StatusTicked(_goblin, StatusKind.Regen, 5)));
+        Assert.Equal(
+            [new TimedSound(UiSoundFiles.Battle.RegenTick, StartOf(PlaybackBeatKind.Tick))],
+            SoundsOf(new StatusTicked(_goblin, TestStatuses.Regen, 5)));
     }
 
     [Fact]
     public void Of_AnotherStatusTicked_Throws()
     {
-        Assert.Throws<InvalidOperationException>(() => SoundsOf(new StatusTicked(_goblin, StatusKind.Stun, 5)));
+        Assert.Throws<InvalidOperationException>(() => SoundsOf(new StatusTicked(_goblin, TestStatuses.Stun, 5)));
     }
 
     [Fact]
@@ -118,7 +125,9 @@ public sealed class BattleSoundsTests
     [Fact]
     public void Of_TurnSkipped_IsStunnedAtTheSkipBeat()
     {
-        Assert.Equal([new TimedSound(UiSoundFiles.Battle.Stunned, StartOf(PlaybackBeatKind.Skip))], SoundsOf(new TurnSkipped(_goblin, StatusKind.Stun)));
+        Assert.Equal(
+            [new TimedSound(UiSoundFiles.Battle.Stunned, StartOf(PlaybackBeatKind.Skip))],
+            SoundsOf(new TurnSkipped(_goblin, TestStatuses.Stun)));
     }
 
     [Fact]
@@ -144,7 +153,9 @@ public sealed class BattleSoundsTests
     [Fact]
     public void Of_StatusEnded_IsItsSound()
     {
-        Assert.Equal([new TimedSound(UiSoundFiles.Battle.StatusEnded, TimeSpan.Zero)], SoundsOf(new StatusEnded(_goblin, StatusKind.Stun)));
+        Assert.Equal(
+            [new TimedSound(UiSoundFiles.Battle.StatusEnded, TimeSpan.Zero)],
+            SoundsOf(new StatusEnded(_goblin, TestStatuses.Stun)));
     }
 
     [Fact]

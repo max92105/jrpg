@@ -1,6 +1,5 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
-using Jrpg.Core.Statuses;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Tests.Exploration;
 using Jrpg.Game.Tests.Ui;
@@ -99,6 +98,6 @@ public sealed class PlaybackSoundQueueTests
         RepositoryScreenText.Text.Messages);
 
     private ActionPlayback HitAfterATick() => ActionPlayback.Start(
-        [new StatusTicked(_goblin, StatusKind.Poison, 3), new EffectApplied(_goblin, EffectKind.Damage, 13)],
+        [new StatusTicked(_goblin, TestStatuses.Poison, 3), new EffectApplied(_goblin, EffectKind.Damage, 13)],
         RepositoryScreenText.Text.Messages);
 }

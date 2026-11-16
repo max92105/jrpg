@@ -1,6 +1,5 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
-using Jrpg.Core.Statuses;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Tests.Exploration;
 using Jrpg.Game.Tests.Ui;
@@ -65,9 +64,9 @@ public sealed class ActionPlaybackSoundTests
             [
                 new ActionStarted(actor, new AttackCommand(_goblin)),
                 new EffectApplied(_goblin, EffectKind.Damage, 13),
-                new StatusTicked(actor, StatusKind.Regen, 5),
-                new TurnSkipped(_goblin, StatusKind.Stun),
-                new StatusTicked(_goblin, StatusKind.Poison, 9),
+                new StatusTicked(actor, TestStatuses.Regen, 5),
+                new TurnSkipped(_goblin, TestStatuses.Stun),
+                new StatusTicked(_goblin, TestStatuses.Poison, 9),
             ],
             RepositoryScreenText.Text.Messages);
 

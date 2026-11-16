@@ -1,7 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Randomness;
-using Jrpg.Core.Statuses;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Tests.Ui;
 
@@ -67,7 +66,7 @@ public sealed class ActionPlaybackFallTests
         [
             new ActionStarted(_sarxian, new AttackCommand(_goblin)),
             new EffectApplied(_goblin, EffectKind.Damage, 13),
-            new StatusTicked(_sarxian, StatusKind.Poison, 9),
+            new StatusTicked(_sarxian, TestStatuses.Poison, 9),
             new CombatantDefeated(_sarxian),
         ];
         var playback = Start(events);
@@ -108,9 +107,9 @@ public sealed class ActionPlaybackFallTests
         [
             new ActionStarted(_sarxian, new AttackCommand(_goblin)),
             new EffectApplied(_goblin, EffectKind.Damage, 13),
-            new StatusTicked(_sarxian, StatusKind.Regen, 5),
-            new TurnSkipped(_goblin, StatusKind.Stun),
-            new StatusTicked(_goblin, StatusKind.Poison, 9),
+            new StatusTicked(_sarxian, TestStatuses.Regen, 5),
+            new TurnSkipped(_goblin, TestStatuses.Stun),
+            new StatusTicked(_goblin, TestStatuses.Poison, 9),
             new CombatantDefeated(_goblin),
         ];
         var playback = Start(events);

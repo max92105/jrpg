@@ -1,7 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Randomness;
-using Jrpg.Core.Statuses;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Tests.Ui;
 
@@ -45,7 +44,7 @@ public sealed class ActionPlaybackPhaseTests
         [
             new ActionStarted(_sarxian, new AttackCommand(_goblin)),
             new EffectApplied(_goblin, EffectKind.Damage, 13),
-            new TurnSkipped(_nextGoblin, StatusKind.Stun),
+            new TurnSkipped(_nextGoblin, TestStatuses.Stun),
             new EnemyPhaseEntered(_goblin, _phase),
         ]);
 
@@ -59,8 +58,8 @@ public sealed class ActionPlaybackPhaseTests
         var playback = Start(
         [
             new ActionStarted(_sarxian, new DefendCommand()),
-            new TurnSkipped(_goblin, StatusKind.Stun),
-            new StatusTicked(_goblin, StatusKind.Poison, 5),
+            new TurnSkipped(_goblin, TestStatuses.Stun),
+            new StatusTicked(_goblin, TestStatuses.Poison, 5),
             new EnemyPhaseEntered(_goblin, _phase),
         ]);
 

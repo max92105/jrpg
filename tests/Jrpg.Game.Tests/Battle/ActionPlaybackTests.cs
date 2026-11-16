@@ -1,7 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Randomness;
-using Jrpg.Core.Statuses;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Tests.Ui;
 
@@ -41,7 +40,8 @@ public sealed class ActionPlaybackTests
     [Fact]
     public void Start_StatusApplied_AddsCueWithStatusName()
     {
-        var playback = Start([new ActionStarted(_sarxian, new AttackCommand(_goblin)), new StatusApplied(_goblin, StatusKind.Stun, 1)]);
+        var playback = Start(
+            [new ActionStarted(_sarxian, new AttackCommand(_goblin)), new StatusApplied(_goblin, TestStatuses.Stun, 1)]);
 
         Assert.Equal([new CueOnTarget(_goblin, "Stun")], playback.Cues);
         Assert.Equal([PlaybackBeatKind.Impact], playback.Beats.Select(beat => beat.Kind));
@@ -60,7 +60,8 @@ public sealed class ActionPlaybackTests
     [Fact]
     public void Start_StatusResisted_AddsResistedCueOnTheImpact()
     {
-        var playback = Start([new ActionStarted(_sarxian, new AttackCommand(_goblin)), new StatusResisted(_goblin, StatusKind.Stun)]);
+        var playback = Start(
+            [new ActionStarted(_sarxian, new AttackCommand(_goblin)), new StatusResisted(_goblin, TestStatuses.Stun)]);
 
         Assert.Equal([new CueOnTarget(_goblin, "Resisted")], playback.Cues);
         Assert.Equal([PlaybackBeatKind.Impact], playback.Beats.Select(beat => beat.Kind));
@@ -73,8 +74,8 @@ public sealed class ActionPlaybackTests
         [
             new ActionStarted(_sarxian, new AttackCommand(_goblin)),
             new EffectApplied(_goblin, EffectKind.Damage, 13),
-            new StatusApplied(_goblin, StatusKind.Stun, 1),
-            new TurnSkipped(_goblin, StatusKind.Stun),
+            new StatusApplied(_goblin, TestStatuses.Stun, 1),
+            new TurnSkipped(_goblin, TestStatuses.Stun),
         ];
 
         var playback = Start(events);
@@ -91,8 +92,8 @@ public sealed class ActionPlaybackTests
         [
             new ActionStarted(_sarxian, new AttackCommand(_goblin)),
             new EffectApplied(_goblin, EffectKind.Damage, 13),
-            new TurnSkipped(_goblin, StatusKind.Stun),
-            new TurnSkipped(second, StatusKind.Stun),
+            new TurnSkipped(_goblin, TestStatuses.Stun),
+            new TurnSkipped(second, TestStatuses.Stun),
         ];
 
         var playback = Start(events);
@@ -105,7 +106,8 @@ public sealed class ActionPlaybackTests
     [Fact]
     public void Start_StatusEnded_AddsNoBeat()
     {
-        var playback = Start([new ActionStarted(_sarxian, new AttackCommand(_goblin)), new StatusEnded(_goblin, StatusKind.Stun)]);
+        var playback = Start(
+            [new ActionStarted(_sarxian, new AttackCommand(_goblin)), new StatusEnded(_goblin, TestStatuses.Stun)]);
 
         Assert.Empty(playback.Beats);
         Assert.Empty(playback.Cues);
@@ -147,7 +149,7 @@ public sealed class ActionPlaybackTests
         [
             new ActionStarted(_sarxian, new AttackCommand(_goblin)),
             new EffectApplied(_goblin, EffectKind.Damage, 13),
-            new StatusTicked(_sarxian, StatusKind.Regen, 5),
+            new StatusTicked(_sarxian, TestStatuses.Regen, 5),
         ];
 
         var playback = Start(events);

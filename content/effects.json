@@ -46,6 +46,12 @@
     "perPower": 4
   },
   {
+    "id": "ice_1",
+    "kind": "damage",
+    "perPower": 2,
+    "damageType": "ice"
+  },
+  {
     "id": "light_2",
     "kind": "damage",
     "perPower": 4,

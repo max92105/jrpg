@@ -53,11 +53,17 @@ internal static class AbsentWhenNullFilter
         // Decision 800: a status without tiers is its own family.
         (typeof(StatusDefinition), "family"),
 
+        // Decision 810: a mark shows its name's first letter unless the record names another.
+        (typeof(StatusDefinition), "markLetter"),
+
         // ADR 0056: a heal record has no type.
         (typeof(TieredEffect), "damageType"),
 
         // Decision 803: only a typed tick names its type.
         (typeof(StatusPart), "damageType"),
+
+        // Decision 807: only a stat change names its stat.
+        (typeof(StatusPart), "stat"),
 
         // ADR 0054: a walk whose facings all read their rows has no sequences, and a facing that reads its row has no
         // sequence of its own.

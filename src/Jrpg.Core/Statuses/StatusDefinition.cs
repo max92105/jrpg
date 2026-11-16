@@ -3,9 +3,10 @@ using Jrpg.Core.Stats;
 namespace Jrpg.Core.Statuses;
 
 /// <summary>
-/// One status as content describes it (ADR 0055): its words, whether it harms its holder, when in its holder's turn it
-/// ticks, the family a holder keeps one of, and the parts it applies while held. Compares its parts in order (decision
-/// 795), so two records built apart from the same parts are equal, as a drop table compares its entries.
+/// One status as content describes it (ADR 0055): its words, its mark's letter, whether it harms its holder, when it
+/// ticks in its holder's turn, the family a holder keeps one of, and the parts it applies while held. Compares its
+/// parts in order (decision 795), so two records built apart from the same parts are equal (a drop table compares its
+/// entries the same way).
 /// </summary>
 public sealed record StatusDefinition
 {
@@ -26,6 +27,9 @@ public sealed record StatusDefinition
 
     /// <summary>The statuses a holder keeps one of (decision 800), such as <c>poison</c>; its id when absent.</summary>
     public string? Family { get; init; }
+
+    /// <summary>The letter its mark shows; the name's first when absent (decision 810).</summary>
+    public string? MarkLetter { get; init; }
 
     public required IReadOnlyList<StatusPart> Parts { get; init; }
 
@@ -55,6 +59,7 @@ public sealed record StatusDefinition
         && IsHarmful == other.IsHarmful
         && ActsAt == other.ActsAt
         && Family == other.Family
+        && MarkLetter == other.MarkLetter
         && Parts.SequenceEqual(other.Parts);
 
     public override int GetHashCode() => HashCode.Combine(Id, Parts.Count);

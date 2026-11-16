@@ -45,6 +45,23 @@ public sealed class StatusCatalogValidatorTests
             With(new StatusPart(HealEachTurn, 4, DamageType.Fire)),
             "parts[0]: damageType is only for damageEachTurn (was fire on healEachTurn)."
         },
+        { With(Part(StatChange, -15)), "parts[0]: statChange must name a stat." },
+        {
+            With(new StatusPart(DamageEachTurn, 8, Stat: StatKind.Accuracy)),
+            "parts[0]: stat is only for statChange (was accuracy on damageEachTurn)."
+        },
+        {
+            With(Changing(StatKind.Accuracy, -15), Changing(StatKind.Speed, -15)),
+            "parts[1]: statChange can't change speed (it changes accuracy, dodge, critChance, crowdControlResistance)."
+        },
+        {
+            With(Changing(StatKind.Accuracy, -15), Changing(StatKind.Accuracy, -5)),
+            "parts[1]: statChange of accuracy is listed twice."
+        },
+        { With(Changing(StatKind.Dodge, 0)), "parts[0]: statChange's amount must not be 0." },
+        { _poison with { MarkLetter = "LL" }, "markLetter must be one letter or digit (was 'LL')." },
+        { _poison with { MarkLetter = " " }, "markLetter must be one letter or digit (was ' ')." },
+        { _poison with { MarkLetter = "" }, "markLetter must be one letter or digit (was '')." },
     };
 
     [Theory]
@@ -107,6 +124,28 @@ public sealed class StatusCatalogValidatorTests
         Assert.Equal("statuses.json: family 'poison': poison_2's parts differ from poison_1's.", exception.Message);
     }
 
+    // Decision 800: a family's records change the same stats, so a refresh can keep the stronger of each.
+    [Fact]
+    public void Validate_OneFamilyWithAnotherStat_Throws()
+    {
+        var slowed = _poison with { Family = "slowed", Parts = [Changing(StatKind.Accuracy, -15)] };
+        var dodging = slowed with { Id = "poison_2", Parts = [Changing(StatKind.Dodge, -15)] };
+
+        var exception = Assert.Throws<ContentValidationException>(() => Validate(slowed, dodging));
+
+        Assert.Equal("statuses.json: family 'slowed': poison_2's parts differ from poison_1's.", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_TwoStatChangesOfDifferentStats_Accepted() =>
+        Assert.Null(Record.Exception(() => Validate(With(Changing(StatKind.Accuracy, -15), Changing(StatKind.CritChance, -5)))));
+
+    [Theory]
+    [InlineData("L")]
+    [InlineData("7")]
+    public void Validate_MarkLetterOfOneLetterOrDigit_Accepted(string markLetter) =>
+        Assert.Null(Record.Exception(() => Validate(_poison with { MarkLetter = markLetter })));
+
     [Fact]
     public void Validate_DamageEachTurnOfOne_Accepted() =>
         Assert.Null(Record.Exception(() => Validate(With(Part(DamageEachTurn, 1)))));
@@ -140,4 +179,6 @@ public sealed class StatusCatalogValidatorTests
     private static StatusDefinition With(params StatusPart[] parts) => _poison with { Parts = parts };
 
     private static StatusPart Part(StatusPartKind kind, int amount) => new(kind, amount);
+
+    private static StatusPart Changing(StatKind stat, int points) => new(StatChange, points, Stat: stat);
 }

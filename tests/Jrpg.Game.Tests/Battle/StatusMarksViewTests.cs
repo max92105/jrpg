@@ -75,6 +75,20 @@ public sealed class StatusMarksViewTests
         Assert.Equal("B", Assert.Single(marks.Marks).Letter.Text);
     }
 
+    // Decision 810: a record's mark letter wins over its name's first, so Slowed doesn't show Stun's "S".
+    [Fact]
+    public void Refresh_StatusWithMarkLetter_ShowsIt()
+    {
+        var record = TestStatuses.Record("slowed_1", "Slowed", new StatusPart(StatusPartKind.DamageTakenChange, 10));
+        var slowed = record with { MarkLetter = "L" };
+        var (marks, hex) = MarksOfGoblinCHexedWith(slowed);
+        hex();
+
+        marks.Refresh();
+
+        Assert.Equal("L", Assert.Single(marks.Marks).Letter.Text);
+    }
+
     // Decision 800: a holder keeps one status per family, so the screen shows one mark for it.
     [Fact]
     public void Refresh_TwoRecordsOfOneFamily_ShowsOneMark()

@@ -31,6 +31,18 @@
     "effect": { "kind": "damage", "damageType": "fire", "power": 0, "tier": "fire_2", "targeting": "singleEnemy" }
   },
   {
+    "id": "cone_of_cold",
+    "name": "Cone of Cold",
+    "description": "A blast of frost at one enemy that slows it for two of its turns. Placeholder: the developer writes the real spell.",
+    "iconFile": "Attack.png",
+    "soundFile": "PlaceholderSkillHex.wav",
+    "resourceChanges": [ { "resourceId": "mana", "amount": -4 } ],
+    "effect": {
+      "kind": "damage", "damageType": "ice", "power": 0, "tier": "ice_1", "targeting": "singleEnemy",
+      "statuses": [ { "status": "slowed_1", "turns": 2 } ]
+    }
+  },
+  {
     "id": "heal",
     "name": "Heal",
     "description": "Restores HP to one ally.",

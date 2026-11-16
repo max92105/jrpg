@@ -1,5 +1,5 @@
 # Skills and statuses model (editor push, roadmap row 6)
-Status: approved
+Status: retro pending
 
 Drafted on 2026-11-15 from roadmap row 6 of [the editor push](../2026-11-15-editor-push/README.md), its design.md
 sections 3.8 and 5, and the developer's decisions 675-677, 695-697 and 702-705 there. Approved on 2026-11-15 by
@@ -113,7 +113,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/ST.md](slices/ST.md)
 - [x] **WK. Weakened: a status lowers the damage its holder deals** (Core + Data + content, about 220 lines) →
   [slices/WK.md](slices/WK.md)
-- [ ] **SL. Slowed: a status changes a stat by points, with its own mark letter** (Core + Data + Game + content, about
+- [x] **SL. Slowed: a status changes a stat by points, with its own mark letter** (Core + Data + Game + content, about
   260 lines) → [slices/SL.md](slices/SL.md)
 
 ## Decisions

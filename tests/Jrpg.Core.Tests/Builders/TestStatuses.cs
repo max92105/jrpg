@@ -1,4 +1,5 @@
 using Jrpg.Core.Effects;
+using Jrpg.Core.Stats;
 using Jrpg.Core.Statuses;
 
 namespace Jrpg.Core.Tests.Builders;
@@ -25,6 +26,10 @@ internal static class TestStatuses
     public const string WeakenedId = "weakened";
 
     public const string EmpoweredId = "empowered";
+
+    public const string SlowedId = "slowed";
+
+    public const string FocusedId = "focused";
 
     /// <summary>The holder loses <paramref name="amount"/> HP at the end of each of its turns.</summary>
     public static StatusGrant Poison(int amount, int turns) =>
@@ -58,6 +63,18 @@ internal static class TestStatuses
     /// </summary>
     public static StatusGrant Empowered(int percent, int turns) =>
         new(Record(EmpoweredId, new StatusPart(StatusPartKind.DamageDealtChange, percent)), turns);
+
+    /// <summary>
+    /// The holder's <paramref name="stat"/> changes by <paramref name="points"/>: Slowed's are negative.
+    /// </summary>
+    public static StatusGrant Slowed(StatKind stat, int points, int turns) =>
+        new(Record(SlowedId, new StatusPart(StatusPartKind.StatChange, points, Stat: stat)), turns);
+
+    /// <summary>
+    /// The holder's <paramref name="stat"/> changes by <paramref name="points"/>, in a family apart from Slowed's.
+    /// </summary>
+    public static StatusGrant Focused(StatKind stat, int points, int turns) =>
+        new(Record(FocusedId, new StatusPart(StatusPartKind.StatChange, points, Stat: stat)), turns);
 
     public static string IdOf(StatusDefinition status) => status.Id;
 

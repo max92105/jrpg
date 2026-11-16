@@ -54,3 +54,5 @@ default). The mage's placeholder Cone of Cold (`ice_1`) leaves it for two turns.
   as often as before.
 - **Note from WK:** the Status page shows three skills per class, so Cone of Cold, a fourth, stays off the mage's
   `skillIds` as Enfeeble stayed off the warlock's, until the page scrolls (backlog).
+- **Done, with deviations:** Cone of Cold stays off the mage's `skillIds` (WK's note); `WithStatChange(stats, stat,
+  points)` bounds each stat's summed points, so a rise and a drop cancel in any order; the family shape includes `stat`.

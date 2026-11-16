@@ -113,6 +113,27 @@
     ]
   },
   {
+    "id": "slowed_1",
+    "name": "Slowed",
+    "description": "Aims worse and lands fewer crits.",
+    "isHarmful": true,
+    "actsAt": "endOfTurn",
+    "family": "slowed",
+    "markLetter": "L",
+    "parts": [
+      {
+        "kind": "statChange",
+        "amount": -15,
+        "stat": "accuracy"
+      },
+      {
+        "kind": "statChange",
+        "amount": -5,
+        "stat": "critChance"
+      }
+    ]
+  },
+  {
     "id": "stun",
     "name": "Stun",
     "description": "Loses its turn.",

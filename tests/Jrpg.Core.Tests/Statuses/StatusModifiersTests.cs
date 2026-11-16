@@ -76,6 +76,112 @@ public sealed class StatusModifiersTests
         Assert.Equal(-150, current.DamageModifierPermille);
     }
 
+    // A stat change is in percentage points, the stats in permille: 100 % - 15 points = 850.
+    [Fact]
+    public void Apply_AccuracyChange_AddsItsPoints()
+    {
+        var current = StatusModifiers.Apply(_stats, Holding(TestStatuses.Slowed(StatKind.Accuracy, -15, 3)));
+
+        Assert.Equal(850, current.AccuracyPermille);
+    }
+
+    [Fact]
+    public void Apply_DodgeChange_AddsItsPoints()
+    {
+        var current = StatusModifiers.Apply(
+            _stats with { DodgePermille = 100 }, Holding(TestStatuses.Focused(StatKind.Dodge, 10, 3)));
+
+        Assert.Equal(200, current.DodgePermille);
+    }
+
+    [Fact]
+    public void Apply_CritChanceChange_AddsItsPoints()
+    {
+        var current = StatusModifiers.Apply(
+            _stats with { CritChancePermille = 100 }, Holding(TestStatuses.Slowed(StatKind.CritChance, -5, 3)));
+
+        Assert.Equal(50, current.CritChancePermille);
+    }
+
+    [Fact]
+    public void Apply_CrowdControlResistanceChange_AddsItsPoints()
+    {
+        var current = StatusModifiers.Apply(
+            _stats with { CrowdControlResistancePermille = 100 },
+            Holding(TestStatuses.Focused(StatKind.CrowdControlResistance, 20, 3)));
+
+        Assert.Equal(300, current.CrowdControlResistancePermille);
+    }
+
+    [Fact]
+    public void Apply_AccuracyBelowZero_HeldAtZero()
+    {
+        var current = StatusModifiers.Apply(
+            _stats with { AccuracyPermille = 100 }, Holding(TestStatuses.Slowed(StatKind.Accuracy, -15, 3)));
+
+        Assert.Equal(0, current.AccuracyPermille);
+    }
+
+    [Fact]
+    public void Apply_DodgeBelowZero_HeldAtZero()
+    {
+        var current = StatusModifiers.Apply(
+            _stats with { DodgePermille = 100 }, Holding(TestStatuses.Slowed(StatKind.Dodge, -15, 3)));
+
+        Assert.Equal(0, current.DodgePermille);
+    }
+
+    // 45 % + 10 points would be 55 %, past the 50 % cap (decision 295).
+    [Fact]
+    public void Apply_DodgeAboveTheCap_HeldAtTheCap()
+    {
+        var current = StatusModifiers.Apply(
+            _stats with { DodgePermille = 450 }, Holding(TestStatuses.Focused(StatKind.Dodge, 10, 3)));
+
+        Assert.Equal(500, current.DodgePermille);
+    }
+
+    [Fact]
+    public void Apply_CritChanceBelowZero_HeldAtZero()
+    {
+        var current = StatusModifiers.Apply(
+            _stats with { CritChancePermille = 30 }, Holding(TestStatuses.Slowed(StatKind.CritChance, -5, 3)));
+
+        Assert.Equal(0, current.CritChancePermille);
+    }
+
+    [Fact]
+    public void Apply_CrowdControlResistanceBelowZero_HeldAtZero()
+    {
+        var current = StatusModifiers.Apply(
+            _stats with { CrowdControlResistancePermille = 30 },
+            Holding(TestStatuses.Slowed(StatKind.CrowdControlResistance, -5, 3)));
+
+        Assert.Equal(0, current.CrowdControlResistancePermille);
+    }
+
+    // Two families change accuracy: 100 % - 15 + 5 points = 900.
+    [Fact]
+    public void Apply_TwoStatChangesOfOneStat_AddUp()
+    {
+        var statuses = Holding(TestStatuses.Slowed(StatKind.Accuracy, -15, 3), TestStatuses.Focused(StatKind.Accuracy, 5, 3));
+
+        var current = StatusModifiers.Apply(_stats, statuses);
+
+        Assert.Equal(900, current.AccuracyPermille);
+    }
+
+    // 0 - 10 + 15 points is 5 %; holding the drop at 0 before the rise would give 15 %.
+    [Fact]
+    public void Apply_DropPastZeroThenARise_AddsUpBeforeTheBound()
+    {
+        var statuses = Holding(TestStatuses.Slowed(StatKind.Dodge, -10, 3), TestStatuses.Focused(StatKind.Dodge, 15, 3));
+
+        var current = StatusModifiers.Apply(_stats, statuses);
+
+        Assert.Equal(50, current.DodgePermille);
+    }
+
     [Fact]
     public void ExtraDamageTakenPercent_Exposed_IsItsPower()
     {
@@ -85,5 +191,16 @@ public sealed class StatusModifiersTests
         var extra = StatusModifiers.ExtraDamageTakenPercent(statuses);
 
         Assert.Equal(50, extra);
+    }
+
+    private static StatusSet Holding(params StatusGrant[] grants)
+    {
+        var statuses = new StatusSet();
+        foreach (var grant in grants)
+        {
+            statuses.Apply(grant);
+        }
+
+        return statuses;
     }
 }

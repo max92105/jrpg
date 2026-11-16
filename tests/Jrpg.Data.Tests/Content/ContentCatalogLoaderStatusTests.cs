@@ -56,6 +56,16 @@ public sealed class ContentCatalogLoaderStatusTests : IDisposable
         Assert.Contains(weakened.Parts, part => part.Kind == StatusPartKind.DamageDealtChange);
     }
 
+    // Decision 808: Cone of Cold grants Slowed, which lowers its holder's accuracy (decision 807).
+    [Fact]
+    public void Load_RepositoryConeOfCold_GrantsSlowed()
+    {
+        var coneOfCold = ContentCatalogLoader.Load(_content.Path).Skills["cone_of_cold"];
+
+        var slowed = Assert.Single(coneOfCold.Effect.Statuses, grant => grant.Status.Id == "slowed_1").Status;
+        Assert.Contains(slowed.Parts, part => (part.Kind, part.Stat) == (StatusPartKind.StatChange, StatKind.Accuracy));
+    }
+
     [Fact]
     public void Load_StatusesFileMissing_RefusesNamingIt()
     {

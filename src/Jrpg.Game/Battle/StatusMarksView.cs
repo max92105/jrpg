@@ -8,9 +8,9 @@ namespace Jrpg.Game.Battle;
 
 /// <summary>
 /// One combatant's statuses as a row of small diamond marks, one per family (decision 800), in the order applied, like
-/// the reference UI's buff and weakness icons: the status name's first letter, its turns left small at the corner, and
-/// a rim, warm red for a harmful status and cool blue for a helpful one, as its record says (decision 810). A new mark
-/// pops in; an ended one fades out. Text is formatted at refreshes.
+/// the reference UI's buff and weakness icons: the record's mark letter or its name's first, its turns left small at
+/// the corner, and a rim, warm red for a harmful status and cool blue for a helpful one, as its record says (decision
+/// 810). A new mark pops in; an ended one fades out. Text is formatted at refreshes.
 /// </summary>
 internal sealed class StatusMarksView
 {
@@ -111,7 +111,7 @@ internal sealed class StatusMarksView
 
     private StatusMark AddMark(StatusDefinition status)
     {
-        var letter = MeasuredText.Of(_letterFont.Font, status.Name[..1].ToUpperInvariant());
+        var letter = MeasuredText.Of(_letterFont.Font, (status.MarkLetter ?? status.Name[..1]).ToUpperInvariant());
         var mark = new StatusMark(status.FamilyKey, status.IsHarmful, letter) { TurnsLeft = -1 };
         _marks.Add(mark);
         return mark;

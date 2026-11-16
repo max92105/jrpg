@@ -33,4 +33,9 @@ public enum StatusPartKind
     /// 786); a negative one lowers it, above -100.
     /// </summary>
     DamageDealtChange,
+
+    /// <summary>
+    /// Its holder's <see cref="StatusPart.Stat"/> changes by the amount, in percentage points (decision 807).
+    /// </summary>
+    StatChange,
 }

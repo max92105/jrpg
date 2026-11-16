@@ -22,7 +22,7 @@ Older plans are single files with the same sections.
 | [2026-11-15-enemy-behavior](2026-11-15-enemy-behavior/README.md) | approved (the editor push's row 8) |
 | [2026-11-15-encounters-and-backgrounds](2026-11-15-encounters-and-backgrounds/README.md) | approved (the editor push's row 10) |
 | [2026-11-15-mode-bar](2026-11-15-mode-bar/README.md) | approved (the editor push's row 11: the dialog pages WD1-WD8 run before row 7, the mode bar WS1-WS6 at its rank) |
-| [2026-11-15-skills-and-statuses-model](2026-11-15-skills-and-statuses-model/README.md) | approved (the editor push's row 6) |
+| [2026-11-15-skills-and-statuses-model](2026-11-15-skills-and-statuses-model/README.md) | retro pending (the editor push's row 6) |
 | [2026-11-15-event-window-cleanup](2026-11-15-event-window-cleanup/README.md) | retro pending (the editor push's row 3) |
 | [2026-11-15-sprite-cells-and-mirrors](2026-11-15-sprite-cells-and-mirrors/README.md) | retro pending (the editor push's row 5) |
 | [2026-11-15-cinematic-focus-point](2026-11-15-cinematic-focus-point/README.md) | retro pending (the editor push's row 4) |

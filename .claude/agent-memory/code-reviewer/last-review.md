@@ -5,18 +5,17 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-enemy-behavior, slice EB11 (FoeHpBelow, EveryNthTurn: TacticCondition.Turns, TacticConditionNumber.Turns,
-TacticMemory.TurnsActed/NoteTurnActed, validator LeftOutProblem + MostTurnsBetween, AbsentWhenZero "turns", editor
-choice phrases + TacticRuleRow ConditionOf/NumberName). 2026-11-16. Round 1. Verdict: Ready to commit (no Critical).
+Plan 2026-11-15-enemy-behavior, slice EB12 (TacticTarget.UnafflictedFoe, TacticTargetCandidates.For takes the skill,
+EnemyTactics.SkillOf, EnemyTargeting.ForRule one draw after the taunt, TacticTargetFit.GrantsHarm, Data
+FindTargetProblem harmful-grant message, editor words). The plan's last slice. 2026-11-16. Round 1. Verdict: Ready to
+commit (no Critical, no Warning).
 
-- Warning (open): EnemyEveryNthTurnTests - turns 1, 3, 6 also pass with `TurnsActed + 1 >= Turns` ("from the 3rd turn
-  on"); add ChooseCommand_EveryThirdTurnOnItsFourthTurn_IsNotEligible (DefendFor rounds: 3, Tactics(0), AttackCommand).
-- Warning (open): TacticRuleRow.WhenWords - EveryNthTurn reads "When every Nth turn of its own 3 turns: ..."; word the
-  Turns case (e.g. "Every 3 turns of its own") or relabel, with a Sentence test in TacticRuleRowSentenceTests.
-- Suggestion (open, optional): TacticRuleRowSentenceTests has no FoeHpBelow/EveryNthTurn sentence pinned (covered by
-  the Warning's test for the turns one).
-- EB10 carried suggestions dropped (optional, not re-raised).
-- Checked, no finding: quick skill counting twice is unreachable today (enemies hold no resources, Combatant.FromEnemy;
-  Data requires a cost on isQuick, SkillCatalogValidator:23), a readied extra turn counts as a turn acted (decision 847's
-  "turns acted"); stun skip arrives in the member's Execute so NoteOwnTurn isn't called for the stunned enemy; validator
-  bounds 1/11 refused, 2/10 accepted, percent 1/99 accepted; Turns 0 % would throw in Core but Data refuses it.
+- Suggestion (open, optional): EnemyTacticRuleValidatorTests.PoisonSkill builds Skill(id, SingleEnemy) then replaces
+  its whole Effect; build the record once (a grants parameter on Skill).
+- Suggestion (open, optional): no Data test pins the attack with unafflictedFoe ("(attack).on: unafflictedFoe needs a
+  skill that grants a harmful status.").
+- EB11 Warnings (EveryThirdTurnOnItsFourthTurn test, TacticRuleRow "Every N turns of its own") fixed: both in the tree.
+- Checked, no finding: fallen foes never legal (TargetRules.CanTarget SingleEnemy needs IsAlive); poison_2 held vs
+  poison_1 granted matches by FamilyKey; boon grant ignored; draws exact (FixedSequenceRandom throws on an extra draw):
+  no taunt 1 draw, taunt 1 roll + 1 draw; Data's singleEnemy branch equals Core's !GrantsHarm today (only reached when
+  Fits is false); content has no family mixing harmful and boon tiers.

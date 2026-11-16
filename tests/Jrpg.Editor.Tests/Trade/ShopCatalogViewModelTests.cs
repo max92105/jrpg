@@ -6,7 +6,7 @@ using Jrpg.Editor.Trade;
 
 namespace Jrpg.Editor.Tests.Trade;
 
-// The Shops window's list (ADR 0045): the draft's shops in id order, only a new shop removable (decision 581), the
+// The Shops page's list (ADR 0045): the draft's shops in id order, only a new shop removable (decision 581), the
 // picker's priced items by name (decision 584), and the problem line ending with Data's message (decision 580).
 public sealed class ShopCatalogViewModelTests
 {
@@ -110,31 +110,6 @@ public sealed class ShopCatalogViewModelTests
         Assert.Contains(nameof(ShopCatalogViewModel.Problem), notified);
     }
 
-    // OK greys with the problem line (the editor rules' CanApply), raised with it.
-    [Fact]
-    public void CanApply_ProblemAppears_IsFalseAndNotifies()
-    {
-        var catalog = new ShopCatalogViewModel(_content);
-        var notified = new List<string?>();
-        catalog.PropertyChanged += (_, e) => notified.Add(e.PropertyName);
-
-        catalog.Shops[1].Name = "";
-
-        Assert.False(catalog.CanApply);
-        Assert.Contains(nameof(ShopCatalogViewModel.CanApply), notified);
-    }
-
-    [Fact]
-    public void CanApply_ProblemGoes_IsTrueAgain()
-    {
-        var catalog = new ShopCatalogViewModel(_content);
-        catalog.Shops[1].Name = "";
-
-        catalog.Shops[1].Name = "General Store";
-
-        Assert.True(catalog.CanApply);
-    }
-
     [Fact]
     public void Problem_LastItemRemoved_IsDataMessageAndNotifies()
     {
@@ -187,6 +162,39 @@ public sealed class ShopCatalogViewModelTests
         catalog.AddShopCommand.Execute(null);
 
         Assert.Throws<InvalidOperationException>(catalog.ToShops);
+    }
+
+    // The armory is chosen first (id order), so only Choose picks the general store.
+    [Fact]
+    public void Choose_KnownId_ChoosesIt()
+    {
+        var catalog = new ShopCatalogViewModel(_content);
+
+        catalog.Choose("general_store");
+
+        Assert.Equal("general_store", catalog.SelectedShop!.Id);
+    }
+
+    [Fact]
+    public void Choose_UnknownId_KeepsTheChoice()
+    {
+        var catalog = new ShopCatalogViewModel(_content);
+        catalog.Choose("general_store");
+
+        catalog.Choose("smithy");
+
+        Assert.Equal("general_store", catalog.SelectedShop!.Id);
+    }
+
+    [Fact]
+    public void ChosenKey_NewShopTyped_IsItsTypedId()
+    {
+        var catalog = new ShopCatalogViewModel(_content);
+        catalog.AddShopCommand.Execute(null);
+
+        catalog.SelectedShop!.Id = "smithy";
+
+        Assert.Equal("smithy", catalog.ChosenKey);
     }
 
     private static ItemDefinition Item(string id, string name, int? price) => new()

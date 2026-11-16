@@ -8,9 +8,9 @@ using Jrpg.Editor.Objects;
 namespace Jrpg.Editor.Trade;
 
 /// <summary>
-/// One shop as the Shops window edits it (ADR 0045): its id (typed while the shop is new, fixed once the draft holds
-/// it, decision 582), its name and the items it sells in order, added after the chosen one from the picker's priced
-/// items. <see cref="Problem"/> is only the typed id's: the name and the items are Data's rules, shown by the list.
+/// One shop as the Shops page edits it (ADR 0045): its id (typed while the shop is new, fixed once the draft holds it,
+/// decision 582), its name and the items it sells in order, added after the chosen one from the picker's priced items.
+/// <see cref="Problem"/> is only the typed id's: the name and the items are Data's rules, shown by the list.
 /// </summary>
 internal sealed partial class ShopViewModel : ObservableObject
 {

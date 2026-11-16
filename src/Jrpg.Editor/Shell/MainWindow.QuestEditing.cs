@@ -1,4 +1,5 @@
 using Jrpg.Editor.Quests;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Shell;
 
@@ -16,7 +17,9 @@ internal sealed partial class MainWindow
         }
 
         var edited = questEditing.Start();
-        if (new QuestCatalogWindow(edited) { Owner = this }.ShowDialog() == true)
+        var window = new QuestCatalogWindow(edited) { Owner = this };
+        DialogBounds.FitTo(window, this);
+        if (window.ShowDialog() == true)
         {
             questEditing.Apply(edited);
         }

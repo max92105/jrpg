@@ -7,13 +7,15 @@ using Jrpg.Editor.Cinematics;
 using Jrpg.Editor.Loot;
 using Jrpg.Editor.Sprites;
 using Jrpg.Editor.Trade;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// The Database menu's dispatch: an entry's title runs its opener (decision 938). Shops..., Drop tables..., Effect
-/// strips..., Enemies... and Cinematics...: each window edits its catalog of the draft, and OK applies the whole
-/// session as one undo step (ADR 0045, decision 591), as the Quests window does.
+/// The Database menu's dispatch: an entry's title runs its opener (decision 938). Shops... (a page in the catalog
+/// dialog), Drop tables..., Effect strips..., Enemies... and Cinematics...: each edits its catalog of the draft at the
+/// main window's size (decision 930), and OK applies the whole session as one undo step (ADR 0045, decision 591), as
+/// the Quests window does.
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -47,10 +49,20 @@ internal sealed partial class MainWindow
             return;
         }
 
-        var edited = shopEditing.Start();
-        if (new ShopCatalogWindow(edited) { Owner = this }.ShowDialog() == true)
+        OpenInDialog("Shops", shopEditing.Start, shopEditing.Apply, edited => new ShopCatalogPage(edited));
+    }
+
+    // Starts the page's session, shows it in the dialog over the main window, applies it on OK.
+    private void OpenInDialog<TEdited>(
+        string title, Func<TEdited> start, Action<TEdited> apply, Func<TEdited, FrameworkElement> buildPage)
+        where TEdited : IEditedCatalog
+    {
+        var edited = start();
+        var dialog = new CatalogDialog(title, buildPage(edited), edited) { Owner = this };
+        DialogBounds.FitTo(dialog, this);
+        if (dialog.ShowDialog() == true)
         {
-            shopEditing.Apply(edited);
+            apply(edited);
         }
     }
 
@@ -65,7 +77,9 @@ internal sealed partial class MainWindow
 
         var edited = dropTableEditing.Start();
         edited.ChooseTable(chosenTableId);
-        if (new DropTableCatalogWindow(edited) { Owner = owner }.ShowDialog() != true)
+        var window = new DropTableCatalogWindow(edited) { Owner = owner };
+        DialogBounds.FitTo(window, owner);
+        if (window.ShowDialog() != true)
         {
             return false;
         }
@@ -98,6 +112,7 @@ internal sealed partial class MainWindow
         {
             Owner = this,
         };
+        DialogBounds.FitTo(window, this);
         if (window.ShowDialog() == true)
         {
             enemyEditing.Apply(edited);
@@ -115,6 +130,7 @@ internal sealed partial class MainWindow
         var edited = cinematicEditing.Start();
         var artRoot = _viewModel.ArtRoot;
         var window = new CinematicCatalogWindow(edited, LoadPicture) { Owner = this };
+        DialogBounds.FitTo(window, this);
         if (window.ShowDialog() == true)
         {
             cinematicEditing.Apply(edited);
@@ -136,6 +152,7 @@ internal sealed partial class MainWindow
         var window = new EffectStripCatalogWindow(
             edited, file => SpriteImageFile.LoadFrom(artRoot, ArtFolders.Effects, file), animationTime)
         { Owner = this };
+        DialogBounds.FitTo(window, this);
         if (window.ShowDialog() == true)
         {
             effectStripEditing.Apply(edited);

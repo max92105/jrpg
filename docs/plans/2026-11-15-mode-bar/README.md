@@ -89,7 +89,7 @@ page recipe: [page-recipe.md](page-recipe.md).
 ### Stage 1: the dialog and the menu (right after row 6, before row 7's first window slice)
 - [x] **WD1. The Database menu in its own file, `Shell/DatabaseMenu.xaml`, its clicks caught on the menu** (Editor,
   about 80 lines, a move) → [slices/WD1.md](slices/WD1.md)
-- [ ] **WD2. `CatalogDialog` and the Shops page: one dialog at the main window's size hosting a page; the six other
+- [x] **WD2. `CatalogDialog` and the Shops page: one dialog at the main window's size hosting a page; the six other
   windows open at that size too** (Editor, about 230 lines) → [slices/WD2.md](slices/WD2.md)
 
 ### Stage 2: the six windows as pages (right after stage 1)

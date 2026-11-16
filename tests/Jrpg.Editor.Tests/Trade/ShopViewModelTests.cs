@@ -3,8 +3,8 @@ using Jrpg.Editor.Trade;
 
 namespace Jrpg.Editor.Tests.Trade;
 
-// One shop as the Shops window edits it (ADR 0045): a saved id is fixed, an item is added after the chosen one and
-// never twice, and the problem is only the typed id's.
+// One shop as the Shops page edits it (ADR 0045): a saved id is fixed, an item is added after the chosen one and never
+// twice, and the problem is only the typed id's.
 public sealed class ShopViewModelTests
 {
     private static readonly ShopDefinition _store = new("general_store", "General Store", ["potion", "bomb"]);

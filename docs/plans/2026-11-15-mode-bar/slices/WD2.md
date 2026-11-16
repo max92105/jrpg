@@ -44,3 +44,6 @@ Agents may run it (no art in Shops). `open-editor-windows.ps1`: "Database>Shops.
 of the main window, the other five the same size, no `ERROR`, no binding-error line. In the editor: Database >
 Shops...: rename a shop, Enter: applied (Ctrl+Z puts it back); add a shop with an empty id: the problem line shows,
 OK greys, Esc drops it.
+- **Done, with deviations:** `ShopCatalogViewModel.CanApply` and its two tests removed (the dialog greys OK on
+  `Problem`); new files 159 lines; tests 202 → 210 (`wc -l`); `ChosenKey` raises no change (its first reader, WS2,
+  reads it on demand).

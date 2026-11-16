@@ -8,16 +8,17 @@ using Jrpg.Core.Trade;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Events;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Trade;
 
 /// <summary>
-/// Every shop as the Shops window edits it (ADR 0045): the draft's shops in id order, the ones added this session after
+/// Every shop as the Shops page edits it (ADR 0045): the draft's shops in id order, the ones added this session after
 /// them; only an added one can be removed, since a map's event may open a saved one (decision 581). The picker offers
 /// the priced items by name (decision 584). <see cref="Problem"/> is a shop's own problem first, then Data's message
-/// for the whole list (decision 580).
+/// for the whole list (decision 580). A shop is chosen by its id.
 /// </summary>
-internal sealed partial class ShopCatalogViewModel : ObservableObject
+internal sealed partial class ShopCatalogViewModel : ObservableObject, IEditedCatalog
 {
     private readonly ContentCatalog _content;
 
@@ -56,14 +57,15 @@ internal sealed partial class ShopCatalogViewModel : ObservableObject
         RecordListProblem.FirstOf(Shops, shop => shop.Id, shop => shop.Problem, "Shop")
         ?? CatalogProblems.OfShops([.. Shops.Select(shop => shop.ToShop())], _content);
 
-    /// <summary>Whether OK may apply the session: no problem shows.</summary>
-    public bool CanApply => Problem is null;
+    public string? ChosenKey => SelectedShop?.Id;
 
     /// <exception cref="InvalidOperationException">
-    /// There is a <see cref="Problem"/>; the window applies only without one.
+    /// There is a <see cref="Problem"/>; the page's host applies only without one.
     /// </exception>
     public IReadOnlyList<ShopDefinition> ToShops() =>
         Problem is { } problem ? throw new InvalidOperationException(problem) : [.. Shops.Select(shop => shop.ToShop())];
+
+    public void Choose(string key) => SelectedShop = Shops.FirstOrDefault(shop => shop.Id == key) ?? SelectedShop;
 
     /// <summary>Adds a shop with nothing typed yet and chooses it, so its id is the next thing typed.</summary>
     [RelayCommand]
@@ -106,10 +108,5 @@ internal sealed partial class ShopCatalogViewModel : ObservableObject
 
     private void OnShopItemsChanged(object? sender, NotifyCollectionChangedEventArgs e) => RaiseProblemChanged();
 
-    // The problem line and OK's state read the same thing.
-    private void RaiseProblemChanged()
-    {
-        OnPropertyChanged(nameof(Problem));
-        OnPropertyChanged(nameof(CanApply));
-    }
+    private void RaiseProblemChanged() => OnPropertyChanged(nameof(Problem));
 }

@@ -1,5 +1,6 @@
 using System.Windows;
 using Jrpg.Editor.Sprites;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Shell;
 
@@ -22,6 +23,7 @@ internal sealed partial class MainWindow
         {
             Owner = this,
         };
+        DialogBounds.FitTo(window, this);
         if (window.ShowDialog() == true)
         {
             editing.Apply(edited);

@@ -5,7 +5,7 @@ using Jrpg.Editor.Trade;
 
 namespace Jrpg.Editor.Tests.Trade;
 
-// The Shops window starts from the draft and its whole session is one undo step (decision 591).
+// The Shops page starts from the draft and its whole session is one undo step (decision 591).
 public sealed class ShopEditingViewModelTests
 {
     private readonly CatalogDraft _draft = new(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")));

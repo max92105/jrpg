@@ -5,11 +5,9 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-skill-and-status-editors, slice FX2b (the page half of FX2: Effects/TieredEffectCatalogPage,
-MainViewModel.TieredEffectEditing, MainWindow.Database opener, DatabaseMenu entry, smoke script, map row; FX2a is
-8e7e1df5). 2026-11-16. Round 1. Verdict: Ready to commit.
+Plan 2026-11-15-skill-and-status-editors, slice FX4 (Editor/Statuses/StatusPartRow, StatusViewModel;
+SectionRowProblem moved Skills/ -> Catalogs/; notes in FX5, FX6). 2026-11-16. Round 1. Verdict: Ready to commit.
 
-- Suggestion (open): the list's muted kind and the Kind box print the enum ("RestoreHp") where effects.json and the
-  slice say restoreHp / "a heal"; a small display converter or label record if the developer wants the file's word.
-- FX2a carried items: Problem order (fixed: slice note rewords the Goal and FX5.md); Duplicate on an empty id
-  (fixed: gives an empty id); DuplicateOf placeholder per-Power (fixed: why comment present).
+- Warning (open): StatusPartRow.DamageTypes offers no "none" entry, so a typed tick can't go back to typeless (decision
+  803, poison_1); asked to rule: fix in the row (a choice record with a none entry first, TierChoice-style), not FX6.
+- FX2b carried Suggestion (open, developer's call): the Effects page prints enum names (RestoreHp) not the file's word.

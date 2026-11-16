@@ -110,7 +110,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   enemy can use moves to Core** (Core + Data, about 290 lines) → [slices/EB2.md](slices/EB2.md)
 
 ### Phase 2: the Tactics tab
-- [ ] **EB3. One rule as typed, and what its boxes offer** (Editor, about 280 lines; split point named) →
+- [x] **EB3. One rule as typed, and what its boxes offer** (Editor, about 280 lines; split point named) →
   [slices/EB3.md](slices/EB3.md)
 - [ ] **EB4. One list of rules: add after the chosen one, remove, move; a phase's threshold** (Editor, about 200
   lines) → [slices/EB4.md](slices/EB4.md)

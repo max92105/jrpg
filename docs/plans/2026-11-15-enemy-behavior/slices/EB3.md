@@ -75,3 +75,12 @@ None: nothing shows yet (EB7 shows the boxes).
   order. A skill an enemy names is always in `SkillChoices`: Data refuses an enemy naming a skill it can't use, and the
   Skills page's check (`CatalogProblems.OfSkills`) runs the enemies against the edited skills, so the draft never holds
   one.
+- **Done (EB3b, the row):** `TacticRuleRow` with 18 tests (19 cases), the plan's nine and nine more the rules ask
+  for: each `[NotifyPropertyChangedFor]` relay (When, the two number boxes as a theory, the target, the index), the
+  sentence's two other forms (always with the attack, a kind without a number), `NumberUnit`'s empty arm, `CopyOf`
+  with a problem typed, and `From` leaving the number box empty for a kind without one. The From test with a
+  condition asserts `Assert.Same` on the `All` entries, so both `Of`s are pinned. Deviations: the boxes are set
+  through a private constructor holding `New`'s values and object initializers (five boxes would be a fifth
+  parameter); a new rule's number box starts empty, and `From` leaves it empty where the percent is 0 (a kind reading
+  none), so picking a kind with a number shows "Percent must be a whole number (was '')." until one is typed;
+  `NumberUnit` is "" while the kind reads no number; `CopyOf` leaves `Index` to the list.

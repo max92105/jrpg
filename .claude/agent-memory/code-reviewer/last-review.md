@@ -5,11 +5,13 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-skills-and-statuses-model, slice MS (Effect.Statuses list, decision 809). 2026-11-15. Round 1.
-Verdict: Ready to commit. No findings.
+Plan 2026-11-15-skills-and-statuses-model, slice CH (every grant has a landing chance, decisions 798/801/802/819).
+2026-11-15. Round 1. Verdict: Ready to commit.
 
-- Checked: LandOn's else-if keeps the old guard (standing, landed) with the loop inside; SkillEmpowerment's GrantStatus
-  branch with an empty list is unreachable (validator refuses it); `"statuses": null` refused by
-  RespectNullableAnnotations, null elements by FindStatusesProblem; no `"status"` key left in content/; the miss test
-  discriminates (goblin 40 HP survives a 10-power hit, so a landed hit would grant).
-- R1 Follow-up (EffectScalingTests whole-Effect compare) answered by Effect.Equals comparing the list in order: fixed.
+- Warning, open: EffectLanding.cs:138 comment above `Grant` still says "A stun rolls ...; the other statuses land"
+  (every grant rolls now).
+- Checked: no assertion weakened beyond the slice (loader test unpinned by the slice; stun amount 100 -> 0 follows the
+  move; refresh test kept on Exposed). Self-taunt test discriminates: FixedSequenceRandom(0) has one value for the
+  shuffle and throws on a second draw, so cutting a taunt by resistance would fail it.
+- Not raised (plan decision 799): SkillEmpowerment raises only Power, so a dominant force no longer raises a stun's
+  chance; no status-only stun skill in content.

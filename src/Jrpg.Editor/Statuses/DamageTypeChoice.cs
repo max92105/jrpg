@@ -1,5 +1,5 @@
-using System.Text.Json;
 using Jrpg.Core.Stats;
+using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Statuses;
 
@@ -15,8 +15,6 @@ internal sealed record DamageTypeChoice(DamageType? Type, string Line)
     public static IReadOnlyList<DamageTypeChoice> All { get; } =
     [
         new(null, "(none: ignores resistances)"),
-        .. Enum.GetValues<DamageType>().Select(type => new DamageTypeChoice(type, Spelled(type))),
+        .. Enum.GetValues<DamageType>().Select(type => new DamageTypeChoice(type, ContentSpelling.Of(type))),
     ];
-
-    private static string Spelled(DamageType type) => JsonNamingPolicy.CamelCase.ConvertName(type.ToString());
 }

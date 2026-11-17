@@ -2,6 +2,7 @@
              x:ClassModifier="internal"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:catalogs="clr-namespace:Jrpg.Editor.Catalogs"
              xmlns:items="clr-namespace:Jrpg.Editor.Items">
   <UserControl.Resources>
     <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
@@ -12,6 +13,10 @@
     <Style x:Key="ListButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
       <Setter Property="Width" Value="144" />
       <Setter Property="Margin" Value="0,4,4,0" />
+    </Style>
+    <!-- A click into a bonus row's box chooses that row, so Add bonus and Remove bonus act on the row being typed in. -->
+    <Style x:Key="TypedRow" TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+      <Setter Property="catalogs:RowFocus.ChoosesRow" Value="True" />
     </Style>
   </UserControl.Resources>
   <DockPanel>
@@ -128,6 +133,31 @@
                         ItemsSource="{Binding DamageTypeChoices}"
                         SelectedItem="{Binding DamageType}"
                         ToolTip="The type its hits meet resistances as" />
+            </StackPanel>
+          </StackPanel>
+          <!-- Each stat once, from those a base item may give: the affix-only stats are rolls' alone (ADR 0030). -->
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Bonuses" Style="{StaticResource FieldLabel}" VerticalAlignment="Top" />
+            <ListBox Width="250" MinHeight="24" ItemsSource="{Binding Bonuses}" SelectedItem="{Binding SelectedBonus}"
+                     ItemContainerStyle="{StaticResource TypedRow}">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal">
+                    <ComboBox Width="170"
+                              ItemsSource="{Binding DataContext.StatChoices, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                              SelectedItem="{Binding Stat}" />
+                    <TextBox Width="50"
+                             Margin="4,0,0,0"
+                             Text="{Binding ValueText, UpdateSourceTrigger=PropertyChanged}"
+                             ToolTip="Points for a primary, max HP or speed, percents for the rest; never 0" />
+                  </StackPanel>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+            <StackPanel Margin="4,0,0,0">
+              <Button Content="Add bonus" Width="100" Command="{Binding AddBonusCommand}"
+                      ToolTip="The first stat no row names, after the chosen row" />
+              <Button Content="Remove bonus" Width="100" Margin="0,4,0,0" Command="{Binding RemoveBonusCommand}" />
             </StackPanel>
           </StackPanel>
         </StackPanel>

@@ -2,8 +2,8 @@ namespace Jrpg.Editor.Catalogs;
 
 /// <summary>
 /// The first row of a page's section that can't be built (a skill's cost changes, needs and grants, a status's parts,
-/// an enemy's rules), named by its list and its place as the page shows it, or by Data's field where the page numbers
-/// its rows as Data does.
+/// an enemy's rules, an equipment's bonuses), named by its list and its place as the page shows it, or by Data's field
+/// where the page numbers its rows as Data does, with what the row names where its place alone wouldn't find it.
 /// </summary>
 internal static class SectionRowProblem
 {
@@ -22,6 +22,22 @@ internal static class SectionRowProblem
     /// </returns>
     public static string? FirstInField<T>(string field, IReadOnlyList<T> rows, Func<T, string?> problemOf) =>
         First(rows, problemOf) is { } found ? $"{field}[{found.Index}]: {found.Problem}" : null;
+
+    /// <param name="field">Data's name for the list: "bonuses".</param>
+    /// <param name="rows">The rows in the page's order.</param>
+    /// <param name="nameOf">What the row names, so the line can be matched with the row: "power".</param>
+    /// <param name="problemOf">A row's own problem, or null.</param>
+    /// <returns>
+    /// "bonuses[1] (power): Value must be a whole number (was 'x')."; null when every row can be built.
+    /// </returns>
+    public static string? FirstInField<T>(
+        string field,
+        IReadOnlyList<T> rows,
+        Func<T, string> nameOf,
+        Func<T, string?> problemOf) =>
+        First(rows, problemOf) is { } found
+            ? $"{field}[{found.Index}] ({nameOf(rows[found.Index])}): {found.Problem}"
+            : null;
 
     private static (int Index, string Problem)? First<T>(IReadOnlyList<T> rows, Func<T, string?> problemOf)
     {

@@ -5,7 +5,7 @@ using Jrpg.Editor.Items;
 namespace Jrpg.Editor.Tests.Items;
 
 // An equipment's form as typed (decision 880): its kind, and a weapon's damage and type, hidden, never read and written
-// empty off a weapon; the bonuses carried.
+// empty off a weapon; a kind changed keeps the bonuses, whose rows ItemEquipmentViewModelBonusTests covers.
 public sealed class ItemEquipmentViewModelTests
 {
     private static readonly EquipmentStats _axe = ItemFixtures.CopperAxe.Equipment!;

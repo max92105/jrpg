@@ -10,8 +10,9 @@ namespace Jrpg.Editor.Items;
 /// One item as the Items page edits it (decision 879): its id (typed while the item is new, fixed once the draft holds
 /// it, decision 582), name, description, icon, max stack, price and menu use as typed, and an equipment's form
 /// (decision 880), written over the record it came from, so what no box edits (the effect, the fixed affixes) is
-/// carried; its category is the record's and never typed (decision 878). <see cref="Problem"/> is only the typed id's
-/// and the number boxes': the rest is Data's rules, which the list shows for every item at once.
+/// carried; its category is the record's and never typed (decision 878). <see cref="Problem"/> is only the typed id's,
+/// the number boxes' and the equipment form's (a box that can't be read, a stat named twice): the rest is Data's rules,
+/// which the list shows for every item at once.
 /// </summary>
 internal sealed partial class ItemViewModel : ObservableObject
 {

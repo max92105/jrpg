@@ -1,6 +1,6 @@
-using System.Text.Json;
 using Jrpg.Core.Content;
 using Jrpg.Core.Effects;
+using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Effects;
 
@@ -27,8 +27,6 @@ internal sealed record TierChoice(string Id, string Line, TieredEffect? Tier)
     // Spelled as the content files spell the values, which the Effects page's records show.
     private static string LineOf(TieredEffect tier) =>
         tier.DamageType is { } type
-            ? $"{tier.Id}: {Spelled(tier.Kind)}, {Spelled(type)}, x{tier.PerPower}"
-            : $"{tier.Id}: {Spelled(tier.Kind)}, x{tier.PerPower}";
-
-    private static string Spelled<T>(T value) where T : struct, Enum => JsonNamingPolicy.CamelCase.ConvertName(value.ToString());
+            ? $"{tier.Id}: {ContentSpelling.Of(tier.Kind)}, {ContentSpelling.Of(type)}, x{tier.PerPower}"
+            : $"{tier.Id}: {ContentSpelling.Of(tier.Kind)}, x{tier.PerPower}";
 }

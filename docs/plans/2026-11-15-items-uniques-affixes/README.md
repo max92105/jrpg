@@ -134,8 +134,10 @@ slices run; IU5 is optional and IU16 merged into IU15.
 
 ### Phase 4: the Affixes page
 - [x] **IU14. One affix as the Affixes page types it** (Editor, about 190 lines) → [slices/IU14.md](slices/IU14.md)
-- [ ] **IU15. The Affixes list, its undo step and Database > Affixes, uniques following their affixes' stats** (Editor
+- [x] **IU15. The Affixes list, its undo step and Database > Affixes, uniques following their affixes' stats** (Editor
   + Data, about 290 lines; IU16 merged in, decision 885) → [slices/IU15.md](slices/IU15.md)
+- [ ] **IU15b. The Affixes page and Database > Affixes** (Editor, about 110 lines; IU15's split) →
+  [slices/IU15b.md](slices/IU15b.md)
 
 ### Phase 5: the gear damage modifier
 - [ ] **IU17. A "+% damage" affix stat raises its wearer's damage through the modifiers' sum** (Core + Data + Game,
@@ -244,6 +246,9 @@ The Affixes page:
 - **885.** (Review C5.) The Affixes page's XAML is under about 80 lines (no OK, Cancel or problem line), so the page
   lands with its list and undo step in IU15; IU16 is merged there. New records start from the tunables in design.md,
   section 1.
+- **1002.** (IU15.) An affix compares its kinds in order (Core's `AffixDefinition.Equals`, as `ItemDefinition` its fixed
+  affixes); the page writes the ticked kinds in enum order, but keeps the record's own list while the same kinds are
+  ticked, so an untouched page records no step and rewrites no hand-ordered `kinds` line.
 
 The gear damage modifier:
 - **886.** It lands here (IU17): `StatKind.DamageBonus`, a percent stat, whose sum over the worn gear joins row 6's

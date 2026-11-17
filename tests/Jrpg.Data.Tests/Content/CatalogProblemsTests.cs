@@ -4,6 +4,7 @@ using Jrpg.Core.Content;
 using Jrpg.Core.Crafting;
 using Jrpg.Core.Items;
 using Jrpg.Core.Loot;
+using Jrpg.Core.Stats;
 using Jrpg.Core.Trade;
 using Jrpg.Data.Content;
 
@@ -151,6 +152,66 @@ public sealed class CatalogProblemsTests
     // The accepted bound: a cost of a whole stack loads.
     [Fact]
     public void OfItems_MaterialStackAtTheForgesCost_IsNull() => Assert.Null(OfItemsWithAForgeOfOre(rerollQuantity: 2));
+
+    [Fact]
+    public void OfAffixes_ValidPool_IsNull() =>
+        Assert.Null(CatalogProblems.OfAffixes([.. _catalog.Affixes.Values], _catalog));
+
+    [Fact]
+    public void OfAffixes_RangeAcrossZero_IsDatasMessage()
+    {
+        var affixes = WithAgility(agility => agility with { Min = -2, Max = 5 });
+
+        var problem = CatalogProblems.OfAffixes(affixes, _catalog);
+
+        Assert.Equal(
+            "affixes.json: affix 'agility': min and max must be on the same side of 0, or a roll could add nothing "
+                + "(was -2 and 5).",
+            problem);
+    }
+
+    // A unique's value is free of its affix's range but not of its side of zero (decision 866).
+    [Fact]
+    public void OfAffixes_RangeMovedBelowZeroUnderAUnique_IsTheItemsMessage()
+    {
+        var affixes = WithAgility(agility => agility with { Min = -5, Max = -2 });
+
+        var problem = CatalogProblems.OfAffixes(affixes, WithAgileCharm());
+
+        Assert.Equal(
+            "items.json: item 'test_charm': fixedAffixes[0] (agility): value must be below 0, as affix 'agility' rolls (was 4).",
+            problem);
+    }
+
+    [Fact]
+    public void OfAffixes_RangeNarrowedUnderAUniquesValue_IsNull()
+    {
+        var affixes = WithAgility(agility => agility with { Min = 1, Max = 2 });
+
+        Assert.Null(CatalogProblems.OfAffixes(affixes, WithAgileCharm()));
+    }
+
+    private static List<AffixDefinition> WithAgility(Func<AffixDefinition, AffixDefinition> change) =>
+        [.. _catalog.Affixes.Values.Select(affix => affix.Id == "agility" ? change(affix) : affix)];
+
+    // The test world with a unique of the test's own, agility fixed at 4: no test world unique names agility.
+    private static ContentCatalog WithAgileCharm()
+    {
+        var charm = new ItemDefinition
+        {
+            Id = "test_charm",
+            Name = "Test Charm",
+            Description = "",
+            IconFile = "Armor.png",
+            MaxStack = 99,
+            IsUsableFromMenu = false,
+            Equipment = new EquipmentStats(EquipmentKind.Amulet) { Bonuses = StatBonuses.None },
+            IsUnique = true,
+            FixedAffixes = [new RolledAffix("agility", StatKind.Agility, 4)],
+        };
+        var items = _catalog.Items.Values.Append(charm).ToDictionary(item => item.Id, StringComparer.Ordinal);
+        return _catalog with { Items = items };
+    }
 
     // The test world's items and a material of the test's own, stacking to 2, that every Forge list names.
     private static string? OfItemsWithAForgeOfOre(int rerollQuantity)

@@ -8,7 +8,7 @@ namespace Jrpg.Editor.Catalogs;
 
 /// <summary>
 /// The catalogs the Database windows edit (ADR 0045): the shops, the enemies, the drop tables, the cinematics, the
-/// effect strips and the items, the whole session of each window recorded as one undo step.
+/// effect strips, the items and the affix pool, the whole session of each window recorded as one undo step.
 /// </summary>
 internal sealed partial class CatalogDraft
 {
@@ -108,6 +108,35 @@ internal sealed partial class CatalogDraft
 
         Do(new CatalogEdit(catalog => catalog with { Items = after }, catalog => catalog with { Items = before }));
     }
+
+    /// <summary>
+    /// Replaces the affix pool as one undo step (decision 884), every unique's fixed affixes taking their stats from
+    /// the new pool, so a stat changed on an affix reaches the uniques naming it; an undo restores both. Nothing when
+    /// the pool is the same by content, kinds in order included. No undo refusal: only items name an affix, the Affixes
+    /// page removes only one added this session, and catalog steps undo in order.
+    /// </summary>
+    public void SetAffixes(IReadOnlyList<AffixDefinition> affixes)
+    {
+        var (affixesBefore, itemsBefore) = (Current.Affixes, Current.Items);
+        var affixesAfter = affixes.ToDictionary(affix => affix.Id, StringComparer.Ordinal);
+        if (HasSameRecords(affixesBefore, affixesAfter, EqualityComparer<AffixDefinition>.Default.Equals))
+        {
+            return;
+        }
+
+        var itemsAfter = itemsBefore.Values.ToDictionary(
+            item => item.Id, item => WithFixedStatsFrom(affixesAfter, item), StringComparer.Ordinal);
+        Do(new CatalogEdit(
+            catalog => catalog with { Affixes = affixesAfter, Items = itemsAfter },
+            catalog => catalog with { Affixes = affixesBefore, Items = itemsBefore }));
+    }
+
+    // A fixed affix holds its affix's stat, resolved from the pool as items.json is read (decision 865); a unique's
+    // value stays whatever the new range (decision 866).
+    private static ItemDefinition WithFixedStatsFrom(Dictionary<string, AffixDefinition> pool, ItemDefinition item) =>
+        item.IsUnique
+            ? item with { FixedAffixes = [.. item.FixedAffixes.Select(line => line with { Stat = pool[line.AffixId].Stat })] }
+            : item;
 
     // A window's session changed nothing when it hands back the same ids and each record the same by content, so an OK
     // with no edit records no step (and keeps the redo).

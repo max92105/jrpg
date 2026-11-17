@@ -5,8 +5,7 @@ using Jrpg.Editor.Loot;
 
 namespace Jrpg.Editor.Tests.Loot;
 
-// One affix as the Affixes page types it, written over the record it came from; the kinds compared as a list, since the
-// record holds them in one and compares it by reference.
+// One affix as the Affixes page types it, written over the record it came from; the record compares its kinds in order.
 public sealed class AffixViewModelTests
 {
     [Fact]
@@ -39,7 +38,7 @@ public sealed class AffixViewModelTests
     {
         var affix = AffixViewModel.From(AffixFixtures.Fierce);
 
-        AssertSameContent(AffixFixtures.Fierce, affix.ToAffix());
+        Assert.Equal(AffixFixtures.Fierce, affix.ToAffix());
     }
 
     [Fact]
@@ -54,7 +53,7 @@ public sealed class AffixViewModelTests
         affix.GoldValueText = "40";
 
         var expected = AffixFixtures.Fierce with { Stat = StatKind.LifeSteal, Min = 2, Max = 9, Weight = 8, GoldValue = 40 };
-        AssertSameContent(expected, affix.ToAffix());
+        Assert.Equal(expected, affix.ToAffix());
     }
 
     [Fact]
@@ -66,6 +65,29 @@ public sealed class AffixViewModelTests
         AffixFixtures.Toggle(affix, EquipmentKind.Weapon).IsChosen = true;
 
         Assert.Equal([EquipmentKind.Weapon, EquipmentKind.Chest, EquipmentKind.Feet], affix.ToAffix().Kinds);
+    }
+
+    // The file's order isn't the enum's: the same kinds ticked keep it (decision 1002).
+    [Fact]
+    public void ToAffix_SameKindsTickedAgain_KeepsTheRecordsOrder()
+    {
+        var affix = AffixViewModel.From(AffixFixtures.Fierce with { Kinds = [EquipmentKind.Ring, EquipmentKind.Weapon] });
+        AffixFixtures.Toggle(affix, EquipmentKind.Ring).IsChosen = false;
+
+        AffixFixtures.Toggle(affix, EquipmentKind.Ring).IsChosen = true;
+
+        Assert.Equal([EquipmentKind.Ring, EquipmentKind.Weapon], affix.ToAffix().Kinds);
+    }
+
+    [Fact]
+    public void ToAffix_AsManyKindsButAnotherOne_AreInEnumOrder()
+    {
+        var affix = AffixViewModel.From(AffixFixtures.Fierce with { Kinds = [EquipmentKind.Ring, EquipmentKind.Weapon] });
+        AffixFixtures.Toggle(affix, EquipmentKind.Ring).IsChosen = false;
+
+        AffixFixtures.Toggle(affix, EquipmentKind.Feet).IsChosen = true;
+
+        Assert.Equal([EquipmentKind.Weapon, EquipmentKind.Feet], affix.ToAffix().Kinds);
     }
 
     [Fact]
@@ -173,7 +195,7 @@ public sealed class AffixViewModelTests
             GoldValue = 20,
         };
         Assert.True(affix.IsNew);
-        AssertSameContent(expected, affix.ToAffix());
+        Assert.Equal(expected, affix.ToAffix());
     }
 
     [Fact]
@@ -187,7 +209,7 @@ public sealed class AffixViewModelTests
 
         Assert.True(copy.IsNew);
         Assert.Equal("", idWhileCopied);
-        AssertSameContent(AffixFixtures.Fierce with { Id = "fierce_2" }, copy.ToAffix());
+        Assert.Equal(AffixFixtures.Fierce with { Id = "fierce_2" }, copy.ToAffix());
     }
 
     [Fact]
@@ -202,13 +224,5 @@ public sealed class AffixViewModelTests
 
         Assert.Equal((StatKind.DropLuck, "8x"), (copy.Stat, copy.MaxText));
         Assert.False(AffixFixtures.Toggle(copy, EquipmentKind.Ring).IsChosen);
-    }
-
-    // The record compares its kinds' list by reference, so the rest is compared whole with the kinds set alike, and the
-    // kinds in order apart.
-    private static void AssertSameContent(AffixDefinition expected, AffixDefinition actual)
-    {
-        Assert.Equal(expected, actual with { Kinds = expected.Kinds });
-        Assert.Equal(expected.Kinds, actual.Kinds);
     }
 }

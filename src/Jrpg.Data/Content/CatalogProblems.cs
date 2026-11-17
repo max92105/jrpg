@@ -77,6 +77,21 @@ public static partial class CatalogProblems
         FirstProblem(() => CheckDropTables(tables, content));
 
     /// <summary>
+    /// The first problem in the affix pool (decision 884): an affix's own range, sign, kinds, weight or gold value,
+    /// then the items' check against the edited pool, since a unique's fixed value stays on its affix's side of zero
+    /// though free of its range (decision 866); null when the loader would take them.
+    /// </summary>
+    /// <param name="affixes">The affixes as edited.</param>
+    /// <param name="content">The items whose uniques name the pool, and what the items' check reads.</param>
+    public static string? OfAffixes(IReadOnlyList<AffixDefinition> affixes, ContentCatalog content) =>
+        FirstProblem(() =>
+        {
+            CheckAffixes(affixes);
+            var edited = content with { Affixes = affixes.ToDictionary(affix => affix.Id, StringComparer.Ordinal) };
+            CheckItems([.. content.Items.Values.OrderBy(item => item.Id, StringComparer.Ordinal)], edited);
+        });
+
+    /// <summary>
     /// The first problem in the skills (decision 974): a skill's own rule, then the classes' check (a class's skills
     /// use only its resources) and the enemies' check (an enemy's skills use none), both run with these skills, since
     /// the editor writes neither file; null when the loader would take them.

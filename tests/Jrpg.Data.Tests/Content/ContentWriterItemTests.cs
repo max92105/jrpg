@@ -106,23 +106,25 @@ public sealed class ContentWriterItemTests : IDisposable
     [Fact]
     public void WriteMapCatalogs_UniqueAdded_WritesItsFixedAffixesBack()
     {
-        var band = new ItemDefinition
-        {
-            Id = "test_band",
-            Name = "Test Band",
-            Description = "",
-            IconFile = "Armor.png",
-            MaxStack = 99,
-            IsUsableFromMenu = false,
-            Equipment = new EquipmentStats(EquipmentKind.Ring) { Bonuses = StatBonuses.None },
-            Price = 300,
-            IsUnique = true,
-            FixedAffixes = [FixedFromPool("crit_chance", 9), FixedFromPool("power", 7)],
-        };
+        var band = TestBand(FixedFromPool("crit_chance", 9), FixedFromPool("power", 7));
 
         _writer.WriteMapCatalogs(WithItems(band));
 
         Assert.Equal(band, ContentCatalogLoader.Load(_content.Path).Items["test_band"]);
+    }
+
+    // The pool is read before the items, as the loader reads it: a unique's +7 is on the wrong side of the edited
+    // range, which the items' check would name first.
+    [Fact]
+    public void WriteMapCatalogs_AffixRefusedAndAUniqueOnIt_RefusesNamingAffixesJson()
+    {
+        var catalog = WithItems(TestBand(FixedFromPool("power", 7)));
+        var refused = _catalog.Affixes["power"] with { Min = 5, Max = -1 };
+
+        var exception = Assert.Throws<ContentValidationException>(
+            () => _writer.WriteMapCatalogs(catalog with { Affixes = WithAffixes(refused).Affixes }));
+
+        Assert.StartsWith("affixes.json", exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]
@@ -147,6 +149,20 @@ public sealed class ContentWriterItemTests : IDisposable
 
     private ContentCatalog WithItems(ItemDefinition item) =>
         _catalog with { Items = new Dictionary<string, ItemDefinition>(_catalog.Items) { [item.Id] = item } };
+
+    private static ItemDefinition TestBand(params RolledAffix[] fixedAffixes) => new()
+    {
+        Id = "test_band",
+        Name = "Test Band",
+        Description = "",
+        IconFile = "Armor.png",
+        MaxStack = 99,
+        IsUsableFromMenu = false,
+        Equipment = new EquipmentStats(EquipmentKind.Ring) { Bonuses = StatBonuses.None },
+        Price = 300,
+        IsUnique = true,
+        FixedAffixes = fixedAffixes,
+    };
 
     private RolledAffix FixedFromPool(string affixId, int value) => new(affixId, _catalog.Affixes[affixId].Stat, value);
 

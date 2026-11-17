@@ -30,8 +30,9 @@ public sealed partial class ContentWriter
         ObjectCatalogValidator.Validate(ContentCatalogLoader.ObjectsFile, SortedObjects(catalog), catalog.Tiles.Keys.ToHashSet());
         QuestCatalogValidator.Validate(ContentCatalogLoader.QuestsFile, SortedQuests(catalog));
         CatalogProblems.CheckFieldSprites(SortedFieldSprites(catalog), catalog);
-        CatalogProblems.CheckItems(SortedItems(catalog), catalog);
+        // As the loader reads them: a unique names the pool, so the pool's own problem comes first.
         CatalogProblems.CheckAffixes(SortedAffixes(catalog));
+        CatalogProblems.CheckItems(SortedItems(catalog), catalog);
         CatalogProblems.CheckShops(SortedShops(catalog), catalog);
         CatalogProblems.CheckDropTables(SortedDropTables(catalog), catalog);
 

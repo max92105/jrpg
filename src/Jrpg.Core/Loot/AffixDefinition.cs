@@ -27,4 +27,14 @@ public sealed record AffixDefinition
 
     /// <summary>What the affix adds to a piece's price in a shop (ADR 0031, decision 375).</summary>
     public required int GoldValue { get; init; }
+
+    // A record compares a list by reference; an affix rebuilt with the same kinds in order is the same affix, so the
+    // Affixes page closed unchanged records no step (as ItemDefinition does its fixed affixes).
+    public bool Equals(AffixDefinition? other) =>
+        other is not null
+        && (Id, Stat, Min, Max, Weight, GoldValue)
+            .Equals((other.Id, other.Stat, other.Min, other.Max, other.Weight, other.GoldValue))
+        && Kinds.SequenceEqual(other.Kinds);
+
+    public override int GetHashCode() => HashCode.Combine(Id, Kinds.Count);
 }

@@ -139,7 +139,10 @@ internal sealed partial class AffixViewModel : ObservableObject
             GoldValueText = GoldValueText,
         };
 
-    /// <summary>The record it came from with the typed fields over it, the ticked kinds in enum order.</summary>
+    /// <summary>
+    /// The record it came from with the typed fields over it, the ticked kinds in enum order, or in the record's own
+    /// order while the same kinds are ticked (decision 1002).
+    /// </summary>
     /// <exception cref="InvalidOperationException">There is a <see cref="Problem"/>.</exception>
     public AffixDefinition ToAffix() =>
         Problem is { } problem
@@ -158,8 +161,16 @@ internal sealed partial class AffixViewModel : ObservableObject
         {
             Id = Id,
             Stat = Stat,
-            Kinds = [.. Kinds.Where(toggle => toggle.IsChosen).Select(toggle => toggle.Kind)],
+            Kinds = KindsKeepingTheRecordsOrder(),
         };
+
+    // The files keep a hand-written order, which the record compares: kept while the same kinds are ticked, an
+    // untouched page records no step and rewrites no line (decision 1002); other ticks are in enum order.
+    private IReadOnlyList<EquipmentKind> KindsKeepingTheRecordsOrder()
+    {
+        List<EquipmentKind> ticked = [.. Kinds.Where(toggle => toggle.IsChosen).Select(toggle => toggle.Kind)];
+        return ticked.Count == _source.Kinds.Count && ticked.All(_source.Kinds.Contains) ? _source.Kinds : ticked;
+    }
 
     private void OnKindToggled(object? sender, PropertyChangedEventArgs e)
     {

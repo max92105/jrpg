@@ -5,12 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-encounters-and-backgrounds, slice BG1 (map names its battle background; encounter's own wins).
-2026-11-16. Round 1. Verdict: Ready to commit (no Critical, no Warning).
+Plan 2026-11-15-encounters-and-backgrounds, slice BG2 (Map settings' Battle background box).
+2026-11-16. Round 1. Verdict: Ready to commit (no Critical).
 
-- Suggestion (open): src/Jrpg.Data/Art/ArtReferenceCheck.Backgrounds.cs:15,21 — `BackgroundFile!` /
-  `BattleBackgroundFile!` after a Where; a pattern-matching Select would drop the null-forgiving operators.
-- Fixed (carried from IU17): StatusModifiersTests.cs:67 now names decision 886.
-- Checked, no finding: PendingEncounter is set only by the random roll (ExplorationState.cs:265), so a map without
-  random battles never reaches a null background; NewMapViewModel's `new MapSettings` has no table, so no background is
-  needed; the interim editor gap (ticking random battles with no box) is BG2's problem line.
+- Warning (open): src/Jrpg.Editor/Shell/MainViewModel.MapSettings.cs:27 — the edited summary line still says "Each is
+  one undo step"; ToSettings goes out as one SetMapSettingsEdit (resize apart), so one Ctrl+Z reverts name and
+  background together. Fix: "then the other fields together as one undo step"; same for the partial's class summary
+  (line 10-11, "each one undo step").
+- Dropped (in backlog.md:207): ArtFolders.ImagesIn throws when art/backgrounds is missing.
+- Dropped from BG1: Suggestion on ArtReferenceCheck.Backgrounds.cs `!` after Where (a Suggestion, not carried).
+- Checked, no finding: the box sits outside the random-battles panel (a town may name one, decision 909); the
+  MapSettingsViewModelTests fixture (random battles, no background) now has CanApply false, and no test there asserts
+  Problem null or CanApply; test-world maps with random battles name a background (BG1), so shell apply tests hold.

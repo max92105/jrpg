@@ -5,11 +5,9 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-encounters-and-backgrounds, slice EC2b (EC2's split: Background and Music boxes, FileBoxChoices).
-2026-11-17. Round 1. Verdict: Ready to commit (no Critical, no Warning).
+Plan 2026-11-15-encounters-and-backgrounds, slice EC3 (first part; SetEncounters and EncounterEditingViewModel split
+to EC3b). 2026-11-17. Round 1. Verdict: Ready to commit (no Critical, no Warning, no Suggestion).
 
-- EC2's Suggestion ("a missing enemy" wording): fixed (no longer in src/Jrpg.Editor/Encounters).
-- Answered, not a finding: EncounterDefinition content equality belongs in EC3 as its slice plans
-  (`CatalogDraft.IsSameEncounter`, as `IsSameEnemy`), not a Core `Equals` now.
-- Checked, not a finding: `new EncounterDefinition` in ToEncounter drops a field added to the record later; the slice
-  note records the source field's removal, and every current field is typed.
+- Checked, not a finding: EncounterCatalogViewModel is another copy of the catalog list view model (as
+  AffixCatalogViewModel); backlog.md already lists "The catalog list view model is copied three times", so not raised.
+- Carried from EC2b: IsSameEncounter (content equality of EnemyIds) now belongs to EC3b's SetEncounters; check it there.

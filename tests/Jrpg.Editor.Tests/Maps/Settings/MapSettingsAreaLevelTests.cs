@@ -12,12 +12,13 @@ public sealed class MapSettingsAreaLevelTests
         new MapLayout { Id = "forest", Width = 20, Height = 15, Layers = [], Objects = [] },
         new MapSettings { Id = "forest", DisplayName = "Forest" });
 
-    private readonly MapSettingsViewModel _settings = new(_forest, [], []);
+    private readonly MapSettingsViewModel _settings = new(_forest, [], [], []);
 
     [Fact]
     public void AreaLevelText_MapWithLevel_ShowsIt()
     {
-        var settings = new MapSettingsViewModel(new MapDefinition(_forest.Layout, _forest.Settings with { AreaLevel = 7 }), [], []);
+        var settings = new MapSettingsViewModel(
+            new MapDefinition(_forest.Layout, _forest.Settings with { AreaLevel = 7 }), [], [], []);
 
         Assert.Equal("7", settings.AreaLevelText);
         Assert.False(settings.AreSettingsChanged);

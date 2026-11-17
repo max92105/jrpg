@@ -1,3 +1,4 @@
+using Jrpg.Data.Art;
 using Jrpg.Data.Audio;
 using Jrpg.Editor.Maps;
 using Jrpg.Editor.Maps.Editing;
@@ -7,17 +8,23 @@ namespace Jrpg.Editor.Shell;
 
 /// <summary>
 /// Map > Map settings: the dialog's state for the shown map, and its apply: the new size first, asking before it drops
-/// anything, then the other fields, each one undo step.
+/// anything, then the other fields together as one undo step.
 /// </summary>
 internal sealed partial class MainViewModel
 {
     /// <summary>The settings dialog's state for the open map; null when no map is open.</summary>
     public MapSettingsViewModel? StartEditingSettings() =>
-        CurrentMap is { } open ? new(open.Map, Catalog!.Encounters.Keys, AudioFolders.TracksIn(_audioRoot)) : null;
+        CurrentMap is { } open
+            ? new(
+                open.Map,
+                Catalog!.Encounters.Keys,
+                AudioFolders.TracksIn(_audioRoot),
+                ArtFolders.ImagesIn(ArtRoot, ArtFolders.Backgrounds))
+            : null;
 
     /// <summary>
     /// Applies the settings dialog to the open map: the new size first, asking before it drops anything, then the name,
-    /// the track, the area level, the banner and the random battles. Each is one undo step.
+    /// the track, the area level, the banner, the battle background and the random battles, together as one undo step.
     /// </summary>
     /// <returns>False when nothing was applied: a field has a problem or the user kept the old size.</returns>
     public bool TryApplySettings(MapSettingsViewModel edited)

@@ -10,13 +10,14 @@ public sealed class MapSettingsBannerTests
         new MapLayout { Id = "forest", Width = 20, Height = 15, Layers = [], Objects = [] },
         new MapSettings { Id = "forest", DisplayName = "Forest" });
 
-    private readonly MapSettingsViewModel _settings = new(_forest, [], []);
+    private readonly MapSettingsViewModel _settings = new(_forest, [], [], []);
 
     // The fixture differs from the default: a map with the banner off.
     [Fact]
     public void ShowsBanner_MapWithBannerOff_IsFalse()
     {
-        var settings = new MapSettingsViewModel(new MapDefinition(_forest.Layout, _forest.Settings with { ShowsBanner = false }), [], []);
+        var settings = new MapSettingsViewModel(
+            new MapDefinition(_forest.Layout, _forest.Settings with { ShowsBanner = false }), [], [], []);
 
         Assert.False(settings.ShowsBanner);
         Assert.False(settings.AreSettingsChanged);

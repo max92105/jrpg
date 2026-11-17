@@ -92,7 +92,7 @@ slices and Editor slices aim at about 200 lines, not because the scope grew.
 ### Phase 1: a map's battle background
 - [x] **BG1. A map names its battle background; an encounter's own wins** (Core, Data, Game, Editor, content, about
   260 lines) → [slices/BG1.md](slices/BG1.md)
-- [ ] **BG2. Map settings' Battle background box** (Editor, about 150 lines) → [slices/BG2.md](slices/BG2.md)
+- [x] **BG2. Map settings' Battle background box** (Editor, about 150 lines) → [slices/BG2.md](slices/BG2.md)
 
 ### Phase 2: animated backgrounds
 - [x] **ADR 0059, animated battle backgrounds as grid sheets.** Write it from the entry under "ADRs needed" below

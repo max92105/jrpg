@@ -14,7 +14,7 @@ public sealed class MapSettingsViewModelTests
             RandomEncounters = new RandomEncounterTable { OneInSteps = 25, GraceSteps = 3, EncounterIds = ["wolves", "goblin_trio"] },
         });
 
-    private readonly MapSettingsViewModel _settings = new(_forest, ["wolves", "bats", "goblin_trio"], []);
+    private readonly MapSettingsViewModel _settings = new(_forest, ["wolves", "bats", "goblin_trio"], [], []);
 
     [Fact]
     public void Constructor_MapWithBattles_TicksItsEncounters()
@@ -174,5 +174,5 @@ public sealed class MapSettingsViewModelTests
     }
 
     private static MapSettingsViewModel Scored(string? track, IReadOnlyList<string> files) =>
-        new(new MapDefinition(_forest.Layout, _forest.Settings with { MusicFile = track }), ["wolves", "goblin_trio"], files);
+        new(new MapDefinition(_forest.Layout, _forest.Settings with { MusicFile = track }), ["wolves", "goblin_trio"], files, []);
 }

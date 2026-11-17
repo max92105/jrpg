@@ -55,3 +55,11 @@ forest):
 3. Open `milestone` (a town, no random battles), **Map > Settings...**, choose `Forest.png`, **OK**, **Ctrl+S**: its
    file gains `"battleBackgroundFile": "Forest.png"` before `"randomEncounters"`. **Ctrl+Z**, **Ctrl+S**: `git status`
    shows it unchanged.
+
+- **Done, with deviations:** code +56 -15, tests +157 -18: about 180 lines net against the 150 planned, the excess in
+  tests. The fixture is built in the test class (a "forest" naming `Forest.png`, varied with `with`), as its siblings
+  build theirs, not loaded from the test world. Three tests beyond the list:
+  `Problem_OddsAndBackgroundWrong_IsTheOddsProblem` (the chain's order),
+  `SelectedBattleBackground_NoneChosen_RaisesProblemChanged` (the box's own notify arm), and
+  `MainViewModelMapSettingsTests.StartEditingSettings_OpenMap_ListsTheBackgroundsFolder` (`StartMenu.png`, which no map
+  names). `MapSettingsViewModel.cs` is 203 lines.

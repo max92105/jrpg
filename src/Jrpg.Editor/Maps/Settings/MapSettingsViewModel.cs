@@ -5,14 +5,19 @@ using Jrpg.Core.Maps;
 namespace Jrpg.Editor.Maps.Settings;
 
 /// <summary>
-/// The map settings dialog: display name, track, area level, size and random battles, edited apart from the map until
-/// applied. The id changes elsewhere, through Map > Rename map (decision 530). Numbers are kept as typed
-/// (<see cref="TypedCounts"/>).
+/// The map settings dialog: display name, track, area level, size, battle background and random battles, edited apart
+/// from the map until applied. The id changes elsewhere, through Map > Rename map (decision 530). Numbers are kept as
+/// typed (<see cref="TypedCounts"/>).
 /// </summary>
 internal sealed partial class MapSettingsViewModel : ObservableObject
 {
     /// <summary>The Music box's first entry: a silent map (decision 419).</summary>
     public const string NoMusic = "(none)";
+
+    /// <summary>
+    /// The Battle background box's first entry: a map without random battles needs none (decision 909).
+    /// </summary>
+    public const string NoBattleBackground = "(none)";
 
     private readonly (int Width, int Height) _currentSize;
     private readonly MapSettings _currentSettings;
@@ -20,15 +25,23 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
     /// <param name="map">The map as it is.</param>
     /// <param name="encounterIds">Every encounter random battles can pick from.</param>
     /// <param name="musicFiles">The tracks in the music folder, so only a file that exists can be chosen.</param>
-    public MapSettingsViewModel(MapDefinition map, IEnumerable<string> encounterIds, IReadOnlyList<string> musicFiles)
+    /// <param name="backgroundFiles">The images in the backgrounds folder, chosen from as the tracks are.</param>
+    public MapSettingsViewModel(
+        MapDefinition map,
+        IEnumerable<string> encounterIds,
+        IReadOnlyList<string> musicFiles,
+        IReadOnlyList<string> backgroundFiles)
     {
         MapId = map.Id;
         _currentSettings = map.Settings;
         _currentSize = (map.Layout.Width, map.Layout.Height);
         DisplayName = map.Settings.DisplayName;
         var track = map.Settings.MusicFile;
-        MusicChoices = MusicChoicesFor(track, musicFiles);
+        MusicChoices = ChoicesFor(track, NoMusic, musicFiles);
         SelectedMusic = track ?? NoMusic;
+        var background = map.Settings.BattleBackgroundFile;
+        BattleBackgroundChoices = ChoicesFor(background, NoBattleBackground, backgroundFiles);
+        SelectedBattleBackground = background ?? NoBattleBackground;
         AreaLevelText = map.Settings.AreaLevel is { } level ? Text(level) : "";
         ShowsBanner = map.Settings.ShowsBanner;
         FolderText = map.Settings.Folder ?? "";
@@ -43,9 +56,10 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
         Encounters = [.. encounterIds.Order(StringComparer.Ordinal).Select(id => new EncounterChoice(id) { IsChosen = table?.EncounterIds.Contains(id) == true })];
     }
 
-    // A track no longer in the folder stays listed, so opening the dialog never changes the map.
-    private static IReadOnlyList<string> MusicChoicesFor(string? track, IReadOnlyList<string> musicFiles) =>
-        track is null || musicFiles.Contains(track) ? [NoMusic, .. musicFiles] : [NoMusic, track, .. musicFiles];
+    // A track or background no longer in its folder stays listed, so opening the dialog never changes the map
+    // (decisions 419, 909).
+    private static IReadOnlyList<string> ChoicesFor(string? current, string none, IReadOnlyList<string> files) =>
+        current is null || files.Contains(current) ? [none, .. files] : [none, current, .. files];
 
     public string MapId { get; }
 
@@ -55,6 +69,12 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
 
     [ObservableProperty]
     public partial string SelectedMusic { get; set; }
+
+    public IReadOnlyList<string> BattleBackgroundChoices { get; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(BattleBackgroundProblem), nameof(Problem), nameof(CanApply))]
+    public partial string SelectedBattleBackground { get; set; }
 
     [ObservableProperty]
     public partial string DisplayName { get; set; }
@@ -82,7 +102,7 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
     public partial string HeightText { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(OddsProblem), nameof(Problem), nameof(CanApply))]
+    [NotifyPropertyChangedFor(nameof(OddsProblem), nameof(BattleBackgroundProblem), nameof(Problem), nameof(CanApply))]
     public partial bool HasRandomEncounters { get; set; }
 
     /// <summary>Each step past the grace steps starts a battle with a chance of 1 in this many.</summary>
@@ -111,6 +131,12 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
             ? "The battle odds and the steps without battles must be whole numbers of at least 1."
             : null;
 
+    /// <summary>
+    /// Why the battle background can't be applied; null when it can. Random battles need one (decision 892).
+    /// </summary>
+    public string? BattleBackgroundProblem =>
+        HasRandomEncounters && SelectedBattleBackground == NoBattleBackground ? "Random battles need a battle background." : null;
+
     /// <summary>Why the area level can't be applied; null when it can, an empty box included.</summary>
     public string? AreaLevelProblem =>
         !string.IsNullOrWhiteSpace(AreaLevelText) && TypedCounts.Parse(AreaLevelText, int.MaxValue) is null
@@ -121,14 +147,16 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
     public string? FolderProblem => FolderText.Trim() is { Length: > 0 } typed ? MapFolderPath.ProblemOf(typed) : null;
 
     /// <summary>
-    /// What stops OK, the first of the size, the battle odds, the area level and the folder; null when nothing.
+    /// What stops OK, the first of the size, the battle odds, the battle background, the area level and the folder;
+    /// null when nothing.
     /// </summary>
-    public string? Problem => SizeProblem ?? OddsProblem ?? AreaLevelProblem ?? FolderProblem;
+    public string? Problem => SizeProblem ?? OddsProblem ?? BattleBackgroundProblem ?? AreaLevelProblem ?? FolderProblem;
 
     public bool CanApply => Problem is null;
 
     /// <summary>
-    /// Whether the name, the track, the area level, the banner, the folder or the random battles differ from the map's.
+    /// Whether the name, the track, the area level, the banner, the folder, the battle background or the random battles
+    /// differ from the map's.
     /// </summary>
     public bool AreSettingsChanged => !AreSame(ToSettings(), _currentSettings);
 
@@ -144,7 +172,7 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
         AreaLevel = TypedCounts.Parse(AreaLevelText, int.MaxValue),
         ShowsBanner = ShowsBanner,
         Folder = FolderText.Trim() is { Length: > 0 } folder ? folder : null,
-        BattleBackgroundFile = _currentSettings.BattleBackgroundFile,
+        BattleBackgroundFile = SelectedBattleBackground == NoBattleBackground ? null : SelectedBattleBackground,
         RandomEncounters = HasRandomEncounters
             ? new RandomEncounterTable
             {
@@ -164,6 +192,7 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
         && edited.AreaLevel == current.AreaLevel
         && edited.ShowsBanner == current.ShowsBanner
         && edited.Folder == current.Folder
+        && edited.BattleBackgroundFile == current.BattleBackgroundFile
         && (edited.RandomEncounters, current.RandomEncounters) switch
         {
             (null, null) => true,

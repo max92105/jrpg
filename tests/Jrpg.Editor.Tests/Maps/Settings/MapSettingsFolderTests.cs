@@ -14,12 +14,13 @@ public sealed class MapSettingsFolderTests
         new MapLayout { Id = "forest", Width = 20, Height = 15, Layers = [], Objects = [] },
         new MapSettings { Id = "forest", DisplayName = "Forest" });
 
-    private readonly MapSettingsViewModel _settings = new(_forest, [], []);
+    private readonly MapSettingsViewModel _settings = new(_forest, [], [], []);
 
     [Fact]
     public void FolderText_MapInAFolder_ShowsIt()
     {
-        var settings = new MapSettingsViewModel(new MapDefinition(_forest.Layout, _forest.Settings with { Folder = "Act 1/Woods" }), [], []);
+        var settings = new MapSettingsViewModel(
+            new MapDefinition(_forest.Layout, _forest.Settings with { Folder = "Act 1/Woods" }), [], [], []);
 
         Assert.Equal("Act 1/Woods", settings.FolderText);
         Assert.False(settings.AreSettingsChanged);

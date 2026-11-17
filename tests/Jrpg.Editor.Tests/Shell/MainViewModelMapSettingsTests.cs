@@ -119,6 +119,17 @@ public sealed class MainViewModelMapSettingsTests : IDisposable
         Assert.False(viewModel.CurrentMap!.UndoCommand.CanExecute(null));
     }
 
+    // The title's picture: no map names it, so only the backgrounds folder lists it.
+    [Fact]
+    public void StartEditingSettings_OpenMap_ListsTheBackgroundsFolder()
+    {
+        var viewModel = _content.Open(_content.TestWorld);
+
+        var settings = viewModel.StartEditingSettings()!;
+
+        Assert.Contains("StartMenu.png", settings.BattleBackgroundChoices);
+    }
+
     [Fact]
     public void TryApplySettings_EmptySizeBox_AppliesNothing()
     {

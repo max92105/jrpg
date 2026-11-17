@@ -1,4 +1,3 @@
-using System.IO;
 using Jrpg.Data.Art;
 using Jrpg.Editor.GifImport;
 using Jrpg.Editor.Objects;
@@ -38,12 +37,9 @@ internal sealed partial class MainViewModel
         return result;
     }
 
-    // The folder's readable images and their sizes, read when the page opens, never cached: an import changes them.
     private FieldSpriteEditingViewModel CreateFieldSpriteEditing() =>
         new(
             Content!,
-            () => [.. ArtFolders.FieldSpriteImagesIn(ArtRoot).Where(file => PngSize.IsReadable(FieldSpritePath(file)))],
-            file => PngSize.IsReadable(FieldSpritePath(file)) ? PngSize.Read(FieldSpritePath(file)) : null);
-
-    private string FieldSpritePath(string file) => Path.Combine(ArtRoot, ArtFolders.FieldSprites, file);
+            () => ReadableImagesIn(ArtFolders.FieldSprites),
+            file => ReadableSizeOf(ArtFolders.FieldSprites, file));
 }

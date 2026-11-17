@@ -5,8 +5,8 @@ using Microsoft.Win32;
 namespace Jrpg.Editor.Catalogs;
 
 /// <summary>
-/// The file dialog of an art folder's Import... (the Character sprites, Enemies and Effect strips pages): several
-/// images at once, GIFs offered only where <see cref="ArtImageImport.TakesGifs"/> converts them.
+/// The file dialog of an art folder's Import... (the Character sprites, Enemies, Effect strips and Battle backgrounds
+/// pages): several images at once, GIFs offered only where <see cref="ArtImageImport.TakesGifs"/> converts them.
 /// </summary>
 internal static class ArtImageFileDialog
 {

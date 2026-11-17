@@ -6,9 +6,11 @@ public sealed class ArtFoldersTests
 {
     // The developer imports NPC sheets into this folder: only the two the code relies on are pinned, and the order.
     [Fact]
-    public void FieldSpriteImagesIn_RepositoryArt_ListsPlayerAndPlaceholder()
+    public void ImagesIn_RepositoryFieldSprites_ListsPlayerAndPlaceholder()
     {
-        var images = ArtFolders.FieldSpriteImagesIn(ArtFolders.RootIn(Path.Combine(AppContext.BaseDirectory, "content")));
+        var artRoot = ArtFolders.RootIn(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        var images = ArtFolders.ImagesIn(artRoot, ArtFolders.FieldSprites);
 
         Assert.Contains("npc_placeholder.png", images);
         Assert.Contains("player.png", images);

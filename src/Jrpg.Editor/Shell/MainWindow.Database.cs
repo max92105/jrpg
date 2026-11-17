@@ -3,9 +3,11 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Jrpg.Data.Art;
 using Jrpg.Editor.Animation;
+using Jrpg.Editor.Backgrounds;
 using Jrpg.Editor.Battle;
 using Jrpg.Editor.Cinematics;
 using Jrpg.Editor.Effects;
+using Jrpg.Editor.GifImport;
 using Jrpg.Editor.Items;
 using Jrpg.Editor.Loot;
 using Jrpg.Editor.Quests;
@@ -32,6 +34,7 @@ internal sealed partial class MainWindow
         ["Drop tables"] = () => _ = EditDropTables(this, ""),
         ["Affixes"] = OpenAffixes,
         ["Effect strips"] = OpenEffectStrips,
+        ["Battle backgrounds"] = OpenBattleBackgrounds,
         ["Skills"] = OpenSkills,
         ["Effects"] = OpenTieredEffects,
         ["Statuses"] = OpenStatuses,
@@ -192,6 +195,21 @@ internal sealed partial class MainWindow
                 var tool = new StripFromCellsWindow(_viewModel.ImportCellStrip) { Owner = owner };
                 return tool.ShowDialog() == true ? tool.Written : null;
             }));
+    }
+
+    // Decoded whole: an animated background's frames are cut from its sheet at the sheet's own size.
+    private void OpenBattleBackgrounds()
+    {
+        if (_viewModel.BattleBackgroundEditing is not { } backgroundEditing)
+        {
+            return;
+        }
+
+        var artRoot = _viewModel.ArtRoot;
+        OpenInDialog("Battle backgrounds", backgroundEditing.Start, backgroundEditing.Apply, edited => new BattleBackgroundPage(
+            edited,
+            file => SpriteImageFile.LoadFrom(artRoot, ArtFolders.Backgrounds, file),
+            paths => _viewModel.ImportArtImages(ArtFolders.Backgrounds, paths, GifImportOptions.Default)));
     }
 
     private void OpenSkills()

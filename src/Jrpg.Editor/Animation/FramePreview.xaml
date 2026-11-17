@@ -24,9 +24,14 @@
       <TextBlock Text="{Binding FrameLine}" Foreground="{StaticResource MutedTextBrush}" VerticalAlignment="Center" Margin="8,0,0,0" />
     </StackPanel>
 
-    <!-- Nearest neighbor, so pixel art stays crisp however far the host's area scales it. -->
-    <Border Background="Black" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1">
-      <Image x:Name="FrameImage" Stretch="Uniform" RenderOptions.BitmapScalingMode="NearestNeighbor" />
+    <!-- Nearest neighbor, so pixel art stays crisp however far the host's area scales it. Centered and clipped, so a
+         cover-fit frame larger than the area shows its middle. -->
+    <Border x:Name="Picture" Background="Black" BorderBrush="{StaticResource BorderBrush}" BorderThickness="1" ClipToBounds="True">
+      <Image x:Name="FrameImage"
+             Stretch="Uniform"
+             HorizontalAlignment="Center"
+             VerticalAlignment="Center"
+             RenderOptions.BitmapScalingMode="NearestNeighbor" />
     </Border>
   </DockPanel>
 </UserControl>

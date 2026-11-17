@@ -37,10 +37,6 @@ public static class ArtFolders
     /// <param name="artRoot">The <c>art</c> folder, from <see cref="RootIn"/>.</param>
     public static IReadOnlyList<string> TilesheetImagesIn(string artRoot) => ImagesIn(artRoot, Tilesheets);
 
-    /// <summary>The PNG file names in the field-sprite folder, the player's and NPCs', sorted ordinally.</summary>
-    /// <param name="artRoot">The <c>art</c> folder, from <see cref="RootIn"/>.</param>
-    public static IReadOnlyList<string> FieldSpriteImagesIn(string artRoot) => ImagesIn(artRoot, FieldSprites);
-
     /// <summary>The PNG file names in one art folder, sorted ordinally; the editor's pickers list them.</summary>
     /// <param name="artRoot">The <c>art</c> folder, from <see cref="RootIn"/>.</param>
     /// <param name="folder">One of the folder names above, such as <see cref="Portraits"/>.</param>

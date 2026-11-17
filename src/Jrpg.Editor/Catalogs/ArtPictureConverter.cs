@@ -12,23 +12,10 @@ namespace Jrpg.Editor.Catalogs;
 /// <param name="load">Decodes a picture of the page's art folder by its name there; null when it can't.</param>
 internal sealed class ArtPictureConverter(Func<string, BitmapSource?> load) : IValueConverter
 {
-    private readonly Dictionary<string, BitmapSource?> _decoded = new(StringComparer.Ordinal);
+    private readonly DecodedArtImages _pictures = new(load);
 
-    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
-    {
-        if (value is not string { Length: > 0 } file)
-        {
-            return null;
-        }
-
-        if (!_decoded.TryGetValue(file, out var picture))
-        {
-            picture = load(file);
-            _decoded[file] = picture;
-        }
-
-        return picture;
-    }
+    public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        value is string { Length: > 0 } file ? _pictures.Of(file) : null;
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
         throw new NotSupportedException("The page only shows a picture.");

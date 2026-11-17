@@ -45,8 +45,13 @@ internal sealed partial class BattleBackgroundViewModel : ObservableObject
     /// An animated one's frame time in milliseconds as typed, the box its preview plays at; empty for a still.
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Problem))]
+    [NotifyPropertyChangedFor(nameof(Problem), nameof(FrameMilliseconds))]
     public partial string FrameMillisecondsText { get; set; }
+
+    /// <summary>
+    /// The Frame time box as a number, which the preview plays at; null while it isn't a whole number.
+    /// </summary>
+    public int? FrameMilliseconds => TypedNumber.Parse(FrameMillisecondsText);
 
     /// <summary>
     /// "Still, 1920 x 1080 px", "Animated: 4 frames of 960 x 540 px in a 2 x 2 grid", "Image missing"; an animated one

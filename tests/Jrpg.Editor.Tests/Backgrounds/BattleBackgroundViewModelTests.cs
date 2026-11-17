@@ -173,6 +173,38 @@ public sealed class BattleBackgroundViewModelTests
     }
 
     [Fact]
+    public void FrameMillisecondsText_Changed_RaisesFrameMilliseconds()
+    {
+        var background = Animated();
+        List<string?> raised = [];
+        background.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        background.FrameMillisecondsText = "600";
+
+        Assert.Contains(nameof(BattleBackgroundViewModel.FrameMilliseconds), raised);
+    }
+
+    [Fact]
+    public void FrameMilliseconds_Typed_IsTheNumber()
+    {
+        var background = Animated();
+
+        background.FrameMillisecondsText = "600";
+
+        Assert.Equal(600, background.FrameMilliseconds);
+    }
+
+    [Fact]
+    public void FrameMilliseconds_NotANumber_IsNull()
+    {
+        var background = Animated();
+
+        background.FrameMillisecondsText = "x";
+
+        Assert.Null(background.FrameMilliseconds);
+    }
+
+    [Fact]
     public void ToRecord_TypedTime_IsTheRecordWithThatTime()
     {
         var background = Animated();

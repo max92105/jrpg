@@ -1,0 +1,58 @@
+<UserControl x:Class="Jrpg.Editor.Backgrounds.BattleBackgroundPage"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:animation="clr-namespace:Jrpg.Editor.Animation"
+             xmlns:backgrounds="clr-namespace:Jrpg.Editor.Backgrounds">
+  <DockPanel>
+    <!-- The backgrounds folder's images in name order, each with its kind, then the records whose image is missing.
+         Import... under the list copies PNGs in at once and hands them to the list as stills (decision 902). -->
+    <DockPanel DockPanel.Dock="Left" Width="280">
+      <TextBlock DockPanel.Dock="Top" Text="Battle backgrounds" FontWeight="Bold" />
+      <StackPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
+        <Button Content="Import..."
+                Width="70"
+                HorizontalAlignment="Left"
+                Click="OnImportClicked"
+                ToolTip="PNG pictures, each a still background; one over an animated background's file makes it still" />
+        <TextBlock x:Name="ImportStatusText" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap" Margin="0,4,0,0" />
+      </StackPanel>
+      <ListBox ItemsSource="{Binding Backgrounds}" SelectedItem="{Binding SelectedBackground}" Margin="0,4,0,0">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <StackPanel>
+              <TextBlock Text="{Binding File}" TextTrimming="CharacterEllipsis" />
+              <TextBlock x:Name="Kind" Text="{Binding KindLine}" Foreground="{StaticResource MutedTextBrush}" TextTrimming="CharacterEllipsis" />
+            </StackPanel>
+            <DataTemplate.Triggers>
+              <DataTrigger Binding="{Binding IsImageMissing}" Value="True">
+                <Setter TargetName="Kind" Property="Foreground" Value="{StaticResource ProblemTextBrush}" />
+              </DataTrigger>
+            </DataTemplate.Triggers>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+
+    <!-- The chosen background: its kind, an animated one's frame time as typed, and the shared preview playing it
+         cover-fit in a 16:9 area, as the battle draws it over the screen (decision 899). -->
+    <StackPanel Margin="12,0,0,0" DataContext="{Binding SelectedBackground}" Style="{StaticResource EnabledWhenChosen}">
+      <TextBlock Text="{Binding File}" FontWeight="Bold" />
+      <TextBlock Text="{Binding KindLine}" Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0" />
+      <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+        <TextBlock Text="Frame time (ms)" Width="110" VerticalAlignment="Center" />
+        <TextBox Width="70"
+                 IsEnabled="{Binding IsAnimated}"
+                 Text="{Binding FrameMillisecondsText, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="How long each frame shows, at least 1 ms; a still has none. Its frame size and count come from its import" />
+      </StackPanel>
+      <animation:FramePreview x:Name="BackgroundPreview"
+                              Width="{x:Static backgrounds:BattleBackgroundPage.PreviewWidth}"
+                              PictureHeight="{x:Static backgrounds:BattleBackgroundPage.PreviewHeight}"
+                              Stretch="UniformToFill"
+                              HorizontalAlignment="Left"
+                              Margin="0,16,0,0"
+                              FrameMilliseconds="{Binding FrameMilliseconds}" />
+    </StackPanel>
+  </DockPanel>
+</UserControl>

@@ -16,14 +16,15 @@
 # Build the editor first (dotnet build src/Jrpg.Editor); the script runs the Debug build, which reads content/.
 # Agents: never open a screenshot that can show Mana Seed art (decision 438): the main window (its tile and object
 # panels), Character sprites, the composer or New NPC. Read the script's lines for those; look only at windows of
-# generated art (Effect strips, Strip from sheet cells, Cinematics, Enemies, Shops, Drop tables, Quests).
+# generated art (Effect strips, Strip from sheet cells, Battle backgrounds, Cinematics, Enemies, Shops, Drop tables and
+# Quests).
 # Take its whole output (into a variable or a file): a pipe that stops early (head, Select-Object -First) ends the
 # script before it closes its editor, which then holds the build's files.
 param(
     [string]$Out = (Join-Path $env:TEMP 'jrpg-editor-windows'),
     [string[]]$Windows = @(
         'Database>Quests...', 'Database>Shops...', 'Database>Drop tables...', 'Database>Effect strips...',
-        'Database>Effect strips...>Strip from sheet cells...',
+        'Database>Effect strips...>Strip from sheet cells...', 'Database>Battle backgrounds...',
         'Database>Skills...', 'Database>Effects...', 'Database>Statuses...', 'Database>Cinematics...',
         'Database>Enemies...',
         'NPCs>Character sprites...',

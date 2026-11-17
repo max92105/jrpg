@@ -10,10 +10,11 @@ namespace Jrpg.Editor.Catalogs;
 /// <summary>
 /// Copies images into an art folder through Data, which refuses what the game couldn't use (a field sprite too small
 /// for its record, an effect strip that isn't whole square frames, decision 590); as <see cref="SheetImport"/>, a file
-/// copy and not a catalog step, so it isn't undone. Serves the Character sprites, Enemies and Effect strips pages'
-/// Import.... A GIF for the battlers or the effects becomes a strip of its name first (ADR 0047), through the same
-/// checks, a battle sprite's loop in the result; an effect GIF's loop, there only when its pace was typed, is a pace
-/// for the Effect strips session, which writes it as a record on OK (decision 988).
+/// copy and not a catalog step, so it isn't undone. Serves the Character sprites, Enemies, Effect strips and Battle
+/// backgrounds pages' Import..., a background PNG refused past 4096 px a side (decision 895). A GIF for the battlers or
+/// the effects becomes a strip of its name first (ADR 0047), through the same checks, a battle sprite's loop in the
+/// result; an effect GIF's loop, there only when its pace was typed, is a pace for the Effect strips session, which
+/// writes it as a record on OK (decision 988).
 /// </summary>
 /// <param name="writer">Writes into the content folder.</param>
 /// <param name="catalog">The records an image is checked against, unsaved ones included.</param>
@@ -28,7 +29,7 @@ internal sealed class ArtImageImport(ContentWriter writer, CatalogDraft catalog)
     public static bool TakesGifs(string artFolder) => artFolder is ArtFolders.Battlers or ArtFolders.Effects;
 
     /// <param name="artFolder">
-    /// The field sprites, battlers, portraits or effects folder (<see cref="ArtFolders"/>).
+    /// The field sprites, battlers, portraits, effects or backgrounds folder (<see cref="ArtFolders"/>).
     /// </param>
     /// <param name="paths">The images chosen, in order.</param>
     /// <param name="gifOptions">

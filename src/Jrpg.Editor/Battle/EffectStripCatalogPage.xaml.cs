@@ -22,8 +22,7 @@ namespace Jrpg.Editor.Battle;
 internal sealed partial class EffectStripCatalogPage : UserControl
 {
     private readonly EffectStripCatalogViewModel _strips;
-    private readonly Func<string, BitmapSource?> _loadImage;
-    private readonly Dictionary<string, BitmapSource?> _images = new(StringComparer.Ordinal);
+    private readonly DecodedArtImages _images;
     private readonly Func<IReadOnlyList<string>, GifImportOptions, SheetImportResult> _import;
     private readonly Func<Window, SheetImportResult?> _makeStripFromCells;
 
@@ -45,7 +44,7 @@ internal sealed partial class EffectStripCatalogPage : UserControl
     {
         InitializeComponent();
         DataContext = _strips = strips;
-        (_loadImage, _import, _makeStripFromCells) = (loadImage, import, makeStripFromCells);
+        (_images, _import, _makeStripFromCells) = (new DecodedArtImages(loadImage), import, makeStripFromCells);
         strips.PropertyChanged += OnStripsChanged;
         ShowChosenStrip();
     }
@@ -61,7 +60,7 @@ internal sealed partial class EffectStripCatalogPage : UserControl
     // Only a new choice hands the preview new frames, which start it over: a typed frame time or hit frame reaches it
     // through its bindings and keeps the shown frame. A missing image shows nothing.
     private void ShowChosenStrip() =>
-        StripPreview.Frames = _strips.SelectedStrip is { FrameCount: { } frameCount } strip && ImageOf(strip.File) is { } image
+        StripPreview.Frames = _strips.SelectedStrip is { FrameCount: { } frameCount } strip && _images.Of(strip.File) is { } image
             ? PreviewFrames.OfStrip(image, frameCount)
             : null;
 
@@ -89,22 +88,8 @@ internal sealed partial class EffectStripCatalogPage : UserControl
     private void TakeImport(SheetImportResult result)
     {
         ImportStatusText.Text = EffectStripCatalogViewModel.ImportLineOf(result);
-        foreach (var file in result.Imported)
-        {
-            _images.Remove(file);
-        }
+        _images.Forget(result.Imported);
 
         _strips.TakeImport(result);
-    }
-
-    private BitmapSource? ImageOf(string file)
-    {
-        if (!_images.TryGetValue(file, out var image))
-        {
-            image = _loadImage(file);
-            _images.Add(file, image);
-        }
-
-        return image;
     }
 }

@@ -4,6 +4,7 @@ using Jrpg.Data.Art;
 using Jrpg.Data.Audio;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Animation;
+using Jrpg.Editor.Backgrounds;
 using Jrpg.Editor.Battle;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Cinematics;
@@ -21,9 +22,9 @@ namespace Jrpg.Editor.Shell;
 /// <summary>
 /// The Database menu's pages over the draft (ADR 0045, decision 583): the shops, the drop tables, the enemies, the
 /// cinematics (ADR 0046), the effect strips (decision 659), the skills, the tiered effects, the statuses (decision
-/// 976), the items (decision 877) and the affixes (decision 884), beside the quests; and the image import the Enemies,
-/// Effect strips and Character sprites pages share, and the strip Strip from sheet cells writes, through Data, asking
-/// first before either replaces any image of the art folder.
+/// 976), the items (decision 877), the affixes (decision 884) and the battle backgrounds (decision 901), beside the
+/// quests; and the image import the Enemies, Effect strips, Character sprites and Battle backgrounds pages share, and
+/// the strip Strip from sheet cells writes, through Data, asking before either replaces an image of the art folder.
 /// </summary>
 internal sealed partial class MainViewModel
 {
@@ -47,11 +48,13 @@ internal sealed partial class MainViewModel
 
     public AffixEditingViewModel? AffixEditing { get; }
 
+    public BattleBackgroundEditingViewModel? BattleBackgroundEditing { get; }
+
     /// <summary>
     /// Copies images into an art folder (asking before replacing one, decisions 125 and 590); a file copy, not an undo
     /// step. The art warning is read again and the outcome goes to the status bar, as the tilesheet import's.
     /// </summary>
-    /// <param name="artFolder">The field sprites, battlers, portraits or effects folder.</param>
+    /// <param name="artFolder">The field sprites, battlers, portraits, effects or backgrounds folder.</param>
     /// <param name="paths">The images chosen in the file dialog.</param>
     /// <param name="gifOptions">How a GIF chosen for the battlers or the effects becomes a strip (ADR 0047).</param>
     public SheetImportResult ImportArtImages(string artFolder, IReadOnlyList<string> paths, GifImportOptions gifOptions)
@@ -145,17 +148,25 @@ internal sealed partial class MainViewModel
     }
 
     private EffectStripEditingViewModel CreateEffectStripEditing() =>
+        new(Content!, () => ReadableImagesIn(ArtFolders.Effects), file => ReadableSizeOf(ArtFolders.Effects, file));
+
+    private BattleBackgroundEditingViewModel CreateBattleBackgroundEditing() =>
         new(
             Content!,
-            ReadableEffectImages,
-            file => PngSize.IsReadable(EffectPath(file)) ? PngSize.Read(EffectPath(file)) : null);
+            () => ReadableImagesIn(ArtFolders.Backgrounds),
+            file => ReadableSizeOf(ArtFolders.Backgrounds, file));
 
     private ItemEditingViewModel CreateItemEditing() =>
-        new(Content!, () => ArtFolders.ImagesIn(ArtRoot, ArtFolders.Icons), ReadableEffectImages);
+        new(Content!, () => ArtFolders.ImagesIn(ArtRoot, ArtFolders.Icons), () => ReadableImagesIn(ArtFolders.Effects));
 
-    // An image the folder holds but can't be read is left out, as the Character sprites page's: its size is unknown.
-    private IReadOnlyList<string> ReadableEffectImages() =>
-        [.. ArtFolders.ImagesIn(ArtRoot, ArtFolders.Effects).Where(file => PngSize.IsReadable(EffectPath(file)))];
+    // An image the folder holds but can't be read is left out of an art page's list, as its size is unknown; both are
+    // read when the page opens, never cached, since an import changes them (the Character sprites, Effect strips and
+    // Battle backgrounds pages, and the Items page's effect strips).
+    private IReadOnlyList<string> ReadableImagesIn(string artFolder) =>
+        [.. ArtFolders.ImagesIn(ArtRoot, artFolder).Where(file => PngSize.IsReadable(ArtPath(artFolder, file)))];
 
-    private string EffectPath(string file) => Path.Combine(ArtRoot, ArtFolders.Effects, file);
+    private (int Width, int Height)? ReadableSizeOf(string artFolder, string file) =>
+        PngSize.IsReadable(ArtPath(artFolder, file)) ? PngSize.Read(ArtPath(artFolder, file)) : null;
+
+    private string ArtPath(string artFolder, string file) => Path.Combine(ArtRoot, artFolder, file);
 }

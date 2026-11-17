@@ -62,3 +62,18 @@ BG8's "Verify by hand" list, all of it (the script's line, the Forest and Forest
 - **Note from BG8 review:** add a test importing a PNG named like a missing image's record (`Gone.png`): its record
   is dropped and its row moves ahead of the missing-image rows (in a sibling of `BattleBackgroundCatalogViewModelTests`,
   which is at 248 lines).
+- **Done, with deviations:** `Backgrounds/BattleBackgroundPage` (58 lines of XAML, 85 of code: the list shows each
+  row's kind line under its file, a missing image's in the problem color; the import's line under Import...);
+  `Animation/FramePreview` 37 + 137 (`Stretch` and `PictureHeight`, the image centered so a cover-fit frame shows its
+  middle); `BattleBackgroundViewModel.FrameMilliseconds` (124 lines; three tests, one more than planned: a box that
+  isn't a number is null; `BattleBackgroundViewModelTests` 233); the review note's two tests in
+  `BattleBackgroundImportTests` (51). The readable images and sizes are `MainViewModel.Database`'s `ReadableImagesIn`
+  and `ReadableSizeOf` (172 lines), the Effect strips, Items and Character sprites pages' copies gone
+  (`ReadableEffectImages` inlined; `Data/Art/ArtFolders.FieldSpriteImagesIn` lost its only caller and went, its test
+  now `ImagesIn_RepositoryFieldSprites_ListsPlayerAndPlaceholder`). The decode-once image lookup was its third copy
+  here: `Catalogs/DecodedArtImages` (36 lines, `Of`, `Forget`; `DecodedArtImagesTests` 62, 4 tests), held by this
+  page, `Battle/EffectStripCatalogPage` (95) and `Catalogs/ArtPictureConverter` (22), a file that can't be read still
+  kept as null. `MainWindow.Database.cs` 258, `MainViewModel.cs` 292. The menu tooltip ends "import PNGs." until BG9.
+  About 400 lines with tests, past the 200 planned (the page's code-behind, the preview's two properties with their
+  docs, the review's extraction). Tests: 7262. The smoke script opened the Effect strips and Battle backgrounds pages
+  with no `ERROR` and no binding error.

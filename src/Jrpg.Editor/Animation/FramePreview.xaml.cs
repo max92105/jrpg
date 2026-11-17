@@ -11,7 +11,8 @@ namespace Jrpg.Editor.Animation;
 /// The shared preview of an animation the editor writes (decision 986): its frames over black, Play or Pause, Step back
 /// and Step forward, and the frame line. It reads its host's frame time and hit frame one-way, so the host's typed box
 /// is the only one and what plays is what is written. Its rules are <see cref="FramePlayback"/>'s, moved by the render
-/// clock from each Loaded to the next Unloaded.
+/// clock from each Loaded to the next Unloaded. A frame fits its picture whole unless the host asks it to cover a fixed
+/// area, as the Battle backgrounds page does (cover-fit, as the battle draws a background).
 /// </summary>
 internal sealed partial class FramePreview : UserControl
 {
@@ -23,6 +24,12 @@ internal sealed partial class FramePreview : UserControl
 
     public static readonly DependencyProperty HitFrameProperty = DependencyProperty.Register(
         nameof(HitFrame), typeof(int?), typeof(FramePreview), new PropertyMetadata(null, OnHitFrameChanged));
+
+    public static readonly DependencyProperty StretchProperty = DependencyProperty.Register(
+        nameof(Stretch), typeof(Stretch), typeof(FramePreview), new PropertyMetadata(Stretch.Uniform, OnStretchChanged));
+
+    public static readonly DependencyProperty PictureHeightProperty = DependencyProperty.Register(
+        nameof(PictureHeight), typeof(double), typeof(FramePreview), new PropertyMetadata(double.NaN, OnPictureHeightChanged));
 
     private readonly FramePlayback _playback = new();
 
@@ -64,6 +71,27 @@ internal sealed partial class FramePreview : UserControl
         set => SetValue(HitFrameProperty, value);
     }
 
+    /// <summary>
+    /// How a frame fills the picture: <see cref="Stretch.Uniform"/>, whole inside it (the default), or
+    /// <see cref="Stretch.UniformToFill"/>, covering it with the overflow cut evenly on both sides, as the battle draws
+    /// a background.
+    /// </summary>
+    public Stretch Stretch
+    {
+        get => (Stretch)GetValue(StretchProperty);
+        set => SetValue(StretchProperty, value);
+    }
+
+    /// <summary>
+    /// The picture's height in device-independent pixels, the buttons and frame line under it; unset, the picture takes
+    /// what the host's height leaves. A host covering a fixed area sets it with the control's width.
+    /// </summary>
+    public double PictureHeight
+    {
+        get => (double)GetValue(PictureHeightProperty);
+        set => SetValue(PictureHeightProperty, value);
+    }
+
     // Shown at once, as the playback raises no frame change when the new list starts on the frame the old one showed.
     private static void OnFramesChanged(DependencyObject target, DependencyPropertyChangedEventArgs e)
     {
@@ -77,6 +105,12 @@ internal sealed partial class FramePreview : UserControl
 
     private static void OnHitFrameChanged(DependencyObject target, DependencyPropertyChangedEventArgs e) =>
         ((FramePreview)target)._playback.HitFrame = (int?)e.NewValue;
+
+    private static void OnStretchChanged(DependencyObject target, DependencyPropertyChangedEventArgs e) =>
+        ((FramePreview)target).FrameImage.Stretch = (Stretch)e.NewValue;
+
+    private static void OnPictureHeightChanged(DependencyObject target, DependencyPropertyChangedEventArgs e) =>
+        ((FramePreview)target).Picture.Height = (double)e.NewValue;
 
     private void OnPlaybackChanged(object? sender, PropertyChangedEventArgs e)
     {

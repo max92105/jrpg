@@ -5,11 +5,13 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-classes-and-progression, slice PM3 (SetPartyMembers, UsersOfPartyMember, RefusalOfPartyMemberUndo,
-PartyMemberEditingViewModel). 2026-11-17. Round 1. Verdict: Ready to commit.
+Plan 2026-11-15-classes-and-progression, slice PM4 (first part: the Party members page, boxes and art marks; pictures
+and imports split to PM4b). 2026-11-17. Round 1. Verdict: Ready to commit.
 
-- PM2 Warning (ToMember art names untrimmed): fixed (PartyMemberViewModel.cs:102-104 trim).
-- Follow-up, open: CombinedHistory.cs at 291 lines; only PM3's Done note says the next refusal needs a partial; add a
-  backlog line.
-- Follow-up, open: PM4's Remove-while-new on a member applied in an earlier session is a step, not an undo, so no
-  refusal checks a map recruiting it; PM4 should refuse or note it.
+- PM3 Follow-up (Remove of a member applied earlier): fixed (restart shows it saved; editing test
+  Start_AfterApplyingAnAddedMember_CannotRemoveIt).
+- PM3 Follow-up (CombinedHistory at 291 lines): dropped, backlog.md lines 365-366 record it.
+- Suggestion, open: "Not in the art folders: ..." sentence built twice (EnemyCatalogPage.xaml.cs:109,
+  PartyMemberCatalogViewModel.cs:78); one BattleArtChoices method could build it.
+- Follow-up, open: PM4b's TakeImport must raise MissingArtNote after ArtChoices.Refresh; picking a name the box already
+  holds raises no Changed, so the note stays stale.

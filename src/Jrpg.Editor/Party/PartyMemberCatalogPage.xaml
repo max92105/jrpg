@@ -1,0 +1,91 @@
+<UserControl x:Class="Jrpg.Editor.Party.PartyMemberCatalogPage"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:party="clr-namespace:Jrpg.Editor.Party">
+  <UserControl.Resources>
+    <Style x:Key="FieldLabel" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+      <Setter Property="Width" Value="110" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+  </UserControl.Resources>
+  <DockPanel>
+    <!-- The draft's members in id order, the ones added this session after them; only those can be removed (decision 953). -->
+    <DockPanel DockPanel.Dock="Left" Width="240">
+      <TextBlock DockPanel.Dock="Top" Text="Party members" FontWeight="Bold" />
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
+        <Button Content="Add" Width="50" Command="{Binding AddMemberCommand}" ToolTip="A new member last in the list, its id to type" />
+        <Button Content="Remove" Width="60" Margin="4,0,0,0" Command="{Binding RemoveMemberCommand}"
+                ToolTip="Only a member added this session; maps and the new game may name a saved one" />
+      </StackPanel>
+      <ListBox ItemsSource="{Binding Members}" SelectedItem="{Binding SelectedMember}" DisplayMemberPath="Label" Margin="0,4,0,0" />
+    </DockPanel>
+
+    <!-- The chosen member: its texts, its class by name, then its three pictures by file, each offering its folder's. -->
+    <ScrollViewer Margin="12,0,0,0" VerticalScrollBarVisibility="Auto">
+      <StackPanel DataContext="{Binding SelectedMember}" Style="{StaticResource EnabledWhenChosen}">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="Id" Style="{StaticResource FieldLabel}" />
+          <TextBox Width="240"
+                   Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}"
+                   IsEnabled="{Binding IsNew}"
+                   ToolTip="Lowercase letters, digits and _; fixed once saved, since maps and the new game name it" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Name" Style="{StaticResource FieldLabel}" />
+          <TextBox Width="240" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
+        <!-- A class the draft lacks is listed as missing, so the box still shows what the member names (decision 967). -->
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Class" Style="{StaticResource FieldLabel}" />
+          <ComboBox Width="240"
+                    ItemsSource="{Binding DataContext.Classes, RelativeSource={RelativeSource AncestorType=party:PartyMemberCatalogPage}}"
+                    DisplayMemberPath="Label"
+                    SelectedValuePath="Id"
+                    SelectedValue="{Binding ClassId}"
+                    ToolTip="The member's stats, skills and battle resources at each level" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Summary" Style="{StaticResource FieldLabel}" VerticalAlignment="Top" />
+          <TextBox Width="400"
+                   MinLines="4"
+                   MaxLines="4"
+                   TextWrapping="Wrap"
+                   VerticalScrollBarVisibility="Auto"
+                   Text="{Binding Summary, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="Who the character is, shown when choosing a leader" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+          <TextBlock Text="Battle sprite" Style="{StaticResource FieldLabel}" />
+          <ComboBox Width="240"
+                    IsEditable="True"
+                    ItemsSource="{Binding DataContext.ArtChoices.Battlers, RelativeSource={RelativeSource AncestorType=party:PartyMemberCatalogPage}}"
+                    Text="{Binding BattleSpriteFile, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTip="A PNG of art/battlers, the member in battle" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Portrait" Style="{StaticResource FieldLabel}" />
+          <ComboBox Width="240"
+                    IsEditable="True"
+                    ItemsSource="{Binding DataContext.ArtChoices.Portraits, RelativeSource={RelativeSource AncestorType=party:PartyMemberCatalogPage}}"
+                    Text="{Binding PortraitFile, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTip="A PNG of art/portraits, the member's face in menus and dialogue" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Attack effect strip" Style="{StaticResource FieldLabel}" />
+          <ComboBox Width="240"
+                    IsEditable="True"
+                    ItemsSource="{Binding DataContext.ArtChoices.Effects, RelativeSource={RelativeSource AncestorType=party:PartyMemberCatalogPage}}"
+                    Text="{Binding AttackEffectFile, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTip="A strip of art/effects, played on the target of the member's attack" />
+        </StackPanel>
+        <!-- Missing art is kept and saved, the game's start refuses it (decision 442). -->
+        <TextBlock Foreground="{StaticResource ProblemTextBrush}"
+                   TextWrapping="Wrap"
+                   Margin="0,6,0,0"
+                   Text="{Binding DataContext.MissingArtNote, RelativeSource={RelativeSource AncestorType=party:PartyMemberCatalogPage}}" />
+      </StackPanel>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

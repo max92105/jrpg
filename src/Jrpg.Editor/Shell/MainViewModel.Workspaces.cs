@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Jrpg.Data.Art;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Party;
 using Jrpg.Editor.Workspaces;
@@ -121,6 +122,10 @@ internal sealed partial class MainViewModel
                 CatalogPage.Of("Shops", CatalogGroup.Trade, ShopEditing!),
                 CatalogPage.Of("Character sprites", CatalogGroup.Characters, FieldSpriteEditing!),
                 CatalogPage.Of("Classes", CatalogGroup.Characters, new ClassEditingViewModel(content)),
+                CatalogPage.Of(
+                    "Party members",
+                    CatalogGroup.Characters,
+                    new PartyMemberEditingViewModel(content, folder => ArtFolders.ImagesIn(ArtRoot, folder))),
             ]);
         workspace.PropertyChanged += OnDatabaseWorkspaceChanged;
         return workspace;

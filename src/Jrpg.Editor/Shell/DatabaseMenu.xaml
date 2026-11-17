@@ -21,4 +21,5 @@
   <MenuItem Header="Enemies" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Enemies" ToolTip="Each enemy's numbers, resistances, rewards, pictures, and its rules and phases on the Tactics tab." />
   <MenuItem Header="Encounters" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Encounters" ToolTip="Each encounter's enemies in their places, its own background or the map's, and its music; Map &gt; Settings... picks which encounters a map rolls." />
   <MenuItem Header="Classes" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Classes" ToolTip="Each class's stats per level, its skills and their levels, and its battle resources; party members name a class." />
+  <MenuItem Header="Party members" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Party members" ToolTip="Each character's name, class, summary and battle pictures; events recruit them and the new game offers them as leaders." />
 </MenuItem>

@@ -6,8 +6,8 @@ using Jrpg.Editor.Battle;
 
 namespace Jrpg.Editor.Tests.Battle;
 
-// The three art folders as the Enemies page's boxes offer them: read through the shell's lookup, read again after an
-// import, and the pictures an enemy names that its folder lacks (decision 442).
+// The three art folders as the Enemies and Party members pages' boxes offer them: read through the shell's lookup, read
+// again after an import, and the pictures an enemy or a member names that its folder lacks (decision 442).
 public sealed class BattleArtChoicesTests
 {
     private static readonly ContentCatalog _catalog =
@@ -32,26 +32,28 @@ public sealed class BattleArtChoicesTests
     {
         var choices = new BattleArtChoices(folder => _folders[folder]);
 
-        Assert.Empty(choices.MissingOf(EnemyViewModel.From(Wolf).Art));
+        Assert.Empty(choices.MissingOf(Wolf.BattleSpriteFile, Wolf.PortraitFile, Wolf.AttackEffectFile));
     }
 
     [Fact]
     public void MissingOf_SpriteNotInFolder_MarksIt()
     {
         var choices = new BattleArtChoices(folder => _folders[folder]);
-        var art = EnemyViewModel.From(Wolf with { BattleSpriteFile = "Bear.png" }).Art;
 
-        Assert.Equal(["battle sprite Bear.png"], choices.MissingOf(art));
+        var missing = choices.MissingOf("Bear.png", Wolf.PortraitFile, Wolf.AttackEffectFile);
+
+        Assert.Equal(["battle sprite Bear.png"], missing);
     }
 
-    // A new enemy names no picture yet: each mark says so instead of ending in a blank.
+    // A new enemy or member names no picture yet: each mark says so instead of ending in a blank.
     [Fact]
     public void MissingOf_NoPictureNamed_MarksEachAsNone()
     {
         var choices = new BattleArtChoices(folder => _folders[folder]);
-        var art = EnemyViewModel.New().Art;
 
-        Assert.Equal(["battle sprite (none)", "portrait (none)", "attack effect (none)"], choices.MissingOf(art));
+        var missing = choices.MissingOf("", "", "");
+
+        Assert.Equal(["battle sprite (none)", "portrait (none)", "attack effect (none)"], missing);
     }
 
     [Fact]

@@ -22,7 +22,8 @@ public sealed class MainViewModelDatabaseWorkspaceTests : IDisposable
 
         Assert.Equal(
             ["Quests", "Cinematics", "Enemies", "Encounters", "Skills", "Effects", "Statuses", "Drop tables",
-                "Effect strips", "Battle backgrounds", "Items", "Affixes", "Shops", "Character sprites", "Classes"],
+                "Effect strips", "Battle backgrounds", "Items", "Affixes", "Shops", "Character sprites", "Classes",
+                "Party members"],
             viewModel.DatabaseWorkspace!.Pages.Select(page => page.Title));
     }
 

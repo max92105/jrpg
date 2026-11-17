@@ -4,8 +4,9 @@ using Jrpg.Data.Art;
 namespace Jrpg.Editor.Battle;
 
 /// <summary>
-/// The files the Enemies page's three art boxes offer (decision 589's picker pattern): the battlers, portraits and
-/// effects folders as they are, read through a lookup the shell gives, and read again after an import.
+/// The files the three art boxes of the Enemies and Party members pages offer (decision 589's picker pattern): the
+/// battlers, portraits and effects folders as they are, read through a lookup the shell gives, and read again once an
+/// import copied a file in.
 /// </summary>
 internal sealed partial class BattleArtChoices : ObservableObject
 {
@@ -38,19 +39,20 @@ internal sealed partial class BattleArtChoices : ObservableObject
     }
 
     /// <summary>
-    /// Which of an enemy's pictures its folder lacks, as "battle sprite Wolf.png" lines for the marks (decision 442);
-    /// empty when every one is there.
+    /// Which of an enemy's or a party member's pictures its folder lacks, as "battle sprite Wolf.png" lines for the
+    /// marks (decision 442); empty when every one is there. Takes the names, so the rule holds for both without this
+    /// type knowing a member.
     /// </summary>
-    public IReadOnlyList<string> MissingOf(EnemyArtViewModel art)
+    public IReadOnlyList<string> MissingOf(string battleSpriteFile, string portraitFile, string attackEffectFile)
     {
         var missing = new List<string>();
-        AddMissing(missing, "battle sprite", art.BattleSpriteFile, Battlers);
-        AddMissing(missing, "portrait", art.PortraitFile, Portraits);
-        AddMissing(missing, "attack effect", art.AttackEffectFile, Effects);
+        AddMissing(missing, "battle sprite", battleSpriteFile, Battlers);
+        AddMissing(missing, "portrait", portraitFile, Portraits);
+        AddMissing(missing, "attack effect", attackEffectFile, Effects);
         return missing;
     }
 
-    // A new enemy names no picture yet: its mark says so rather than ending in a blank.
+    // A new enemy or member names no picture yet: its mark says so rather than ending in a blank.
     private static void AddMissing(List<string> missing, string kind, string file, IReadOnlyList<string> folder)
     {
         var name = file.Trim();

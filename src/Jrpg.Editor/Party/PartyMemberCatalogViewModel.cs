@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Jrpg.Core.Content;
 using Jrpg.Core.Party;
 using Jrpg.Data.Content;
+using Jrpg.Editor.Battle;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Events;
 using Jrpg.Editor.Workspaces;
@@ -14,17 +15,19 @@ namespace Jrpg.Editor.Party;
 /// Every party member as the Party members page edits it (decision 953): the draft's members in id order, the ones
 /// added this session after them; Add starts from the blank; only an added member can be removed, since maps and the
 /// new game name a saved one (decision 581); no Duplicate, a member being one character. <see cref="Problem"/> is the
-/// chosen member's own first, then another's, then Data's message for the whole list. Its host chooses a member by its
-/// id (<see cref="IEditedCatalog"/>).
+/// chosen member's own first, then another's, then Data's message for the whole list; <see cref="MissingArtNote"/> the
+/// chosen member's pictures the art folders lack. Its host chooses a member by its id (<see cref="IEditedCatalog"/>).
 /// </summary>
 internal sealed partial class PartyMemberCatalogViewModel : ObservableObject, IEditedCatalog
 {
     private readonly ContentCatalog _content;
 
     /// <param name="content">The draft as it is: the members edited and the classes they name.</param>
-    public PartyMemberCatalogViewModel(ContentCatalog content)
+    /// <param name="artImagesIn">The PNG names of an art folder by name, built by the shell over the art root.</param>
+    public PartyMemberCatalogViewModel(ContentCatalog content, Func<string, IReadOnlyList<string>> artImagesIn)
     {
         _content = content;
+        ArtChoices = new BattleArtChoices(artImagesIn);
         Members =
         [
             .. content.PartyMembers.Values
@@ -48,8 +51,11 @@ internal sealed partial class PartyMemberCatalogViewModel : ObservableObject, IE
     /// </summary>
     public IReadOnlyList<RecordChoice> Classes { get; }
 
+    /// <summary>The files the three art boxes offer: the battlers, portraits and effects folders.</summary>
+    public BattleArtChoices ArtChoices { get; }
+
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Problem))]
+    [NotifyPropertyChangedFor(nameof(Problem), nameof(MissingArtNote))]
     [NotifyCanExecuteChangedFor(nameof(RemoveMemberCommand))]
     public partial PartyMemberViewModel? SelectedMember { get; set; }
 
@@ -61,6 +67,16 @@ internal sealed partial class PartyMemberCatalogViewModel : ObservableObject, IE
         SelectedMember?.Problem
         ?? RecordListProblem.FirstOf(Members, listed => listed.Id, listed => listed.Problem, "Member")
         ?? CatalogProblems.OfPartyMembers([.. Members.Select(listed => listed.ToMember())], _content);
+
+    /// <summary>
+    /// "Not in the art folders: portrait Omer2.png.", the chosen member's pictures its folders lack: kept and saved
+    /// (decision 442), refused by the game's start; empty when every one is there or no member is chosen.
+    /// </summary>
+    public string MissingArtNote =>
+        SelectedMember is { } chosen
+        && ArtChoices.MissingOf(chosen.BattleSpriteFile, chosen.PortraitFile, chosen.AttackEffectFile) is [_, ..] missing
+            ? $"Not in the art folders: {string.Join(", ", missing)}."
+            : "";
 
     /// <summary>The chosen member's id; null with none chosen or while a new one has no id yet.</summary>
     public string? ChosenKey => SelectedMember is { Id.Length: > 0 } chosen ? chosen.Id : null;
@@ -108,5 +124,10 @@ internal sealed partial class PartyMemberCatalogViewModel : ObservableObject, IE
     private bool CanRemoveMember() => SelectedMember is { IsNew: true };
 
     // Only typed fields reach here, never a member's label or problem notices, so Data's check runs once per change.
-    private void OnMemberChanged(object? sender, EventArgs e) => OnPropertyChanged(nameof(Problem));
+    // The chosen member's art names are among them, so its note is read again.
+    private void OnMemberChanged(object? sender, EventArgs e)
+    {
+        OnPropertyChanged(nameof(Problem));
+        OnPropertyChanged(nameof(MissingArtNote));
+    }
 }

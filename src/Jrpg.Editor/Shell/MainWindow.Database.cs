@@ -47,6 +47,7 @@ internal sealed partial class MainWindow
         pageViews.Register<StatusCatalogViewModel>(edited => new StatusCatalogPage(edited));
         pageViews.Register<EncounterCatalogViewModel>(edited => new EncounterPage(edited));
         pageViews.Register<ClassCatalogViewModel>(edited => new ClassCatalogPage(edited));
+        pageViews.Register<PartyMemberCatalogViewModel>(edited => new PartyMemberCatalogPage(edited));
         RegisterPicturePages(pageViews);
         RegisterPagesOnTheAnimationClock(pageViews, animationTime);
         return pageViews;

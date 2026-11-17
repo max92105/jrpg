@@ -14,10 +14,12 @@ public sealed class PartyMemberCatalogViewModelTests
     // Added after the scholar, its id first: a list in id order is sorted, not read in the dictionary's order.
     private static readonly PartyMemberDefinition _bram = Scholar with { Id = "bram", Name = "Bram" };
 
-    private readonly PartyMemberCatalogViewModel _catalog = new(World with
-    {
-        PartyMembers = new Dictionary<string, PartyMemberDefinition> { [Scholar.Id] = Scholar, [_bram.Id] = _bram },
-    });
+    private readonly PartyMemberCatalogViewModel _catalog = new(
+        World with
+        {
+            PartyMembers = new Dictionary<string, PartyMemberDefinition> { [Scholar.Id] = Scholar, [_bram.Id] = _bram },
+        },
+        ImagesIn);
 
     [Fact]
     public void Constructor_Members_ListsThemInIdOrder()
@@ -36,7 +38,7 @@ public sealed class PartyMemberCatalogViewModelTests
             [ClassFixtures.Scholar.Id] = ClassFixtures.Scholar,
         };
 
-        var catalog = new PartyMemberCatalogViewModel(World with { Classes = classes });
+        var catalog = new PartyMemberCatalogViewModel(World with { Classes = classes }, ImagesIn);
 
         Assert.Equal([new("scholar", "Scholar"), new RecordChoice("archer", "Warden")], catalog.Classes);
     }
@@ -51,7 +53,7 @@ public sealed class PartyMemberCatalogViewModelTests
         var catalog = new PartyMemberCatalogViewModel(World with
         {
             PartyMembers = new Dictionary<string, PartyMemberDefinition> { [ilsa.Id] = ilsa, [bram.Id] = bram },
-        });
+        }, ImagesIn);
 
         Assert.Equal(["Archer (archer)", "Scholar (scholar)", "(missing) bard"], catalog.Classes.Select(choice => choice.Label));
     }
@@ -115,7 +117,41 @@ public sealed class PartyMemberCatalogViewModelTests
 
         _catalog.Members[1].Summary = "Reads in the dark.";
 
-        Assert.Equal([nameof(PartyMemberCatalogViewModel.Problem)], raised);
+        Assert.Equal([nameof(PartyMemberCatalogViewModel.Problem), nameof(PartyMemberCatalogViewModel.MissingArtNote)], raised);
+    }
+
+    [Fact]
+    public void MissingArtNote_EveryPictureInItsFolder_IsEmpty() => Assert.Equal("", _catalog.MissingArtNote);
+
+    // Bram is chosen at start; the battle sprite and effect stay the folders' own.
+    [Fact]
+    public void MissingArtNote_PortraitNotInFolder_NamesIt()
+    {
+        _catalog.Members[0].PortraitFile = "BramFace.png";
+
+        Assert.Equal("Not in the art folders: portrait BramFace.png.", _catalog.MissingArtNote);
+    }
+
+    [Fact]
+    public void MissingArtNote_ArtNameTyped_RaisesChanged()
+    {
+        List<string?> raised = [];
+        ((INotifyPropertyChanged)_catalog).PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        _catalog.Members[0].AttackEffectFile = "Ink.png";
+
+        Assert.Contains(nameof(PartyMemberCatalogViewModel.MissingArtNote), raised);
+    }
+
+    [Fact]
+    public void MissingArtNote_OtherMemberChosen_RaisesChanged()
+    {
+        List<string?> raised = [];
+        ((INotifyPropertyChanged)_catalog).PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        _catalog.SelectedMember = _catalog.Members[1];
+
+        Assert.Contains(nameof(PartyMemberCatalogViewModel.MissingArtNote), raised);
     }
 
     [Fact]
@@ -144,7 +180,7 @@ public sealed class PartyMemberCatalogViewModelTests
     {
         var noMembers = World with { PartyMembers = new Dictionary<string, PartyMemberDefinition>() };
 
-        var empty = new PartyMemberCatalogViewModel(noMembers);
+        var empty = new PartyMemberCatalogViewModel(noMembers, ImagesIn);
 
         Assert.Null(empty.ChosenKey);
     }

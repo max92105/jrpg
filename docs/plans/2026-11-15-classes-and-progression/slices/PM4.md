@@ -85,3 +85,13 @@ problem line, a `Database > Party members...` entry and `OnEditPartyMembersClick
   page belongs in `RegisterPicturePages`; reuse `EnemyArtSources` only if its clock is harmless there.
 - **Note from PM3 review:** check that Remove can't drop a member an open map already recruits: a member applied on
   this page restarts as saved (Remove greyed), so only an unapplied one is removable; confirm with a test if cheap.
+- **Split on 2026-11-17:** with the XAML, the estimate passed 320 lines, so the previews, the three Import... buttons,
+  `TakeImport` and the move to `RegisterPicturePages` are PM4b; this slice is the page with its boxes and art marks.
+  Its hand check is steps 2 to 5 above, without the pictures.
+- **Done, with deviations:** split as above. The mark is `MissingArtNote`, the line the page binds ("Not in the art
+  folders: portrait Omer2.png."), in place of a list the code-behind joins; its tests are named after it, and two more
+  check it empty and raised on choosing another member. `Problem_TypedChange_RaisesProblemChanged` now expects the
+  note raised too. The PM3 review's Remove check is the editing test
+  `Start_AfterApplyingAnAddedMember_CannotRemoveIt`. The smoke script shows the page, no `ERROR`, no binding error.
+  Sizes: `PartyMemberCatalogPage.xaml` 91, `.xaml.cs` 17, `PartyMemberCatalogViewModel` 133, `BattleArtChoices` 64;
+  tests 187 and 45 (5 new).

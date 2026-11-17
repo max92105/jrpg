@@ -103,7 +103,9 @@ internal sealed partial class EnemyCatalogPage : UserControl
     private void ShowArt()
     {
         var art = _enemies.SelectedEnemy?.Art;
-        var missing = art is null ? [] : _enemies.ArtChoices.MissingOf(art);
+        var missing = art is null
+            ? []
+            : _enemies.ArtChoices.MissingOf(art.BattleSpriteFile, art.PortraitFile, art.AttackEffectFile);
         MissingText.Text = missing.Count == 0 ? "" : $"Not in the art folders: {string.Join(", ", missing)}.";
         _loop = art?.PreviewLoop;
         BattlerPreview.RenderTransform = new ScaleTransform(art is { IsSpriteFlipped: true } ? -1 : 1, 1);

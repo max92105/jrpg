@@ -36,3 +36,5 @@ None.
 None here: no page adds an encounter yet. EC5's hand check (step 5) covers the refusal by hand.
 - **Note from BG1:** `CombinedHistory` already holds quest, shop, cinematic and item refusals (`RefusalOfEventNamedUndo`,
   IU9 added the item one): restate the shared-helper step against those before writing the encounter refusal.
+- **Note from EC3:** EC3 was split: `CatalogDraft.SetEncounters` and `EncounterEditingViewModel` land in EC3b, which
+  EC4 needs as well.

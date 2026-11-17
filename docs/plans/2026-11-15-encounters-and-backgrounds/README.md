@@ -124,7 +124,9 @@ slices and Editor slices aim at about 200 lines, not because the scope grew.
 - [x] **EC2. One encounter as edited** (Editor, about 210 lines) → [slices/EC2.md](slices/EC2.md)
 - [x] **EC2b. One encounter's Background and Music boxes** (Editor, about 120 lines; EC2's split) →
   [slices/EC2b.md](slices/EC2b.md)
-- [ ] **EC3. Every encounter, and Apply as one undo step** (Editor, about 250 lines) → [slices/EC3.md](slices/EC3.md)
+- [x] **EC3. Every encounter, and Apply as one undo step** (Editor, about 250 lines) → [slices/EC3.md](slices/EC3.md)
+- [ ] **EC3b. Apply the Encounters page as one undo step** (Editor, about 120 lines; EC3's split) →
+  [slices/EC3b.md](slices/EC3b.md)
 - [ ] **EC4. An undo can't remove an encounter a map's battles list** (Editor, about 130 lines) →
   [slices/EC4.md](slices/EC4.md)
 - [ ] **EC5. The Encounters page** (Editor, about 170 lines) → [slices/EC5.md](slices/EC5.md)

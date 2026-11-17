@@ -61,3 +61,12 @@ None: no page yet (EC5). The suite runs green.
   EC2b each box's pick), never for its `Label` or `Problem` notices or a slot's choice, as the affixes and items do: the
   list subscribes to `Changed` instead of each encounter's `PropertyChanged` and `Enemies` collection, so no
   `ListItemWatch` is needed. EC2 split: the Background and Music boxes are EC2b's, which lands before EC3.
+- **Done, with deviations:** split at start (estimate about 440 lines with tests, from the affixes' list and editing
+  view models): `CatalogDraft.SetEncounters` and `EncounterEditingViewModel` went to [EC3b](EC3b.md), and EC4 needs
+  both (its note). The commands are `AddEncounter` and `RemoveEncounter`, as the shops' and affixes', not `Add` and
+  `Remove`. The list listens to each encounter's `Changed` (EC2's note), so no `ListItemWatch`. Added beyond the plan:
+  `Problem_Constructed_IsNull`, `CanExecuteChanged_AddedEncounterChosen_LightsRemove`,
+  `Problem_AnotherChosen_RaisedAndNamesTheNewOneByPosition`, `Problem_EnemyTheContentLacks_IsDatasMessage`,
+  `ToEncounters_WithAProblem_Throws` and `ChosenKey_NewEncounterWithoutId_IsNull`. About 345 lines with tests:
+  `EncounterCatalogViewModel` 97, `EncounterCatalogViewModelTests` 167, `EncounterCatalogViewModelChoiceTests` 51,
+  `EncounterFixtures` +30 (`Catalog`: the test world with the goblin and an orc, b_pair and a_trio); 7353 tests.

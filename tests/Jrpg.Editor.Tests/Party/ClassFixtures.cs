@@ -6,12 +6,22 @@ using Jrpg.Editor.Party;
 namespace Jrpg.Editor.Tests.Party;
 
 /// <summary>
-/// The Classes page tests' own class, so no repository number is pinned: every base and growth number differs from the
-/// others and from a new class's, so a box that drops or swaps one shows in a record compared whole; and the boxes'
-/// texts read in the page's order.
+/// The Classes page tests' own classes, so no repository number is pinned: every base and growth number of the scholar
+/// differs from the others and from a new class's, so a box that drops or swaps one shows in a record compared whole; a
+/// second class for the list; and the boxes' texts read in the page's order.
 /// </summary>
 internal static class ClassFixtures
 {
+    /// <summary>
+    /// A class with one skill that costs nothing (the repository's <c>expose</c>, which a class may name) and no
+    /// resources; its id sorts before the scholar's.
+    /// </summary>
+    public static ClassDefinition Archer { get; } =
+        new("archer", "Archer", "Shoots from behind the line.", new ClassStats(120, 12), new ClassStats(10, 1))
+        {
+            SkillIds = ["expose"],
+        };
+
     /// <summary>A class with one resource that isn't lasting, and no skills.</summary>
     public static ClassDefinition Scholar { get; } = new(
         "scholar",

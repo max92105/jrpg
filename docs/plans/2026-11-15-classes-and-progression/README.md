@@ -103,8 +103,10 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   → [slices/CL2.md](slices/CL2.md)
 - [x] **CL2b. One class as typed: its id, name, description and the two sets of boxes** (Editor, about 230 lines; split
   from CL2) → [slices/CL2b.md](slices/CL2b.md)
-- [ ] **CL3. The classes as a catalog: Add, Duplicate, Remove while new, one undo step** (Editor, about 230 lines) →
-  [slices/CL3.md](slices/CL3.md)
+- [x] **CL3. The classes as a catalog: Add, Duplicate, Remove while new** (Editor, about 230 lines; split, the undo step
+  is CL3b) → [slices/CL3.md](slices/CL3.md)
+- [ ] **CL3b. The classes' undo step: the session applied as one `SetClasses` step** (Editor, about 160 lines; split
+  from CL3) → [slices/CL3b.md](slices/CL3b.md)
 - [ ] **CL4. Database > Classes: the page with its Stats tab** (Editor, about 50 lines plus about 120 of XAML) →
   [slices/CL4.md](slices/CL4.md)
 - [ ] **CL5. The Levels tab: a class's numbers at every level, through Core's `ClassSheet`** (Core + Editor, about 230

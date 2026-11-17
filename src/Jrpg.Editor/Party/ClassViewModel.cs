@@ -45,6 +45,23 @@ internal sealed partial class ClassViewModel : ObservableObject
     public static ClassViewModel New() => new(_blank) { IsNew = true };
 
     /// <summary>
+    /// A new class copying the chosen one as typed, its id left to type (decision 585): the boxes' texts, not the
+    /// record, so a half-typed class duplicates too; its skills and resources come from the record it came from.
+    /// </summary>
+    public static ClassViewModel DuplicateOf(ClassViewModel chosen)
+    {
+        var copy = new ClassViewModel(chosen._source with { Id = "" })
+        {
+            IsNew = true,
+            Name = chosen.Name,
+            Description = chosen.Description,
+        };
+        copy.Base.CopyFrom(chosen.Base);
+        copy.Growth.CopyFrom(chosen.Growth);
+        return copy;
+    }
+
+    /// <summary>
     /// True while the class was added this session: the only time its id can be typed (decision 582).
     /// </summary>
     public bool IsNew { get; private init; }

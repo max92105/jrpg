@@ -59,3 +59,5 @@ None new: the page binds CL2's and CL3's tested view models. Guard: the smoke sc
   `MainViewModelDatabaseWorkspaceTests.DatabaseWorkspace_ContentLoaded_ListsEveryPageInGroupOrder` gains it after the
   page before it, so "Tests: none new" still changes that one assertion. The smoke script's default list is its lines
   32-35.
+- **Note from CL3:** split on 2026-11-17; the page also needs CL3b, whose `Party/ClassEditingViewModel` its
+  registration takes.

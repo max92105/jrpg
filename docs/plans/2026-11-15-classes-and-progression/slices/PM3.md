@@ -41,3 +41,4 @@ None: the page comes in PM4, whose hand check covers the refusal.
 - **Note from CL1:** `Shell/CombinedHistory.cs` is at 282 lines (221 when planned), so its +15 reaches about 297:
   recount first and put the members' refusal in the `CombinedHistory.DatabasePage` partial (37) or a new one if it
   would pass 300.
+- **Note from CL3:** the `Catalogs/CatalogDraft.Party.cs` partial comes with CL3b, split from CL3 on 2026-11-17.

@@ -1,15 +1,14 @@
-# CL3. The classes as a catalog: Add, Duplicate, Remove while new, one undo step
+# CL3. The classes as a catalog: Add, Duplicate, Remove while new (the undo step is CL3b)
 
 Editor, about 230 lines (about 120 of them tests). Needs CL2. Design: section 3; decisions 945, 946; the mode bar's
-WS12 recipe, steps 1, 2 and 9.
+WS12 recipe, steps 1 and 7.
 
 ## Goal
-The Classes page's state and its apply, headless: every class of the draft in id order, Add (the blank, last, chosen),
-Duplicate (a copy of the chosen class's boxes after it, its skills and resources included, its id left to type),
-Remove (only a class added this session), the problem line (the chosen class's own problem, then any class's by id,
-then Data's message for the whole list through `CatalogProblems.OfClasses`). The catalog view model is an
-`IEditedCatalog` (its chosen class's id), the editing view model an `ICatalogEditing<ClassCatalogViewModel>`: Apply
-records one `CatalogDraft.SetClasses` step; an Apply with no change records none.
+The Classes page's state, headless: every class of the draft in id order, Add (the blank, last, chosen), Duplicate (a
+copy of the chosen class's boxes after it, its skills and resources included, its id left to type), Remove (only a
+class added this session), the problem line (the chosen class's own problem, then any class's by id, then Data's
+message for the whole list through `CatalogProblems.OfClasses`). The catalog view model is an `IEditedCatalog` (its
+chosen class's id). The editing view model and its `CatalogDraft.SetClasses` step are CL3b's goal.
 
 ## New types
 - `Party/ClassCatalogViewModel` (`ObservableObject`, `IEditedCatalog`): every class on the page, Add, Duplicate, Remove
@@ -25,24 +24,14 @@ records one `CatalogDraft.SetClasses` step; an Apply with no change records none
   - `IReadOnlyList<ClassDefinition> ToClasses()` (throws on a problem).
   - Relays its classes' typed changes to `Problem`, skipping their `Label` and `Problem` notices
     (`.claude/rules/editor.md`), as `Battle/EnemyCatalogViewModel` does.
-- `Party/ClassEditingViewModel(CatalogDraft catalog)` (`ICatalogEditing<ClassCatalogViewModel>`): starts the Classes
-  page from the draft and applies its session as one step. `Start()` from `catalog.Current`; `Apply(edited)` calls
-  `catalog.SetClasses(edited.ToClasses())`.
 
 ## Changes
 - `Party/ClassViewModel`: `static ClassViewModel DuplicateOf(ClassViewModel chosen)`, copying the boxes as typed
   (`ClassStatsBoxes.CopyFrom`), not the record, so a half-typed class duplicates (decision 585's rule).
-- `Catalogs/CatalogDraft.Party.cs` (new partial): `public void SetClasses(IReadOnlyList<ClassDefinition> classes)`, one
-  step, nothing when the same by content (`HasSameRecords` with `IsSameClass`: the record `with` the lists, then
-  `SkillIds` and `Resources` by sequence, as `IsSameEnemy` compares tactics). The summary says why there is no undo
-  refusal (decision 945).
-- `Catalogs/CatalogDraft.Skills.cs` (row 7's SK2): `SetSkills`' summary loses "classes and enemies name skills but the
-  editor writes neither": the editor now writes classes, and a skill a class still lists, once removed, is Data's
-  message at the next Apply or save, not an undo refusal (catalog steps undo in order).
 
 ## Tests
-- `Party/ClassCatalogViewModelTests` (new; a `CatalogDraft` over the test world's content `with` `Classes` set to
-  `ClassFixtures.Scholar` and a second class built in the test):
+- `Party/ClassCatalogViewModelTests` (new; the test world's content `with` `Classes` set to `ClassFixtures.Scholar`
+  and a second class built in the test):
   - `Constructor_Classes_ListsThemInIdOrder` (the two fixtures added in the opposite order).
   - `AddClass_AddsBlankLastAndChoosesIt`.
   - `DuplicateClass_TypedBoxes_CopiesThemWithAnEmptyId`; `DuplicateClass_ClassWithResources_CopiesThem`.
@@ -52,9 +41,6 @@ records one `CatalogDraft.SetClasses` step; an Apply with no change records none
   - `Problem_TypedChange_RaisesProblemChanged`; `CanApply_WithProblem_IsFalse`.
   - The recipe's three: `Choose_KnownId_ChoosesIt`, `Choose_UnknownId_KeepsTheChoice`,
     `ChosenKey_NothingChosen_IsNull`.
-- `Catalogs/CatalogDraftClassTests` (new): `SetClasses_ChangedGrowth_RecordsOneStep`;
-  `SetClasses_SameClasses_RecordsNothing` (lists rebuilt, same content); `SetClasses_Undo_RestoresTheClasses`.
-- `Party/ClassEditingViewModelTests` (new): `Apply_EditedName_ChangesTheDraft`; `Start_AfterUndo_ReadsTheDraftAgain`.
 
 ## Verify by hand
 None: the page comes in CL4.
@@ -63,3 +49,15 @@ None: the page comes in CL4.
   they name"); CL3 rewords it again once the Classes page edits a class's skills (CL6 at the latest).
 - **Note from CL2:** needs CL2b, which holds `ClassViewModel` and its `Changed` event (the id, name, description or a
   box typed); relay that event to the list's problem, as `Encounters/EncounterCatalogViewModel` does.
+- **Done, with deviations:** split on 2026-11-17, the whole slice estimated at about 440 lines with tests: CL3 built
+  `Party/ClassCatalogViewModel` (99 lines) and `ClassViewModel.DuplicateOf` (+17, the file at 125) with
+  `Party/ClassCatalogViewModelTests` (234, 23 tests), the second class being `ClassFixtures.Archer` (42 lines with it;
+  one skill, `expose`, so CL3b reuses it); `ClassEditingViewModel`, `CatalogDraft.SetClasses` (the new
+  `CatalogDraft.Party` partial), `SetSkills`' summary and their tests moved to CL3b. No `CanApply`: the Database mode's
+  Apply greys on the page's `Problem` (`DatabaseWorkspaceViewModel.CanApply`), so `CanApply_WithProblem_IsFalse`
+  became `Problem_Constructed_IsNull`. `Problem` starts with the chosen class's own, as the goal and decision 946 say
+  (the type list left it out), and `ChosenKey` is null while a new class has no id, as the affixes' and encounters'
+  are. Tests beyond the list: Duplicate's skills (`DuplicateClass_ClassWithSkills_CopiesThem`, beside the resources'
+  test, one class having each), Duplicate greyed with nothing chosen, the commands' `CanExecuteChanged`, another class's
+  problem by id, the chosen class's first, `Problem` raised on a choice, `ToClasses` (its throw and its records), and
+  `ChosenKey` for a new class and a saved one.

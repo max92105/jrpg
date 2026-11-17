@@ -61,3 +61,4 @@ uses them yet (LV2).
 2. Run the game, choose Omer: the battle's Skills menu and the Status page list the mage's skills as before.
 3. Type `"level": 99` on one entry by hand, run the game: it stops at startup naming `classes.json`, the class, the
    skill and the max level 21. Undo the edit.
+- **Note from CL3:** `Catalogs/CatalogDraftClassTests` comes with CL3b, split from CL3 on 2026-11-17.

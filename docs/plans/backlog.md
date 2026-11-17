@@ -356,3 +356,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - The `ListBoxItem` style setting `RowFocus.ChoosesRow` is copied in four pages (Item, Skill, Class as `TypedRow`,
   DropTable inline): one keyed style in `Shell/EditorTheme.xaml` would replace them (classes and progression plan, CL6b
   review).
+- `Editor/Party/ClassViewModel.Skills` and `.Resources` each hold the chosen-row move greying and the list-change
+  handler (re-watch, re-grey, raise `Problem` and `Changed`): a third chosen-row list extracts them (classes and
+  progression plan, CL7d review).

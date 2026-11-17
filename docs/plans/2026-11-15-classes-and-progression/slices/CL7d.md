@@ -27,3 +27,11 @@ Each list change reaches the class's `Changed` once, as the skills' list does (d
 
 ## Verify by hand
 None: the tab comes in CL8.
+
+- **Done, with deviations:** the tests went to a new `Party/ClassResourceCommandTests` (233 lines, 20 tests: the
+  planned ones, plus the first chosen at start, an added resource watched, the list change's `Problem` notice, Remove
+  and both moves greyed with nothing chosen, Up moving, and the only resource removed leaving nothing chosen and the
+  three commands greyed, after review), so `ClassResourceListTests` stays at 135.
+  `ClassViewModel.Resources.cs` (101): `SelectedResource`, Add, Remove, Up and Down through `Events/ListOrder`, and the
+  list followed with `Catalogs/ListItemWatch.Follow`; `ClassViewModel` (182) chooses the first resource at start. The
+  move greying and list relay are the skills' second copy, not extracted (two copies; backlog line for a third).

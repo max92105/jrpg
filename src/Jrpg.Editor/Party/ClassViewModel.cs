@@ -10,9 +10,9 @@ namespace Jrpg.Editor.Party;
 /// One class as the Classes page types it (decisions 945-948): its id (typed while the class is new, fixed once the
 /// draft holds it, decision 582), name, description, and its base and growth as the same eight boxes each, written over
 /// the record it came from; its skills as typed, added, removed and moved (the <c>.Skills</c> partial); its resources
-/// as typed (the <c>.Resources</c> partial); and the Levels tab's rows, read from the boxes as typed against the
-/// draft's experience table and stat rules. <see cref="Problem"/> is only the typed id's, the boxes', the skill levels'
-/// and the resources' own; the rest is Data's rules, which the list shows.
+/// as typed, added, removed and moved (the <c>.Resources</c> partial); and the Levels tab's rows, read from the boxes
+/// as typed against the draft's experience table and stat rules. <see cref="Problem"/> is only the typed id's, the
+/// boxes', the skill levels' and the resources' own; the rest is Data's rules, which the list shows.
 /// </summary>
 internal sealed partial class ClassViewModel : ObservableObject
 {
@@ -42,12 +42,13 @@ internal sealed partial class ClassViewModel : ObservableObject
         SelectedSkill = Skills.FirstOrDefault();
         Resources = [.. resources];
         WatchResources();
+        SelectedResource = Resources.FirstOrDefault();
     }
 
     /// <summary>
-    /// The id, the name, the description, a box or a skill's level typed, a skill added, removed or moved, or a
-    /// resource's typed field: what the list's problem line listens to, never the label's or the problem's own notices,
-    /// so the list runs Data's check once per change.
+    /// The id, the name, the description, a box or a skill's level typed, a skill added, removed or moved, a resource's
+    /// typed field, or a resource added, removed or moved: what the list's problem line listens to, never the label's
+    /// or the problem's own notices, so the list runs Data's check once per change.
     /// </summary>
     public event EventHandler? Changed;
 

@@ -13,8 +13,9 @@ using Jrpg.Core.World;
 namespace Jrpg.Core.Tests.Exploration;
 
 /// <summary>
-/// "field" is a 6x1 floor with random battles (1 in 2 steps after 1 grace step), a sign cell at (5, 0) and a post at (3, 0) that talks when faced.
-/// "house" is a 3x1 floor without battles whose cell (2, 0) warps to the field's (0, 0).
+/// "field" is a 6x1 floor with random battles (1 in 2 steps after 1 grace step) fought on "Map.png" (its encounter
+/// names no background of its own), a sign cell at (5, 0) and a post at (3, 0) that talks when faced. "house" is a 3x1
+/// floor without battles whose cell (2, 0) warps to the field's (0, 0).
 /// </summary>
 public sealed class ExplorationEncounterTests
 {
@@ -22,7 +23,7 @@ public sealed class ExplorationEncounterTests
     private static readonly TimeSpan _oneStep = TimeSpan.FromSeconds(1.0 / 3);
     private static readonly MoveIntent _right = MoveIntent.FromAxes(1, 0);
 
-    private static readonly EncounterDefinition _goblins = new() { Id = "goblin_trio", EnemyIds = ["goblin"], BackgroundFile = "Forest.png" };
+    private static readonly EncounterDefinition _goblins = new() { Id = "goblin_trio", EnemyIds = ["goblin"] };
 
     [Fact]
     public void Walk_EnterNewCellOnEncounterMap_SetsPendingEncounter()
@@ -143,6 +144,28 @@ public sealed class ExplorationEncounterTests
         Assert.Null(exploration.PendingEncounter);
     }
 
+    [Fact]
+    public void PendingBattleBackground_AfterARollOnAMapWithABackground_IsTheMaps()
+    {
+        var exploration = StartOn("field", new FixedSequenceRandom(0, 0));
+        exploration.Walk(_right, _oneStep);
+
+        exploration.Walk(_right, _oneStep);
+
+        Assert.Equal("Map.png", exploration.PendingBattleBackground);
+    }
+
+    [Fact]
+    public void PendingBattleBackground_NoBattlePending_IsNull()
+    {
+        var exploration = StartOn("field", new FixedSequenceRandom(1));
+        exploration.Walk(_right, _oneStep);
+
+        exploration.Walk(_right, _oneStep);
+
+        Assert.Null(exploration.PendingBattleBackground);
+    }
+
     private static ExplorationState StartOn(string mapId, IRandom random, Point2D? position = null)
     {
         var field = new MapLayoutBuilder().WithLayer("111111").Build() with
@@ -160,6 +183,7 @@ public sealed class ExplorationEncounterTests
             .WithObjects(new ObjectDefinition { Id = "post", Width = 1, Height = 1, CollisionPolygon = [], Category = "test", Tiles = [], AbovePlayerZones = [] })
             .WithMaps(field, house)
             .WithRandomEncounters("field", new RandomEncounterTable { OneInSteps = 2, GraceSteps = 1, EncounterIds = ["goblin_trio"] })
+            .WithBattleBackground("field", "Map.png")
             .WithEncounters(_goblins)
             .Build();
         var context = new ExplorationContext(catalog, new Inventory(), new WorldState(), random);

@@ -42,4 +42,14 @@ public sealed class RepositoryEncounterTests
 
         Assert.Equal("boss/loop.wav", catalog.Encounters["goblin_chief"].MusicFile);
     }
+
+    // Decision 894: the background moved from the encounters to the maps that roll them.
+    [Fact]
+    public void Load_RepositoryContent_RandomBattleMapsNameABackground()
+    {
+        var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
+
+        Assert.NotNull(catalog.Maps["milestone_outside"].Settings.BattleBackgroundFile);
+        Assert.NotNull(catalog.Maps["primeval_growth_crossroad"].Settings.BattleBackgroundFile);
+    }
 }

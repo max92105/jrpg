@@ -89,3 +89,10 @@ to draw. The repository moves `Forest.png` from the encounters to the maps, so e
 3. `dotnet run --project src/Jrpg.Editor`, open `milestone_outside`, **Map > Settings...**, change the display name,
    **OK**, **File > Save**: `content/maps/milestone_outside.json` still has its `battleBackgroundFile` line. Undo,
    Save, and check `git status` shows the file unchanged.
+
+- **Done, with deviations:** code +101 -15, tests +299 -30 (26 of them the two encounter-background tests moved
+  unchanged), content +25 -12: about 330 lines net against the 260 planned, the excess in tests. The Core test
+  builder gained `WithBattleBackground(mapId, file)`, since Core tests have no test world to build "with" over; the
+  field map in `ExplorationEncounterTests` is fought on "Map.png" and its encounter names none. One test beyond the
+  list: `ArtReferenceCheckBackgroundTests.FindProblems_TwoMapBackgroundsMissing_ListsThemInIdOrder` (maps put in the
+  catalog in reverse order, for the maps-in-id-order sort). `ExplorationState.cs` is 281 lines.

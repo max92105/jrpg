@@ -1,6 +1,7 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Core.Loot;
+using Jrpg.Core.Maps;
 using Jrpg.Core.Randomness;
 using Jrpg.Core.Session;
 using Jrpg.Game.Battle;
@@ -156,6 +157,27 @@ public sealed class BattleSceneTests
         Assert.Null(first);
         Assert.Null(second);
         Assert.Null(session.ActiveBattle);
+    }
+
+    // Only the map names "Arena.png", so the scene can only have it from the map (decision 892).
+    [Fact]
+    public void Constructor_EncounterWithoutItsOwnBackground_UsesTheMaps()
+    {
+        var rolling = StartMapScenarios.NextToForestWarpAlwaysRolling;
+        var forest = rolling.Maps["forest"];
+        var trio = rolling.Encounters["goblin_trio"] with { BackgroundFile = null };
+        var catalog = rolling with
+        {
+            Maps = new Dictionary<string, MapDefinition>(rolling.Maps)
+            {
+                ["forest"] = new MapDefinition(forest.Layout, forest.Settings with { BattleBackgroundFile = "Arena.png" }),
+            },
+            Encounters = new Dictionary<string, EncounterDefinition>(rolling.Encounters) { ["goblin_trio"] = trio },
+        };
+
+        var (_, scene) = StartForestBattleScene(catalog);
+
+        Assert.Equal("Arena.png", scene.BackgroundFile);
     }
 
     // Settling plays any enemy turns ahead of Sarxian (200 HP, out of the goblins' reach), so the list is offered.

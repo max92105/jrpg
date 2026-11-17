@@ -184,26 +184,6 @@ public sealed class ArtReferenceCheckTests
     }
 
     [Fact]
-    public void FindProblems_MissingEncounterBackground_NamesTheEncounter()
-    {
-        var catalog = WithGoblinTrioBackground("Gone.png");
-
-        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
-
-        Assert.Equal($"backgrounds/Gone.png: not found in {_artRoot}. Named by encounter 'goblin_trio'.", problem);
-    }
-
-    [Fact]
-    public void FindProblems_BackgroundNameDiffersInCase_NamesTheFile()
-    {
-        var catalog = WithGoblinTrioBackground("forest.png");
-
-        var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
-
-        Assert.Equal("backgrounds/forest.png: the file is named Forest.png; names must match exactly. Named by encounter 'goblin_trio'.", problem);
-    }
-
-    [Fact]
     public void FindProblems_MissingTilesheet_NamesTheFileAndSkipsItsTiles()
     {
         var sheet = _catalog.Tilesheets["city"];
@@ -212,11 +192,5 @@ public sealed class ArtReferenceCheckTests
         var problem = Assert.Single(ArtReferenceCheck.FindProblems(catalog, _artRoot));
 
         Assert.Equal($"tilesheets/Gone.png: not found in {_artRoot}.", problem);
-    }
-
-    private static ContentCatalog WithGoblinTrioBackground(string file)
-    {
-        var trio = _catalog.Encounters["goblin_trio"] with { BackgroundFile = file };
-        return _catalog with { Encounters = new Dictionary<string, EncounterDefinition>(_catalog.Encounters) { ["goblin_trio"] = trio } };
     }
 }

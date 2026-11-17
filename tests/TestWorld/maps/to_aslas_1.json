@@ -2,6 +2,7 @@
   "id": "to_aslas_1",
   "displayName": "to_Aslas_1",
   "musicFile": "forest/loop.wav",
+  "battleBackgroundFile": "Forest.png",
   "randomEncounters": {
     "oneInSteps": 15,
     "graceSteps": 5,

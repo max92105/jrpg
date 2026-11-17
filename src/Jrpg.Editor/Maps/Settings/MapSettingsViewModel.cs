@@ -144,6 +144,7 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
         AreaLevel = TypedCounts.Parse(AreaLevelText, int.MaxValue),
         ShowsBanner = ShowsBanner,
         Folder = FolderText.Trim() is { Length: > 0 } folder ? folder : null,
+        BattleBackgroundFile = _currentSettings.BattleBackgroundFile,
         RandomEncounters = HasRandomEncounters
             ? new RandomEncounterTable
             {

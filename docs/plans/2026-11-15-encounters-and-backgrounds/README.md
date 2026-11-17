@@ -1,5 +1,5 @@
 # Encounters and battle backgrounds (editor push, roadmap row 10)
-Status: approved
+Status: approved, in progress
 
 Approved on 2026-11-15 by delegation (the developer delegated approval of the editor push's sub-plans), with the devil's
 advocate's review applied: the plan builds on row 7's shared preview (`Animation/FramePreview`, AN1) and GIF dialog
@@ -90,7 +90,7 @@ slices and Editor slices aim at about 200 lines, not because the scope grew.
 ## Slices
 
 ### Phase 1: a map's battle background
-- [ ] **BG1. A map names its battle background; an encounter's own wins** (Core, Data, Game, Editor, content, about
+- [x] **BG1. A map names its battle background; an encounter's own wins** (Core, Data, Game, Editor, content, about
   260 lines) → [slices/BG1.md](slices/BG1.md)
 - [ ] **BG2. Map settings' Battle background box** (Editor, about 150 lines) → [slices/BG2.md](slices/BG2.md)
 

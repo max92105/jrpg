@@ -75,3 +75,6 @@ records one undo step; Ctrl+Z undoes it; Save all writes `animated-backgrounds.j
 4. **Import...** a PNG from outside the content folder (any 1920 x 1080 PNG): it appears in the list, still, chosen;
    the file is in `content/art/backgrounds/` at once. Delete that file afterwards (it is never committed).
 5. Capture the page with the pulse visible (it holds no Mana Seed art).
+- **Note from BG1:** the mode bar's WS1-WS6 hadn't landed when row 10 started (`Workspaces/` holds `IEditedCatalog`,
+  `CatalogDialog`, `DialogBounds`): unless WS2 has landed by then, host the page in `CatalogDialog` through
+  `MainWindow.Database.OpenInDialog`, as WD2-WD8 and IU15b did, and declare no `ICatalogEditing<T>`.

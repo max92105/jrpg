@@ -46,6 +46,9 @@ internal static class AbsentWhenNullFilter
         // Decision 532: a map at the top of the editor's list has no folder.
         (typeof(MapSettings), "folder"),
 
+        // Decision 892: a map without random battles may name no battle background.
+        (typeof(MapSettings), "battleBackgroundFile"),
+
         // ADR 0039: only animated tiles have an animation.
         (typeof(TileDefinition), "animation"),
 

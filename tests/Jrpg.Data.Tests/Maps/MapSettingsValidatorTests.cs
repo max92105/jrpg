@@ -14,6 +14,7 @@ public sealed class MapSettingsValidatorTests
     {
         Id = "forest",
         DisplayName = "Forest",
+        BattleBackgroundFile = "Forest.png",
         RandomEncounters = new RandomEncounterTable { OneInSteps = 25, GraceSteps = 3, EncounterIds = ["goblin_trio"] },
     };
 
@@ -23,6 +24,11 @@ public sealed class MapSettingsValidatorTests
         { WithTable(_forest.RandomEncounters! with { GraceSteps = 0 }), "randomEncounters.graceSteps must be at least 1 (was 0)." },
         { WithTable(_forest.RandomEncounters! with { EncounterIds = [] }), "randomEncounters.encounterIds must list at least one encounter." },
         { WithTable(_forest.RandomEncounters! with { EncounterIds = ["goblin_trio", null!] }), "randomEncounters.encounterIds holds a null entry." },
+        {
+            _forest with { BattleBackgroundFile = null },
+            "randomEncounters needs battleBackgroundFile, the background its battles are fought on (decision 892)."
+        },
+        { _forest with { BattleBackgroundFile = " " }, "battleBackgroundFile must not be blank; leave it out for none." },
         { _forest with { AreaLevel = 0 }, "areaLevel must be at least 1 (was 0)." },
         { _forest with { AreaLevel = -1 }, "areaLevel must be at least 1 (was -1)." },
         { _forest with { Folder = "" }, "folder: A folder path is names joined by '/', each with text, no space at either end and no backslash." },
@@ -69,6 +75,26 @@ public sealed class MapSettingsValidatorTests
     public void Validate_NoRandomEncounters_DoesNotThrow()
     {
         var exception = Record.Exception(() => MapSettingsValidator.Validate(FileName, _forest with { RandomEncounters = null }, _encounterIds));
+
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void Validate_RandomBattlesWithABackground_Accepts()
+    {
+        var settings = _forest with { BattleBackgroundFile = "Arena.png" };
+
+        var exception = Record.Exception(() => MapSettingsValidator.Validate(FileName, settings, _encounterIds));
+
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void Validate_NoRandomBattlesAndNoBackground_Accepts()
+    {
+        var settings = _forest with { RandomEncounters = null, BattleBackgroundFile = null };
+
+        var exception = Record.Exception(() => MapSettingsValidator.Validate(FileName, settings, _encounterIds));
 
         Assert.Null(exception);
     }

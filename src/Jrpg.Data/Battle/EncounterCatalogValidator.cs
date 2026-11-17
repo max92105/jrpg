@@ -17,6 +17,13 @@ internal static class EncounterCatalogValidator
         }
 
         var unknownEnemyId = encounter.EnemyIds.FirstOrDefault(id => !enemyIds.Contains(id));
-        return unknownEnemyId is null ? null : $"enemyIds has unknown enemy id '{unknownEnemyId}'.";
+        if (unknownEnemyId is not null)
+        {
+            return $"enemyIds has unknown enemy id '{unknownEnemyId}'.";
+        }
+
+        return encounter.BackgroundFile is { } file && string.IsNullOrWhiteSpace(file)
+            ? "backgroundFile must not be blank; leave it out for the map's."
+            : null;
     }
 }

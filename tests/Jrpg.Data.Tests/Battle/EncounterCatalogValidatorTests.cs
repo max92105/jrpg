@@ -24,6 +24,29 @@ public sealed class EncounterCatalogValidatorTests
     }
 
     [Fact]
+    public void Validate_EncounterWithoutBackground_Accepts()
+    {
+        var encounter = _goblinTrio with { BackgroundFile = null };
+
+        var exception = Record.Exception(() => EncounterCatalogValidator.Validate("encounters.json", [encounter], _enemyIds));
+
+        Assert.Null(exception);
+    }
+
+    [Fact]
+    public void Validate_BlankBackground_IsRefused()
+    {
+        var encounter = _goblinTrio with { BackgroundFile = " " };
+
+        var exception = Assert.Throws<ContentValidationException>(
+            () => EncounterCatalogValidator.Validate("encounters.json", [encounter], _enemyIds));
+
+        Assert.Equal(
+            "encounters.json: encounter 'goblin_trio': backgroundFile must not be blank; leave it out for the map's.",
+            exception.Message);
+    }
+
+    [Fact]
     public void Validate_UnknownEnemyId_ThrowsNamingTheEncounter()
     {
         var encounter = _goblinTrio with { EnemyIds = ["goblin", "dragon"] };

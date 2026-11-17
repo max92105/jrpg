@@ -114,6 +114,12 @@ public sealed class ExplorationState
     public EncounterDefinition? PendingEncounter { get; private set; }
 
     /// <summary>
+    /// The background the pending battle is fought on (<see cref="EncounterBackground"/>); null with none pending.
+    /// </summary>
+    public string? PendingBattleBackground =>
+        PendingEncounter is { } encounter ? EncounterBackground.On(encounter, CurrentMap.Settings) : null;
+
+    /// <summary>
     /// What the confirm button would start on the object the player faces, for the Game's prompt; null while an event
     /// runs or a battle is pending. The same record while the target stays the same, so the Game can compare references.
     /// </summary>

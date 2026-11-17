@@ -1,23 +1,32 @@
 [
   {
+    "id": "goblin_chief",
+    "enemyIds": [
+      "goblin",
+      "goblin",
+      "goblin_chief"
+    ],
+    "musicFile": "boss/loop.wav"
+  },
+  {
     "id": "goblin_trio",
-    "enemyIds": ["goblin", "goblin", "goblin"],
-    "backgroundFile": "Forest.png"
+    "enemyIds": [
+      "goblin",
+      "goblin",
+      "goblin"
+    ]
   },
   {
     "id": "stone_beetle",
-    "enemyIds": ["stone_beetle", "stone_beetle"],
-    "backgroundFile": "Forest.png"
+    "enemyIds": [
+      "stone_beetle",
+      "stone_beetle"
+    ]
   },
   {
     "id": "training_dummy",
-    "enemyIds": ["training_dummy"],
-    "backgroundFile": "Forest.png"
-  },
-  {
-    "id": "goblin_chief",
-    "enemyIds": ["goblin", "goblin", "goblin_chief"],
-    "backgroundFile": "Forest.png",
-    "musicFile": "boss/loop.wav"
+    "enemyIds": [
+      "training_dummy"
+    ]
   }
 ]

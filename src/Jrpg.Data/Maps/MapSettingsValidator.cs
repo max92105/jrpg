@@ -11,6 +11,7 @@ internal static class MapSettingsValidator
         var problem = FindIdentityProblem(fileName, settings)
             ?? (settings.AreaLevel is { } level ? RangeProblems.AtLeast("areaLevel", level, minimum: 1) : null)
             ?? (settings.Folder is { } folder && MapFolderPath.ProblemOf(folder) is { } folderProblem ? $"folder: {folderProblem}" : null)
+            ?? FindBackgroundProblem(settings)
             ?? FindEncounterProblem(settings.RandomEncounters, encounterIds);
         if (problem is not null)
         {
@@ -27,6 +28,20 @@ internal static class MapSettingsValidator
         }
 
         return string.IsNullOrWhiteSpace(settings.DisplayName) ? "displayName must not be empty." : null;
+    }
+
+    // Required with random battles and checked inside the one map file (decision 892), so an edited encounter never
+    // invalidates a map it doesn't write.
+    private static string? FindBackgroundProblem(MapSettings settings)
+    {
+        if (settings.BattleBackgroundFile is { } file && string.IsNullOrWhiteSpace(file))
+        {
+            return "battleBackgroundFile must not be blank; leave it out for none.";
+        }
+
+        return settings.RandomEncounters is not null && settings.BattleBackgroundFile is null
+            ? "randomEncounters needs battleBackgroundFile, the background its battles are fought on (decision 892)."
+            : null;
     }
 
     private static string? FindEncounterProblem(RandomEncounterTable? table, IReadOnlySet<string> encounterIds)

@@ -42,6 +42,7 @@ internal sealed class ContentCatalogBuilder
     private EnemyDefinition[] _enemies = [];
     private EncounterDefinition[] _encounters = [];
     private readonly Dictionary<string, RandomEncounterTable> _randomEncounters = [];
+    private readonly Dictionary<string, string> _battleBackgrounds = [];
 
     public ContentCatalogBuilder WithItems(params ItemDefinition[] items)
     {
@@ -129,6 +130,12 @@ internal sealed class ContentCatalogBuilder
         return this;
     }
 
+    public ContentCatalogBuilder WithBattleBackground(string mapId, string file)
+    {
+        _battleBackgrounds[mapId] = file;
+        return this;
+    }
+
     public ContentCatalogBuilder WithNewGame(NewGameDefinition newGame)
     {
         _newGame = newGame;
@@ -163,5 +170,11 @@ internal sealed class ContentCatalogBuilder
     };
 
     private MapSettings SettingsFor(string mapId) =>
-        new() { Id = mapId, DisplayName = mapId, RandomEncounters = _randomEncounters.GetValueOrDefault(mapId) };
+        new()
+        {
+            Id = mapId,
+            DisplayName = mapId,
+            BattleBackgroundFile = _battleBackgrounds.GetValueOrDefault(mapId),
+            RandomEncounters = _randomEncounters.GetValueOrDefault(mapId),
+        };
 }

@@ -29,6 +29,12 @@ public sealed record MapSettings
     /// </summary>
     public string? Folder { get; init; }
 
+    /// <summary>
+    /// The background, in the backgrounds folder, that the map's battles are fought on unless their encounter names its
+    /// own (decisions 700, 892); required while the map has random battles.
+    /// </summary>
+    public string? BattleBackgroundFile { get; init; }
+
     /// <summary>Null on maps without random battles, such as towns and houses.</summary>
     public RandomEncounterTable? RandomEncounters { get; init; }
 }

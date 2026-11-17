@@ -52,3 +52,8 @@ undo step; Save all writes `encounters.json`.
    tick `test_pair`, **OK**; switch to `milestone` (the map list) and **Ctrl+Z**: the status band reads "Can't undo:
    encounter test_pair is rolled on milestone_outside." Close the editor with **Don't save**.
 6. Capture the page (no Mana Seed art in it).
+- **Note from BG1:** the mode bar's WS1-WS6 hadn't landed when row 10 started (`Workspaces/` holds `IEditedCatalog`,
+  `CatalogDialog`, `DialogBounds`): unless WS2 has landed by then, host the page in `CatalogDialog` through
+  `MainWindow.Database.OpenInDialog`, as WD2-WD8 and IU15b did, and declare no `ICatalogEditing<T>`.
+- **Note from BG1:** `goblin_chief` (row 8's boss) now uses the map's background like the others; decision 892's boss arena
+  has no content yet, so a hand check giving an encounter its own background picks one from the folder.

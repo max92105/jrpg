@@ -3,6 +3,7 @@
   "displayName": "Milestone Outside",
   "musicFile": "forest/loop.wav",
   "folder": "Milestone Area",
+  "battleBackgroundFile": "Forest.png",
   "randomEncounters": {
     "oneInSteps": 25,
     "graceSteps": 3,

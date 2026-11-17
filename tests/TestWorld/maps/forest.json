@@ -2,6 +2,7 @@
   "id": "forest",
   "displayName": "Forest",
   "musicFile": "forest/loop.wav",
+  "battleBackgroundFile": "Forest.png",
   "randomEncounters": {
     "oneInSteps": 25,
     "graceSteps": 3,

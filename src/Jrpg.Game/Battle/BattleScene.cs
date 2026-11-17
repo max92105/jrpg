@@ -11,9 +11,9 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// The battle screen over the map (ADR 0013): the encounter's background, the battlers, the HUD and the commands. When
-/// the battle is over it finishes it in the session once and asks the flow, once, to go back to the map (or to the
-/// title after a defeat).
+/// The battle screen over the map (ADR 0013): the battle's background (the encounter's own or the map's), the battlers,
+/// the HUD and the commands. When the battle is over it finishes it in the session once and asks the flow, once, to go
+/// back to the map (or to the title after a defeat).
 /// </summary>
 internal sealed class BattleScene : IScene
 {
@@ -62,8 +62,8 @@ internal sealed class BattleScene : IScene
         _battlers = new BattlersView(battle, _sequence, ui);
         _partyStatus = new PartyStatusView(battle.Formation, text, ui);
         _enemyTags = new EnemyTagView(battle.Combatants, _sequence, text, ui);
-        _backgroundFile = session.Exploration.PendingEncounter?.BackgroundFile
-            ?? throw new InvalidOperationException("A battle screen needs the encounter it fights.");
+        _backgroundFile = session.Exploration.PendingBattleBackground
+            ?? throw new InvalidOperationException("A battle screen needs the background its encounter is fought on.");
         _outcome = new BattleOutcomeScreens(sources.Saves, text, ui);
         _commands = new CommandMenu(session.Inventory, sources.Items);
         _commandPanel = new CommandPanelView(_commands, _battlers, text, ui);
@@ -74,6 +74,9 @@ internal sealed class BattleScene : IScene
     }
 
     public IReadOnlyList<string> Sounds => _sounds.Files;
+
+    /// <summary>The background the battle is fought on, for the tests (decision 892).</summary>
+    internal string BackgroundFile => _backgroundFile;
 
     /// <summary>What the battle screen calls for from the music as its outcome shows (decision 418).</summary>
     public BattleMusicCue MusicCue => _outcome.MusicCue;

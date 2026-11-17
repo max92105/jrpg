@@ -106,8 +106,10 @@ slices and Editor slices aim at about 200 lines, not because the scope grew.
 - [x] **BG6. A GIF into a background sheet, headless** (Editor, about 190 lines) → [slices/BG6.md](slices/BG6.md)
 - [x] **BG7. The Battle backgrounds page's rules: every background, still or animated, and its problem line** (Editor,
   about 320 lines, its split point named) → [slices/BG7.md](slices/BG7.md)
-- [ ] **BG7b. The Battle backgrounds page's rules, the two view models** (Editor, about 450 lines; BG7's split, its own
-  split point named) → [slices/BG7b.md](slices/BG7b.md)
+- [x] **BG7b. The Battle backgrounds page's rules, one background's view model** (Editor, about 450 lines; BG7's split,
+  split again at its named point) → [slices/BG7b.md](slices/BG7b.md)
+- [ ] **BG7c. The Battle backgrounds page's rules, the list view model** (Editor, about 200 lines; BG7b's split) →
+  [slices/BG7c.md](slices/BG7c.md)
 - [ ] **BG8. The Battle backgrounds page: the shared preview, cover-fit, PNG import, Apply as one undo step** (Editor,
   about 200 lines) → [slices/BG8.md](slices/BG8.md)
 - [ ] **BG9. AN2's GIF dialog gains a background kind: the GIF plays at the chosen height before it is written**

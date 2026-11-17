@@ -81,3 +81,13 @@ None: no page yet (BG8).
   no content rule: the row's record as typed through `CatalogProblems.OfAnimatedBackgrounds([record])` first, the grid
   only when that is null; `PreviewCells` and the kind line's grid only on a record and size that pass both (`FrameOrigin`
   throws on an image narrower than a frame).
+- **Note from BG7b (the split):** the size check put the whole slice past ~320 lines with tests, so this run stopped at
+  the named split point; `BattleBackgroundCatalogViewModel`, its tests and its map entry moved to [BG7c](BG7c.md).
+- **Done, with deviations:** split at the named point: `Backgrounds/BattleBackgroundViewModel` (119 lines),
+  `BattleBackgroundViewModelTests` (201, 24 tests, not 10: each branch and bound's side, a frame width of 0 and an
+  image narrower than a frame giving no preview cells, a three-column sheet's cells and "3 x 2 grid" (the review's),
+  an untouched record equal to its source, `Problem`'s change raised) and the shared record `BackgroundFixtures.Pulse`
+  and `PulseSheet` (23, the Editor tests' `XFixtures` name). The kind line of an animated record whose record or grid
+  has a problem gives the image's size ("Animated, 960 x 1080 px"); its grid is read from the preview cells, not worked
+  out beside `FrameOrigin`. The review's other suggestion, dropping the `!` in `WithTypedTime`, fails the build
+  (CS8629 on `int?.Value`), so it stays. Tests: 7223.

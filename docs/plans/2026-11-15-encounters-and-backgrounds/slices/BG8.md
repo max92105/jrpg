@@ -1,9 +1,9 @@
 # BG8. The Battle backgrounds page: the shared preview, cover-fit, PNG import, Apply as one undo step
 
-Editor; about 200 lines with tests (about 150 of XAML, code-behind and wiring, 6 tests). Needs BG7, the mode bar plan's
-stage 1 (its page recipe, `Workspaces/CatalogDialog`, `Shell/DatabaseMenu.xaml`) and row 7's AN1 and AN6
-(`Animation/FramePreview`, `PreviewFrames.OfCells`). Decisions 901, 902. Design: "Tunables and placeholders" (the
-preview area).
+Editor; about 200 lines with tests (about 150 of XAML, code-behind and wiring, 6 tests). Needs BG7 (with BG7b and
+BG7c, its splits), the mode bar plan's stage 1 (its page recipe, `Workspaces/CatalogDialog`, `Shell/DatabaseMenu.xaml`)
+and row 7's AN1 and AN6 (`Animation/FramePreview`, `PreviewFrames.OfCells`). Decisions 901, 902. Design: "Tunables and
+placeholders" (the preview area).
 
 ## Goal
 **Database > Battle backgrounds** shows a page (built on the mode bar plan's recipe, its WS12 file): the backgrounds

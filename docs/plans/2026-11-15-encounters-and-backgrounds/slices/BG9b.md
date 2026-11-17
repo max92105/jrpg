@@ -59,3 +59,11 @@ binding error. It can't open the GIF dialog (it needs a chosen file): BG9's "Ver
   page's wiring and `ArtImageImport` moved here. `ArtImageImport` came along because widening `TakesGifs` offers GIFs
   in the page's file dialog at once, and the page would then import one with the default 128 px options, which
   `ConvertToBackground` refuses with a throw for a GIF under 128 px.
+- **Done, as planned** (about 230 lines with tests, +173 -54): `Catalogs/ArtImageImport` 143 lines (BG9's parked draft,
+  its one-GIF refusal counting the first GIF chosen, not the first file); `Battle/GifImportWindow` 76 lines of XAML and
+  97 of code (the background panel's `ComboBox` and sheet line, the battlers' panel collapsed by a `DataTrigger`, the
+  preview re-shown on `PreviewAtChosenHeight`, the combo focused on load); `Backgrounds/BattleBackgroundPage` 59 + 91;
+  `Shell/MainWindow.Database.cs` 257 (its `GifImport` using gone); the menu tooltip. Tests: `ArtImageImportGifTests`
+  247 lines, 2 more (the second test also imports a PNG chosen ahead of the GIFs) and the portraits refusal's new
+  words; 7291. The smoke script opened Battle backgrounds as a page with no `ERROR` and no binding error, and the net
+  caught Help > Raise a test error; it can't open the GIF dialog, which needs a chosen file.

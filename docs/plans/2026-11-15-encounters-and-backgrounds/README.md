@@ -116,7 +116,7 @@ slices and Editor slices aim at about 200 lines, not because the scope grew.
   [slices/BG8b.md](slices/BG8b.md)
 - [x] **BG9. AN2's GIF dialog gains a background kind: the GIF plays at the chosen height before it is written**
   (Editor, about 250 lines) → [slices/BG9.md](slices/BG9.md)
-- [ ] **BG9b. The GIF dialog's background look, the backgrounds' GIF import and the page's Import... taking GIFs**
+- [x] **BG9b. The GIF dialog's background look, the backgrounds' GIF import and the page's Import... taking GIFs**
   (Editor, about 200 lines; BG9's split) → [slices/BG9b.md](slices/BG9b.md)
 
 ### Phase 3: the Encounters page

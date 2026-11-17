@@ -331,3 +331,5 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   when the session ends a playthrough (encounters and backgrounds plan, BG5 review).
 - `Editor/Tiles/SheetImportResult` now carries battle-background records too (so `Tiles` uses `Core.Battle`); it serves
   every art import, so `Catalogs/` is its home (encounters and backgrounds plan, BG9 review).
+- `Editor/Battle/GifImportWindow.AskFor` tests a path for `.gif` with its own `Path.GetExtension` check, a copy of
+  `Catalogs/ArtImageImport.IsGif`: share one (encounters and backgrounds plan, BG9b review).

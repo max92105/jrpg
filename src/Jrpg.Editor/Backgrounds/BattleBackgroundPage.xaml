@@ -6,7 +6,8 @@
              xmlns:backgrounds="clr-namespace:Jrpg.Editor.Backgrounds">
   <DockPanel>
     <!-- The backgrounds folder's images in name order, each with its kind, then the records whose image is missing.
-         Import... under the list copies PNGs in at once and hands them to the list as stills (decision 902). -->
+         Import... under the list copies PNGs in at once and hands them to the list as stills (decision 902), and one
+         GIF as an animated background's sheet once the GIF dialog has played it (decision 903). -->
     <DockPanel DockPanel.Dock="Left" Width="280">
       <TextBlock DockPanel.Dock="Top" Text="Battle backgrounds" FontWeight="Bold" />
       <StackPanel DockPanel.Dock="Bottom" Margin="0,6,0,0">
@@ -14,7 +15,7 @@
                 Width="70"
                 HorizontalAlignment="Left"
                 Click="OnImportClicked"
-                ToolTip="PNG pictures, each a still background; one over an animated background's file makes it still" />
+                ToolTip="PNG pictures, each a still background, or one GIF as an animated one, its frame height and time chosen while it plays; a PNG over an animated background's file makes it still" />
         <TextBlock x:Name="ImportStatusText" Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap" Margin="0,4,0,0" />
       </StackPanel>
       <ListBox ItemsSource="{Binding Backgrounds}" SelectedItem="{Binding SelectedBackground}" Margin="0,4,0,0">

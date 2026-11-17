@@ -7,9 +7,10 @@ using Jrpg.Editor.GifImport;
 namespace Jrpg.Editor.Battle;
 
 /// <summary>
-/// The GIF import's dialog, opened by Import... before a GIF becomes a strip: its height, background and pace boxes
-/// beside the first chosen GIF playing in the shared preview (decision 987). OK is greyed while a box can't be read;
-/// Cancel imports nothing.
+/// The GIF import's dialog, opened by Import... before a GIF becomes a strip or a background's sheet: its height,
+/// background and pace boxes beside the first chosen GIF playing in the shared preview (decision 987). A background's
+/// kind chooses its frame height among decision 898's instead, hides the background box and names the sheet it makes
+/// (decision 903). OK is greyed while a box can't be read or the sheet can't hold every frame; Cancel imports nothing.
 /// </summary>
 internal sealed partial class GifImportWindow : Window
 {
@@ -21,11 +22,7 @@ internal sealed partial class GifImportWindow : Window
         DataContext = _options = options;
         options.PropertyChanged += OnOptionsChanged;
         ShowGif();
-        Loaded += (_, _) =>
-        {
-            HeightBox.Focus();
-            HeightBox.SelectAll();
-        };
+        Loaded += (_, _) => FocusHeight();
     }
 
     /// <summary>
@@ -67,19 +64,33 @@ internal sealed partial class GifImportWindow : Window
 
     private void OnOptionsChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(GifImportOptionsViewModel.RemovesBackground))
+        if (e.PropertyName is nameof(GifImportOptionsViewModel.RemovesBackground)
+            or nameof(GifImportOptionsViewModel.PreviewAtChosenHeight))
         {
             ShowGif();
         }
     }
 
-    // Cleared as the import clears it, at its own size. New frames start the preview over, so the background box
-    // restarts it at frame 0.
+    // Cleared as the import clears it, at its own size; a background at the chosen height, as its sheet holds it, its
+    // box hidden and never ticked. New frames start the preview over, so the background box or a new height restarts it
+    // at frame 0.
     private void ShowGif() =>
-        GifPreview.Frames = _options.Gif is { } gif
+        GifPreview.Frames = (_options.IsBackground ? _options.PreviewAtChosenHeight : _options.Gif) is { } gif
             ? PreviewFrames.OfPixels(
                 _options.RemovesBackground ? BackgroundRemoval.Apply(gif.Frames) : gif.Frames, gif.Width, gif.Height)
             : null;
+
+    private void FocusHeight()
+    {
+        if (_options.IsBackground)
+        {
+            HeightChoiceBox.Focus();
+            return;
+        }
+
+        HeightBox.Focus();
+        HeightBox.SelectAll();
+    }
 
     // OK is greyed while a problem shows, so a click always applies.
     private void OnOkClicked(object sender, RoutedEventArgs e) => DialogResult = true;

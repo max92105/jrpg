@@ -7,7 +7,6 @@ using Jrpg.Editor.Backgrounds;
 using Jrpg.Editor.Battle;
 using Jrpg.Editor.Cinematics;
 using Jrpg.Editor.Effects;
-using Jrpg.Editor.GifImport;
 using Jrpg.Editor.Items;
 using Jrpg.Editor.Loot;
 using Jrpg.Editor.Quests;
@@ -209,7 +208,7 @@ internal sealed partial class MainWindow
         OpenInDialog("Battle backgrounds", backgroundEditing.Start, backgroundEditing.Apply, edited => new BattleBackgroundPage(
             edited,
             file => SpriteImageFile.LoadFrom(artRoot, ArtFolders.Backgrounds, file),
-            paths => _viewModel.ImportArtImages(ArtFolders.Backgrounds, paths, GifImportOptions.Default)));
+            (paths, options) => _viewModel.ImportArtImages(ArtFolders.Backgrounds, paths, options)));
     }
 
     private void OpenSkills()

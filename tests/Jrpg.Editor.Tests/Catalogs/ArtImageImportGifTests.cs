@@ -9,9 +9,10 @@ using Jrpg.Editor.Tests.Tiles;
 namespace Jrpg.Editor.Tests.Catalogs;
 
 /// <summary>
-/// Import... taking a GIF as a battle sprite or an attack effect (ADR 0047, decision 639): the test world's records
-/// over an empty content folder, the GIFs written by <see cref="GifFixtures"/>: a sprite's 4 x 4 frames at the default
-/// 128 px, an effect's 4 x 2 frames at 8 px.
+/// Import... taking a GIF as a battle sprite, an attack effect or a battle background (ADR 0047, decision 639, ADR
+/// 0059): the test world's records over an empty content folder, the GIFs written by <see cref="GifFixtures"/>: a
+/// sprite's 4 x 4 frames at the default 128 px, an effect's 4 x 2 frames at 8 px, a background's 4 x 4 frames at their
+/// own 4 px.
 /// </summary>
 [Collection(GifFixtures.StripFoldersCollection)]
 public sealed class ArtImageImportGifTests : IDisposable
@@ -87,7 +88,9 @@ public sealed class ArtImageImportGifTests : IDisposable
 
         var result = _import.Import(ArtFolders.Portraits, [gif], GifImportOptions.Default, Ask(answer: true));
 
-        Assert.Equal(["Gnoll.gif: only a battle sprite or an attack effect is imported from a GIF."], result.Refusals);
+        Assert.Equal(
+            ["Gnoll.gif: only a battle sprite, an attack effect or a battle background is imported from a GIF."],
+            result.Refusals);
         Assert.Empty(_questions);
     }
 
@@ -179,6 +182,41 @@ public sealed class ArtImageImportGifTests : IDisposable
             Assert.Equal(new TileAnimation { FrameCount = 3, FrameMilliseconds = 110 }, result.Animations["Burst.png"]);
             var note = "3 frames, 0.33 s, paced at the typed 110 ms; the Effect strips page's OK writes its record";
             Assert.Equal($"Imported Burst.png ({note}).", result.Summary);
+        });
+    }
+
+    // Three 4 x 4 frames at their own height lie in one row of a 12 x 4 sheet; the typed 110 ms is told from the 100.
+    [Fact]
+    public void Import_BackgroundGif_WritesTheSheetAndReturnsItsRecord()
+    {
+        var gif = Gif("Fire.gif", Frame(10), Frame(10), Frame(10));
+        var options = new GifImportOptions(4, RemovesBackground: false) { FrameMilliseconds = 110 };
+
+        StaThread.Run(() =>
+        {
+            var result = _import.Import(ArtFolders.Backgrounds, [gif], options, Ask(answer: true));
+
+            Assert.Equal((12, 4), PngSize.Read(Art(ArtFolders.Backgrounds, "Fire.png")));
+            var record = result.Backgrounds["Fire.png"];
+            Assert.Equal((4, 4), (record.FrameWidth, record.FrameHeight));
+            Assert.Equal(new TileAnimation { FrameCount = 3, FrameMilliseconds = 110 }, record.Animation);
+            Assert.Equal("Imported Fire.png (3 frames of 4 x 4 px, the typed 110 ms).", result.Summary);
+        });
+    }
+
+    // The first GIF is the first one chosen, not the first file: a PNG ahead of it is imported as well.
+    [Fact]
+    public void Import_TwoBackgroundGifs_RefusesTheSecond()
+    {
+        var still = PngHeaderFile.Write(Path.Combine(_root, "source", "Still.png"), 64, 36);
+        string[] paths = [still, Gif("A.gif", Frame(10), Frame(10)), Gif("B.gif", Frame(10), Frame(10))];
+
+        StaThread.Run(() =>
+        {
+            var result = _import.Import(ArtFolders.Backgrounds, paths, new GifImportOptions(4, false), Ask(answer: true));
+
+            Assert.Equal(["Still.png", "A.png"], result.Imported);
+            Assert.Equal(["B.gif: import one background GIF at a time."], result.Refusals);
         });
     }
 

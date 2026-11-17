@@ -4,7 +4,9 @@ using System.Windows.Controls;
 using System.Windows.Media.Imaging;
 using Jrpg.Data.Art;
 using Jrpg.Editor.Animation;
+using Jrpg.Editor.Battle;
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.GifImport;
 using Jrpg.Editor.Tiles;
 
 namespace Jrpg.Editor.Backgrounds;
@@ -14,7 +16,8 @@ namespace Jrpg.Editor.Backgrounds;
 /// kind, frame time and preview on the right. Its host shows the problem line and keeps or drops the session. The
 /// chosen one plays in the shared preview (<see cref="FramePreview"/>, decision 986) at its typed frame time, cover-fit
 /// in a 16:9 area as the battle draws it; a still shows as its one frame. An image is read once per page, again once an
-/// import replaced it. Import... under the list copies PNGs into the folder and hands them to the list as stills.
+/// import replaced it. Import... under the list copies PNGs into the folder as stills, or one GIF as an animated
+/// background's sheet once the GIF dialog chose its frame height and pace (decision 903), and hands them to the list.
 /// </summary>
 internal sealed partial class BattleBackgroundPage : UserControl
 {
@@ -26,17 +29,18 @@ internal sealed partial class BattleBackgroundPage : UserControl
 
     private readonly BattleBackgroundCatalogViewModel _backgrounds;
     private readonly DecodedArtImages _images;
-    private readonly Func<IReadOnlyList<string>, SheetImportResult> _import;
+    private readonly Func<IReadOnlyList<string>, GifImportOptions, SheetImportResult> _import;
 
     /// <param name="backgrounds">The page's state, from <see cref="BattleBackgroundEditingViewModel.Start"/>.</param>
     /// <param name="loadImage">Decodes a backgrounds image at its own size; null when it can't.</param>
     /// <param name="import">
-    /// The shell's import: copies the chosen PNGs into the backgrounds folder and says what it did.
+    /// The shell's import: copies the chosen PNGs into the backgrounds folder, a GIF as a sheet by the options, and
+    /// says what it did.
     /// </param>
     public BattleBackgroundPage(
         BattleBackgroundCatalogViewModel backgrounds,
         Func<string, BitmapSource?> loadImage,
-        Func<IReadOnlyList<string>, SheetImportResult> import)
+        Func<IReadOnlyList<string>, GifImportOptions, SheetImportResult> import)
     {
         InitializeComponent();
         DataContext = _backgrounds = backgrounds;
@@ -70,13 +74,15 @@ internal sealed partial class BattleBackgroundPage : UserControl
     // before its row is chosen, so the preview shows the new picture.
     private void OnImportClicked(object sender, RoutedEventArgs e)
     {
-        if (ArtImageFileDialog.Choose(Window.GetWindow(this), "Import battle backgrounds", ArtFolders.Backgrounds)
-            is not { } paths)
+        var owner = Window.GetWindow(this);
+        if (ArtImageFileDialog.Choose(owner, "Import battle backgrounds", ArtFolders.Backgrounds) is not { } paths
+            || GifImportWindow.AskFor(owner, paths, (first, _) => GifImportOptionsViewModel.ForBackground(first))
+                is not { } options)
         {
             return;
         }
 
-        var result = _import(paths);
+        var result = _import(paths, options);
         ImportStatusText.Text = result.Summary;
         _images.Forget(result.Imported);
 

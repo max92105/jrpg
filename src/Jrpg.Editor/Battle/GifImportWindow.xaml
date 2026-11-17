@@ -9,14 +9,17 @@
         ResizeMode="NoResize"
         WindowStartupLocation="CenterOwner"
         ShowInTaskbar="False">
+  <Window.Resources>
+    <BooleanToVisibilityConverter x:Key="VisibleWhenTrue" />
+  </Window.Resources>
   <DockPanel Margin="12">
     <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,12,0,0">
       <Button Content="OK" Width="80" IsDefault="True" Click="OnOkClicked" IsEnabled="{Binding CanApply}" />
       <Button Content="Cancel" Width="80" Margin="8,0,0,0" IsCancel="True" />
     </StackPanel>
 
-    <!-- The first chosen GIF as the import composes it. The preview has no pace box of its own: it plays at the
-         dialog's pace box, so what plays is what is written. -->
+    <!-- The first chosen GIF as the import composes it, a background's at the chosen height. The preview has no pace
+         box of its own: it plays at the dialog's pace box, so what plays is what is written. -->
     <animation:FramePreview x:Name="GifPreview"
                             DockPanel.Dock="Right"
                             Width="256"
@@ -25,12 +28,39 @@
                             FrameMilliseconds="{Binding FrameMilliseconds}" />
 
     <StackPanel Width="356">
-      <StackPanel Orientation="Horizontal">
-        <TextBlock Text="Battle height (px)" Width="130" VerticalAlignment="Center" />
-        <TextBox x:Name="HeightBox" Width="70" Text="{Binding HeightText, UpdateSourceTrigger=PropertyChanged}" />
+      <!-- A battler's or an effect's typed height and background box; a background is never cleared (decision 904). The
+           style sits on the panel, not on the check box, so the theme's own styles stay. -->
+      <StackPanel>
+        <StackPanel.Style>
+          <Style TargetType="StackPanel">
+            <Style.Triggers>
+              <DataTrigger Binding="{Binding IsBackground}" Value="True">
+                <Setter Property="Visibility" Value="Collapsed" />
+              </DataTrigger>
+            </Style.Triggers>
+          </Style>
+        </StackPanel.Style>
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="Battle height (px)" Width="130" VerticalAlignment="Center" />
+          <TextBox x:Name="HeightBox" Width="70" Text="{Binding HeightText, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
+        <TextBlock Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0" Text="{Binding FactorNote}" />
+        <CheckBox Content="Top-left color is background" Margin="0,8,0,0" IsChecked="{Binding RemovesBackground}" />
       </StackPanel>
-      <TextBlock Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0" Text="{Binding FactorNote}" />
-      <CheckBox Content="Top-left color is background" Margin="0,8,0,0" IsChecked="{Binding RemovesBackground}" />
+      <!-- A background's frame height among decision 898's, and the sheet it makes with its video memory. -->
+      <StackPanel Visibility="{Binding IsBackground, Converter={StaticResource VisibleWhenTrue}}">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="Frame height" Width="130" VerticalAlignment="Center" />
+          <ComboBox x:Name="HeightChoiceBox"
+                    Width="140"
+                    ItemsSource="{Binding HeightChoices}"
+                    DisplayMemberPath="Label"
+                    SelectedValuePath="Height"
+                    SelectedValue="{Binding SelectedHeight}"
+                    ToolTip="The GIF's own height, then the divisors of 1080 below it, so the battle scales a frame up by a whole factor" />
+        </StackPanel>
+        <TextBlock Foreground="{StaticResource MutedTextBrush}" TextWrapping="Wrap" Margin="0,4,0,0" Text="{Binding SheetLine}" />
+      </StackPanel>
       <!-- A dock, not a horizontal stack, so a long note wraps beside the box instead of running past the column. -->
       <DockPanel Margin="0,8,0,0">
         <TextBlock Text="Frame time (ms)" Width="130" VerticalAlignment="Center" />

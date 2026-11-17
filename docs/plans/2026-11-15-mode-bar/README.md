@@ -105,7 +105,7 @@ page recipe: [page-recipe.md](page-recipe.md).
 - [ ] **WS1. The mode bar: World and Database, the Database mode an empty page; World's menus, tool bar, map keys,
   Delete selected objects and the map's undo off in Database mode** (Editor, about 230 lines) →
   [slices/WS1.md](slices/WS1.md)
-- [ ] ADR 0060, the Database mode's pages and the undo rule of a live page. Write it from decisions 918-924, 928, 931
+- [x] ADR 0060, the Database mode's pages and the undo rule of a live page. Write it from decisions 918-924, 928, 931
   and 939; status "accepted as a default; the developer's to overturn". Amends ADR 0045 (its amendment B, the nested
   window, retired by WS6).
 - [ ] **WS2. A page's session: the catalog pages, the shown one started from the draft, Apply as one undo step

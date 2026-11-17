@@ -5,18 +5,14 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-items-uniques-affixes, slice IU14 (Editor/Loot/AffixViewModel, EquipmentKindToggle; tests
-AffixFixtures, AffixViewModelTests, AffixViewModelNoticeTests). 2026-11-16. Round 1. Verdict: Ready to commit
-(no Critical, no Warning).
+Plan 2026-11-15-items-uniques-affixes, slice IU15 (first part; IU15b = page, IEditedCatalog, menu line, opener).
+2026-11-16. Round 1. Verdict: Ready to commit (no Critical).
 
-- Suggestion (open): private `TypedRecord()` returns the source with the typed id, stat and kinds but the source's
-  numbers; a name like `RecordWithTypedChoices` would say so without the comment.
-- Suggestion (open): `AffixFixtures.Catalog` (static auto-property) loads test-world in the class's type initializer,
-  so every test reading `Fierce` loads it, and a load failure or id clash fails them all; make it lazy or move it to
-  IU15's catalog tests.
-- Follow-up (open): `AffixDefinition` compares `Kinds` by reference while `ItemDefinition` overrides Equals with
-  SequenceEqual; a Core Equals (with its test) would retire `AssertSameContent` and IU15's content helper.
-- Checked, no finding: Loot/ folder matches Core.Loot and the map row; Duplicate's copy subscribes its own toggles,
-  copies half-typed boxes (no parse); Changed raised from the partials, never from notices; New matches design.md
-  tunables (power, 1..1, 10, 20, no kind); ObjectIds.ProblemOf(Id, []) as every sibling page.
-- IU13 Suggestions: not carried (round closed).
+- Warning (open): AffixCatalogViewModel.Problem / CatalogProblems.OfAffixes check the pool alone, but a unique's value
+  must stay on its affix's side of zero (UniqueItemRules.FindSignProblem, decision 866): flipping `power` to -5..-1
+  passes the page, records the step, and Save all is refused on items.json. Summaries in both claim "a unique's values
+  don't depend on the ranges". Fix: check the draft's uniques against the edited pool after OfAffixes, or a plan note.
+- Checked, no finding: AffixDefinition.Equals/GetHashCode consistent; TickedKinds safe with equal-count/All check;
+  ContentWriter test discriminates the order (+7 vs range 5..-1 refused by items check); WithFixedStatsFrom's
+  pool[...] safe because saved affixes can't be removed (id editing locked by IU15b's page, while IsNew).
+- IU14 Follow-up (AffixDefinition Equals): fixed. IU14 Suggestions: not carried.

@@ -43,6 +43,12 @@ inner object's Chosen across Sel switches, from the view model or the outer List
 An ItemsSource set by a style DataTrigger (EW1, 2026-11-15) still shows the locally bound SelectedItem on open, after a
 null-then-set DataContext and on switching: the trigger's late ItemsSource loses nothing.
 
+WPF tab fact (probed 2026-11-17, CL5b review, .NET 10 scratch project; name a XAML input `.txt` or the SDK compiles
+it): an unselected TabItem's content bindings stay live, so a computed list property is read once per notice even
+while another tab shows; Grid.IsSharedSizeScope on the panel holding a header Grid and a virtualized ItemsControl
+aligns their SharedSizeGroup columns. Count reads with a counter in the getter; trace via
+PresentationTraceSources.DataBindingSource listener.
+
 WPF context menu fact (probed 2026-11-15, EW2 review, PowerShell -STA): a button's ContextMenu inherits the button's
 DataContext once PlacementTarget is set, and follows a later DataContext change; a DataContext assigned locally on the
 menu sticks and goes stale (a right-click open after a switch shows the old items).

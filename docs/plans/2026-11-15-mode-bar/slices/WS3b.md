@@ -44,3 +44,10 @@ from the menu. `open-editor-windows.ps1` after the XAML line: no `ERROR`. The ru
 - **Note from WS2 review:** `MainViewModel.ShowDatabase` has no guard for Database already shown: once it calls
   `DatabaseWorkspace.Open()`, pressing Database again would restart the session and drop what was typed but not
   applied. Return early (or grey the lit button) when Database is shown, with a test.
+- **Done, with deviations:** `ShowDatabase` returns early while Database is shown (rather than greying the lit
+  button); `CreateDatabaseWorkspace(content)` reads the fourteen editing view models with `!`, since the constructor
+  calls it once they are built. 7 tests instead of 5, in the new `MainViewModelDatabaseWorkspaceTests` (119 lines):
+  added `DatabaseWorkspace_ContentLoaded_ListsEveryPageInGroupOrder` (decision 917's order, the menu's titles) and
+  `ShowWorld_FromDatabase_EndsThePageSession`. `MainViewModel.cs` 295, `MainViewModel.Workspaces.cs` 101,
+  `DatabaseWorkspaceView.xaml` 15. `open-editor-windows.ps1`: every default entry opened, no `ERROR`, the test error
+  caught by the net.

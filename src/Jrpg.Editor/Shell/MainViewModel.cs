@@ -109,6 +109,7 @@ internal sealed partial class MainViewModel : ObservableObject
             AffixEditing = new AffixEditingViewModel(Content);
             BattleBackgroundEditing = CreateBattleBackgroundEditing();
             EncounterEditing = CreateEncounterEditing();
+            DatabaseWorkspace = CreateDatabaseWorkspace(Content);
             NpcSpriteChange = new NpcSpriteChange(Content, Placing.Browser);
             if (MapIds.Count > 0)
             {

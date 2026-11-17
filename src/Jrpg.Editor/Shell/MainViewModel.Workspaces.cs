@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Shell;
@@ -7,7 +8,8 @@ namespace Jrpg.Editor.Shell;
 /// <summary>
 /// The mode bar (decision 916): World shows the maps; Database hides them and puts the shown map out of reach of the
 /// undo history (its steps waiting as another map's do until World is shown again), Delete selected objects and
-/// Ctrl+H's collision (decision 925). Back to previous map shows World first.
+/// Ctrl+H's collision (decision 925), and shows the catalog pages of <see cref="DatabaseWorkspace"/>. Leaving Database
+/// applies the shown page first, or stays when it refuses (decision 919); Back to previous map shows World first.
 /// </summary>
 internal sealed partial class MainViewModel
 {
@@ -21,28 +23,65 @@ internal sealed partial class MainViewModel
 
     public bool IsDatabaseShown => Workspace == EditorWorkspace.Database;
 
+    /// <summary>The Database mode's pages and the shown one's session; null when the content didn't load.</summary>
+    public DatabaseWorkspaceViewModel? DatabaseWorkspace { get; }
+
     /// <summary>
-    /// Alt+Left and Map > Back to previous map: World, then the previous map; greyed with the map list's Back.
+    /// Alt+Left and Map > Back to previous map: World, then the previous map, neither while the shown Database page
+    /// refuses to apply; greyed with the map list's Back.
     /// </summary>
     public IRelayCommand GoBackToMapCommand => field ??= CreateGoBackToMapCommand();
 
     [RelayCommand]
     private void ShowWorld()
     {
+        if (DatabaseWorkspace is { } workspace && !workspace.TryClose())
+        {
+            return;
+        }
+
         Workspace = EditorWorkspace.World;
         History?.OpenMap = CurrentMap;
         Placing?.IsMapShown = true;
     }
 
-    // A stroke still being dragged becomes its map's undo step first, as when another map is shown.
+    // A stroke still being dragged becomes its map's undo step first, as when another map is shown. Pressing Database
+    // again would start the shown page again and drop what was typed.
     [RelayCommand]
     private void ShowDatabase()
     {
+        if (IsDatabaseShown)
+        {
+            return;
+        }
+
         CurrentMap?.EndStroke();
         Workspace = EditorWorkspace.Database;
         History?.OpenMap = null;
         Placing?.IsMapShown = false;
+        DatabaseWorkspace?.Open();
     }
+
+    // The list's order is decision 917's groups: Story, Battle, Items, Trade, Characters. Called by the constructor
+    // once the content loaded, so every editing view model is built.
+    private DatabaseWorkspaceViewModel CreateDatabaseWorkspace(CatalogDraft content) =>
+        new(content,
+        [
+            CatalogPage.Of("Quests", QuestEditing!),
+            CatalogPage.Of("Cinematics", CinematicEditing!),
+            CatalogPage.Of("Enemies", EnemyEditing!),
+            CatalogPage.Of("Encounters", EncounterEditing!),
+            CatalogPage.Of("Skills", SkillEditing!),
+            CatalogPage.Of("Effects", TieredEffectEditing!),
+            CatalogPage.Of("Statuses", StatusEditing!),
+            CatalogPage.Of("Drop tables", DropTableEditing!),
+            CatalogPage.Of("Effect strips", EffectStripEditing!),
+            CatalogPage.Of("Battle backgrounds", BattleBackgroundEditing!),
+            CatalogPage.Of("Items", ItemEditing!),
+            CatalogPage.Of("Affixes", AffixEditing!),
+            CatalogPage.Of("Shops", ShopEditing!),
+            CatalogPage.Of("Character sprites", FieldSpriteEditing!),
+        ]);
 
     private RelayCommand CreateGoBackToMapCommand()
     {
@@ -51,7 +90,10 @@ internal sealed partial class MainViewModel
             () =>
             {
                 ShowWorld();
-                goBack.Execute(null);
+                if (IsWorldShown)
+                {
+                    goBack.Execute(null);
+                }
             },
             () => goBack.CanExecute(null));
         goBack.CanExecuteChanged += (_, _) => command.NotifyCanExecuteChanged();

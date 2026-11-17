@@ -112,7 +112,7 @@ page recipe: [page-recipe.md](page-recipe.md).
   starting it again on the same record, Revert** (Editor, about 230 lines) → [slices/WS2.md](slices/WS2.md)
 - [x] **WS3. Leaving a page applies it first: another page and World mode, refused with the page's problem or its
   apply's failure; a draft change starts the shown page again** (Editor, about 240 lines) → [slices/WS3.md](slices/WS3.md)
-- [ ] **WS3b. The mode switch goes through the workspace: the main window builds it with every page, Database opens it,
+- [x] **WS3b. The mode switch goes through the workspace: the main window builds it with every page, Database opens it,
   World and Back to previous map only when the page applies** (Editor, split from WS3, about 150 lines) →
   [slices/WS3b.md](slices/WS3b.md)
 - [ ] **WS4. Undo, Redo, Save, Save all, the close question and the dialogs still opened in Database mode apply the

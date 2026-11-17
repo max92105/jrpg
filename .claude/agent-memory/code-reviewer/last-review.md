@@ -5,8 +5,10 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-encounters-and-backgrounds, slice EC5 (the Encounters page, decision 1006), last slice of the plan.
-2026-11-17. Round 1. Verdict: Ready to commit (no Critical, no Warning).
+Plan 2026-11-15-mode-bar, slice WS1 (the mode bar: World/Database, decisions 916, 922, 925).
+2026-11-17. Round 1. Verdict: Ready to commit (no Critical).
 
-- Suggestion: MainViewModelEncounterTests `ReadEncounterChoices_ImageAddedToTheFolderAfterStart_IsOffered` writes the PNG before `Start()`; rename "AfterTheEditorOpened" — open
-- Suggestion: `EncounterEditing_TestWorld_StartsOnItsEncountersInIdOrder` pins TestWorld's four ids and the name-order test's `Take(3)` assumes no test-world enemy sorts before "Goblin"; assert relative order of needed ids — open
+- Warning: MainWindow.xaml Ctrl+H KeyBinding (`ToggleCollisionCommand`) still fires in Database (window KeyBindings bypass the OnPreviewKeyDown return), toggling the hidden map's collision; CanExecute on IsWorldShown — open
+- Suggestion: test `ShowDatabase_StrokeBeingDragged_RecordsItBeforeLaterCatalogSteps` could also assert the shop is gone (names what was undone) — open
+- Follow-up (EC5): `EncounterEditing_TestWorld_StartsOnItsEncountersInIdOrder` still pins TestWorld's four ids — open
+- EC5 suggestion "ImageAddedToTheFolderAfterStart" rename — fixed

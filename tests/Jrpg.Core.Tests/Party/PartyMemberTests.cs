@@ -31,7 +31,7 @@ public sealed class PartyMemberTests
     public void Recruit_ClassSkillIdNotInCatalog_Throws()
     {
         var definition = new PartyMemberBuilder().BuildDefinition();
-        var healer = _growingClass with { SkillIds = ["heal"] };
+        var healer = _growingClass with { Skills = [new("heal")] };
 
         Assert.Throws<ArgumentException>(() => PartyMember.Recruit(definition, healer, new Dictionary<string, SkillDefinition>(), TestStatRules.Neutral));
     }
@@ -39,7 +39,7 @@ public sealed class PartyMemberTests
     [Fact]
     public void Recruit_ClassWithSkills_HasThemInClassOrder()
     {
-        var healer = _growingClass with { SkillIds = ["recovery", "heal"] };
+        var healer = _growingClass with { Skills = [new("recovery"), new("heal")] };
 
         var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), healer, SkillCatalog(), TestStatRules.Neutral);
 
@@ -49,7 +49,7 @@ public sealed class PartyMemberTests
     [Fact]
     public void Restore_ClassWithSkills_HasThem()
     {
-        var healer = _growingClass with { SkillIds = ["heal"] };
+        var healer = _growingClass with { Skills = [new("heal")] };
         var progress = new PartyMemberProgress("test_member", 2, 0, Hp: 50, Worn: new Dictionary<EquipmentSlot, SavedGear>(), LastingAmounts: new Dictionary<string, int>());
 
         var member = PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), healer, SkillCatalog(), TestStatRules.Neutral);

@@ -62,3 +62,11 @@ uses them yet (LV2).
 3. Type `"level": 99` on one entry by hand, run the game: it stops at startup naming `classes.json`, the class, the
    skill and the max level 21. Undo the edit.
 - **Note from CL3:** `Catalogs/CatalogDraftClassTests` comes with CL3b, split from CL3 on 2026-11-17.
+- **Done, with deviations:** decision 1012: the class validator's existing messages say `skills`, the file's field,
+  not `skillIds` (seven asserted messages follow). The null entry and level 0 are a theory,
+  `Validate_NullEntryOrLevelBelowOne_Throws`. `ClassSkillLevelCheck` goes through `ContentListValidator` for the
+  "class 'mage':" prefix. `classes.json` relaid by a script into the writer's layout (480 to 526 lines, same ids in the
+  same order, no `level`); the simulations' output identical; saves untouched. Sizes: about 100 lines of Core, Data and
+  Editor (`ClassSkill` 10, `ClassSkillLevelCheck` 25) and about 190 of tests (`ContentWriterClassTests` 236,
+  `ClassCatalogValidatorTests` 289, about 40 changed `SkillIds` sites). After review, one test beyond the list:
+  `CatalogProblemsPartyTests.OfClasses_SkillPastMaxLevel_NamesClassAndSkill`, so `OfClasses` keeps the level check.

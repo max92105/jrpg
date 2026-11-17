@@ -46,14 +46,14 @@ public sealed class CatalogProblemsSkillTests
     [Fact]
     public void OfSkills_ClassSkillWithAForeignResource_NamesClassesFile()
     {
-        var mage = _catalog.Classes["mage"] with { SkillIds = ["spark"] };
+        var mage = _catalog.Classes["mage"] with { Skills = [new("spark")] };
         var content = _catalog with { Classes = Replaced(_catalog.Classes, "mage", mage) };
         var spark = _spark with { ResourceChanges = [new ResourceChange("stamina", -1)] };
 
         var problem = CatalogProblems.OfSkills([.. _catalog.Skills.Values, spark], content);
 
         Assert.Equal(
-            "classes.json: class 'mage': skillIds lists 'spark', which uses 'stamina', a resource mage doesn't have.", problem);
+            "classes.json: class 'mage': skills lists 'spark', which uses 'stamina', a resource mage doesn't have.", problem);
     }
 
     // The enemy names a skill only the edited list holds: checked against the content's skills, it would be unknown.

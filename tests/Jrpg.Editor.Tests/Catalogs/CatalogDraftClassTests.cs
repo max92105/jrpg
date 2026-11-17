@@ -26,7 +26,7 @@ public sealed class CatalogDraftClassTests
     public void SetClasses_SameClasses_RecordsNothing()
     {
         var copies = _draft.Current.Classes.Values
-            .Select(copied => copied with { SkillIds = [.. copied.SkillIds], Resources = [.. copied.Resources] })
+            .Select(copied => copied with { Skills = [.. copied.Skills], Resources = [.. copied.Resources] })
             .ToList();
 
         _draft.SetClasses(copies);
@@ -37,7 +37,16 @@ public sealed class CatalogDraftClassTests
     [Fact]
     public void SetClasses_OnlySkillsChanged_RecordsOneStep()
     {
-        _draft.SetClasses([Archer with { SkillIds = ["cleave"] }, Scholar]);
+        _draft.SetClasses([Archer with { Skills = [new("cleave")] }, Scholar]);
+
+        Assert.True(_draft.CanUndo);
+    }
+
+    // The same skill ids in the same order: only the level tells the two apart (ADR 0062).
+    [Fact]
+    public void SetClasses_OnlyALevelChanged_RecordsOneStep()
+    {
+        _draft.SetClasses([Archer with { Skills = [new("expose") { Level = 5 }] }, Scholar]);
 
         Assert.True(_draft.CanUndo);
     }

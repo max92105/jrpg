@@ -44,7 +44,7 @@ public sealed class ClassViewModelTests
     [Fact]
     public void ToClass_NameTyped_KeepsItsSkillsAndResources()
     {
-        var scholar = ClassViewModel.From(Scholar with { SkillIds = ["heal", "focus_bolt"] }, World);
+        var scholar = ClassViewModel.From(Scholar with { Skills = [new("heal"), new("focus_bolt")] }, World);
 
         scholar.Name = "Sage";
 

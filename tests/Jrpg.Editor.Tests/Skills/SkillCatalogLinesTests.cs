@@ -66,7 +66,7 @@ public sealed class SkillCatalogLinesTests
     [Fact]
     public void LearnedByText_SavedSkill_NamesItsClass()
     {
-        var mage = SkillFixtures.TestWorld.Classes["mage"] with { Name = "Mage", SkillIds = ["bolt"] };
+        var mage = SkillFixtures.TestWorld.Classes["mage"] with { Name = "Mage", Skills = [new("bolt")] };
 
         var catalog = new SkillCatalogViewModel(
             Catalog() with { Classes = ById(mage.Id, mage) },

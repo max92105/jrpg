@@ -5,7 +5,7 @@ using Jrpg.Data.Content;
 namespace Jrpg.Data.Tests.Content;
 
 // The classes' problem line (decision 944): the loader's own message for the edited list, the skills a class names
-// checked against the content's skills.
+// checked against the content's skills and their levels against its experience table.
 public sealed class CatalogProblemsPartyTests
 {
     private static readonly ContentCatalog _catalog =
@@ -28,8 +28,22 @@ public sealed class CatalogProblemsPartyTests
     [Fact]
     public void OfClasses_UnknownSkill_NamesIt()
     {
-        var problem = CatalogProblems.OfClasses([_ranger with { SkillIds = ["volley"] }], _catalog);
+        var problem = CatalogProblems.OfClasses([_ranger with { Skills = [new("volley")] }], _catalog);
 
-        Assert.Equal("classes.json: class 'ranger': skillIds has unknown skill id 'volley'.", problem);
+        Assert.Equal("classes.json: class 'ranger': skills has unknown skill id 'volley'.", problem);
+    }
+
+    // expose costs nothing, so the ranger without resources may name it and only its level is refused (decision 965).
+    [Fact]
+    public void OfClasses_SkillPastMaxLevel_NamesClassAndSkill()
+    {
+        var maxLevel = _catalog.Rules.Experience.MaxLevel;
+        var ranger = _ranger with { Skills = [new("expose") { Level = maxLevel + 1 }] };
+
+        var problem = CatalogProblems.OfClasses([ranger], _catalog);
+
+        Assert.Equal(
+            $"classes.json: class 'ranger': skills lists 'expose' at level {maxLevel + 1}, past the max level {maxLevel}.",
+            problem);
     }
 }

@@ -1,13 +1,14 @@
 using System.Text.Json.Serialization.Metadata;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Loot;
+using Jrpg.Core.Party;
 
 namespace Jrpg.Data.Content;
 
 /// <summary>
 /// Leaves a whole-number field out of a file while it is 1, its default, so a table the editor writes reads like a
-/// hand-written one (decision 600, decision 586's pattern): a drop entry's quantities, each on its own, and an effect's
-/// hits (decision 973).
+/// hand-written one (decision 600, decision 586's pattern): a drop entry's quantities, each on its own, an effect's
+/// hits (decision 973) and the level a class learns a skill at (ADR 0062).
 /// </summary>
 internal static class AbsentWhenOneFilter
 {
@@ -19,6 +20,9 @@ internal static class AbsentWhenOneFilter
 
         // Decision 973: most effects land once.
         (typeof(Effect), "hits"),
+
+        // ADR 0062: most of a class's skills are known from level 1.
+        (typeof(ClassSkill), "level"),
     ];
 
     public static void SkipOneOptionalFields(JsonTypeInfo typeInfo) =>

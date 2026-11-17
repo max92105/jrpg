@@ -79,6 +79,9 @@ public static class ContentCatalogLoader
         var classIds = classes.Select(classDefinition => classDefinition.Id).ToFrozenSet();
         var rules = ReadValidated<GameRules>(contentRoot, RulesFile, GameRulesValidator.Validate);
 
+        // classes.json is read before rules.json, so its skills' levels are checked against the table only now.
+        ClassSkillLevelCheck.Check(ClassesFile, classes, rules.Experience);
+
         // Before the items: a unique's fixed affix names a pool affix by id, resolved as it is read (decision 865).
         var affixesById = ReadValidated<IReadOnlyList<AffixDefinition>>(contentRoot, AffixesFile, AffixCatalogValidator.Validate)
             .ToFrozenDictionary(affix => affix.Id);

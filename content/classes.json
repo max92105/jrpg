@@ -27,9 +27,13 @@
       },
       "accuracy": 1
     },
-    "skillIds": [
-      "taunt",
-      "rampage"
+    "skills": [
+      {
+        "skillId": "taunt"
+      },
+      {
+        "skillId": "rampage"
+      }
     ],
     "resources": [
       {
@@ -75,10 +79,16 @@
       },
       "accuracy": 1
     },
-    "skillIds": [
-      "heal",
-      "recovery",
-      "heal_all"
+    "skills": [
+      {
+        "skillId": "heal"
+      },
+      {
+        "skillId": "recovery"
+      },
+      {
+        "skillId": "heal_all"
+      }
     ],
     "resources": [
       {
@@ -128,10 +138,16 @@
       },
       "accuracy": 1
     },
-    "skillIds": [
-      "rejuvenate",
-      "rot",
-      "equilibrium"
+    "skills": [
+      {
+        "skillId": "rejuvenate"
+      },
+      {
+        "skillId": "rot"
+      },
+      {
+        "skillId": "equilibrium"
+      }
     ],
     "resources": [
       {
@@ -192,9 +208,13 @@
       },
       "accuracy": 1
     },
-    "skillIds": [
-      "power_strike",
-      "shield_bash"
+    "skills": [
+      {
+        "skillId": "power_strike"
+      },
+      {
+        "skillId": "shield_bash"
+      }
     ],
     "resources": [
       {
@@ -241,10 +261,16 @@
       },
       "accuracy": 1
     },
-    "skillIds": [
-      "fire_blast",
-      "fireball",
-      "meteor"
+    "skills": [
+      {
+        "skillId": "fire_blast"
+      },
+      {
+        "skillId": "fireball"
+      },
+      {
+        "skillId": "meteor"
+      }
     ],
     "resources": [
       {
@@ -306,9 +332,13 @@
       },
       "accuracy": 1
     },
-    "skillIds": [
-      "palm_strike",
-      "flurry"
+    "skills": [
+      {
+        "skillId": "palm_strike"
+      },
+      {
+        "skillId": "flurry"
+      }
     ],
     "resources": [
       {
@@ -354,10 +384,16 @@
       },
       "accuracy": 1
     },
-    "skillIds": [
-      "smite",
-      "aura_of_protection",
-      "wide_aura"
+    "skills": [
+      {
+        "skillId": "smite"
+      },
+      {
+        "skillId": "aura_of_protection"
+      },
+      {
+        "skillId": "wide_aura"
+      }
     ],
     "resources": [
       {
@@ -405,9 +441,13 @@
       },
       "accuracy": 1
     },
-    "skillIds": [
-      "ready",
-      "expose"
+    "skills": [
+      {
+        "skillId": "ready"
+      },
+      {
+        "skillId": "expose"
+      }
     ],
     "resources": [
       {
@@ -452,10 +492,16 @@
       },
       "accuracy": 1
     },
-    "skillIds": [
-      "eldritch_bolt",
-      "void_rift",
-      "chaos_lance"
+    "skills": [
+      {
+        "skillId": "eldritch_bolt"
+      },
+      {
+        "skillId": "void_rift"
+      },
+      {
+        "skillId": "chaos_lance"
+      }
     ],
     "resources": [
       {

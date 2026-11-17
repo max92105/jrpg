@@ -23,9 +23,9 @@ internal sealed partial class CatalogDraft
     }
 
     // As an enemy's: the with-copy compares every field but the two lists, the lists by content and order (the skills'
-    // order is the menu's, ADR 0020).
+    // order is the menu's, ADR 0020, and a skill's level alone is a change, ADR 0062).
     private static bool IsSameClass(ClassDefinition before, ClassDefinition after) =>
-        before with { SkillIds = after.SkillIds, Resources = after.Resources } == after
-        && before.SkillIds.SequenceEqual(after.SkillIds)
+        before with { Skills = after.Skills, Resources = after.Resources } == after
+        && before.Skills.SequenceEqual(after.Skills)
         && before.Resources.SequenceEqual(after.Resources);
 }

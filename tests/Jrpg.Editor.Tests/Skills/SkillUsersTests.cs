@@ -16,8 +16,8 @@ public sealed class SkillUsersTests
     [Fact]
     public void LearnedBy_TwoClasses_NamesBothInIdOrder()
     {
-        var warlock = _world.Classes["mage"] with { Id = "warlock", Name = "Warlock", SkillIds = ["bolt"] };
-        var mage = _world.Classes["mage"] with { Name = "Wizard", SkillIds = ["zap", "bolt"] };
+        var warlock = _world.Classes["mage"] with { Id = "warlock", Name = "Warlock", Skills = [new("bolt")] };
+        var mage = _world.Classes["mage"] with { Name = "Wizard", Skills = [new("zap"), new("bolt")] };
         var content = _world with { Classes = ClassesOf(warlock, mage) };
 
         var line = SkillUsers.LearnedBy("bolt", content);
@@ -28,7 +28,7 @@ public sealed class SkillUsersTests
     [Fact]
     public void LearnedBy_NoClass_SaysSo()
     {
-        var mage = _world.Classes["mage"] with { SkillIds = ["zap"] };
+        var mage = _world.Classes["mage"] with { Skills = [new("zap")] };
 
         var line = SkillUsers.LearnedBy("bolt", _world with { Classes = ClassesOf(mage) });
 

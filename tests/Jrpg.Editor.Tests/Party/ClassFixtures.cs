@@ -21,7 +21,7 @@ internal static class ClassFixtures
     public static ClassDefinition Archer { get; } =
         new("archer", "Archer", "Shoots from behind the line.", new ClassStats(120, 12), new ClassStats(10, 1))
         {
-            SkillIds = ["expose"],
+            Skills = [new("expose")],
         };
 
     /// <summary>A class with one resource that isn't lasting, and no skills.</summary>

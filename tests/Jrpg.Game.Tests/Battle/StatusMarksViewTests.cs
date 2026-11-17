@@ -163,7 +163,7 @@ public sealed class StatusMarksViewTests
         var definition = catalog.PartyMembers["ragnir"];
         var member = PartyMember.Recruit(
             definition,
-            catalog.ClassOf(definition) with { SkillIds = [hex.Id] },
+            catalog.ClassOf(definition) with { Skills = [new(hex.Id)] },
             new Dictionary<string, SkillDefinition> { [hex.Id] = hex },
             BattleScenarios.CertainRules);
         var battle = BattleState.Start(

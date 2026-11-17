@@ -155,7 +155,7 @@ public sealed class SkillCatalogViewModelTests
     public void Problem_ClassCantPayAnEditedSkill_IsDataMessage()
     {
         var bolt = SkillFixtures.Bolt with { ResourceChanges = [new ResourceChange("stamina", -1)] };
-        var mage = SkillFixtures.TestWorld.Classes["mage"] with { SkillIds = ["bolt"] };
+        var mage = SkillFixtures.TestWorld.Classes["mage"] with { Skills = [new("bolt")] };
         var content = SkillFixtures.CatalogWithoutUsers([bolt], [SkillFixtures.Fire1]) with
         {
             Classes = new Dictionary<string, ClassDefinition> { ["mage"] = mage },
@@ -164,7 +164,7 @@ public sealed class SkillCatalogViewModelTests
         var catalog = new SkillCatalogViewModel(content, SkillFixtures.PoisonOnlyChoices);
 
         Assert.Equal(
-            "classes.json: class 'mage': skillIds lists 'bolt', which uses 'stamina', a resource mage doesn't have.",
+            "classes.json: class 'mage': skills lists 'bolt', which uses 'stamina', a resource mage doesn't have.",
             catalog.Problem);
     }
 

@@ -40,8 +40,9 @@ public sealed partial class ContentWriter
         // Before the enemies, so a skill's own problem is named before an enemy's tactic naming it.
         CatalogProblems.CheckTieredEffects(SortedTieredEffects(catalog));
         CatalogProblems.CheckStatuses(SortedStatuses(catalog));
-        // The classes too, against these skills: they have no check of their own here, so they are checked once.
+        // The classes' own rules too, against these skills, so they are checked once; their skills' levels right after.
         CatalogProblems.CheckSkills(SortedSkills(catalog), catalog);
+        CatalogProblems.CheckClassSkillLevels(SortedClasses(catalog), catalog.Rules.Experience);
         CatalogProblems.CheckEnemies(SortedEnemies(catalog), catalog);
         CatalogProblems.CheckEncounters(SortedEncounters(catalog), catalog);
         CatalogProblems.CheckCinematics(SortedCinematics(catalog));

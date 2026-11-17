@@ -118,7 +118,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 - [x] ADR 0062, skills learned at a level (amends ADR 0020). Write it from decisions 959, 963-966 and 970 and design.md,
   section 5 (the options: an optional level on each skill entry, chosen; a `skillLevels` map beside `skillIds`; a
   separate level-up table). The developer delegated approval; the rule is the first of "Defaults to confirm".
-- [ ] **LV1. A class's skill entry may name a level: the file shape, its checks, every level 1** (Core + Data + content,
+- [x] **LV1. A class's skill entry may name a level: the file shape, its checks, every level 1** (Core + Data + content,
   about 240 lines) → [slices/LV1.md](slices/LV1.md)
 - [ ] **LV2. A member knows the class skills at or below its level, and learns on a level up** (Core, about 220 lines)
   → [slices/LV2.md](slices/LV2.md)
@@ -263,6 +263,8 @@ Skills learned at a level (ADR 0062):
 - **970.** The game's readers of a member's skills (the battle's Skills menu, the Status page, the leader profile) read
   the known ones (`PartyMember.Skills`); the readers of a class's whole list (Data's checks, row 7's balance table and
   "Learned by" line) read `ClassDefinition.SkillIds`.
+- **1012.** (LV1) The class validator's messages name the file's field, `skills`, which replaced `skillIds`: "skills has
+  unknown skill id 'meteor'.", "skills lists 'heal' more than once.", "skills lists 'smite', which uses 'conviction'...".
 
 Shared and new game:
 - **960.** A member's starting gear is not built: members join with nothing worn, and no rule says otherwise.

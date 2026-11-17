@@ -32,7 +32,11 @@ public sealed class CommandMenuSkillTests
     {
         var menu = new CommandMenu(_inventory, BattleScenarios.Catalog.Items);
         var definition = BattleScenarios.Catalog.PartyMembers["zaruk"];
-        var member = PartyMember.Recruit(definition, BattleScenarios.Catalog.ClassOf(definition) with { SkillIds = [] }, BattleScenarios.Catalog.Skills, BattleScenarios.Catalog.Rules.Stats);
+        var member = PartyMember.Recruit(
+            definition,
+            BattleScenarios.Catalog.ClassOf(definition) with { Skills = [] },
+            BattleScenarios.Catalog.Skills,
+            BattleScenarios.Catalog.Rules.Stats);
         var party = new PartyState([member], [member], BattleScenarios.Catalog.Rules.Party);
         var goblin = BattleScenarios.Catalog.Enemies["goblin"];
 

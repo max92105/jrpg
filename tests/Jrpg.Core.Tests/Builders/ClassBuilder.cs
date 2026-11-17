@@ -55,7 +55,7 @@ internal sealed class ClassBuilder
 
     public ClassDefinition Build() => new(_id, _id, $"{_id} description", WithOwnPrimaries(_base, _basePrimaries), WithOwnPrimaries(_growth, _growthPrimaries))
     {
-        SkillIds = _skillIds,
+        Skills = [.. _skillIds.Select(id => new ClassSkill(id))],
         Resources = _resources,
     };
 

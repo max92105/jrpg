@@ -19,6 +19,7 @@ internal static class ClassCatalogValidator
         : FindNegativeStat("base", classDefinition.Base)
             ?? FindNegativeStat("growth", classDefinition.Growth)
             ?? ResourceDefinitionValidator.FindProblem(classDefinition.Resources)
+            ?? FindEntryProblem(classDefinition.Skills)
             ?? FindSkillProblem(classDefinition.SkillIds, references)
             ?? FindForeignResourceProblem(classDefinition, references)
             ?? FindUnreachableRequirementProblem(classDefinition, references);
@@ -38,22 +39,35 @@ internal static class ClassCatalogValidator
         : primaries.Will < 0 ? $"{field}.will must be at least 0 (was {primaries.Will})."
         : null;
 
+    // Before the id checks: they read SkillIds, which reads every entry. The level's upper bound is the experience
+    // table's, checked once the rules are read (ClassSkillLevelCheck).
+    private static string? FindEntryProblem(IReadOnlyList<ClassSkill> skills)
+    {
+        if (skills.Any(skill => skill is null))
+        {
+            return "skills must not contain a null entry.";
+        }
+
+        var belowOne = skills.FirstOrDefault(skill => skill.Level < 1);
+        return belowOne is null ? null : $"skills lists '{belowOne.SkillId}' at level {belowOne.Level}; levels start at 1.";
+    }
+
     private static string? FindSkillProblem(IReadOnlyList<string> skillIds, ClassReferences references)
     {
-        // The JSON reader lets a null list element through, and a frozen lookup throws on a null key.
+        // The reader refuses a null id but not an empty one; a null from code would throw in the frozen lookup.
         if (skillIds.Any(string.IsNullOrWhiteSpace))
         {
-            return "skillIds must not contain an empty id.";
+            return "skills must not contain an empty id.";
         }
 
         var unknownSkillId = skillIds.FirstOrDefault(id => !references.Skills.ContainsKey(id));
         if (unknownSkillId is not null)
         {
-            return $"skillIds has unknown skill id '{unknownSkillId}'.";
+            return $"skills has unknown skill id '{unknownSkillId}'.";
         }
 
         var repeatedSkillId = skillIds.GroupBy(id => id).FirstOrDefault(group => group.Count() > 1)?.Key;
-        return repeatedSkillId is null ? null : $"skillIds lists '{repeatedSkillId}' more than once.";
+        return repeatedSkillId is null ? null : $"skills lists '{repeatedSkillId}' more than once.";
     }
 
     // A class's skills only use its own resources (ADR 0020); this runs once the skill ids are known valid.
@@ -67,7 +81,8 @@ internal static class ClassCatalogValidator
             .FirstOrDefault(use => !ownIds.Contains(use.ResourceId));
         return foreign.SkillId is null
             ? null
-            : $"skillIds lists '{foreign.SkillId}', which uses '{foreign.ResourceId}', a resource {classDefinition.Id} doesn't have.";
+            : $"skills lists '{foreign.SkillId}', which uses '{foreign.ResourceId}', "
+                + $"a resource {classDefinition.Id} doesn't have.";
     }
 
     // A requirement above the max could never be met, so the skill would stay greyed for good.
@@ -86,7 +101,7 @@ internal static class ClassCatalogValidator
         }
 
         var (resourceId, atLeast) = (requirement.ResourceId, requirement.AtLeast);
-        return $"skillIds lists '{skillId}', which needs {atLeast} {resourceId}, above its max of {maxima[resourceId]}.";
+        return $"skills lists '{skillId}', which needs {atLeast} {resourceId}, above its max of {maxima[resourceId]}.";
     }
 
     private static IEnumerable<string> ResourceIdsUsedBy(SkillDefinition skill) =>

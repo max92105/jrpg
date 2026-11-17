@@ -8,8 +8,8 @@ using Jrpg.Data.Content;
 namespace Jrpg.Data.Tests.Content;
 
 // classes.json is written with the other catalogs (decision 944), on a copy of the test world: checked against the
-// skills as the loader checks it, sorted by id, a resource's absent rules, false lasting flag, zero amounts and zero
-// gains left out of the file.
+// skills and the experience table as the loader checks it, sorted by id, a resource's absent rules, false lasting flag,
+// zero amounts and zero gains and a skill's level 1 left out of the file.
 public sealed class ContentWriterClassTests : IDisposable
 {
     private const string FileName = "classes.json";
@@ -110,9 +110,9 @@ public sealed class ContentWriterClassTests : IDisposable
         var before = File.ReadAllBytes(_content.PathOf(FileName));
 
         var exception = Assert.Throws<ContentValidationException>(
-            () => _writer.WriteMapCatalogs(With(Ranger("ranger") with { SkillIds = ["volley"] })));
+            () => _writer.WriteMapCatalogs(With(Ranger("ranger") with { Skills = [new("volley")] })));
 
-        Assert.Equal("classes.json: class 'ranger': skillIds has unknown skill id 'volley'.", exception.Message);
+        Assert.Equal("classes.json: class 'ranger': skills has unknown skill id 'volley'.", exception.Message);
         Assert.Equal(before, File.ReadAllBytes(_content.PathOf(FileName)));
     }
 
@@ -121,13 +121,46 @@ public sealed class ContentWriterClassTests : IDisposable
     {
         var before = File.ReadAllBytes(_content.PathOf(FileName));
         var aimedShot = AimedShot();
-        var ranger = Ranger("ranger") with { SkillIds = [aimedShot.Id], Resources = [] };
+        var ranger = Ranger("ranger") with { Skills = [new(aimedShot.Id)], Resources = [] };
 
         var exception = Assert.Throws<ContentValidationException>(
             () => _writer.WriteMapCatalogs(With(ranger) with { Skills = SkillsWith(aimedShot) }));
 
         Assert.Equal(
-            "classes.json: class 'ranger': skillIds lists 'aimed_shot', which uses 'focus', a resource ranger doesn't have.",
+            "classes.json: class 'ranger': skills lists 'aimed_shot', which uses 'focus', a resource ranger doesn't have.",
+            exception.Message);
+        Assert.Equal(before, File.ReadAllBytes(_content.PathOf(FileName)));
+    }
+
+    // ADR 0062: an entry learned from level 1 reads as a plain skill id, as the hand-written file had them.
+    [Fact]
+    public void WriteMapCatalogs_SkillAtLevelOne_LeavesLevelOut()
+    {
+        _writer.WriteMapCatalogs(WithRangerLearning(new ClassSkill("aimed_shot")));
+
+        Assert.Equal(["skillId"], WrittenClass("ranger")["skills"]![0]!.AsObject().Select(field => field.Key));
+    }
+
+    [Fact]
+    public void WriteMapCatalogs_SkillAtLevelTen_WritesIt()
+    {
+        _writer.WriteMapCatalogs(WithRangerLearning(new ClassSkill("aimed_shot") { Level = 10 }));
+
+        var reloaded = ContentCatalogLoader.Load(_content.Path).Classes["ranger"];
+        Assert.Equal([new ClassSkill("aimed_shot") { Level = 10 }], reloaded.Skills);
+    }
+
+    [Fact]
+    public void WriteMapCatalogs_SkillPastMaxLevel_WritesNothing()
+    {
+        var before = File.ReadAllBytes(_content.PathOf(FileName));
+        var maxLevel = _catalog.Rules.Experience.MaxLevel;
+
+        var exception = Assert.Throws<ContentValidationException>(
+            () => _writer.WriteMapCatalogs(WithRangerLearning(new ClassSkill("aimed_shot") { Level = maxLevel + 1 })));
+
+        Assert.Equal(
+            $"classes.json: class 'ranger': skills lists 'aimed_shot' at level {maxLevel + 1}, past the max level {maxLevel}.",
             exception.Message);
         Assert.Equal(before, File.ReadAllBytes(_content.PathOf(FileName)));
     }
@@ -161,9 +194,9 @@ public sealed class ContentWriterClassTests : IDisposable
 
     private static void AssertSameClass(ClassDefinition expected, ClassDefinition actual)
     {
-        Assert.Equal(expected.SkillIds, actual.SkillIds);
+        Assert.Equal(expected.Skills, actual.Skills);
         Assert.Equal(expected.Resources, actual.Resources);
-        Assert.Equal(expected with { SkillIds = actual.SkillIds, Resources = actual.Resources }, actual);
+        Assert.Equal(expected with { Skills = actual.Skills, Resources = actual.Resources }, actual);
     }
 
     // Its only resource the focus, whatever power_strike costs today.
@@ -177,6 +210,10 @@ public sealed class ContentWriterClassTests : IDisposable
 
     private Dictionary<string, SkillDefinition> SkillsWith(SkillDefinition skill) =>
         new(_catalog.Skills) { [skill.Id] = skill };
+
+    // The ranger has the focus that aimed_shot uses, so only the entry's level can be refused.
+    private ContentCatalog WithRangerLearning(ClassSkill aimedShot) =>
+        With(Ranger("ranger") with { Skills = [aimedShot] }) with { Skills = SkillsWith(AimedShot()) };
 
     // The test world's classes stay: its members name them.
     private ContentCatalog With(params ClassDefinition[] classes)
@@ -192,6 +229,8 @@ public sealed class ContentWriterClassTests : IDisposable
 
     private JsonArray Written() => JsonNode.Parse(File.ReadAllText(_content.PathOf(FileName)))!.AsArray();
 
-    private JsonObject WrittenResource(string classId) =>
-        Written().Single(classDefinition => (string?)classDefinition!["id"] == classId)!["resources"]![0]!.AsObject();
+    private JsonObject WrittenResource(string classId) => WrittenClass(classId)["resources"]![0]!.AsObject();
+
+    private JsonObject WrittenClass(string classId) =>
+        Written().Single(classDefinition => (string?)classDefinition!["id"] == classId)!.AsObject();
 }

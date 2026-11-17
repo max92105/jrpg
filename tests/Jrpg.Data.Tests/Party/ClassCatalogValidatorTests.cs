@@ -73,33 +73,56 @@ public sealed class ClassCatalogValidatorTests
     public void Validate_UnknownSkillId_ThrowsNamingClassAndSkill()
     {
         var exception = Assert.Throws<ContentValidationException>(
-            () => Validate([Class("cleric") with { SkillIds = ["heal", "meteor"] }]));
+            () => Validate([Class("cleric") with { Skills = [new("heal"), new("meteor")] }]));
 
-        Assert.Equal("classes.json: class 'cleric': skillIds has unknown skill id 'meteor'.", exception.Message);
+        Assert.Equal("classes.json: class 'cleric': skills has unknown skill id 'meteor'.", exception.Message);
     }
 
     [Fact]
     public void Validate_DuplicateSkillId_Throws()
     {
         var exception = Assert.Throws<ContentValidationException>(
-            () => Validate([Class("cleric") with { SkillIds = ["heal", "heal"] }]));
+            () => Validate([Class("cleric") with { Skills = [new("heal"), new("heal")] }]));
 
-        Assert.Equal("classes.json: class 'cleric': skillIds lists 'heal' more than once.", exception.Message);
+        Assert.Equal("classes.json: class 'cleric': skills lists 'heal' more than once.", exception.Message);
     }
 
     [Fact]
     public void Validate_EmptySkillId_ThrowsNamingTheClass()
     {
         var exception = Assert.Throws<ContentValidationException>(
-            () => Validate([Class("cleric") with { SkillIds = ["heal", null!] }]));
+            () => Validate([Class("cleric") with { Skills = [new("heal"), new(null!)] }]));
 
-        Assert.Equal("classes.json: class 'cleric': skillIds must not contain an empty id.", exception.Message);
+        Assert.Equal("classes.json: class 'cleric': skills must not contain an empty id.", exception.Message);
     }
 
     [Fact]
     public void Validate_NoSkillIds_Passes()
     {
         var exception = Record.Exception(() => Validate([Class("fighter")]));
+
+        Assert.Null(exception);
+    }
+
+    public static TheoryData<ClassSkill, string> MalformedSkillEntries => new()
+    {
+        { null!, "skills must not contain a null entry." },
+        { new ClassSkill("heal") { Level = 0 }, "skills lists 'heal' at level 0; levels start at 1." },
+    };
+
+    [Theory]
+    [MemberData(nameof(MalformedSkillEntries))]
+    public void Validate_NullEntryOrLevelBelowOne_Throws(ClassSkill skill, string problem)
+    {
+        var exception = Assert.Throws<ContentValidationException>(() => Validate([Class("cleric") with { Skills = [skill] }]));
+
+        Assert.Equal($"classes.json: class 'cleric': {problem}", exception.Message);
+    }
+
+    [Fact]
+    public void Validate_SkillAtLevelOne_IsAccepted()
+    {
+        var exception = Record.Exception(() => Validate([Class("cleric") with { Skills = [new("heal") { Level = 1 }] }]));
 
         Assert.Null(exception);
     }
@@ -159,10 +182,10 @@ public sealed class ClassCatalogValidatorTests
     public void Validate_SkillChangesForeignResource_ThrowsNamingClassSkillAndResource()
     {
         var exception = Assert.Throws<ContentValidationException>(
-            () => Validate([Class("mage") with { SkillIds = ["smite"], Resources = [Mana] }]));
+            () => Validate([Class("mage") with { Skills = [new("smite")], Resources = [Mana] }]));
 
         Assert.Equal(
-            "classes.json: class 'mage': skillIds lists 'smite', which uses 'conviction', a resource mage doesn't have.",
+            "classes.json: class 'mage': skills lists 'smite', which uses 'conviction', a resource mage doesn't have.",
             exception.Message);
     }
 
@@ -172,9 +195,10 @@ public sealed class ClassCatalogValidatorTests
         var faith = new ResourceDefinition("faith", "Faith", Max: 5, StartsAt: 5) { Color = TestColor };
 
         var exception = Assert.Throws<ContentValidationException>(
-            () => Validate([Class("cleric") with { SkillIds = ["heal_all"], Resources = [faith] }]));
+            () => Validate([Class("cleric") with { Skills = [new("heal_all")], Resources = [faith] }]));
 
-        Assert.Equal("classes.json: class 'cleric': skillIds lists 'heal_all', which needs 6 faith, above its max of 5.", exception.Message);
+        Assert.Equal(
+            "classes.json: class 'cleric': skills lists 'heal_all', which needs 6 faith, above its max of 5.", exception.Message);
     }
 
     [Fact]

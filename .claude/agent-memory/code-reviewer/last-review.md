@@ -5,11 +5,9 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-classes-and-progression, slice CL3b (CL3's undo step): Catalogs/CatalogDraft.Party (SetClasses,
-IsSameClass), Party/ClassEditingViewModel, CatalogDraftClassTests (5), ClassEditingViewModelTests (3). 2026-11-17.
-Round 1. Verdict: Ready to commit.
+Plan 2026-11-15-classes-and-progression, slice CL4 (Database > Classes page, Stats tab): Party/ClassCatalogPage
+.xaml(.cs), registration in MainViewModel.Workspaces / MainWindow.Database / DatabaseMenu.xaml, CatalogGroup summary,
+page-order test, smoke script list. 2026-11-17. Round 1. Verdict: Ready to commit.
 
-- Suggestion: the "draft over test-world with Archer and Scholar" constructor is copied in both new test classes; a
-  ClassFixtures member before a third copy (CL4's page tests) — open
-- Carried from CL3: Duplicate's skills copy untested — fixed (DuplicateClass_ClassWithSkills_CopiesThem)
-- Carried from CL3: move `_archer` into ClassFixtures — fixed (ClassFixtures.Archer)
+- Suggestion: "Per level" column header vs the problem line's "Growth power" wording (ClassStatsBoxes label) — open
+- Carried from CL3b: ClassFixtures draft before a third copy — moot (CL4 added no test needing it; slice note says so)

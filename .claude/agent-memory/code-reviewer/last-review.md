@@ -5,16 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-items-uniques-affixes, slice IU8 (Editor Items/ItemCatalogPage, ItemCatalogViewModel IEditedCatalog +
-IconFiles + MissingIconNote, ItemEditingViewModel icon reader, Catalogs/ArtPictureConverter moved from Cinematics, shell
-wiring, DatabaseMenu, smoke script). 2026-11-16. Round 1. Verdict: Ready to commit (no Critical, no Warning).
+Plan 2026-11-15-items-uniques-affixes, slice IU9 (CatalogDraft.ItemsRemovedByUndo, CatalogUsage.UsersOfItem +
+GivesItem, CombinedHistory.RefusalOfItemUndo and RefusalOfEventNamedUndo, SaveWithCellEvent moved to EditorTestContent).
+2026-11-16. Round 1. Verdict: Ready to commit (no Critical).
 
-- Suggestion (open, optional): Sprites/SpriteImageFile class summary still names only "the Cinematics page's still" for
-  the at-width decode; the Items icon is its second caller.
-- Suggestion (open, optional): ItemCatalogViewModel raises ChosenKey on selection and on every typed change; nothing
-  subscribes (IEditedCatalog's hosts read it once), no other page raises it, no test pins it.
-- Suggestion (open, optional): the empty MissingIconNote TextBlock keeps a line of height under the icon row (capture).
-- Checked, no finding: Cinematics page keeps key "PictureOf", both bindings and PreviewWidth decode; empty icon is
-  refused by ArtReferenceCheck.AddMissing (Path.Combine(...,"") -> folder, File.Exists false), item icons use AddMissing
-  (not exact-name) so case-insensitive matches the game; editable ComboBox Text-bound like 6 other editable boxes.
-- Fixed (from IU7): explicit Problem raise after SelectedItem in Insert/Remove gone; the "new list" test comment gone.
+- Warning (open): third copy of the "event step names id X" pattern: UsersOfShop/UsersOfCinematic/UsersOfItem in
+  CatalogUsage and RefusalOfShop/Cinematic/ItemUndo in CombinedHistory; proposed a shared step predicate query
+  (MapsWithStep(catalog, openLayouts, Func<EventStep,bool>)) and one refusal loop.
+- Checked, no finding: refusal order kept (quest, shop, cinematic, then item, before objects/sheets/tiles); other item
+  references (shops, drop tables) only via later linear steps; NewGame starting items, party members, rules have no
+  editor setter; MapEvent has no item condition; cinematics name no item; test-world has potion, not test_tonic; no test
+  reads the old quest_check/shop_check/cinematic_check ids (shop file's own unsaved test still uses shop_check inline).
+- Dropped (IU8 optional suggestions, not carried): SpriteImageFile summary, ChosenKey raise, MissingIconNote height.

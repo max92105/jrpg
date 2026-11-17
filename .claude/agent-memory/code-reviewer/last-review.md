@@ -5,13 +5,10 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-classes-and-progression, slice CL1 (classes.json written by the writer: CatalogProblems.Party
-OfClasses/CheckClasses, SortedClasses, resource fields in the four AbsentWhen filters, decision 1011 empty gains;
-content/classes.json relaid, semantically identical: only explicit "startsAt": 0 dropped). 2026-11-17.
-Round 1. Verdict: Ready to commit.
+Plan 2026-11-15-classes-and-progression, slice CL2 (split: Party/ClassStatsBoxes, ClassFixtures.Scholar,
+ClassStatsBoxesTests (10); ClassViewModel moved to CL2b). 2026-11-17. Round 1. Verdict: Ready to commit.
 
-- Suggestion: AbsentWhenEmptyFilter.cs cites decision 944 for the `gains` entry (summary and inline comment); the
-  rule is decision 1011 — open
-- Suggestion: the same 12-line "Note from CL1" (page recipe) copied into CL4, PM4, NG3, XP3; one copy in README — open
-- WS6 Warning (drop-tables test on the only table) — fixed (targets "vault")
-- WS6 Suggestion (ADR 0060 "strip Edit... same path") — fixed
+- Suggestion: CL2.md heading/Goal/New types still describe ClassViewModel (README retitled CL2); its Done line is 134
+  columns, the rest of the plan wraps at 120 — open
+- Follow-up (from CL1's Suggestion): same "Note from CL1" page recipe copied into CL4, PM4, NG3, XP3 — won't fix (developer's coordinator): one-time instructions to each page slice; drop it
+- CL1 Suggestion (AbsentWhenEmptyFilter cites 944 for gains) — fixed (cites 1011)

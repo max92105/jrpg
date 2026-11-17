@@ -49,7 +49,7 @@ public sealed class ClassResourceViewModelTests
     public void ToResource_UntouchedResource_EqualsTheRecord() =>
         Assert.Equal(Fury, ClassResourceViewModel.From(Fury).ToResource());
 
-    // Backfire and Will scaling have no box until CL9: they come back from the record.
+    // Backfire and Will scaling come back from their boxes as the record has them.
     [Fact]
     public void ToResource_UntouchedResource_KeepsItsRules() =>
         Assert.Equal(Surge, ClassResourceViewModel.From(Surge).ToResource());

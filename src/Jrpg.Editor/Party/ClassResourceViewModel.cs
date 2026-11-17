@@ -9,9 +9,10 @@ namespace Jrpg.Editor.Party;
 /// <summary>
 /// One battle resource of a class as the Resources tab types it (decision 950): its id (typed while new, fixed once the
 /// draft holds it, since skills name it), name, color, the lasting box, its amounts (a max and a start, or from speed
-/// with the speed per charge, which turns the other two off) and its gains, written over the record it came from, so
-/// the four rules no box edits yet are carried as they are. Only the boxes are its own; Data's rules (a start within
-/// the max, a color's shape, the heavy-hit share's range) are the class list's line.
+/// with the speed per charge, which turns the other two off), its gains, and its four optional rules (Will scaling,
+/// backfire, strain, dominance), each on or off (decision 951). Only the boxes are its own; Data's rules (a start
+/// within the max, a color's shape, the heavy-hit share's range, the rules' ranges and the resources they name) are the
+/// class list's line.
 /// </summary>
 internal sealed partial class ClassResourceViewModel : ObservableObject
 {
@@ -37,11 +38,19 @@ internal sealed partial class ClassResourceViewModel : ObservableObject
         SpeedPerChargeText = TypedNumber.Text(original.MaxFromSpeed?.SpeedPerCharge ?? LowestSpeedPerCharge);
         Gains = new ResourceGainsBoxes(original.Gains);
         Gains.PropertyChanged += OnGainTyped;
+        WillScaling = WillScalingBoxes.From(original.WillScaling);
+        Backfire = BackfireBoxes.From(original.Backfire);
+        Strain = StrainBoxes.From(original.Strain);
+        Dominance = DominanceBoxes.From(original.Dominance);
+        WillScaling.Changed += OnRuleTyped;
+        Backfire.Changed += OnRuleTyped;
+        Strain.Changed += OnRuleTyped;
+        Dominance.Changed += OnRuleTyped;
     }
 
     /// <summary>
-    /// A typed field or gain: what the class's list listens to, never the label's notice, so the list runs Data's check
-    /// once per change.
+    /// A typed field, gain or rule box: what the class's list listens to, never the label's notice, so the list runs
+    /// Data's check once per change.
     /// </summary>
     public event EventHandler? Changed;
 
@@ -72,6 +81,10 @@ internal sealed partial class ClassResourceViewModel : ObservableObject
             SpeedPerChargeText = chosen.SpeedPerChargeText,
         };
         copy.Gains.CopyFrom(chosen.Gains);
+        copy.WillScaling.CopyFrom(chosen.WillScaling);
+        copy.Backfire.CopyFrom(chosen.Backfire);
+        copy.Strain.CopyFrom(chosen.Strain);
+        copy.Dominance.CopyFrom(chosen.Dominance);
         return copy;
     }
 
@@ -111,12 +124,20 @@ internal sealed partial class ClassResourceViewModel : ObservableObject
 
     public ResourceGainsBoxes Gains { get; }
 
+    public WillScalingBoxes WillScaling { get; }
+
+    public BackfireBoxes Backfire { get; }
+
+    public StrainBoxes Strain { get; }
+
+    public DominanceBoxes Dominance { get; }
+
     /// <summary>The list's line: "mana: Mana"; "(new resource)" while it has no id.</summary>
     public string Label => Id.Length > 0 ? $"{Id}: {Name}" : "(new resource)";
 
     /// <summary>
     /// Why the resource can't be built: the typed id while new, then the first amount box that counts and isn't a whole
-    /// number, then the first gain's; null when it can.
+    /// number, then the first gain's, then the first box of a rule that is on, in the tab's order; null when it can.
     /// </summary>
     /// <param name="classmateIds">The class's other resources' ids, which a new id must not repeat.</param>
     public string? ProblemAmong(IReadOnlyCollection<string> classmateIds) =>
@@ -124,7 +145,8 @@ internal sealed partial class ClassResourceViewModel : ObservableObject
 
     /// <summary>
     /// The record it came from with the typed fields over it, the name and color trimmed; the max and start 0 while it
-    /// takes them from speed, as Data asks. The id isn't checked here: the class's list checks it against the others.
+    /// takes them from speed, as Data asks; each rule null while off. The id isn't checked here: the class's list
+    /// checks it against the others.
     /// </summary>
     /// <exception cref="InvalidOperationException">A box isn't a whole number.</exception>
     public ResourceDefinition ToResource() =>
@@ -140,14 +162,22 @@ internal sealed partial class ClassResourceViewModel : ObservableObject
                 StartsAt = TakesMaxFromSpeed ? 0 : NumberIn(StartsAtText),
                 MaxFromSpeed = TakesMaxFromSpeed ? new SpeedScaling(NumberIn(SpeedPerChargeText)) : null,
                 Gains = Gains.Typed!,
+                WillScaling = WillScaling.ToRule(),
+                Backfire = Backfire.ToRule(),
+                Strain = Strain.ToRule(),
+                Dominance = Dominance.ToRule(),
             };
 
-    // Only the amount boxes that count: a half-typed max under From speed is never written.
+    // Only the amount boxes that count: a half-typed max under From speed is never written, nor an off rule's box.
     private string? BoxesProblem =>
         (TakesMaxFromSpeed
             ? TypedNumber.ProblemOf("Speed per charge", SpeedPerChargeText)
             : TypedNumber.ProblemOf("Max", MaxText) ?? TypedNumber.ProblemOf("Starts at", StartsAtText))
-        ?? Gains.Problem;
+        ?? Gains.Problem
+        ?? WillScaling.Problem
+        ?? Backfire.Problem
+        ?? Strain.Problem
+        ?? Dominance.Problem;
 
     private static int NumberIn(string text) => TypedNumber.Parse(text)!.Value;
 
@@ -159,6 +189,8 @@ internal sealed partial class ClassResourceViewModel : ObservableObject
             Changed?.Invoke(this, EventArgs.Empty);
         }
     }
+
+    private void OnRuleTyped(object? sender, EventArgs e) => Changed?.Invoke(this, EventArgs.Empty);
 
     partial void OnIdChanged(string value) => Changed?.Invoke(this, EventArgs.Empty);
 

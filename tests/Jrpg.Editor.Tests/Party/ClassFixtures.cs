@@ -12,7 +12,8 @@ namespace Jrpg.Editor.Tests.Party;
 /// The Classes page tests' own classes, so no repository number is pinned: every base and growth number of the scholar
 /// differs from the others and from a new class's, so a box that drops or swaps one shows in a record compared whole; a
 /// second class for the list; the test world holding the two; the Skills tab's draft of three skills; a resource
-/// gaining on every trigger and one from speed with rules; and the stat and gain boxes' texts read in the form's order.
+/// gaining on every trigger, one from speed with Will scaling and backfire, two rival forces and a lasting resource
+/// straining one of them; and the stat and gain boxes' texts read in the form's order.
 /// </summary>
 internal static class ClassFixtures
 {
@@ -99,7 +100,8 @@ internal static class ClassFixtures
 
     /// <summary>
     /// A resource taking its max from speed, one charge per 10, with a backfire and a Will scaling (lower gain, not the
-    /// first effect) that no box edits yet, so a resource written back shows whether its rules were carried.
+    /// blank's raised max), each number differing from the blank's: a rule written back from its boxes shows any number
+    /// the boxes dropped.
     /// </summary>
     public static ResourceDefinition Surge { get; } = new("surge", "Surge")
     {
@@ -107,6 +109,28 @@ internal static class ClassFixtures
         MaxFromSpeed = new SpeedScaling(10),
         Backfire = new BackfireRule(5, 15),
         WillScaling = new WillScaling(4, WillEffect.LowerGain),
+    };
+
+    /// <summary>A force rivalling <see cref="Blight"/>, which names it back, with a bonus of 30 %.</summary>
+    public static ResourceDefinition Bloom { get; } = new("bloom", "Bloom", Max: 5, StartsAt: 2)
+    {
+        Color = "#4CAF50",
+        Dominance = new DominanceRule("blight", 30),
+    };
+
+    /// <summary>The force rivalling <see cref="Bloom"/>, with a bonus of 20 %.</summary>
+    public static ResourceDefinition Blight { get; } = new("blight", "Blight", Max: 5, StartsAt: 0)
+    {
+        Color = "#6D4C41",
+        Dominance = new DominanceRule("bloom", 20),
+    };
+
+    /// <summary>A lasting resource whose missing points lower <see cref="Bloom"/>'s start by 2 each.</summary>
+    public static ResourceDefinition Toll { get; } = new("toll", "Toll", Max: 4, StartsAt: 4)
+    {
+        Color = "#B0BEC5",
+        IsLasting = true,
+        Strain = new StrainRule("bloom", 2),
     };
 
     /// <summary>The eight boxes' texts in the page's order: max HP, speed, accuracy, then the five primaries.</summary>

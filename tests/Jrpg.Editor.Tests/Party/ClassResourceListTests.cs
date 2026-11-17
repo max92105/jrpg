@@ -15,6 +15,12 @@ public sealed class ClassResourceListTests
     private static readonly ContentCatalog _draft =
         World with { Classes = new Dictionary<string, ClassDefinition> { [_scholar.Id] = _scholar } };
 
+    // Every rule: Will scaling and backfire on Surge, Bloom and Blight naming each other, Toll straining Bloom.
+    private static readonly ClassDefinition _ruledScholar = Scholar with { Resources = [Surge, Bloom, Blight, Toll] };
+
+    private static readonly ContentCatalog _ruledDraft =
+        World with { Classes = new Dictionary<string, ClassDefinition> { [_ruledScholar.Id] = _ruledScholar } };
+
     private readonly ClassViewModel _class = ClassViewModel.From(_scholar, _draft);
 
     [Fact]
@@ -126,10 +132,45 @@ public sealed class ClassResourceListTests
         Assert.Equal(1, raised);
     }
 
+    // The page's round trip: every rule through its boxes and back, the class equal to its record by content.
+    [Fact]
+    public void ToClass_UntouchedClassWithEveryRule_EqualsTheRecord() =>
+        Assert.Equal(_ruledScholar, ClassViewModel.From(_ruledScholar, _ruledDraft).ToClass());
+
+    [Fact]
+    public void Problem_EveryRuleAsRead_IsNull() => Assert.Null(CatalogProblemWithRuledClass(_ => { }));
+
+    [Fact]
+    public void Problem_StrainOnNonLastingResource_ShowsDataMessage() =>
+        Assert.Equal(
+            "classes.json: class 'scholar': resource 'toll': strain is only for a lasting resource.",
+            CatalogProblemWithRuledClass(resources => resources[3].IsLasting = false));
+
+    [Fact]
+    public void Problem_StrainOntoLastingResource_ShowsDataMessage() =>
+        Assert.Equal(
+            "classes.json: class 'scholar': resource 'toll': strain.lowersStartOf can't name a lasting resource ('bloom'), "
+            + "whose lowered start would carry on and drop again.",
+            CatalogProblemWithRuledClass(resources => resources[1].IsLasting = true));
+
+    [Fact]
+    public void Problem_DominanceOneSided_ShowsDataMessage() =>
+        Assert.Equal(
+            "classes.json: class 'scholar': resource 'bloom': dominance.over names 'blight', whose dominance doesn't name "
+            + "'bloom' back.",
+            CatalogProblemWithRuledClass(resources => resources[2].Dominance.IsOn = false));
+
     private static string? CatalogProblemWithFuryStartingAt(string startsAt)
     {
         var catalog = new ClassCatalogViewModel(_draft);
         catalog.SelectedClass!.Resources[1].StartsAtText = startsAt;
+        return catalog.Problem;
+    }
+
+    private static string? CatalogProblemWithRuledClass(Action<IList<ClassResourceViewModel>> type)
+    {
+        var catalog = new ClassCatalogViewModel(_ruledDraft);
+        type(catalog.SelectedClass!.Resources);
         return catalog.Problem;
     }
 }

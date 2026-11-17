@@ -32,3 +32,12 @@ None: the tab shows the rules in CL9d. CL8's hand checks still pass (an untouche
 - **Note from CL9b review:** if this slice's tests need `NoticesOf`/`ChangesOf` (copied in `ResourceRuleTests` and
   `ResourceRivalRuleTests`), move them to one shared test type in `Party/` rather than a third copy; and check
   `ClassResourceViewModel.DuplicateOf` calls every rule's `CopyFrom`.
+- **Done:** as planned. `Party/ClassResourceViewModel` (210 lines) builds the four rule boxes from the record,
+  writes each through `ToRule()` (null while off, so an untouched rule equals the record's), puts their problems after
+  the gains' in the tab's order, relays each rule's `Changed` to its own and copies them in `DuplicateOf` (every
+  `CopyFrom`). `ClassFixtures` (152) gains `Bloom` and `Blight`, rival forces, and `Toll`, lasting, straining Bloom.
+  `Party/ClassResourceRuleTests` (184, 17 tests: Backfire shown on, strain and dominance read back unchanged, an
+  unticked backfire writing none, the four typed rules written, each on rule's box named and an off one ignored, the
+  gains before the rules and Will scaling first, each rule's `Changed`, the copy) needs no `NoticesOf` or `ChangesOf`,
+  so they stay where they are. `ClassResourceListTests` (176, +5: the round trip with every rule, no problem as read,
+  strain on a resource that isn't lasting, strain onto a lasting one, one-sided dominance). About 290 lines.

@@ -37,3 +37,9 @@ in its folder kept listed, so opening the page never changes an encounter; `ToEn
 
 ## Verify by hand
 None: no page yet (EC5). The suite runs green.
+- **Done, with deviations:** about 220 lines with tests (code +74 -16, tests +138 -4, the map's two rows). Map settings'
+  `ChoicesFor` was extracted at its second copy, not left private, as cheap and clean: `Catalogs/FileBoxChoices.Of`
+  (18 lines, 3 tests in `Catalogs/FileBoxChoicesTests`), called by both view models. With every field now typed,
+  `ToEncounter` builds a new record and the source field went. Two `Changed` facts instead of one theory, and
+  `ToEncounter_Untouched_EqualsTheRecordButForItsEnemyList` added (EC3's no-step check). `EncounterViewModel` is 155
+  lines, `EncounterViewModelBoxTests` 104; 7337 tests.

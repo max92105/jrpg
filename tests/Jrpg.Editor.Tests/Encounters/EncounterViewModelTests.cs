@@ -168,9 +168,8 @@ public sealed class EncounterViewModelTests
         Assert.Equal(["orc"], written.EnemyIds);
     }
 
-    // The boxes come in EC2b: until then the record's own background and music are carried over.
     [Fact]
-    public void ToEncounter_OwnBackgroundAndMusic_Kept()
+    public void ToEncounter_OwnBackgroundAndMusic_WritesTheFiles()
     {
         var arena = GoblinPair with { BackgroundFile = "Cave.png", MusicFile = "boss/loop.wav" };
 

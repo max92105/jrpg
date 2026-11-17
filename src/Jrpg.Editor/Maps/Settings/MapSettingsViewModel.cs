@@ -1,6 +1,7 @@
 using System.Globalization;
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Maps;
+using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Maps.Settings;
 
@@ -37,10 +38,10 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
         _currentSize = (map.Layout.Width, map.Layout.Height);
         DisplayName = map.Settings.DisplayName;
         var track = map.Settings.MusicFile;
-        MusicChoices = ChoicesFor(track, NoMusic, musicFiles);
+        MusicChoices = FileBoxChoices.Of(track, NoMusic, musicFiles);
         SelectedMusic = track ?? NoMusic;
         var background = map.Settings.BattleBackgroundFile;
-        BattleBackgroundChoices = ChoicesFor(background, NoBattleBackground, backgroundFiles);
+        BattleBackgroundChoices = FileBoxChoices.Of(background, NoBattleBackground, backgroundFiles);
         SelectedBattleBackground = background ?? NoBattleBackground;
         AreaLevelText = map.Settings.AreaLevel is { } level ? Text(level) : "";
         ShowsBanner = map.Settings.ShowsBanner;
@@ -55,11 +56,6 @@ internal sealed partial class MapSettingsViewModel : ObservableObject
         GraceStepsText = Text(table?.GraceSteps ?? 1);
         Encounters = [.. encounterIds.Order(StringComparer.Ordinal).Select(id => new EncounterChoice(id) { IsChosen = table?.EncounterIds.Contains(id) == true })];
     }
-
-    // A track or background no longer in its folder stays listed, so opening the dialog never changes the map
-    // (decisions 419, 909).
-    private static IReadOnlyList<string> ChoicesFor(string? current, string none, IReadOnlyList<string> files) =>
-        current is null || files.Contains(current) ? [none, .. files] : [none, current, .. files];
 
     public string MapId { get; }
 

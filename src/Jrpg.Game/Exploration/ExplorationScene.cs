@@ -16,7 +16,8 @@ namespace Jrpg.Game.Exploration;
 /// The player walking the current map; the scene a new game starts in. It shows the tile layers, the animated player
 /// and objects in depth order, canopies and roofs over the player, with the camera easing after the player, the prompt
 /// and the entry banner over the field (<see cref="FieldOverlays"/>), and leaves map events to
-/// <see cref="EventPresenter"/>.
+/// <see cref="EventPresenter"/>. Entering a map decodes the backgrounds its battles can show and releases the last
+/// map's.
 /// </summary>
 internal sealed class ExplorationScene : IScene
 {
@@ -37,6 +38,8 @@ internal sealed class ExplorationScene : IScene
     private readonly WalkAnimation _walkAnimation = new();
     private MapDefinition _map;
     private MapView _view;
+    private IReadOnlyList<string> _battleBackgrounds;
+    private IReadOnlyList<string> _decodedBattleBackgrounds = [];
 
     public ExplorationScene(ExplorationState exploration, MapArt art, EventPresenter presenter, FieldOverlays overlays)
     {
@@ -86,6 +89,12 @@ internal sealed class ExplorationScene : IScene
     // The banner under the presenter: an event's message box covers it.
     public void Draw(SpriteBatch batch, TextureLibrary textures)
     {
+        // A new list on each entry, so this runs once per map entered.
+        if (!ReferenceEquals(_decodedBattleBackgrounds, _battleBackgrounds))
+        {
+            SwapDecodedBattleBackgrounds(textures);
+        }
+
         DrawMap(batch, textures);
         _overlays.Prompt.Draw(batch, textures, _camera.Origin);
         _overlays.BannerView.Draw(batch, textures);
@@ -143,14 +152,34 @@ internal sealed class ExplorationScene : IScene
     }
 
     // The one way onto a map, at the start and after each warp: the camera jumps rather than gliding across the map.
-    [MemberNotNull(nameof(_map), nameof(_view))]
+    [MemberNotNull(nameof(_map), nameof(_view), nameof(_battleBackgrounds))]
     private void EnterCurrentMap()
     {
         _map = _exploration.CurrentMap;
         _view = new MapView(_map.Layout, _currentDefinitionOf, _art, _npcPoseOf);
         _camera.SnapTo(_exploration.PlayerPosition, _map.Layout);
         _drawList.Rebuild(_map.Layout, _currentDefinitionOf, _exploration.PlayerPosition);
+        _battleBackgrounds = EncounterBackground.PossibleOn(_map.Settings, _art.Encounters);
         _overlays.Banner.Enter(_map);
+    }
+
+    // A sheet takes 20 to 200 ms to decode: done under the warp's black, so a battle's first frame never waits on it
+    // (decision 900, the menu background's precedent). The last map's are released, since every texture is otherwise
+    // cached for the session.
+    private void SwapDecodedBattleBackgrounds(TextureLibrary textures)
+    {
+        var released = BackgroundRelease.Of(_decodedBattleBackgrounds, _battleBackgrounds);
+        for (var index = 0; index < released.Count; index++)
+        {
+            textures.Release(ArtFolders.Backgrounds, released[index]);
+        }
+
+        for (var index = 0; index < _battleBackgrounds.Count; index++)
+        {
+            textures.Get(ArtFolders.Backgrounds, _battleBackgrounds[index]);
+        }
+
+        _decodedBattleBackgrounds = _battleBackgrounds;
     }
 
     private void WalkAndFollow(TimeSpan delta, InputFrame input)

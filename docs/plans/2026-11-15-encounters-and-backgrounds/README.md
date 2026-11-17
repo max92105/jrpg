@@ -101,7 +101,7 @@ slices and Editor slices aim at about 200 lines, not because the scope grew.
   [slices/BG3.md](slices/BG3.md)
 - [x] **BG4. The startup art check on backgrounds, and a placeholder animated background** (Data, content, script,
   about 200 lines) → [slices/BG4.md](slices/BG4.md)
-- [ ] **BG5. The battle plays an animated background; a map's backgrounds decoded on entry, the last map's released**
+- [x] **BG5. The battle plays an animated background; a map's backgrounds decoded on entry, the last map's released**
   (Core, Game, about 250 lines, the 1.6x included) → [slices/BG5.md](slices/BG5.md)
 - [ ] **BG6. A GIF into a background sheet, headless** (Editor, about 190 lines) → [slices/BG6.md](slices/BG6.md)
 - [ ] **BG7. The Battle backgrounds page's rules: every background, still or animated, and its problem line** (Editor,

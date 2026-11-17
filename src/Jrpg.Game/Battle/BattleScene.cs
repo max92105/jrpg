@@ -11,9 +11,9 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Battle;
 
 /// <summary>
-/// The battle screen over the map (ADR 0013): the battle's background (the encounter's own or the map's), the battlers,
-/// the HUD and the commands. When the battle is over it finishes it in the session once and asks the flow, once, to go
-/// back to the map (or to the title after a defeat).
+/// The battle screen over the map (ADR 0013): the encounter's background (its own or the map's), animated or still, the
+/// battlers, the HUD and the commands. When the battle is over it finishes it in the session once and asks the flow,
+/// once, to go back to the map (or to the title after a defeat).
 /// </summary>
 internal sealed class BattleScene : IScene
 {
@@ -24,7 +24,7 @@ internal sealed class BattleScene : IScene
     private readonly UiTextures _ui;
     private readonly BattlersView _battlers;
     private readonly BattleTurnSequence _sequence;
-    private readonly string _backgroundFile;
+    private readonly BattleBackdrop _backdrop;
     private readonly PartyStatusView _partyStatus;
     private readonly EnemyTagView _enemyTags;
     private readonly CommandMenu _commands;
@@ -62,8 +62,9 @@ internal sealed class BattleScene : IScene
         _battlers = new BattlersView(battle, _sequence, ui);
         _partyStatus = new PartyStatusView(battle.Formation, text, ui);
         _enemyTags = new EnemyTagView(battle.Combatants, _sequence, text, ui);
-        _backgroundFile = session.Exploration.PendingBattleBackground
+        var backgroundFile = session.Exploration.PendingBattleBackground
             ?? throw new InvalidOperationException("A battle screen needs the background its encounter is fought on.");
+        _backdrop = new BattleBackdrop(backgroundFile, session.Catalog.AnimatedBackgrounds.GetValueOrDefault(backgroundFile));
         _outcome = new BattleOutcomeScreens(sources.Saves, text, ui);
         _commands = new CommandMenu(session.Inventory, sources.Items);
         _commandPanel = new CommandPanelView(_commands, _battlers, text, ui);
@@ -76,7 +77,7 @@ internal sealed class BattleScene : IScene
     public IReadOnlyList<string> Sounds => _sounds.Files;
 
     /// <summary>The background the battle is fought on, for the tests (decision 892).</summary>
-    internal string BackgroundFile => _backgroundFile;
+    internal string BackgroundFile => _backdrop.File;
 
     /// <summary>What the battle screen calls for from the music as its outcome shows (decision 418).</summary>
     public BattleMusicCue MusicCue => _outcome.MusicCue;
@@ -88,6 +89,8 @@ internal sealed class BattleScene : IScene
     public SceneRequest? Update(TimeSpan delta, InputFrame input)
     {
         _sounds.Clear();
+        // Before the finished branch: the background keeps playing behind the outcome screens (decision 899).
+        _backdrop.Advance(delta);
         _outcome.Advance(delta);
         if (_isFinished)
         {
@@ -215,8 +218,10 @@ internal sealed class BattleScene : IScene
     // The backdrop: the picture, the vignette over the whole screen, and the shade across the top.
     private void DrawBackdrop(SpriteBatch batch, TextureLibrary textures)
     {
-        CoverFit.DrawOverScreen(batch, textures.Get(ArtFolders.Backgrounds, _backgroundFile), Color.White);
-        batch.Draw(_ui.BattleVignette(textures), new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height), Color.White);
+        var image = textures.Get(ArtFolders.Backgrounds, _backdrop.File);
+        var screen = new Rectangle(0, 0, VirtualScreen.Width, VirtualScreen.Height);
+        batch.Draw(image, screen, _backdrop.SourceIn(new Point(image.Width, image.Height)), Color.White);
+        batch.Draw(_ui.BattleVignette(textures), screen, Color.White);
         batch.Draw(_ui.TopShade(textures), new Rectangle(0, 0, VirtualScreen.Width, UiTextures.TopShadeHeight), Color.White);
     }
 }

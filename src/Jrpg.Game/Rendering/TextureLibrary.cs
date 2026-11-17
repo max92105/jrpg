@@ -5,7 +5,7 @@ namespace Jrpg.Game.Rendering;
 
 /// <summary>
 /// The one place the game opens image files (ADR 0009, <c>game.md</c>): PNGs under the art root, loaded on first use,
-/// kept for the session and disposed with it.
+/// kept until released or until the session ends, and disposed then.
 /// </summary>
 internal sealed class TextureLibrary(GraphicsDevice device, string artRoot) : IDisposable
 {
@@ -29,6 +29,20 @@ internal sealed class TextureLibrary(GraphicsDevice device, string artRoot) : ID
         }
 
         return texture;
+    }
+
+    /// <summary>
+    /// Disposes a loaded texture and forgets it, so the next <see cref="Get"/> decodes it again; nothing when it isn't
+    /// loaded. Only for a texture nothing draws any more, such as the last map's battle backgrounds (decision 900).
+    /// </summary>
+    /// <param name="folder">A folder from <c>ArtFolders</c>.</param>
+    /// <param name="file">The file name content gives.</param>
+    public void Release(string folder, string file)
+    {
+        if (_textures.Remove((folder, file), out var texture))
+        {
+            texture.Dispose();
+        }
     }
 
     /// <summary>A texture the game composed itself, such as a baked canopy, kept and disposed with the loaded ones.</summary>

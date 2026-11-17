@@ -326,3 +326,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   copied in about fifteen test files across Core and Data (items plan, IU2-IU4 reviews).
 - `Editor/Catalogs/RecordListProblem.FirstOf` counts two new records with empty ids as one id twice ("Item  is listed
   twice.", ahead of their own "The id must not be empty."): skip empty ids in the twice check (items plan, IU6 review).
+- A new game or a load builds a new `Game/Exploration/ExplorationScene` with nothing decoded, so the last playthrough's
+  map backgrounds stay in `TextureLibrary` until the session ends (bounded by the background files): release them
+  when the session ends a playthrough (encounters and backgrounds plan, BG5 review).

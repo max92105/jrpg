@@ -79,3 +79,11 @@ that the new map doesn't list, so video memory holds one map's backgrounds, not 
 4. F12 captures at two moments of one battle, a frame apart in brightness.
 5. Revert `milestone_outside`'s background to `Forest.png` (**Ctrl+Z**, **Ctrl+S**), and `git status` shows it
    unchanged.
+
+- **Done, with deviations:** about 340 lines with tests, not about 250 (code +170 -13, tests +182): no split point
+  named, the excess in tests and doc comments. One test beyond the list,
+  `BackgroundReleaseTests.Of_TitleBackgroundOnThePreviousMap_IsNeverReleased` (the title's side of the rule).
+  `ExplorationScene.Draw` decodes when the decoded list isn't the entered map's (a new list per entry), not on a flag,
+  so two entries before one draw still release the first map's. `MapArt`'s summary names its encounters; the battle's
+  vignette reuses the backdrop's screen rectangle; the backdrop still draws first, the vignette right after it.
+  `BattleScene.cs` is 227 lines, `ExplorationScene.cs` 244. Hand check 3's fade-ins not yet watched.

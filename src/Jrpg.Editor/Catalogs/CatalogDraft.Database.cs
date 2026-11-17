@@ -7,9 +7,9 @@ using Jrpg.Core.Trade;
 namespace Jrpg.Editor.Catalogs;
 
 /// <summary>
-/// The catalogs the Database windows edit (ADR 0045): the shops, the enemies, the drop tables, the cinematics, the
-/// effect strips, the animated backgrounds, the items and the affix pool, the whole session of each window recorded as
-/// one undo step.
+/// The catalogs the Database windows edit (ADR 0045): the shops, the enemies, the encounters, the drop tables, the
+/// cinematics, the effect strips, the animated backgrounds, the items and the affix pool, the whole session of each
+/// window recorded as one undo step.
 /// </summary>
 internal sealed partial class CatalogDraft
 {
@@ -97,7 +97,8 @@ internal sealed partial class CatalogDraft
 
     /// <summary>
     /// Replaces the enemies as one undo step (decision 591); nothing when they are the same by content, tactics and
-    /// phases included. No undo refusal: only encounters name an enemy, and the editor doesn't edit them.
+    /// phases included. No undo refusal: only encounters name an enemy, and catalog steps undo in order, so an
+    /// encounter's pick of an added enemy is undone before the enemy.
     /// </summary>
     public void SetEnemies(IReadOnlyList<EnemyDefinition> enemies)
     {
@@ -109,6 +110,22 @@ internal sealed partial class CatalogDraft
         }
 
         Do(new CatalogEdit(catalog => catalog with { Enemies = after }, catalog => catalog with { Enemies = before }));
+    }
+
+    /// <summary>
+    /// Replaces the encounters as one undo step (decision 905); nothing when they are the same by content, enemies in
+    /// slot order included.
+    /// </summary>
+    public void SetEncounters(IReadOnlyList<EncounterDefinition> encounters)
+    {
+        var before = Current.Encounters;
+        var after = encounters.ToDictionary(encounter => encounter.Id, StringComparer.Ordinal);
+        if (HasSameRecords(before, after, IsSameEncounter))
+        {
+            return;
+        }
+
+        Do(new CatalogEdit(catalog => catalog with { Encounters = after }, catalog => catalog with { Encounters = before }));
     }
 
     /// <summary>
@@ -173,6 +190,11 @@ internal sealed partial class CatalogDraft
         && before.Phases.Count == after.Phases.Count
         && before.Phases.Zip(after.Phases).All(pair =>
             pair.First.BelowHpPercent == pair.Second.BelowHpPercent && pair.First.Tactics.SequenceEqual(pair.Second.Tactics));
+
+    // As an enemy's: the with-copy compares every field but the enemy list, the list by content and order (slot order
+    // is screen order).
+    private static bool IsSameEncounter(EncounterDefinition before, EncounterDefinition after) =>
+        before with { EnemyIds = after.EnemyIds } == after && before.EnemyIds.SequenceEqual(after.EnemyIds);
 
     /// <summary>The shops the next undo would remove, so it can be refused while a map's event opens one.</summary>
     public IReadOnlyList<string> ShopsRemovedByUndo() => KeysRemovedByUndo(catalog => catalog.Shops);

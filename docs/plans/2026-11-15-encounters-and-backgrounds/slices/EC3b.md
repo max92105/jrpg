@@ -35,3 +35,7 @@ changed by content.
 
 ## Verify by hand
 None: no page yet (EC5). The suite runs green.
+- **Done, with deviations:** about 140 lines with tests (code +48 -4, tests 89, the map's two rows): one test added,
+  `Start_ImageAddedSinceTheEditorStarted_IsOffered` (the boxes read as the page opens, not when the editor starts), 5
+  tests. `EncounterEditingViewModel` 22 lines, `EncounterEditingViewModelTests` 89, `CatalogDraft.Database.cs` 209;
+  7358 tests.

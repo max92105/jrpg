@@ -44,3 +44,10 @@ background's, then another's by file, then Data's for the whole list); the recor
 ## Verify by hand
 None: no page yet (BG8).
 - **Note from BG7b (the split):** BG7b named its own split point; this file holds its second part, as listed above.
+- **Done, with deviations:** `Backgrounds/BattleBackgroundCatalogViewModel` (78 lines) and its tests (183, 16 tests:
+  beyond the list, the empty folder choosing nothing, a missing image's record never looked up, the chosen row's own
+  problem bare, the selection raising `Problem`'s change, Data's line for a record listed twice, a typed time in its
+  record, a throw on a problem). The problem line's row part was its third copy (the Effect strips and Character
+  sprites pages held the other two), so it is extracted as `Catalogs/ArtImageRowProblem` (29 lines,
+  `ArtImageRowProblemTests` 41, 4 tests), its two older callers' tests unchanged; `EffectStripCatalogViewModel.cs` is
+  168, `FieldSpriteCatalogViewModel.cs` 182. About 340 lines with tests, the extraction about 80 of them. Tests: 7243.

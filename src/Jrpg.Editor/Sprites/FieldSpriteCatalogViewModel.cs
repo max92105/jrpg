@@ -59,24 +59,13 @@ internal sealed partial class FieldSpriteCatalogViewModel : ObservableObject, IE
     /// What stops OK: a refused copy, then the chosen setup's problem once edited, then the first problem among the
     /// other edited setups, named by file.
     /// </summary>
-    public string? Problem
-    {
-        get
-        {
-            if (_copyProblem is not null)
-            {
-                return _copyProblem;
-            }
-
-            if (Setup is { } own && _edited.Contains(own.File) && own.Problem is not null)
-            {
-                return own.Problem;
-            }
-
-            var other = EditedSetups().FirstOrDefault(setup => setup != Setup && setup.Problem is not null);
-            return other is null ? null : $"{other.File}: {other.Problem}";
-        }
-    }
+    public string? Problem =>
+        _copyProblem
+        ?? ArtImageRowProblem.FirstOf(
+            Setup is { } own && _edited.Contains(own.File) ? own : null,
+            EditedSetups(),
+            setup => setup.File,
+            setup => setup.Problem);
 
     public string? ChosenKey => Chosen?.File;
 

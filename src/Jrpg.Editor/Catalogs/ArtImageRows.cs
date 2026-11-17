@@ -1,9 +1,9 @@
 namespace Jrpg.Editor.Catalogs;
 
 /// <summary>
-/// The list of a page that edits an art folder's records by file (the Effect strips and Character sprites pages): the
-/// folder's images first, then each record whose image is missing (decision 442), listed so it stays editable and can
-/// be imported again.
+/// The list of a page that edits an art folder's records by file (the Effect strips, Character sprites and Battle
+/// backgrounds pages): the folder's images first, then each record whose image is missing (decision 442), listed so it
+/// stays editable and can be imported again.
 /// </summary>
 internal static class ArtImageRows
 {

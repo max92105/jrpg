@@ -58,8 +58,7 @@ internal sealed partial class EffectStripCatalogViewModel : ObservableObject, IE
     public partial EffectStripViewModel? SelectedStrip { get; set; }
 
     public string? Problem =>
-        SelectedStrip?.Problem
-        ?? Strips.Where(strip => strip.Problem is not null).Select(strip => $"{strip.File}: {strip.Problem}").FirstOrDefault()
+        ArtImageRowProblem.FirstOf(SelectedStrip, Strips, strip => strip.File, strip => strip.Problem)
         ?? CatalogProblems.OfEffectStrips(ListedStrips());
 
     public string? ChosenKey => SelectedStrip?.File;

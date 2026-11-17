@@ -78,3 +78,8 @@ records one undo step; Ctrl+Z undoes it; Save all writes `animated-backgrounds.j
 - **Note from BG1:** the mode bar's WS1-WS6 hadn't landed when row 10 started (`Workspaces/` holds `IEditedCatalog`,
   `CatalogDialog`, `DialogBounds`): unless WS2 has landed by then, host the page in `CatalogDialog` through
   `MainWindow.Database.OpenInDialog`, as WD2-WD8 and IU15b did, and declare no `ICatalogEditing<T>`.
+- **Note from BG7c:** `BattleBackgroundCatalogViewModel` watches the rows it starts with (`OnBackgroundChanged` relays
+  a typed frame time to `Problem`); a row `RefreshAfterStillImport` inserts or replaces is subscribed (and the replaced
+  one unsubscribed) there, as `EffectStripCatalogViewModel.TakeImportedImage` does, with a test typing into an imported
+  row. The problem line's row part is `Catalogs/ArtImageRowProblem`, shared with the Effect strips and Character
+  sprites pages.

@@ -99,8 +99,10 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 ### Phase 1: classes
 - [x] **CL1. `classes.json` is written by the editor, in the writer's layout** (Data + content, about 200 lines plus the
   relaid file) → [slices/CL1.md](slices/CL1.md)
-- [ ] **CL2. One class as typed: name, description, base stats and growth** (Editor, about 210 lines) →
-  [slices/CL2.md](slices/CL2.md)
+- [x] **CL2. A class's base or growth as eight typed boxes** (Editor, about 250 lines; split, the class itself is CL2b)
+  → [slices/CL2.md](slices/CL2.md)
+- [ ] **CL2b. One class as typed: its id, name, description and the two sets of boxes** (Editor, about 230 lines; split
+  from CL2) → [slices/CL2b.md](slices/CL2b.md)
 - [ ] **CL3. The classes as a catalog: Add, Duplicate, Remove while new, one undo step** (Editor, about 230 lines) →
   [slices/CL3.md](slices/CL3.md)
 - [ ] **CL4. Database > Classes: the page with its Stats tab** (Editor, about 50 lines plus about 120 of XAML) →

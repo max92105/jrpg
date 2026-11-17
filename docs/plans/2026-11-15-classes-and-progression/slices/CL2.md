@@ -1,4 +1,4 @@
-# CL2. One class as typed: name, description, base stats and growth
+# CL2. A class's base or growth as eight typed boxes (the class itself is CL2b)
 
 Editor, about 210 lines (about 100 of them tests). Needs CL1. Design: section 3; decisions 945-947.
 
@@ -52,3 +52,10 @@ edits yet are carried silently (decision 945).
 
 ## Verify by hand
 None: no page yet (CL4).
+- **Done, with deviations:** split on 2026-11-17, the whole slice estimated at about 370 lines with tests. CL2 built
+  `Party/ClassStatsBoxes` (111 lines) with `Party/ClassFixtures` (23, `Scholar` only: `WithResource` and `WithSkills`
+  wait for a test that needs them, `with` doing the rest) and `Party/ClassStatsBoxesTests` (116, 10 tests: the boxes'
+  numbers, `Typed` untouched, typed and unreadable, the problem's label, its last box and its order, `CopyFrom` with a
+  half-typed box, the notices). `Party/ClassViewModel` and its tests moved to CL2b, with a `Changed` event added there
+  for CL3's list (the coordinator's model, `Encounters/EncounterViewModel`).
+  The map's new Editor `Party` row names `ClassStatsBoxes`.

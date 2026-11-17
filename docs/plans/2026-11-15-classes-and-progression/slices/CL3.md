@@ -61,3 +61,5 @@ None: the page comes in CL4.
 - **Note from CL1:** `CatalogDraft.Database.cs` is at 214 lines (118 when planned), so `SetClasses` goes in the new
   `Catalogs/CatalogDraft.Party.cs` partial. CL1 already rewrote `CatalogDraft.SetSkills`' summary ("no page edits what
   they name"); CL3 rewords it again once the Classes page edits a class's skills (CL6 at the latest).
+- **Note from CL2:** needs CL2b, which holds `ClassViewModel` and its `Changed` event (the id, name, description or a
+  box typed); relay that event to the list's problem, as `Encounters/EncounterCatalogViewModel` does.

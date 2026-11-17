@@ -49,6 +49,11 @@ while another tab shows; Grid.IsSharedSizeScope on the panel holding a header Gr
 aligns their SharedSizeGroup columns. Count reads with a counter in the getter; trace via
 PresentationTraceSources.DataBindingSource listener.
 
+Real-page probe recipe (CL6b, CL8, 2026-11-17): scratchpad `cl8probe` references the built Jrpg.Editor/Core/Data/
+Toolkit DLLs, merges the four `Shell/Editor*.xaml` dictionaries into a `new Application()`, builds the page by
+reflection over `ContentCatalogLoader.Load(content)`, selects the tab, and listens on DataBindingSource and
+ResourceDictionarySource. A separate tab view's `{DynamicResource NumberBox}` resolves to its host page's style.
+
 WPF context menu fact (probed 2026-11-15, EW2 review, PowerShell -STA): a button's ContextMenu inherits the button's
 DataContext once PlacementTarget is set, and follows a later DataContext change; a DataContext assigned locally on the
 menu sticks and goes stale (a right-click open after a switch shows the old items).

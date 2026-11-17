@@ -1,8 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Loot;
-using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
-using Jrpg.Core.Session;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Input;
 using Jrpg.Game.Scenes;
@@ -15,7 +13,8 @@ public sealed class VictoryScreenTests
     private static readonly InputFrame _confirm = InputFrames.Pressing(GameButton.Confirm);
     private static readonly TimeSpan _oneUpdate = TimeSpan.FromSeconds(1.0 / 60);
 
-    private readonly VictoryScreen _screen = new(new BattleSpoils(Rewards(), Drops.None, Gold: 0));
+    // One card comes in, the bars wait 1.05 s, then Sarxian's 60 experience fill half of a 120-point level in 0.55 s.
+    private readonly VictoryScreen _screen = new(VictoryScenarios.Spoils(VictoryScenarios.HalfALevel()));
 
     [Fact]
     public void Update_ConfirmWhilePlaying_SkipsToEnd()
@@ -60,7 +59,8 @@ public sealed class VictoryScreenTests
     [Fact]
     public void IsAtMaxLevel_MemberAlreadyAtMaxLevel_IsTrue()
     {
-        var screen = new VictoryScreen(new BattleSpoils(new VictoryRewards(60, [new ExperienceGain(Sarxian(), 60, [], IsAtMaxLevel: true)]), Drops.None, Gold: 0));
+        var gain = new ExperienceGain(VictoryScenarios.Sarxian(), 60, [], IsAtMaxLevel: true);
+        var screen = new VictoryScreen(VictoryScenarios.Spoils(gain));
 
         Assert.True(screen.IsAtMaxLevel(0));
     }
@@ -69,8 +69,9 @@ public sealed class VictoryScreenTests
     [Fact]
     public void IsAtMaxLevel_ReachesMaxLevelWhileFilling_FalseUntilTheBarCompletes()
     {
-        var screen = new VictoryScreen(new BattleSpoils(
-            new VictoryRewards(60, [new ExperienceGain(Sarxian(), 60, [new LevelProgressStep(1, 60, 120, 120)], IsAtMaxLevel: true)]), Drops.None, Gold: 0));
+        LevelProgressStep[] lastLevel = [new(1, 60, 120, 120)];
+        var gain = new ExperienceGain(VictoryScenarios.Sarxian(), 60, lastLevel, IsAtMaxLevel: true);
+        var screen = new VictoryScreen(VictoryScenarios.Spoils(gain));
         screen.Update(TimeSpan.FromSeconds(1.1), default);
         Assert.False(screen.IsAtMaxLevel(0));
 
@@ -137,12 +138,7 @@ public sealed class VictoryScreenTests
     private static VictoryScreen ScreenWithAPotionDropped()
     {
         var potion = BattleScenarios.Catalog.Items["potion"];
-        return new VictoryScreen(new BattleSpoils(Rewards(), new Drops([new ItemDrop(potion, 1)], []), Gold: 0));
+        var spoils = VictoryScenarios.Spoils(VictoryScenarios.HalfALevel());
+        return new VictoryScreen(spoils with { Drops = new Drops([new ItemDrop(potion, 1)], []) });
     }
-
-    // One card comes in, the bars wait 1.05 s, then Sarxian's 60 experience fill half of a 120-point level in 0.55 s.
-    private static VictoryRewards Rewards() =>
-        new(60, [new ExperienceGain(Sarxian(), 60, [new LevelProgressStep(1, 0, 60, 120)], IsAtMaxLevel: false)]);
-
-    private static PartyMember Sarxian() => BattleScenarios.Recruit("sarxian");
 }

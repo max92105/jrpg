@@ -11,11 +11,14 @@ namespace Jrpg.Game.Battle;
 /// What a won battle gave, over the frozen battle: each standing member's bar filling level by level, then what dropped
 /// (decision 355). Confirm skips the filling; Confirm once it's done shows the drops, or leaves the battle when nothing
 /// dropped; Confirm on the drops leaves. A level filled sounds as its "Level Up!" shows, by the bar or the skip; the
-/// drops showing sound the field's found item, and leaving the confirm (decisions 430, 432).
-/// <see cref="VictoryScreenView"/> draws it.
+/// drops showing sound the field's found item, and leaving the confirm (decisions 430, 432). A learned skill's line
+/// fades in once its level has filled, silent (decision 964). <see cref="VictoryScreenView"/> draws it.
 /// </summary>
 internal sealed class VictoryScreen
 {
+    // Placeholder timing: a learned skill's line fades in over 0.2 s from its level's fill.
+    private static readonly TimeSpan _learnedLineFade = TimeSpan.FromSeconds(0.2);
+
     private readonly ExperienceBarAnimation[] _bars;
     private readonly AskedSounds _sounds = new();
     private bool _hasLeft;
@@ -58,6 +61,22 @@ internal sealed class VictoryScreen
     /// member who reaches it in this battle first sees the last level fill.
     /// </summary>
     public bool IsAtMaxLevel(int index) => _bars[index].IsComplete && Rewards.Gains[index].IsAtMaxLevel;
+
+    /// <summary>
+    /// How far <paramref name="line"/> has faded in: 0 until its member's bar has filled the level it needs, then
+    /// rising to 1 over 0.2 s; 1 once a later level has filled, or after a skip, which shows every line.
+    /// </summary>
+    public float OpacityOf(LearnedSkillLine line)
+    {
+        var bar = _bars[line.MemberIndex];
+        if (bar.LevelUps < line.LevelsToFill)
+        {
+            return 0;
+        }
+
+        var isItsLevelTheLastFilled = bar.LevelUps == line.LevelsToFill;
+        return isItsLevelTheLastFilled && bar.SinceLastLevelUp is { } since ? Easing.ShareOf(since, _learnedLineFade) : 1;
+    }
 
     /// <returns>
     /// <see cref="BattleFinished"/> on the Confirm that leaves, once: after the bars are full when nothing dropped,

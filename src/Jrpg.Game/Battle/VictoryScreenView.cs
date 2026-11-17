@@ -8,7 +8,8 @@ namespace Jrpg.Game.Battle;
 /// <summary>
 /// Draws the victory screen (leaning toward the <c>battle-victory.jpg</c> reference): the battle shaded dark on the
 /// left, "Victory!" over a hairline, one pointed bar per reward, then the members' cards in two columns, each with a
-/// pointed name tab, the level, "EXP n/m" and a gold bar; on the Items step, the drops in the cards' place.
+/// pointed name tab, the level, "EXP n/m" and a gold bar, and the skills learned under them; on the Items step, the
+/// drops in the cards' place.
 /// </summary>
 internal sealed class VictoryScreenView
 {
@@ -79,6 +80,7 @@ internal sealed class VictoryScreenView
     private readonly MeasuredText[] _experienceTexts;
     private readonly MeasuredText[] _nextLevelTexts;
     private readonly VictoryDropsView _drops;
+    private readonly VictoryLearnedSkillsView _learnedSkills;
 
     /// <param name="screen">The state it draws.</param>
     /// <param name="text">Messages and fonts.</param>
@@ -114,6 +116,7 @@ internal sealed class VictoryScreenView
         _experienceTexts = new MeasuredText[_names.Length];
         _nextLevelTexts = new MeasuredText[_names.Length];
         _drops = new VictoryDropsView(screen.Drops, text, ui);
+        _learnedSkills = new VictoryLearnedSkillsView(screen, text);
     }
 
     /// <summary>
@@ -148,6 +151,7 @@ internal sealed class VictoryScreenView
         else
         {
             DrawCards(batch, textures);
+            _learnedSkills.Draw(batch);
         }
 
         OutcomeFrame.DrawFooter(batch, textures.Pixel);

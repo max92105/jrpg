@@ -45,3 +45,16 @@ alternative): the cards' body face, pale text, centered under the cards, each li
    captures it; compare with `battle-victory.jpg`'s spacing.
 2. Win a battle with no level up: no line, the cards where they were.
 3. Undo the hand edit.
+
+- **Done, with deviations:** decision 1013: the view builds the lines through `LearnedSkillLine.AllOf(rewards,
+  messages)`, so `VictoryScreen` takes no message table; `VictoryScreen.OpacityOf(line)` replaces `IsShown` (0 before
+  the fill, in over 0.2 s, 1 after a later fill or a skip); each line keeps its row. The message is `"{name} learned
+  {skill}."` (the table's named placeholders); the id check is `MessageIdsTests`. Tests named `AllOf_...` and
+  `OpacityOf_...`, with five beyond the list: the levels each line waits for, a second member's card index, the fade
+  midway, the first line staying whole after the second fill, the two sound tests (two level ups with or without a
+  skill learned ask the one level-up sound), and four layout tests in `VictoryScreenViewTests`. After review: the lines
+  center on the card columns in use (`LinesCenterX`, the left one alone for one card); the three victory test files
+  share `VictoryScenarios` (Sarxian, half a level, spoils with nothing dropped); the five-card limit (a third line
+  under five cards crosses the footer's line) is a backlog line. Sizes: `LearnedSkillLine` 41,
+  `VictoryLearnedSkillsView` 68, `VictoryScreen` 150, `VictoryScreenView` 281; `VictoryScreenLearnedSkillTests` 184,
+  `VictoryScreenViewTests` 71, `VictoryScenarios` 23.

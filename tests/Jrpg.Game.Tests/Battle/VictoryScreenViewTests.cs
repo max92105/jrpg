@@ -33,4 +33,39 @@ public sealed class VictoryScreenViewTests
 
         Assert.True(top + VictoryScreenView.CardHeight <= VictoryScreenView.FooterLineTop, $"The last card ends at {top + VictoryScreenView.CardHeight}.");
     }
+
+    // Decision 964: two learned skills' lines under a full party's third row still clear the footer's line.
+    [Fact]
+    public void LinesTop_FullPartyWithTwoLines_EndsAboveTheFooterLine()
+    {
+        var bottom = VictoryLearnedSkillsView.LinesTop(PartyRules.MostActiveMembers) + (2 * VictoryLearnedSkillsView.LinePitch);
+
+        Assert.True(bottom <= VictoryScreenView.FooterLineTop, $"The second line ends at {bottom}.");
+    }
+
+    [Fact]
+    public void LinesCenterX_OneCard_IsItsMiddle()
+    {
+        var center = VictoryLearnedSkillsView.LinesCenterX(1);
+
+        Assert.Equal(VictoryScreenView.CardTopLeft(0).X + (PointedBarShape.CardHeaderWidth / 2f), center);
+    }
+
+    [Fact]
+    public void LinesCenterX_TwoCards_IsTheMiddleOfBothColumns()
+    {
+        var rightEdge = VictoryScreenView.CardTopLeft(1).X + PointedBarShape.CardHeaderWidth;
+
+        var center = VictoryLearnedSkillsView.LinesCenterX(2);
+
+        Assert.Equal((VictoryScreenView.CardTopLeft(0).X + rightEdge) / 2f, center);
+    }
+
+    [Fact]
+    public void LinesTop_TwoCards_StandsUnderTheirRow()
+    {
+        var top = VictoryLearnedSkillsView.LinesTop(2);
+
+        Assert.True(top > VictoryScreenView.CardTopLeft(1).Y + VictoryScreenView.CardHeight, $"The lines start at {top}.");
+    }
 }

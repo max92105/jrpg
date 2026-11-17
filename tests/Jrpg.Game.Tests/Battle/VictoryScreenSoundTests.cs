@@ -1,8 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Loot;
-using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
-using Jrpg.Core.Session;
 using Jrpg.Game.Battle;
 using Jrpg.Game.Input;
 using Jrpg.Game.Tests.Input;
@@ -22,7 +20,7 @@ public sealed class VictoryScreenSoundTests
     [Fact]
     public void Update_BarFillsALevel_AsksTheLevelUpSound()
     {
-        var screen = new VictoryScreen(Spoils(LevelUp(), Drops.None));
+        var screen = new VictoryScreen(VictoryScenarios.Spoils(LevelUp()));
 
         screen.Update(_wholeFill, default);
 
@@ -32,7 +30,7 @@ public sealed class VictoryScreenSoundTests
     [Fact]
     public void Update_UpdateAfterTheLevelUp_AsksNothing()
     {
-        var screen = new VictoryScreen(Spoils(LevelUp(), Drops.None));
+        var screen = new VictoryScreen(VictoryScenarios.Spoils(LevelUp()));
         screen.Update(_wholeFill, default);
 
         screen.Update(_wholeFill, default);
@@ -43,7 +41,7 @@ public sealed class VictoryScreenSoundTests
     [Fact]
     public void Update_BarFillsWithoutALevel_AsksNothing()
     {
-        var screen = new VictoryScreen(Spoils(HalfALevel(), Drops.None));
+        var screen = new VictoryScreen(VictoryScenarios.Spoils(VictoryScenarios.HalfALevel()));
 
         screen.Update(_wholeFill, default);
 
@@ -54,7 +52,7 @@ public sealed class VictoryScreenSoundTests
     [Fact]
     public void Update_SkipLandsALevel_AsksTheLevelUpSound()
     {
-        var screen = new VictoryScreen(Spoils(LevelUp(), Drops.None));
+        var screen = new VictoryScreen(VictoryScenarios.Spoils(LevelUp()));
 
         screen.Update(TimeSpan.Zero, _confirm);
 
@@ -65,7 +63,7 @@ public sealed class VictoryScreenSoundTests
     [Fact]
     public void Update_SkipWithoutALevel_AsksNothing()
     {
-        var screen = new VictoryScreen(Spoils(HalfALevel(), Drops.None));
+        var screen = new VictoryScreen(VictoryScenarios.Spoils(VictoryScenarios.HalfALevel()));
 
         screen.Update(TimeSpan.Zero, _confirm);
 
@@ -76,7 +74,7 @@ public sealed class VictoryScreenSoundTests
     [Fact]
     public void Update_ConfirmShowsTheDrops_AsksTheItemSound()
     {
-        var screen = new VictoryScreen(Spoils(HalfALevel(), APotion()));
+        var screen = new VictoryScreen(VictoryScenarios.Spoils(VictoryScenarios.HalfALevel()) with { Drops = APotion() });
         screen.Update(_wholeFill, default);
 
         screen.Update(TimeSpan.Zero, _confirm);
@@ -88,7 +86,7 @@ public sealed class VictoryScreenSoundTests
     [Fact]
     public void Update_ConfirmLeavesWithoutDrops_AsksTheConfirmSound()
     {
-        var screen = new VictoryScreen(Spoils(HalfALevel(), Drops.None));
+        var screen = new VictoryScreen(VictoryScenarios.Spoils(VictoryScenarios.HalfALevel()));
         screen.Update(_wholeFill, default);
 
         var request = screen.Update(TimeSpan.Zero, _confirm);
@@ -100,7 +98,7 @@ public sealed class VictoryScreenSoundTests
     [Fact]
     public void Update_ConfirmLeavesFromTheDrops_AsksTheConfirmSound()
     {
-        var screen = new VictoryScreen(Spoils(HalfALevel(), APotion()));
+        var screen = new VictoryScreen(VictoryScenarios.Spoils(VictoryScenarios.HalfALevel()) with { Drops = APotion() });
         screen.Update(_wholeFill, default);
         screen.Update(TimeSpan.Zero, _confirm);
 
@@ -110,16 +108,12 @@ public sealed class VictoryScreenSoundTests
         Assert.Equal([UiSoundFiles.Effects.MenuConfirm], screen.Sounds);
     }
 
-    private static BattleSpoils Spoils(ExperienceGain gain, Drops drops) => new(new VictoryRewards(gain.Amount, [gain]), drops, Gold: 0);
-
     // 60 experience from 60 of a 120-point level fill it, then 10 into the next.
-    private static ExperienceGain LevelUp() =>
-        new(Sarxian(), 70, [new LevelProgressStep(1, 60, 120, 120), new LevelProgressStep(2, 0, 10, 150)], IsAtMaxLevel: false);
-
-    private static ExperienceGain HalfALevel() =>
-        new(Sarxian(), 60, [new LevelProgressStep(1, 0, 60, 120)], IsAtMaxLevel: false);
+    private static ExperienceGain LevelUp()
+    {
+        LevelProgressStep[] steps = [new(1, 60, 120, 120), new(2, 0, 10, 150)];
+        return new(VictoryScenarios.Sarxian(), 70, steps, IsAtMaxLevel: false);
+    }
 
     private static Drops APotion() => new([new ItemDrop(BattleScenarios.Catalog.Items["potion"], 1)], []);
-
-    private static PartyMember Sarxian() => BattleScenarios.Recruit("sarxian");
 }

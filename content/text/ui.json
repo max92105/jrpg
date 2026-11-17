@@ -187,6 +187,7 @@
   "battle_victory": "Victory!",
   "battle_level_label": "Lv.",
   "battle_level_up": "Level Up!",
+  "battle_skill_learned": "{name} learned {skill}.",
   "battle_victory_next": "Next",
   "battle_victory_items": "Items",
   "battle_victory_gold": "GOLD",

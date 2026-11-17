@@ -143,4 +143,9 @@ internal static partial class MessageIds
 
     /// <summary>Shown on the victory screen by a member whose bar filled a level.</summary>
     public const string BattleLevelUp = "battle_level_up";
+
+    /// <summary>
+    /// Placeholders <c>{name}</c>, <c>{skill}</c>: under the victory cards, a skill learned (decision 964).
+    /// </summary>
+    public const string BattleSkillLearned = "battle_skill_learned";
 }

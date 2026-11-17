@@ -58,8 +58,8 @@ internal sealed class ExperienceBarAnimation
     public int LevelUps { get; private set; }
 
     /// <summary>
-    /// Time since the bar last filled a level, for the pop; null before any level-up, and after a skip, which shows
-    /// "Level Up!" without popping.
+    /// Time since the bar last filled a level, for the "Level Up!" pop and the fade of that level's learned-skill
+    /// lines; null before any level-up, and after a skip, which shows them at once.
     /// </summary>
     public TimeSpan? SinceLastLevelUp { get; private set; }
 

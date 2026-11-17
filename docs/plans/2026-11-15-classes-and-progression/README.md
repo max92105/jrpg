@@ -122,7 +122,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   about 240 lines) → [slices/LV1.md](slices/LV1.md)
 - [x] **LV2. A member knows the class skills at or below its level, and learns on a level up** (Core, about 220 lines)
   → [slices/LV2.md](slices/LV2.md)
-- [ ] **LV3. The victory screen says "Omer learned Meteor."** (Game + content, about 200 lines) →
+- [x] **LV3. The victory screen says "Omer learned Meteor."** (Game + content, about 200 lines) →
   [slices/LV3.md](slices/LV3.md)
 
 ### Phase 3: the rest of the Classes page
@@ -265,6 +265,10 @@ Skills learned at a level (ADR 0062):
   "Learned by" line) read `ClassDefinition.SkillIds`.
 - **1012.** (LV1) The class validator's messages name the file's field, `skills`, which replaced `skillIds`: "skills has
   unknown skill id 'meteor'.", "skills lists 'heal' more than once.", "skills lists 'smite', which uses 'conviction'...".
+- **1013.** (LV3) The victory screen's learned-skill lines are built by `LearnedSkillLine.AllOf(rewards, messages)`,
+  called by the view, so `VictoryScreen` takes no message table and its constructor's callers stay as they are; the
+  screen's `OpacityOf(line)` replaces the planned `IsShown`, the fade from the fill being the rule tests check. Each
+  line keeps its row from the start, so a line fading in never moves another.
 
 Shared and new game:
 - **960.** A member's starting gear is not built: members join with nothing worn, and no rule says otherwise.

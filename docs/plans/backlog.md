@@ -83,7 +83,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the loot plan (2026-10-29)
 
-- `Battle/VictoryScreenView.cs` is at 277 lines (263 after the Items step, D3): the next change that grows it moves the cards' drawing into a `VictoryCardsView` first.
+- `Battle/VictoryScreenView.cs` is at 281 lines (263 after the Items step, D3; 281 after LV3's learned-skill lines): the next change that grows it moves the cards' drawing into a `VictoryCardsView` first.
 - `tests/Jrpg.Core.Tests/Session/GameSessionSaveTests.cs` is at 270 lines: the next save test goes in a new file split by concern (gear, members, world).
 
 ## From the affix stats plan (2026-10-29)
@@ -139,10 +139,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Battle/BattleScene` is at 290 lines after the sound pass's V1: the next change that grows it moves its outcome screens' update and finish into their own type first.
 - `InventoryPageSoundTests` and the older Inventory tests lean on the list opening on the potion: a small helper that moves to an item by id (S4 review).
 - The music plan's out-of-scope features (settings kept between runs, composed music, crossfades, streaming, field sounds, a `playMusic` step, pausing on lost focus) are listed in `docs/plans/done/2026-10-29-music-and-sfx/README.md`, "Out of scope".
-
-## From the sound pass plan (2026-11-02)
-
-- `VictoryScreenSoundTests` copies `VictoryScreenTests`' spoils builders (Sarxian, half a level, a potion): share them when a third victory test file comes.
 
 ## From the Mana Seed reset plan (2026-11-03, at approval)
 
@@ -348,3 +344,8 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   `tests/Jrpg.Core.Tests/Builders/` would replace them (classes and progression plan, LV2 review).
 - The eight class stat labels in page order are written twice, in `Editor/Party/ClassStatsBoxes.Problem` and
   `ClassLevelPreview.StatsOf`: share one ordered list at a third copy (classes and progression plan, CL5 and LV2 reviews).
+- The victory screen's learned-skill lines (`Battle/VictoryLearnedSkillsView`) stack under the cards: with five
+  members learning three or more skills in one battle, the lines from the third on cross the footer's hairline
+  (`OutcomeFrame.FooterLineTop`, 910) and go under the footer bar. The developer's options: the empty slot beside the
+  fifth card, a cap with "and N more", or a dialog (decision 964's alternative). It can't happen with today's content,
+  every class skill being at level 1 (classes and progression plan, LV3 review).

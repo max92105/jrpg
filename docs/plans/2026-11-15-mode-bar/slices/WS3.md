@@ -3,9 +3,10 @@
 **Stage 3.** Needs WS2.
 
 **Goal:** showing another page or World mode applies the shown page first; a page whose problem stops Apply, or whose
-Apply throws, refuses the move and names why. A draft change while a page is shown starts it again from the draft. The
-main window builds the Database workspace with every page, and the mode switch goes through it. Design:
-[design.md](../design.md), section 3 (the undo rule's first two rows); decisions 919, 921, 922, 939.
+Apply throws, refuses the move and names why. A draft change while a page is shown starts it again from the draft.
+Design: [design.md](../design.md), section 3 (the undo rule's first two rows); decisions 919, 921, 922, 939.
+- **Split:** the main window building the workspace and the mode switch going through it moved to
+  [WS3b](WS3b.md), with the notes from WS1 and the WS2 review; this slice is the workspace's rule, headless.
 
 ## New types
 None.
@@ -20,15 +21,6 @@ None.
     any page (the list passes its own; tests show pages built in the test).
   - `Close()` becomes `bool TryClose()`: refused as above, else the session ended and its key remembered.
   - `[ObservableProperty] string? Refusal`.
-- `Shell/MainViewModel.Workspaces.cs`: `DatabaseWorkspaceViewModel? DatabaseWorkspace` (null while the content didn't
-  load, as the other editing view models), built by `CreateDatabaseWorkspace()` with one `CatalogPage.Of(title,
-  editing)` per page in the list's order (Quests, Cinematics, Enemies, Drop tables, Effect strips, rows 7, 8 and 10's,
-  row 9's, Shops, Character sprites, row 12's); `ShowDatabase` opens it; `ShowWorld` shows World only when `TryClose`
-  passes.
-- `Shell/MainViewModel.cs` (286 on 2026-11-15, recount): the constructor's line building `DatabaseWorkspace`, after the
-  editing view models.
-- `Workspaces/DatabaseWorkspaceView.xaml`: the placeholder also shows `DatabaseWorkspace.Refusal` in the problem brush
-  (WS5 moves it into the bar).
 
 ## Tests
 New file `tests/Jrpg.Editor.Tests/Workspaces/DatabaseWorkspaceLeavingTests.cs`. Fixture built in the test: WS2's draft
@@ -47,29 +39,20 @@ whose `Apply` throws `InvalidOperationException("broken")`.
 - `DatabaseWorkspaceLeavingTests: DraftChanged_ChosenShopUndoneAway_ChoosesTheFirst`
 - `DatabaseWorkspaceLeavingTests: DraftChanged_Closed_StartsNothing`
 
-`tests/Jrpg.Editor.Tests/Shell/MainViewModelWorkspaceTests.cs` (WS1's, about 100 → 130); the shop `armory` built in
-the test and set on the draft first:
-- `MainViewModelWorkspaceTests: ShowDatabase_FirstVisit_ShowsTheFirstPage`
-- `MainViewModelWorkspaceTests: ShowWorld_TypedName_AppliesIt`
-- `MainViewModelWorkspaceTests: ShowWorld_PageWithProblem_StaysInDatabase`
-
 ## Verify by hand
-Nothing typable in Database mode yet (WS5): Database, then World, both buttons and keys, still switch; the dialogs open
-from the menu. The run is the tests and `verify.ps1`.
-- **Note from WS1:** `CreateDatabaseWorkspace()` lists fourteen pages, titled as `Shell/DatabaseMenu.xaml`'s `Tag`s, in
-  decision 917's groups: Story: Quests, Cinematics; Battle: Enemies, Encounters, Skills, Effects (the tiered effects of
-  `effects.json`, not Effect strips), Statuses, Drop tables, Effect strips, Battle backgrounds; Items: Items, Affixes;
-  Trade: Shops; Characters: Character sprites (the order inside Battle is a default, the developer's to change). WS1's
-  `ShowWorld` already puts back `History.OpenMap` and `Placing.IsMapShown`: `TryClose` goes before them. Three callers
-  show World first and must stop when it is refused: `OnNewMapExecuted` (`MainWindow.xaml.cs`), `OnGoToMapExecuted`
-  (in `MainWindow.MapSwitching.cs`, not `MainWindow.xaml.cs`) and `GoBackToMapCommand`, a hand-built command in
-  `MainViewModel.Workspaces.cs` (built lazily, since the constructor can't read `Navigation` without a nullable
-  warning) whose action runs `ShowWorld()` then the navigation's Back with no check yet; it gets one, with a test.
+None: nothing calls the workspace yet (WS3b). The run is the tests and `verify.ps1`.
 - **Note from WS2:** the restart on a `Current` change is in (WS2's `OnDraftChanged`), with WS2's tests
   `DraftChanged_Closed_StartsNothing` (taken from this list) and `MarkSaved_TypedName_KeepsTheSession`; WS3 adds the
   undo tests. Closing keeps `ShownPage` and remembers each page's chosen key in `_chosenKeys` (decision 1007), so
   `ShowPage` reads it. `Close`, `Apply` and `Revert` assume a shown session (`Session!`): `TryClose` and
   `TryApplyShown` take "nothing shown" from there.
-- **Note from WS2 review:** `MainViewModel.ShowDatabase` has no guard for Database already shown: once it calls
-  `DatabaseWorkspace.Open()`, pressing Database again would restart the session and drop what was typed but not
-  applied. Return early (or grey the lit button) when Database is shown, with a test.
+- **Done, with deviations:** split (decision 1008): the shell's wiring, its three `MainViewModelWorkspaceTests` and the
+  notes from WS1 and the WS2 review moved to [WS3b](WS3b.md). One test page instead of two: `NotesEditing` counts its
+  applies and throws its settable `Thrown` (so a refusal can be followed by a move that passes with nothing else
+  changed); `ThrowingEditing` not written. `Refusal` is also cleared by a problem change and a new session (decision
+  1008). 16 tests instead of 10 here (`DraftChanged_Closed_StartsNothing` was WS2's): added
+  `TryApplyShown_Problem_AppliesNothing`, `TryApplyShown_ContentRefused_RefusesNamingItsMessage` (the second caught
+  type), `ShowPage_PageLeftBefore_ReopensOnItsChosenShop`, `TryClose_NothingShown_Passes`,
+  `ProblemChanged_AfterARefusal_ClearsTheRefusal`, `Revert_AfterARefusal_ClearsTheRefusal`. WS2's `Close` tests call
+  `TryClose` (`Close_Shown_...` renamed `TryClose_Shown_...`). `DatabaseWorkspaceViewModel` 166 lines,
+  `DatabaseWorkspaceLeavingTests` 228, `NotesCatalog` 24, `NotesEditing` 26.

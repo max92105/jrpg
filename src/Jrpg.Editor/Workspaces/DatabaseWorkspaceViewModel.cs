@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 
 namespace Jrpg.Editor.Workspaces;
@@ -9,7 +10,7 @@ namespace Jrpg.Editor.Workspaces;
 /// The Database mode's state (ADR 0060): its pages and the one shown, whose session alone holds unapplied edits
 /// (decision 922). Apply records the session as one undo step (decision 918); any new catalog in the draft while a page
 /// is shown, its own Apply included, starts the session again from the draft on the same record (decision 921), so an
-/// added record's id is fixed once applied.
+/// added record's id is fixed once applied. Leaving the page applies it first, or is refused naming why (decision 919).
 /// </summary>
 internal sealed partial class DatabaseWorkspaceViewModel : ObservableObject
 {
@@ -35,20 +36,53 @@ internal sealed partial class DatabaseWorkspaceViewModel : ObservableObject
     [NotifyCanExecuteChangedFor(nameof(ApplyCommand))]
     public partial PageSession? Session { get; private set; }
 
+    /// <summary>
+    /// Why the last move away from the shown page was refused; null once a move passes, and cleared when the page's
+    /// problem or session changes, since it quotes them (decision 1008).
+    /// </summary>
+    [ObservableProperty]
+    public partial string? Refusal { get; private set; }
+
     /// <summary>Shows the last page shown on its last chosen record, the first page on the first visit.</summary>
-    public void Open()
+    public void Open() => Show(ShownPage ?? Pages[0]);
+
+    /// <summary>
+    /// Ends the shown page's session, applied first and its chosen record remembered; false when the page refused
+    /// (<see cref="TryApplyShown"/>), its session kept. Nothing shown passes.
+    /// </summary>
+    public bool TryClose()
     {
-        ShownPage ??= Pages[0];
-        Session = ShownPage.Start(_chosenKeys.GetValueOrDefault(ShownPage));
+        if (!TryApplyShown())
+        {
+            return false;
+        }
+
+        RememberChosenKey();
+        Session = null;
+        return true;
     }
 
     /// <summary>
-    /// Ends the shown page's session, remembering its chosen record; what was typed and not applied goes.
+    /// Applies the shown page before anything leaves it (decision 919): true once applied or with nothing shown; false
+    /// with <see cref="Refusal"/> naming the page when its problem stops Apply or Apply throws (decision 939).
     /// </summary>
-    public void Close()
+    public bool TryApplyShown()
     {
-        _chosenKeys[ShownPage!] = Session!.Edited.ChosenKey;
-        Session = null;
+        Refusal = Session is { } session ? ApplyOrRefuse(session) : null;
+        return Refusal is null;
+    }
+
+    /// <summary>Shows the page on its record when last left, the shown page applied first; refused, it stays.</summary>
+    [RelayCommand]
+    private void ShowPage(CatalogPage page)
+    {
+        if (!TryApplyShown())
+        {
+            return;
+        }
+
+        RememberChosenKey();
+        Show(page);
     }
 
     // The draft's change starts the session again, so Apply needs no restart of its own.
@@ -61,10 +95,46 @@ internal sealed partial class DatabaseWorkspaceViewModel : ObservableObject
     [RelayCommand]
     private void Revert() => StartAgain(Session!);
 
+    // The refusal's words, or null once applied. An Apply that throws is a bug its problem line missed: refused rather
+    // than thrown, so no move depends on it (decision 939).
+    private string? ApplyOrRefuse(PageSession session)
+    {
+        var title = ShownPage!.Title;
+        if (session.Edited.Problem is { } problem)
+        {
+            return $"The {title} page has a problem: {problem} Fix it or press Revert.";
+        }
+
+        try
+        {
+            session.Apply();
+            return null;
+        }
+        catch (Exception refused) when (refused is InvalidOperationException or ContentValidationException)
+        {
+            return $"The {title} page can't apply: {refused.Message}";
+        }
+    }
+
+    private void RememberChosenKey()
+    {
+        if (Session is { } session)
+        {
+            _chosenKeys[ShownPage!] = session.Edited.ChosenKey;
+        }
+    }
+
+    private void Show(CatalogPage page)
+    {
+        ShownPage = page;
+        Session = page.Start(_chosenKeys.GetValueOrDefault(page));
+    }
+
     private void StartAgain(PageSession session) => Session = ShownPage!.Start(session.Edited.ChosenKey);
 
     partial void OnSessionChanged(PageSession? oldValue, PageSession? newValue)
     {
+        Refusal = null;
         if (oldValue is not null)
         {
             oldValue.Edited.PropertyChanged -= OnEditedChanged;
@@ -80,6 +150,7 @@ internal sealed partial class DatabaseWorkspaceViewModel : ObservableObject
     {
         if (e.PropertyName == nameof(IEditedCatalog.Problem))
         {
+            Refusal = null;
             ApplyCommand.NotifyCanExecuteChanged();
         }
     }

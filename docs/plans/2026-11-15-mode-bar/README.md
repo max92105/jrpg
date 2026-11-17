@@ -110,8 +110,11 @@ page recipe: [page-recipe.md](page-recipe.md).
   window, retired by WS6).
 - [x] **WS2. A page's session: the catalog pages, the shown one started from the draft, Apply as one undo step
   starting it again on the same record, Revert** (Editor, about 230 lines) → [slices/WS2.md](slices/WS2.md)
-- [ ] **WS3. Leaving a page applies it first: another page and World mode, refused with the page's problem or its
+- [x] **WS3. Leaving a page applies it first: another page and World mode, refused with the page's problem or its
   apply's failure; a draft change starts the shown page again** (Editor, about 240 lines) → [slices/WS3.md](slices/WS3.md)
+- [ ] **WS3b. The mode switch goes through the workspace: the main window builds it with every page, Database opens it,
+  World and Back to previous map only when the page applies** (Editor, split from WS3, about 150 lines) →
+  [slices/WS3b.md](slices/WS3b.md)
 - [ ] **WS4. Undo, Redo, Save, Save all, the close question and the dialogs still opened in Database mode apply the
   page first** (Editor, about 250 lines) → [slices/WS4.md](slices/WS4.md)
 - [ ] **WS5. The Database view hosts every page: the grouped list, the bar, focus kept; the Database menu shows pages;
@@ -220,6 +223,10 @@ may overturn; the others follow from them, from the code or from the review.
   `Open` reopens it, and each page's chosen key when left is kept in the workspace's own dictionary (design section 3),
   so WS3's `ShowPage` reopens any page on its record. Only a `Current` change starts the shown session again; the
   draft's `IsDirty` notice (a save's mark) doesn't.
+- **1008.** (WS3.) The workspace's `Refusal` quotes the shown page's problem or its apply's failure, so besides the next
+  move that passes, a change of the page's problem (typing a fix) and a new session (Revert, a restart, another page)
+  clear it (`.claude/rules/editor.md`'s note cleared when an input it reads changes). WS3 split in two: WS3, the
+  workspace's leave rule headless; WS3b, the shell building the workspace and the mode switch going through it.
 
 ## Defaults to confirm
 Taken while the developer was away; each is his to overturn, and the slices that change if he does are named.

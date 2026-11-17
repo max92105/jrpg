@@ -151,11 +151,11 @@ public sealed class DatabaseWorkspaceViewModelTests
     }
 
     [Fact]
-    public void Close_Shown_DropsTheSession()
+    public void TryClose_Shown_DropsTheSession()
     {
         _workspace.Open();
 
-        _workspace.Close();
+        _workspace.TryClose();
 
         Assert.Null(_workspace.Session);
     }
@@ -165,7 +165,7 @@ public sealed class DatabaseWorkspaceViewModelTests
     {
         _workspace.Open();
         ShownShops.Choose("smithy");
-        _workspace.Close();
+        _workspace.TryClose();
 
         _workspace.Open();
 
@@ -176,7 +176,7 @@ public sealed class DatabaseWorkspaceViewModelTests
     public void DraftChanged_Closed_StartsNothing()
     {
         _workspace.Open();
-        _workspace.Close();
+        _workspace.TryClose();
 
         _draft.SetShops([_armory]);
 

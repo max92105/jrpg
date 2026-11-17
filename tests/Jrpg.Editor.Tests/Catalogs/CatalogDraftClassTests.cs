@@ -1,5 +1,3 @@
-using Jrpg.Core.Party;
-using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 using static Jrpg.Editor.Tests.Party.ClassFixtures;
 
@@ -9,11 +7,7 @@ namespace Jrpg.Editor.Tests.Catalogs;
 // records nothing, the skills and resources included.
 public sealed class CatalogDraftClassTests
 {
-    private readonly CatalogDraft _draft = new(
-        ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")) with
-        {
-            Classes = new Dictionary<string, ClassDefinition> { [Archer.Id] = Archer, [Scholar.Id] = Scholar },
-        });
+    private readonly CatalogDraft _draft = new(World);
 
     [Fact]
     public void SetClasses_ChangedGrowth_RecordsOneStep()

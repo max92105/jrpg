@@ -1,5 +1,3 @@
-using Jrpg.Core.Party;
-using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Party;
 using static Jrpg.Editor.Tests.Party.ClassFixtures;
@@ -10,11 +8,7 @@ namespace Jrpg.Editor.Tests.Party;
 // nothing changed by content.
 public sealed class ClassEditingViewModelTests
 {
-    private readonly CatalogDraft _draft = new(
-        ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")) with
-        {
-            Classes = new Dictionary<string, ClassDefinition> { [Archer.Id] = Archer, [Scholar.Id] = Scholar },
-        });
+    private readonly CatalogDraft _draft = new(World);
 
     private readonly ClassEditingViewModel _editing;
 

@@ -38,3 +38,12 @@ number would pass a whole number's bounds, it shows that problem instead of rows
 3. Stats tab, type `5` in Growth power, back to Levels: power rises by 5 per level. Type `2147483647`: the tab shows
    "Growth power is too large". Revert.
 4. Run the game, start with Ragnir (fighter): the Status page's max HP at level 1 is the Levels tab's level 1 number.
+- **Done, with deviations:** `ClassViewModel` (151 lines) takes the content (`From`, `New`, `DuplicateOf`'s source)
+  and reads `LevelRows` and `LevelsProblem` from the boxes as typed, never `RowsOf` on a problem; the Levels tab is in
+  `ClassCatalogPage.xaml` (212; a `LevelCell` style for its right-aligned cells). `ClassFixtures.World` (54) is the test
+  world with the scholar first, used by the four test files in place of their copies. Tests in the sibling
+  `ClassViewModelLevelTests` (97, 9 tests; `ClassViewModelTests` is at 241): the planned three, plus the table read
+  untouched, the growth box's problem (the `??`'s other side), and a new class, a duplicate and the catalog's chosen
+  and added class reading the content handed in. `LevelRows_TypedChange_RaisesLevelRowsChanged` is instead
+  `ClassViewModelTests`' two box-typed notice tests, renamed `..._RaisesProblemAndLevels`, whose exact lists now hold
+  `LevelsProblem` and `LevelRows` (one test per box set). No third list of stat names: the tab's headers are XAML text.

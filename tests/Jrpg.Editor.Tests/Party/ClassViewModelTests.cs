@@ -11,7 +11,7 @@ public sealed class ClassViewModelTests
     [Fact]
     public void From_Class_ShowsEveryBaseAndGrowthNumber()
     {
-        var scholar = ClassViewModel.From(Scholar);
+        var scholar = ClassViewModel.From(Scholar, World);
 
         string[] shown = [.. TextsOf(scholar.Base), .. TextsOf(scholar.Growth)];
         Assert.Equal(["140", "9", "3", "11", "7", "17", "5", "13", "12", "2", "4", "6", "8", "10", "14", "16"], shown);
@@ -20,7 +20,7 @@ public sealed class ClassViewModelTests
     [Fact]
     public void New_IdTyped_IsTheBlankClass()
     {
-        var added = ClassViewModel.New();
+        var added = ClassViewModel.New(World);
 
         added.Id = "ranger";
 
@@ -29,12 +29,12 @@ public sealed class ClassViewModelTests
     }
 
     [Fact]
-    public void ToClass_Untouched_EqualsTheSource() => Assert.Equal(Scholar, ClassViewModel.From(Scholar).ToClass());
+    public void ToClass_Untouched_EqualsTheSource() => Assert.Equal(Scholar, ClassViewModel.From(Scholar, World).ToClass());
 
     [Fact]
     public void ToClass_TypedGrowth_SetsGrowth()
     {
-        var scholar = ClassViewModel.From(Scholar);
+        var scholar = ClassViewModel.From(Scholar, World);
 
         scholar.Growth.PowerText = "7";
 
@@ -44,7 +44,7 @@ public sealed class ClassViewModelTests
     [Fact]
     public void ToClass_NameTyped_KeepsItsSkillsAndResources()
     {
-        var scholar = ClassViewModel.From(Scholar with { SkillIds = ["heal", "focus_bolt"] });
+        var scholar = ClassViewModel.From(Scholar with { SkillIds = ["heal", "focus_bolt"] }, World);
 
         scholar.Name = "Sage";
 
@@ -56,7 +56,7 @@ public sealed class ClassViewModelTests
     [Fact]
     public void ToClass_NameAndDescriptionWithSpaces_TrimsThem()
     {
-        var scholar = ClassViewModel.From(Scholar);
+        var scholar = ClassViewModel.From(Scholar, World);
 
         scholar.Name = "  Sage ";
         scholar.Description = " Reads. ";
@@ -69,7 +69,7 @@ public sealed class ClassViewModelTests
     [Fact]
     public void ToClass_WithProblem_Throws()
     {
-        var scholar = ClassViewModel.From(Scholar);
+        var scholar = ClassViewModel.From(Scholar, World);
 
         scholar.Base.SpeedText = "fast";
 
@@ -77,13 +77,13 @@ public sealed class ClassViewModelTests
     }
 
     [Fact]
-    public void Problem_SavedClassUntouched_IsNull() => Assert.Null(ClassViewModel.From(Scholar).Problem);
+    public void Problem_SavedClassUntouched_IsNull() => Assert.Null(ClassViewModel.From(Scholar, World).Problem);
 
     // The growth's box typed first: the base's is named, as the page shows it first.
     [Fact]
     public void Problem_BaseAndGrowthBoxesNotNumbers_NamesTheBase()
     {
-        var scholar = ClassViewModel.From(Scholar);
+        var scholar = ClassViewModel.From(Scholar, World);
 
         scholar.Growth.MaxHpText = "y";
         scholar.Base.WillText = "x";
@@ -94,7 +94,7 @@ public sealed class ClassViewModelTests
     [Fact]
     public void Problem_GrowthBoxNotANumber_NamesIt()
     {
-        var scholar = ClassViewModel.From(Scholar);
+        var scholar = ClassViewModel.From(Scholar, World);
 
         scholar.Growth.WillText = "x";
 
@@ -104,7 +104,7 @@ public sealed class ClassViewModelTests
     [Fact]
     public void Problem_NewClassWithBadId_NamesTheId()
     {
-        var added = ClassViewModel.New();
+        var added = ClassViewModel.New(World);
 
         added.Id = "Ranger";
 
@@ -114,7 +114,7 @@ public sealed class ClassViewModelTests
     [Fact]
     public void Problem_NewClassWithId_IsNull()
     {
-        var added = ClassViewModel.New();
+        var added = ClassViewModel.New(World);
 
         added.Id = "ranger";
 
@@ -125,7 +125,7 @@ public sealed class ClassViewModelTests
     [Fact]
     public void Problem_SavedClass_IgnoresIdRule()
     {
-        var scholar = ClassViewModel.From(Scholar);
+        var scholar = ClassViewModel.From(Scholar, World);
 
         scholar.Id = "";
 
@@ -133,15 +133,15 @@ public sealed class ClassViewModelTests
     }
 
     [Fact]
-    public void Label_SavedClass_NamesIdAndName() => Assert.Equal("scholar: Scholar", ClassViewModel.From(Scholar).Label);
+    public void Label_SavedClass_NamesIdAndName() => Assert.Equal("scholar: Scholar", ClassViewModel.From(Scholar, World).Label);
 
     [Fact]
-    public void Label_NewClassWithoutId_SaysNewClass() => Assert.Equal("(new class)", ClassViewModel.New().Label);
+    public void Label_NewClassWithoutId_SaysNewClass() => Assert.Equal("(new class)", ClassViewModel.New(World).Label);
 
     [Fact]
     public void PropertyChanged_IdTyped_RaisesLabelAndProblem()
     {
-        var added = ClassViewModel.New();
+        var added = ClassViewModel.New(World);
         var raised = new List<string?>();
         added.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
 
@@ -153,7 +153,7 @@ public sealed class ClassViewModelTests
     [Fact]
     public void PropertyChanged_NameTyped_RaisesLabel()
     {
-        var scholar = ClassViewModel.From(Scholar);
+        var scholar = ClassViewModel.From(Scholar, World);
         var raised = new List<string?>();
         scholar.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
 
@@ -164,33 +164,37 @@ public sealed class ClassViewModelTests
     }
 
     [Fact]
-    public void PropertyChanged_BaseBoxTyped_RaisesProblem()
+    public void PropertyChanged_BaseBoxTyped_RaisesProblemAndLevels()
     {
-        var scholar = ClassViewModel.From(Scholar);
+        var scholar = ClassViewModel.From(Scholar, World);
         var raised = new List<string?>();
         scholar.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
 
         scholar.Base.AgilityText = "x";
 
-        Assert.Equal([nameof(ClassViewModel.Problem)], raised);
+        Assert.Equal(
+            [nameof(ClassViewModel.Problem), nameof(ClassViewModel.LevelsProblem), nameof(ClassViewModel.LevelRows)],
+            raised);
     }
 
     [Fact]
-    public void PropertyChanged_GrowthBoxTyped_RaisesProblem()
+    public void PropertyChanged_GrowthBoxTyped_RaisesProblemAndLevels()
     {
-        var scholar = ClassViewModel.From(Scholar);
+        var scholar = ClassViewModel.From(Scholar, World);
         var raised = new List<string?>();
         scholar.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
 
         scholar.Growth.AgilityText = "x";
 
-        Assert.Equal([nameof(ClassViewModel.Problem)], raised);
+        Assert.Equal(
+            [nameof(ClassViewModel.Problem), nameof(ClassViewModel.LevelsProblem), nameof(ClassViewModel.LevelRows)],
+            raised);
     }
 
     [Fact]
     public void Changed_BoxTyped_IsRaisedOnce()
     {
-        var scholar = ClassViewModel.From(Scholar);
+        var scholar = ClassViewModel.From(Scholar, World);
         var raised = 0;
         scholar.Changed += (_, _) => raised++;
 
@@ -202,7 +206,7 @@ public sealed class ClassViewModelTests
     [Fact]
     public void Changed_IdTyped_IsRaised()
     {
-        var added = ClassViewModel.New();
+        var added = ClassViewModel.New(World);
         var raised = 0;
         added.Changed += (_, _) => raised++;
 
@@ -214,7 +218,7 @@ public sealed class ClassViewModelTests
     [Fact]
     public void Changed_NameTyped_IsRaised()
     {
-        var scholar = ClassViewModel.From(Scholar);
+        var scholar = ClassViewModel.From(Scholar, World);
         var raised = 0;
         scholar.Changed += (_, _) => raised++;
 
@@ -226,7 +230,7 @@ public sealed class ClassViewModelTests
     [Fact]
     public void Changed_DescriptionTyped_IsRaised()
     {
-        var scholar = ClassViewModel.From(Scholar);
+        var scholar = ClassViewModel.From(Scholar, World);
         var raised = 0;
         scholar.Changed += (_, _) => raised++;
 

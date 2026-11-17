@@ -111,7 +111,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/CL4.md](slices/CL4.md)
 - [x] **CL5. The Levels tab: a class's numbers at every level, through Core's `ClassSheet`** (Core + Editor, about 230
   lines; split, the tab on the page is CL5b) → [slices/CL5.md](slices/CL5.md)
-- [ ] **CL5b. The Levels tab on the page: the chosen class's rows as typed** (Editor, about 160 lines; split from CL5) →
+- [x] **CL5b. The Levels tab on the page: the chosen class's rows as typed** (Editor, about 160 lines; split from CL5) →
   [slices/CL5b.md](slices/CL5b.md)
 
 ### Phase 2: skills learned at a level

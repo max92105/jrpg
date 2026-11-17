@@ -1,6 +1,4 @@
-using Jrpg.Core.Content;
 using Jrpg.Core.Party;
-using Jrpg.Data.Content;
 using Jrpg.Editor.Party;
 using static Jrpg.Editor.Tests.Party.ClassFixtures;
 
@@ -11,14 +9,7 @@ namespace Jrpg.Editor.Tests.Party;
 // then Data's message for the list.
 public sealed class ClassCatalogViewModelTests
 {
-    // The scholar first: the list's id order puts the archer before it.
-    private static readonly ContentCatalog _content =
-        ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")) with
-        {
-            Classes = new Dictionary<string, ClassDefinition> { [Scholar.Id] = Scholar, [Archer.Id] = Archer },
-        };
-
-    private readonly ClassCatalogViewModel _catalog = new(_content);
+    private readonly ClassCatalogViewModel _catalog = new(World);
 
     [Fact]
     public void Constructor_Classes_ListsThemInIdOrder()
@@ -86,7 +77,7 @@ public sealed class ClassCatalogViewModelTests
     [Fact]
     public void DuplicateClass_NothingChosen_IsGreyed()
     {
-        var empty = new ClassCatalogViewModel(_content with { Classes = new Dictionary<string, ClassDefinition>() });
+        var empty = new ClassCatalogViewModel(World with { Classes = new Dictionary<string, ClassDefinition>() });
 
         Assert.False(empty.DuplicateClassCommand.CanExecute(null));
     }

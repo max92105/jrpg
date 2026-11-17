@@ -11,6 +11,11 @@
       <Setter Property="Width" Value="60" />
       <Setter Property="Margin" Value="0,2,12,2" />
     </Style>
+    <!-- The Levels tab's header and numbers, right-aligned so the digits line up. -->
+    <Style x:Key="LevelCell" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+      <Setter Property="Margin" Value="0,1,12,1" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+    </Style>
   </UserControl.Resources>
   <DockPanel>
     <!-- The draft's classes in id order, the ones added this session after them; only those can be removed (decision 945). -->
@@ -110,6 +115,96 @@
               </Grid>
             </StackPanel>
           </ScrollViewer>
+        </TabItem>
+
+        <!-- Read-only: each level as a member of the class wearing nothing has it, from the boxes as typed (decision 948). -->
+        <TabItem Header="Levels">
+          <DockPanel Margin="8" Grid.IsSharedSizeScope="True">
+            <TextBlock DockPanel.Dock="Top" Text="{Binding LevelsProblem}" TextWrapping="Wrap" Margin="0,0,0,6">
+              <TextBlock.Style>
+                <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+                  <Setter Property="Foreground" Value="{StaticResource ProblemTextBrush}" />
+                  <Style.Triggers>
+                    <DataTrigger Binding="{Binding LevelsProblem}" Value="{x:Null}">
+                      <Setter Property="Visibility" Value="Collapsed" />
+                    </DataTrigger>
+                  </Style.Triggers>
+                </Style>
+              </TextBlock.Style>
+            </TextBlock>
+            <Grid DockPanel.Dock="Top" TextBlock.FontWeight="Bold">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" SharedSizeGroup="Level" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="ToNext" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="MaxHp" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="Speed" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="Accuracy" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="Power" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="Agility" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="Intelligence" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="Constitution" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="Will" />
+              </Grid.ColumnDefinitions>
+              <TextBlock Grid.Column="0" Text="Level" Style="{StaticResource LevelCell}" />
+              <TextBlock Grid.Column="1" Text="To next" Style="{StaticResource LevelCell}"
+                         ToolTip="The experience from this level to the next; none at the table's last level" />
+              <TextBlock Grid.Column="2" Text="Max HP" Style="{StaticResource LevelCell}"
+                         ToolTip="Constitution's share included, with nothing worn" />
+              <TextBlock Grid.Column="3" Text="Speed" Style="{StaticResource LevelCell}" />
+              <TextBlock Grid.Column="4" Text="Accuracy %" Style="{StaticResource LevelCell}" />
+              <TextBlock Grid.Column="5" Text="Power" Style="{StaticResource LevelCell}" />
+              <TextBlock Grid.Column="6" Text="Agility" Style="{StaticResource LevelCell}" />
+              <TextBlock Grid.Column="7" Text="Intelligence" Style="{StaticResource LevelCell}" />
+              <TextBlock Grid.Column="8" Text="Constitution" Style="{StaticResource LevelCell}" />
+              <TextBlock Grid.Column="9" Text="Will" Style="{StaticResource LevelCell}" />
+            </Grid>
+            <!-- Virtualized: a long table builds only the rows in view. -->
+            <ItemsControl ItemsSource="{Binding LevelRows}"
+                          Margin="0,4,0,0"
+                          ScrollViewer.CanContentScroll="True"
+                          VirtualizingPanel.IsVirtualizing="True">
+              <ItemsControl.Template>
+                <ControlTemplate TargetType="ItemsControl">
+                  <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="True">
+                    <ItemsPresenter />
+                  </ScrollViewer>
+                </ControlTemplate>
+              </ItemsControl.Template>
+              <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                  <VirtualizingStackPanel />
+                </ItemsPanelTemplate>
+              </ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                  <Grid>
+                    <Grid.ColumnDefinitions>
+                      <ColumnDefinition Width="Auto" SharedSizeGroup="Level" />
+                      <ColumnDefinition Width="Auto" SharedSizeGroup="ToNext" />
+                      <ColumnDefinition Width="Auto" SharedSizeGroup="MaxHp" />
+                      <ColumnDefinition Width="Auto" SharedSizeGroup="Speed" />
+                      <ColumnDefinition Width="Auto" SharedSizeGroup="Accuracy" />
+                      <ColumnDefinition Width="Auto" SharedSizeGroup="Power" />
+                      <ColumnDefinition Width="Auto" SharedSizeGroup="Agility" />
+                      <ColumnDefinition Width="Auto" SharedSizeGroup="Intelligence" />
+                      <ColumnDefinition Width="Auto" SharedSizeGroup="Constitution" />
+                      <ColumnDefinition Width="Auto" SharedSizeGroup="Will" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Column="0" Text="{Binding Level}" Style="{StaticResource LevelCell}" />
+                    <TextBlock Grid.Column="1" Text="{Binding ExperienceToNext}" Style="{StaticResource LevelCell}" />
+                    <TextBlock Grid.Column="2" Text="{Binding MaxHp}" Style="{StaticResource LevelCell}" />
+                    <TextBlock Grid.Column="3" Text="{Binding Speed}" Style="{StaticResource LevelCell}" />
+                    <TextBlock Grid.Column="4" Text="{Binding AccuracyPercent}" Style="{StaticResource LevelCell}" />
+                    <TextBlock Grid.Column="5" Text="{Binding Primaries.Power}" Style="{StaticResource LevelCell}" />
+                    <TextBlock Grid.Column="6" Text="{Binding Primaries.Agility}" Style="{StaticResource LevelCell}" />
+                    <TextBlock Grid.Column="7" Text="{Binding Primaries.Intelligence}" Style="{StaticResource LevelCell}" />
+                    <TextBlock Grid.Column="8" Text="{Binding Primaries.Constitution}" Style="{StaticResource LevelCell}" />
+                    <TextBlock Grid.Column="9" Text="{Binding Primaries.Will}" Style="{StaticResource LevelCell}" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </DockPanel>
         </TabItem>
       </TabControl>
     </DockPanel>

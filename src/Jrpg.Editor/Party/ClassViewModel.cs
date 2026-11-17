@@ -1,15 +1,17 @@
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Jrpg.Core.Content;
 using Jrpg.Core.Party;
 using Jrpg.Editor.Objects;
 
 namespace Jrpg.Editor.Party;
 
 /// <summary>
-/// One class as the Classes page types it (decisions 945-947): its id (typed while the class is new, fixed once the
+/// One class as the Classes page types it (decisions 945-948): its id (typed while the class is new, fixed once the
 /// draft holds it, decision 582), name, description, and its base and growth as the same eight boxes each, written over
-/// the record it came from, so the skills and resources no tab edits yet are carried as they are. <see cref="Problem"/>
-/// is only the typed id's and the boxes'; the rest is Data's rules, which the list shows.
+/// the record it came from, so the skills and resources no tab edits yet are carried as they are; and the Levels tab's
+/// rows, read from the boxes as typed against the draft's experience table and stat rules. <see cref="Problem"/> is
+/// only the typed id's and the boxes'; the rest is Data's rules, which the list shows.
 /// </summary>
 internal sealed partial class ClassViewModel : ObservableObject
 {
@@ -17,10 +19,12 @@ internal sealed partial class ClassViewModel : ObservableObject
     private static readonly ClassDefinition _blank = new("", "", "", new ClassStats(MaxHp: 1, Speed: 0), new ClassStats(0, 0));
 
     private readonly ClassDefinition _source;
+    private readonly ContentCatalog _content;
 
-    private ClassViewModel(ClassDefinition source)
+    private ClassViewModel(ClassDefinition source, ContentCatalog content)
     {
         _source = source;
+        _content = content;
         Id = source.Id;
         Name = source.Name;
         Description = source.Description;
@@ -37,12 +41,14 @@ internal sealed partial class ClassViewModel : ObservableObject
     public event EventHandler? Changed;
 
     /// <param name="classDefinition">The record as the draft holds it.</param>
-    public static ClassViewModel From(ClassDefinition classDefinition) => new(classDefinition);
+    /// <param name="content">The draft as it is: the experience table and the stat rules the Levels tab reads.</param>
+    public static ClassViewModel From(ClassDefinition classDefinition, ContentCatalog content) => new(classDefinition, content);
 
     /// <summary>
     /// A class added this session: its id, name and description left to type, the lowest legal numbers.
     /// </summary>
-    public static ClassViewModel New() => new(_blank) { IsNew = true };
+    /// <param name="content">The draft as it is: the experience table and the stat rules the Levels tab reads.</param>
+    public static ClassViewModel New(ContentCatalog content) => new(_blank, content) { IsNew = true };
 
     /// <summary>
     /// A new class copying the chosen one as typed, its id left to type (decision 585): the boxes' texts, not the
@@ -50,7 +56,7 @@ internal sealed partial class ClassViewModel : ObservableObject
     /// </summary>
     public static ClassViewModel DuplicateOf(ClassViewModel chosen)
     {
-        var copy = new ClassViewModel(chosen._source with { Id = "" })
+        var copy = new ClassViewModel(chosen._source with { Id = "" }, chosen._content)
         {
             IsNew = true,
             Name = chosen.Name,
@@ -93,6 +99,24 @@ internal sealed partial class ClassViewModel : ObservableObject
     /// </summary>
     public string? Problem => (IsNew ? ObjectIds.ProblemOf(Id, []) : null) ?? Base.Problem ?? Growth.Problem;
 
+    /// <summary>
+    /// Why the Levels tab shows no rows, null while it shows them: the first box that isn't a whole number, the base's
+    /// before the growth's, then the first stat whose number at the max level would pass a whole number's bounds.
+    /// </summary>
+    public string? LevelsProblem =>
+        (Base.Typed, Growth.Typed) is ({ } baseStats, { } growth)
+            ? ClassLevelPreview.ProblemOf(baseStats, growth, _content.Rules.Experience.MaxLevel)
+            : Base.Problem ?? Growth.Problem;
+
+    /// <summary>
+    /// One row per level of the draft's table, from the boxes as typed; empty while there is a
+    /// <see cref="LevelsProblem"/>, so the tab never meets the preview's throw.
+    /// </summary>
+    public IReadOnlyList<LevelPreviewRow> LevelRows =>
+        (Base.Typed, Growth.Typed) is ({ } baseStats, { } growth) && LevelsProblem is null
+            ? ClassLevelPreview.RowsOf(baseStats, growth, _content.Rules)
+            : [];
+
     /// <summary>The record it came from with the typed fields over it, the name and description trimmed.</summary>
     /// <exception cref="InvalidOperationException">There is a <see cref="Problem"/>.</exception>
     public ClassDefinition ToClass() =>
@@ -113,6 +137,8 @@ internal sealed partial class ClassViewModel : ObservableObject
         if (e.PropertyName == nameof(ClassStatsBoxes.Problem))
         {
             OnPropertyChanged(nameof(Problem));
+            OnPropertyChanged(nameof(LevelsProblem));
+            OnPropertyChanged(nameof(LevelRows));
             Changed?.Invoke(this, EventArgs.Empty);
         }
     }

@@ -1,6 +1,8 @@
+using Jrpg.Core.Content;
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
 using Jrpg.Core.Stats;
+using Jrpg.Data.Content;
 using Jrpg.Editor.Party;
 
 namespace Jrpg.Editor.Tests.Party;
@@ -8,7 +10,7 @@ namespace Jrpg.Editor.Tests.Party;
 /// <summary>
 /// The Classes page tests' own classes, so no repository number is pinned: every base and growth number of the scholar
 /// differs from the others and from a new class's, so a box that drops or swaps one shows in a record compared whole; a
-/// second class for the list; and the boxes' texts read in the page's order.
+/// second class for the list; the test world holding the two; and the boxes' texts read in the page's order.
 /// </summary>
 internal static class ClassFixtures
 {
@@ -32,6 +34,16 @@ internal static class ClassFixtures
     {
         Resources = [new ResourceDefinition("focus", "Focus", Max: 6, StartsAt: 2) { Color = "#5B8CFF" }],
     };
+
+    /// <summary>
+    /// The test world with the archer and the scholar as its only classes, the scholar first so a list in id order is
+    /// sorted, not read in the dictionary's order.
+    /// </summary>
+    public static ContentCatalog World { get; } =
+        ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")) with
+        {
+            Classes = new Dictionary<string, ClassDefinition> { [Scholar.Id] = Scholar, [Archer.Id] = Archer },
+        };
 
     /// <summary>The eight boxes' texts in the page's order: max HP, speed, accuracy, then the five primaries.</summary>
     public static string[] TextsOf(ClassStatsBoxes boxes) =>

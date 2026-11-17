@@ -21,7 +21,10 @@ internal sealed partial class ClassCatalogViewModel : ObservableObject, IEditedC
 {
     private readonly ContentCatalog _content;
 
-    /// <param name="content">The draft as it is: the classes edited and the skills they name.</param>
+    /// <param name="content">
+    /// The draft as it is: the classes edited, the skills they name, and the experience table and stat rules each
+    /// class's Levels tab reads.
+    /// </param>
     public ClassCatalogViewModel(ContentCatalog content)
     {
         _content = content;
@@ -29,7 +32,7 @@ internal sealed partial class ClassCatalogViewModel : ObservableObject, IEditedC
         [
             .. content.Classes.Values
                 .OrderBy(classDefinition => classDefinition.Id, StringComparer.Ordinal)
-                .Select(ClassViewModel.From),
+                .Select(classDefinition => ClassViewModel.From(classDefinition, content)),
         ];
         foreach (var listed in Classes)
         {
@@ -68,7 +71,7 @@ internal sealed partial class ClassCatalogViewModel : ObservableObject, IEditedC
 
     /// <summary>Adds a new class last and chooses it, so its id is the next thing typed.</summary>
     [RelayCommand]
-    private void AddClass() => Insert(ClassViewModel.New(), Classes.Count);
+    private void AddClass() => Insert(ClassViewModel.New(_content), Classes.Count);
 
     /// <summary>Adds a copy of the chosen class after it, its id left to type (decision 585).</summary>
     [RelayCommand(CanExecute = nameof(HasSelectedClass))]

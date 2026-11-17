@@ -8,7 +8,8 @@ namespace Jrpg.Data.Content;
 
 /// <summary>
 /// What the loader would refuse in the classes (decision 944), each checked with the skills it names and the experience
-/// table its skills' levels must fit (decision 965).
+/// table its skills' levels must fit (decision 965), and in the party members (decision 952), each checked with the
+/// class it names.
 /// </summary>
 public static partial class CatalogProblems
 {
@@ -46,4 +47,24 @@ public static partial class CatalogProblems
     /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
     internal static void CheckClassSkillLevels(IReadOnlyList<ClassDefinition> classes, ExperienceTable table) =>
         ClassSkillLevelCheck.Check(ContentCatalogLoader.ClassesFile, classes, table);
+
+    /// <summary>
+    /// The first problem in the party members (decision 952): a member's own rule, or a class it names that the content
+    /// lacks; null when the loader would take every member as edited.
+    /// </summary>
+    /// <param name="members">The members as edited.</param>
+    /// <param name="content">The classes the members name.</param>
+    public static string? OfPartyMembers(IReadOnlyList<PartyMemberDefinition> members, ContentCatalog content) =>
+        FirstProblem(() => CheckPartyMembers(members, content));
+
+    /// <summary>
+    /// The checks the loader makes on <c>party-members.json</c> against the content's classes, for the problem lines
+    /// and the writer.
+    /// </summary>
+    /// <param name="members">The members as they will be written.</param>
+    /// <param name="content">The classes the members name, as they will be written.</param>
+    /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
+    internal static void CheckPartyMembers(IReadOnlyList<PartyMemberDefinition> members, ContentCatalog content) =>
+        PartyMemberCatalogValidator.Validate(
+            ContentCatalogLoader.PartyMembersFile, members, new PartyMemberReferences(content.Classes.Keys.ToHashSet()));
 }

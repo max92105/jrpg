@@ -34,3 +34,10 @@ sorts it by id. Nothing edits members yet (PM2).
 ## Verify by hand
 1. `git diff content/party-members.json` in the relay commit: the same nine members, in id order.
 2. Run the game: the leader choice lists the nine characters in `new-game.json`'s order, as before.
+
+- **Done, with deviations:** `party-members.json` joins the writer's catalogs and stamps, checked after the classes;
+  relaid once (83 lines and 3015 bytes before and after, the nine members in id order, each record unchanged; the
+  simulations' lines identical). One test beyond the list, `OfPartyMembers_ClassTheContentLacks_NamesIt`. The removed
+  class test saves a member of a test class, then saves without the class, so no repository member is picked. Sizes:
+  Data `CatalogProblems.Party.cs` 70, `ContentWriter.Catalogs.cs` 151; tests `ContentWriterPartyMemberTests` 108,
+  `CatalogProblemsPartyTests` 85, `ContentWriterRepositoryTests` 90 (about 30 lines of Data, 145 of tests).

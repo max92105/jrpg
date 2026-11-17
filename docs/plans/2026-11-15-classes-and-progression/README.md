@@ -149,7 +149,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/CL9d.md](slices/CL9d.md)
 
 ### Phase 4: party members
-- [ ] **PM1. `party-members.json` is written by the editor** (Data + content, about 130 lines plus the relaid file) →
+- [x] **PM1. `party-members.json` is written by the editor** (Data + content, about 130 lines plus the relaid file) →
   [slices/PM1.md](slices/PM1.md)
 - [ ] **PM2. One member as typed and the members as a catalog** (Editor, about 220 lines) →
   [slices/PM2.md](slices/PM2.md)

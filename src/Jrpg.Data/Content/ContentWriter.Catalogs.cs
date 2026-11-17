@@ -43,6 +43,8 @@ public sealed partial class ContentWriter
         // The classes' own rules too, against these skills, so they are checked once; their skills' levels right after.
         CatalogProblems.CheckSkills(SortedSkills(catalog), catalog);
         CatalogProblems.CheckClassSkillLevels(SortedClasses(catalog), catalog.Rules.Experience);
+        // After the classes, so a class's own problem is named before a member's naming it.
+        CatalogProblems.CheckPartyMembers(SortedPartyMembers(catalog), catalog);
         CatalogProblems.CheckEnemies(SortedEnemies(catalog), catalog);
         CatalogProblems.CheckEncounters(SortedEncounters(catalog), catalog);
         CatalogProblems.CheckCinematics(SortedCinematics(catalog));
@@ -70,6 +72,7 @@ public sealed partial class ContentWriter
         new(ContentCatalogLoader.StatusesFile, ContentFileWriter.Serialize(SortedStatuses(catalog))),
         new(ContentCatalogLoader.SkillsFile, ContentFileWriter.Serialize(SortedSkills(catalog), ReferenceConverters(catalog))),
         new(ContentCatalogLoader.ClassesFile, ContentFileWriter.Serialize(SortedClasses(catalog))),
+        new(ContentCatalogLoader.PartyMembersFile, ContentFileWriter.Serialize(SortedPartyMembers(catalog))),
         new(ContentCatalogLoader.ItemsFile, ContentFileWriter.Serialize(SortedItems(catalog), ItemConverters(catalog))),
         new(ContentCatalogLoader.AffixesFile, ContentFileWriter.Serialize(SortedAffixes(catalog))),
     ];
@@ -133,6 +136,9 @@ public sealed partial class ContentWriter
 
     private static List<ClassDefinition> SortedClasses(ContentCatalog catalog) =>
         [.. catalog.Classes.Values.OrderBy(classDefinition => classDefinition.Id, StringComparer.Ordinal)];
+
+    private static List<PartyMemberDefinition> SortedPartyMembers(ContentCatalog catalog) =>
+        [.. catalog.PartyMembers.Values.OrderBy(member => member.Id, StringComparer.Ordinal)];
 
     private static List<ItemDefinition> SortedItems(ContentCatalog catalog) =>
         [.. catalog.Items.Values.OrderBy(item => item.Id, StringComparer.Ordinal)];

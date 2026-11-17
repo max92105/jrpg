@@ -36,7 +36,7 @@ public static class ContentCatalogLoader
     internal const string RulesFile = "rules.json";
     internal const string ItemsFile = "items.json";
     internal const string SkillsFile = "skills.json";
-    private const string PartyMembersFile = "party-members.json";
+    internal const string PartyMembersFile = "party-members.json";
     internal const string EnemiesFile = "enemies.json";
     internal const string EncountersFile = "encounters.json";
     internal const string DropTablesFile = "drop-tables.json";

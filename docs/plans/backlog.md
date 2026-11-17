@@ -362,3 +362,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Editor/Party/HexColorBrushConverter` repeats Data's private resource color rule (`#` and six hex digits,
   `ResourceDefinitionValidator.FindColorProblem`): one public check in Data used by both keeps the swatch and the problem
   line in step if the rule changes (classes and progression plan, CL8 review).
+- `Editor/Shell/CombinedHistory.cs` is at 291 lines: the next undo refusal goes in a new partial (e.g.
+  `CombinedHistory.Refusals.cs`), or the per-record refusals move into one first (classes and progression plan, PM3
+  review).

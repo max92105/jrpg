@@ -153,7 +153,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/PM1.md](slices/PM1.md)
 - [x] **PM2. One member as typed and the members as a catalog** (Editor, about 220 lines) →
   [slices/PM2.md](slices/PM2.md)
-- [ ] **PM3. The members' undo step, refused while a map recruits or requires an added member** (Editor, about 170
+- [x] **PM3. The members' undo step, refused while a map recruits or requires an added member** (Editor, about 170
   lines) → [slices/PM3.md](slices/PM3.md)
 - [ ] **PM4. Database > Party members: the page with its pictures and imports** (Editor, about 70 lines plus about 120
   of XAML) → [slices/PM4.md](slices/PM4.md)

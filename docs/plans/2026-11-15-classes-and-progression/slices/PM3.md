@@ -42,3 +42,7 @@ None: the page comes in PM4, whose hand check covers the refusal.
   recount first and put the members' refusal in the `CombinedHistory.DatabasePage` partial (37) or a new one if it
   would pass 300.
 - **Note from CL3:** the `Catalogs/CatalogDraft.Party.cs` partial comes with CL3b, split from CL3 on 2026-11-17.
+- **Done:** as planned. The refusal (+9) fits in `Shell/CombinedHistory.cs`, now 291 lines, beside the shop's in
+  `RefusalOfEventNamedUndo`, so no partial; its next refusal needs one. The history's refusal test reads the open
+  map's unsaved recruit; the leader gate is tested in `CatalogUsagePartyMemberTests` only. Sizes: `CatalogUsage` 198,
+  `CatalogDraft.Party` 57, `PartyMemberEditingViewModel` 17; tests 51, 62, 48 and 26 (11 tests).

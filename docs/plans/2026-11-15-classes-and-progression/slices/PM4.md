@@ -83,3 +83,5 @@ problem line, a `Database > Party members...` entry and `OnEditPartyMembersClick
   lookup and clock as one `Battle/EnemyArtSources` record registered in `RegisterPagesOnTheAnimationClock`, the Items
   and Cinematics pages a `SpriteImageFile.LoadAtWidth` lookup in `RegisterPicturePages`. With no idle loop, the members'
   page belongs in `RegisterPicturePages`; reuse `EnemyArtSources` only if its clock is harmless there.
+- **Note from PM3 review:** check that Remove can't drop a member an open map already recruits: a member applied on
+  this page restarts as saved (Remove greyed), so only an unapplied one is removable; confirm with a test if cheap.

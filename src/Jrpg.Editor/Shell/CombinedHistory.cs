@@ -133,11 +133,11 @@ internal sealed partial class CombinedHistory : ObservableObject
     }
 
     // In the order checked: the first map whose event names a quest or a stage the undo would remove (decision 394), or
-    // opens a shop it would remove (decision 581), or plays a cinematic it would remove (decision 630), or gives an
-    // item it would remove (decision 883); the first map whose random battles roll an encounter it would remove
-    // (decision 907); the first map placing or swapping to an object it would remove; the first tile cut from a sheet
-    // it would remove; the first tile it would remove that something still uses (decision 117), each named with the
-    // first user the check found.
+    // opens a shop it would remove (decision 581), or recruits or runs only while leading a party member it would
+    // remove (decision 954), or plays a cinematic it would remove (decision 630), or gives an item it would remove
+    // (decision 883); the first map whose random battles roll an encounter it would remove (decision 907); the first
+    // map placing or swapping to an object it would remove; the first tile cut from a sheet it would remove; the first
+    // tile it would remove that something still uses (decision 117), each named with the first user the check found.
     private string? RefusalOfCatalogUndo()
     {
         if (RefusalOfEventNamedUndo() is { } named)
@@ -177,10 +177,11 @@ internal sealed partial class CombinedHistory : ObservableObject
         return null;
     }
 
-    // The quests, shops, cinematics and items a map's event names, checked apart from the objects, sheets and tiles so
-    // the catalog undo's check stays under the build's complexity bound (CA1502).
+    // The quests, shops, party members, cinematics and items a map's event names, checked apart from the objects,
+    // sheets and tiles so the catalog undo's check stays under the build's complexity bound (CA1502).
     private string? RefusalOfEventNamedUndo() =>
-        RefusalOfQuestUndo() ?? RefusalOfShopUndo() ?? RefusalOfCinematicUndo() ?? RefusalOfItemUndo();
+        RefusalOfQuestUndo() ?? RefusalOfShopUndo() ?? RefusalOfPartyMemberUndo() ?? RefusalOfCinematicUndo()
+        ?? RefusalOfItemUndo();
 
     private string? RefusalOfQuestUndo()
     {
@@ -211,6 +212,14 @@ internal sealed partial class CombinedHistory : ObservableObject
             "opened",
             _catalog.ShopsRemovedByUndo(),
             shopId => CatalogUsage.UsersOfShop(_catalog.Current, shopId, _openMaps.Layouts));
+
+    // A saved member is never removed by its page (decision 953), so only an added one can be undone away.
+    private string? RefusalOfPartyMemberUndo() =>
+        RefusalNamingFirstUser(
+            "party member",
+            "used",
+            _catalog.PartyMembersRemovedByUndo(),
+            memberId => CatalogUsage.UsersOfPartyMember(_catalog.Current, memberId, _openMaps.Layouts));
 
     // A saved cinematic is never removed by its window (decision 630), so only an added one can be undone away.
     private string? RefusalOfCinematicUndo() =>

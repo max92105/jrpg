@@ -7,9 +7,9 @@ namespace Jrpg.Editor.Catalogs;
 /// <summary>
 /// What uses a catalog record, so an undo that would remove it can be refused (decision 117) and a re-cut can say what
 /// it touches (decision 116): maps, saved or open, and objects; a map's events for a quest or a stage (decision 394), a
-/// shop (decision 581), a cinematic (ADR 0046) or a given item (decision 883); a map's random battles for an encounter
-/// (decision 907). Each open map is read as it is now, unsaved changes included, in place of the saved one (decision
-/// 502), its random battles too.
+/// shop (decision 581), a cinematic (ADR 0046), a given item (decision 883) or a party member they recruit or run only
+/// while it leads (decision 954); a map's random battles for an encounter (decision 907). Each open map is read as it
+/// is now, unsaved changes included, in place of the saved one (decision 502), its random battles too.
 /// </summary>
 internal static class CatalogUsage
 {
@@ -113,6 +113,20 @@ internal static class CatalogUsage
         MapsWithStep(catalog, openLayouts, step => step is GiveItemStep give && give.ItemId == itemId);
 
     /// <summary>
+    /// The maps whose events recruit a party member or run only while it leads, so an undo that would remove it can be
+    /// refused (decision 954).
+    /// </summary>
+    /// <param name="catalog">The saved maps.</param>
+    /// <param name="memberId">The member looked for.</param>
+    /// <param name="openLayouts">The open maps' layouts, unsaved changes included; empty when none is open.</param>
+    /// <returns>"map forest" style names, sorted by id; empty when no event names it.</returns>
+    public static IReadOnlyList<string> UsersOfPartyMember(
+        ContentCatalog catalog,
+        string memberId,
+        IReadOnlyCollection<MapLayout> openLayouts) =>
+        MapNamesWhere(catalog, openLayouts, layout => layout.AllEvents.Any(mapEvent => NamesMember(mapEvent, memberId)));
+
+    /// <summary>
     /// The maps whose random battles roll an encounter, so an undo that would remove it can be refused (decision 907).
     /// </summary>
     /// <param name="content">
@@ -158,6 +172,10 @@ internal static class CatalogUsage
         CompleteQuestStep complete => stageId is null && complete.QuestId == questId,
         _ => false,
     };
+
+    private static bool NamesMember(MapEvent mapEvent, string memberId) =>
+        mapEvent.OnlyWhenLeaderId == memberId
+        || mapEvent.Steps.Any(step => step is RecruitStep recruit && recruit.MemberId == memberId);
 
     private static IReadOnlyList<string> MapIdsUsing(HashSet<int> tileIds, ContentCatalog catalog, IReadOnlyCollection<MapLayout> openLayouts) =>
         [.. LayoutsOf(catalog, openLayouts)

@@ -5,12 +5,13 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-classes-and-progression, slice CL8 (the Classes page's Resources tab: `Party/ClassResourcesView`,
-`Party/HexColorBrushConverter`). 2026-11-17. Round 1. Verdict: Ready to commit.
-No Critical, no Warning. Runtime probe (scratchpad cl8probe, real page + theme + repository content): no binding or
-resource trace line; the page's NumberBox reaches all 11 number boxes through DynamicResource; greying, swatch and
-Add/Remove-all behave.
+Plan 2026-11-15-classes-and-progression, slice CL9 (first part of four: `Party/ResourceRuleBoxes<TRule>`,
+`WillScalingBoxes`, `BackfireBoxes`, `ResourceRuleTests`; CL9b-d follow). 2026-11-17. Round 1. Verdict: Ready to commit.
+No Critical, no Warning. Abstract base judged acceptable (is-a, shared IsOn/Problem/ToRule/Changed, one level under
+ObservableObject, four planned users). Blanks checked against `ResourceDefinitionValidator` (1..100, will >= 1).
 
-- Suggestion: the converter's "#" + six hex digits rule repeats Data's private
-  `ResourceDefinitionValidator.FindColorProblem`; one shared rule would keep the swatch and the line in step — open (optional)
-- (CL7d's Follow-up on the move greying copy: now in backlog.md line 359, dropped.)
+- Suggestion: base's `Changed` relays every notice but `Problem` (a deny list) while siblings relay typed fields by
+  `partial void OnXChanged` (an allow list); a subclass adding a computed notice would relay it — say so in the base's
+  doc comment or relay by allow list — open (optional)
+- Suggestion: constructors repeat `(rule ?? _blank)` per box; one local `shown` reads once — open (optional)
+- (CL8's color-rule Suggestion: now in backlog.md line 362, dropped.)

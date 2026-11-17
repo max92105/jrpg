@@ -45,3 +45,8 @@ About 120 lines of code, 110 of tests: about 230. Split point if needed: the res
 
 ## Verify by hand
 None: nothing shows yet. The run is the tests and `verify.ps1`.
+- **Note from WS1:** rows 7-10 landed seven more pages the WD way (`OpenInDialog`), so fourteen editing view models
+  declare `ICatalogEditing<TEdited>`: the seven above plus `SkillEditingViewModel`, `TieredEffectEditingViewModel` (the
+  "Effects" page, `effects.json`), `StatusEditingViewModel`, `ItemEditingViewModel`, `AffixEditingViewModel`,
+  `BattleBackgroundEditingViewModel` and `EncounterEditingViewModel`. Each already has `Start()` and `Apply(edited)`,
+  and each `CatalogDraft.SetX` records nothing when the records are the same, so it stays one line per type.

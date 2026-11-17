@@ -102,7 +102,7 @@ page recipe: [page-recipe.md](page-recipe.md).
 - [x] **WD8. The Character sprites page** (Editor, about 150 lines) → [slices/WD8.md](slices/WD8.md)
 
 ### Stage 3: the mode bar (row 11's rank, after rows 7-10)
-- [ ] **WS1. The mode bar: World and Database, the Database mode an empty page; World's menus, tool bar, map keys,
+- [x] **WS1. The mode bar: World and Database, the Database mode an empty page; World's menus, tool bar, map keys,
   Delete selected objects and the map's undo off in Database mode** (Editor, about 230 lines) →
   [slices/WS1.md](slices/WS1.md)
 - [x] ADR 0060, the Database mode's pages and the undo rule of a live page. Write it from decisions 918-924, 928, 931

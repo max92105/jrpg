@@ -32,6 +32,7 @@
         Alt+Left: back to the previous map; again to return.<LineBreak />
         Map &gt; Rename map... (or right click a map in the list): a new id for the shown map; every warp into it and the new game's start follow, written at once, so it is greyed while anything is unsaved and can't be undone.<LineBreak />
         Ctrl+Z / Ctrl+Y: undo / redo the shown map's changes and the tiles' and objects', newest first; each open map keeps its own.<LineBreak />
+        Ctrl+Shift+W / Ctrl+Shift+D: World (maps) / Database (the catalogs); the buttons at the left of the tool bar do the same. Ctrl+N, Ctrl+M and Alt+Left show World first.<LineBreak />
         F1: this list.
       </TextBlock>
 

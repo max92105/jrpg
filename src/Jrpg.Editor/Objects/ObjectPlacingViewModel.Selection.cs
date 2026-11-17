@@ -87,8 +87,16 @@ internal sealed partial class ObjectPlacingViewModel
         }
     }
 
+    /// <summary>
+    /// Whether the map is shown (World mode, decision 925); while it isn't, Edit > Delete selected objects is greyed
+    /// and the selection kept for when it comes back.
+    /// </summary>
+    [ObservableProperty]
+    [NotifyCanExecuteChangedFor(nameof(DeleteSelectedObjectsCommand))]
+    public partial bool IsMapShown { get; set; } = true;
+
     /// <summary>Removes the selected objects as one undo step.</summary>
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsMapShown))]
     public void DeleteSelectedObjects()
     {
         RemoveObjects(SelectedObjectUids);

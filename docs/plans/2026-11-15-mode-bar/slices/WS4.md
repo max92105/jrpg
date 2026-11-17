@@ -63,3 +63,9 @@ About 70 lines of code, 160 of tests (the saving tests write files): about 250 w
 Still nothing typable in Database mode (WS5). In Database mode Database > Shops... opens its dialog (the Shops page
 in the workspace has nothing typed); undo, redo and save work as before in World mode. The run is the tests and
 `verify.ps1`.
+- **Note from WS1:** the pages' art imports (Import... on Enemies, Effect strips, Battle backgrounds and Character
+  sprites; Strip from sheet cells... on Effect strips) are file copies, not draft steps (`Catalogs/ArtImageImport`,
+  `MainViewModel.ImportCellStrip`), so they need no apply first; an imported effect GIF's pace and a background GIF's
+  record land in the page's own session. `OpenInDialog` serves all thirteen Database entries and Character sprites
+  until WS5, and `EditDropTables` the Enemies page's Edit...; the encounter undo refusal (EC4, decision 907) is one
+  more catalog refusal an Undo meets after the apply.

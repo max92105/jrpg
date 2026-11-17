@@ -6,24 +6,26 @@ using Jrpg.Editor.Maps;
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// Copy, Cut and Paste in Objects mode (decision 512): the window's command bindings over
-/// <see cref="Objects.ObjectCopying"/>. A focused text box handles the three keys itself first.
+/// Copy, Cut and Paste in Objects mode (decision 512), greyed while Database is shown (decision 925): the window's
+/// command bindings over <see cref="Objects.ObjectCopying"/>. A focused text box handles the three keys itself first.
 /// </summary>
 internal sealed partial class MainWindow
 {
-    private bool IsObjectsModeWithMap => _viewModel.Mode == EditingMode.Objects && _viewModel.CurrentMap is not null;
+    private bool IsObjectsModeOnShownMap =>
+        _viewModel.IsWorldShown && _viewModel.Mode == EditingMode.Objects && _viewModel.CurrentMap is not null;
 
     private void OnCopyCanExecute(object sender, CanExecuteRoutedEventArgs e) =>
-        e.CanExecute = IsObjectsModeWithMap && Placing.Copying.CopyCommand.CanExecute(null);
+        e.CanExecute = IsObjectsModeOnShownMap && Placing.Copying.CopyCommand.CanExecute(null);
 
     private void OnCopyExecuted(object sender, ExecutedRoutedEventArgs e) => Placing.Copying.CopyCommand.Execute(null);
 
     private void OnCutCanExecute(object sender, CanExecuteRoutedEventArgs e) =>
-        e.CanExecute = IsObjectsModeWithMap && Placing.Copying.CutCommand.CanExecute(null);
+        e.CanExecute = IsObjectsModeOnShownMap && Placing.Copying.CutCommand.CanExecute(null);
 
     private void OnCutExecuted(object sender, ExecutedRoutedEventArgs e) => Placing.Copying.CutCommand.Execute(null);
 
-    private void OnPasteCanExecute(object sender, CanExecuteRoutedEventArgs e) => e.CanExecute = IsObjectsModeWithMap && Placing.Copying.CanPaste;
+    private void OnPasteCanExecute(object sender, CanExecuteRoutedEventArgs e) =>
+        e.CanExecute = IsObjectsModeOnShownMap && Placing.Copying.CanPaste;
 
     // Centered on the mouse over the map; from the Edit menu, where the mouse isn't, on the middle of the view.
     private void OnPasteExecuted(object sender, ExecutedRoutedEventArgs e)

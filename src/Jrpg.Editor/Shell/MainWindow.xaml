@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:Jrpg.Editor.Shell"
         xmlns:tiles="clr-namespace:Jrpg.Editor.Tiles"
         xmlns:objects="clr-namespace:Jrpg.Editor.Objects"
+        xmlns:workspaces="clr-namespace:Jrpg.Editor.Workspaces"
         Title="Jrpg map editor"
         WindowState="Maximized">
   <Window.Resources>
@@ -35,7 +36,9 @@
     <KeyBinding Key="S" Modifiers="Control+Shift" Command="{Binding SaveAllCommand}" />
     <KeyBinding Key="H" Modifiers="Control" Command="{Binding ToggleCollisionCommand}" />
     <KeyBinding Key="M" Modifiers="Control" Command="Find" />
-    <KeyBinding Key="Left" Modifiers="Alt" Command="{Binding Navigation.GoBackCommand}" />
+    <KeyBinding Key="Left" Modifiers="Alt" Command="{Binding GoBackToMapCommand}" />
+    <KeyBinding Key="W" Modifiers="Control+Shift" Command="{Binding ShowWorldCommand}" />
+    <KeyBinding Key="D" Modifiers="Control+Shift" Command="{Binding ShowDatabaseCommand}" />
   </Window.InputBindings>
   <DockPanel>
     <!-- Not the main menu, so letting go of Alt after Alt + click (pick a tile) doesn't move the focus to the menu. -->
@@ -56,7 +59,7 @@
         <MenuItem Header="Paste objects" Command="Paste" CommandTarget="{Binding ElementName=MapViewport}" />
         <MenuItem Header="Delete selected objects" Command="{Binding Placing.DeleteSelectedObjectsCommand}" InputGestureText="Del" />
       </MenuItem>
-      <MenuItem Header="View">
+      <MenuItem Header="View" Visibility="{Binding IsWorldShown, Converter={StaticResource VisibleWhenTrue}}">
         <MenuItem Header="Grid" IsCheckable="True" IsChecked="{Binding IsGridShown}" />
         <MenuItem Header="Show collision" IsCheckable="True" IsChecked="{Binding IsCollisionShown}" InputGestureText="Ctrl+H" />
         <MenuItem Header="Dim and lock other layers" IsCheckable="True" IsChecked="{Binding Layer.AreOtherLayersDimmed}" ToolTip="Other layers are drawn faint and ignore clicks; choose the layer of what you want to reach." />
@@ -64,7 +67,7 @@
         <MenuItem Header="Fit map" Click="OnFitClicked" InputGestureText="Ctrl+0" />
         <MenuItem Header="Actual size" Click="OnActualSizeClicked" InputGestureText="Ctrl+1" />
       </MenuItem>
-      <MenuItem Header="Tiles">
+      <MenuItem Header="Tiles" Visibility="{Binding IsWorldShown, Converter={StaticResource VisibleWhenTrue}}">
         <MenuItem Header="Mark blocked" IsCheckable="True" IsChecked="{Binding Marking.IsMarkingBlocked}" />
         <MenuItem Header="Set up sheet" Command="{Binding Painting.Browser.SetUpSheetCommand}" />
         <MenuItem Header="Cut sheet" Command="{Binding Painting.Browser.CutSheetCommand}" />
@@ -72,7 +75,7 @@
         <MenuItem Header="Animate tile..." Command="{Binding Animating.OpenCommand}" ToolTip="Open the Animate panel on the cell chosen in the Tiles panel." />
         <MenuItem Header="Import animations..." Click="OnImportAnimationsClicked" IsEnabled="{Binding CanStartNewObject}" ToolTip="Read a Tiled .tsx file: every animated tile of the set-up sheet with its image gets its frames and time. Ctrl+Z undoes the import." />
       </MenuItem>
-      <MenuItem Header="Objects">
+      <MenuItem Header="Objects" Visibility="{Binding IsWorldShown, Converter={StaticResource VisibleWhenTrue}}">
         <MenuItem Header="Edit shapes..." Click="OnEditShapesClicked" IsEnabled="{Binding Placing.CanEditShapes, FallbackValue=False}" />
         <MenuItem Header="New object..." Click="OnNewObjectClicked" IsEnabled="{Binding CanStartNewObject}" ToolTip="Paint an object in the composer from cells of any sheet; a rectangle chosen in the Tiles panel starts it." />
         <MenuItem Header="New object from map selection..." Click="OnNewObjectFromMapClicked" IsEnabled="{Binding CanStartObjectFromMap}" ToolTip="Make an object of the map cells selected with Ctrl + drag in the Tiles tab: the chosen layer is level 0, the layers under and over it the levels under and over." />
@@ -81,15 +84,15 @@
         <MenuItem Header="Duplicate object..." Click="OnDuplicateObjectClicked" IsEnabled="{Binding Composing.CanComposeChosenObject, FallbackValue=False}" ToolTip="A new object from a copy of the chosen one's picture, outline, zones and category; type its id, then repaint what differs. Its shapes open when its size changed." />
       </MenuItem>
       <!-- NPCs are objects drawn from a character sprite (ADR 0015, ADR 0043); the developer wanted them apart from Objects. -->
-      <MenuItem Header="NPCs">
+      <MenuItem Header="NPCs" Visibility="{Binding IsWorldShown, Converter={StaticResource VisibleWhenTrue}}">
         <MenuItem Header="New NPC..." Click="OnNewNpcClicked" IsEnabled="{Binding CanStartNewNpc}" />
         <MenuItem Header="Character sprites..." Click="OnCharacterSpritesClicked" IsEnabled="{Binding CanEditFieldSprites}" ToolTip="Import, cut and animate character sheets; New NPC uses them." />
         <MenuItem Header="Change NPC sprite..." Click="OnChangeNpcSpriteClicked" IsEnabled="{Binding NpcSpriteChange.CanChange, FallbackValue=False}" ToolTip="Give the chosen NPC object another set-up sprite; every placed copy follows. Ctrl+Z undoes it." />
       </MenuItem>
       <local:DatabaseMenu MenuItem.Click="OnDatabaseMenuClicked" />
-      <MenuItem Header="Map">
+      <MenuItem Header="Map" Visibility="{Binding IsWorldShown, Converter={StaticResource VisibleWhenTrue}}">
         <MenuItem Header="Go to map..." Command="Find" InputGestureText="Ctrl+M" />
-        <MenuItem Header="Back to previous map" Command="{Binding Navigation.GoBackCommand}" InputGestureText="Alt+Left" />
+        <MenuItem Header="Back to previous map" Command="{Binding GoBackToMapCommand}" InputGestureText="Alt+Left" />
         <Separator />
         <MenuItem Header="Settings..." Click="OnMapSettingsClicked" />
         <MenuItem Header="Rename map..." Click="OnRenameMapClicked" IsEnabled="{Binding CanRenameMap}" ToolTip="{Binding RenameMapTip}" ToolTipService.ShowOnDisabled="True" />
@@ -101,60 +104,63 @@
       </MenuItem>
     </Menu>
     <local:StatusBand DockPanel.Dock="Top" />
-    <ToolBarTray DockPanel.Dock="Top" IsLocked="True">
-      <ToolBar Band="0" BandIndex="0">
-        <Button Content="Save (Ctrl+S)" Command="{Binding SaveCommand}" />
-        <Button Content="Undo (Ctrl+Z)" Command="{Binding History.UndoCommand}" />
-        <Button Content="Redo (Ctrl+Y)" Command="{Binding History.RedoCommand}" />
-        <Separator />
-        <CheckBox Content="Grid" IsChecked="{Binding IsGridShown}" />
-        <CheckBox Content="Collision" IsChecked="{Binding IsCollisionShown}" ToolTip="Show what blocks the player (Ctrl+H)" />
-        <Separator />
-        <TextBlock Text="Layer" VerticalAlignment="Center" Margin="4,0" />
-        <ComboBox Width="230"
-                  ItemsSource="{Binding Layer.Presets}"
-                  SelectedValuePath="Z"
-                  SelectedValue="{Binding Layer.Z}">
-          <ComboBox.ItemTemplate>
-            <DataTemplate>
-              <TextBlock><Run Text="{Binding Name, Mode=OneWay}" /> (<Run Text="{Binding Z, Mode=OneWay}" />)</TextBlock>
-            </DataTemplate>
-          </ComboBox.ItemTemplate>
-        </ComboBox>
-        <TextBox Width="40"
-                 ToolTip="Layer z: any whole number"
-                 Text="{Binding Layer.Z, UpdateSourceTrigger=PropertyChanged}" />
-        <CheckBox Content="Dim and lock other layers" IsChecked="{Binding Layer.AreOtherLayersDimmed}" ToolTip="Other layers are drawn faint and ignore clicks; choose the layer of what you want to reach." />
-        <Separator />
-        <Button Content="Fit (Ctrl+0)" Click="OnFitClicked" />
-        <Button Content="100 % (Ctrl+1)" Click="OnActualSizeClicked" />
-      </ToolBar>
-      <ToolBar Band="0" BandIndex="1" Style="{StaticResource TilesBand}">
-        <TextBlock Text="Tool (B R F)" VerticalAlignment="Center" Margin="4,0" />
-        <ComboBox Width="90"
-                  ToolTip="Brush: drag. Rectangle: drag, filled on release. Fill: click (or Shift + click with any tool). Right button erases."
-                  ItemsSource="{Binding Painting.Tools}"
-                  SelectedItem="{Binding Painting.Tool}" />
-        <TextBlock Text="Brush ([ ])" VerticalAlignment="Center" Margin="4,0" />
-        <ComboBox Width="50" ItemsSource="{Binding Painting.BrushSizes}" SelectedItem="{Binding Painting.BrushSize}" />
-        <Button Content="Fill layer" Command="{Binding Painting.FillLayerCommand}" />
-        <Button Content="Clear layer" Command="{Binding Painting.ClearLayerCommand}" />
-        <Separator />
-        <CheckBox Content="Mark blocked"
-                  ToolTip="While on, a click on a sheet cell flips it between walkable and blocked (red cross) instead of choosing it."
-                  IsChecked="{Binding Marking.IsMarkingBlocked}" />
-      </ToolBar>
-      <ToolBar Band="0" BandIndex="2" Style="{StaticResource ObjectsBand}">
-        <Button Content="Edit shapes..." Click="OnEditShapesClicked" IsEnabled="{Binding Placing.CanEditShapes, FallbackValue=False}" />
-        <Button Content="New object..." Click="OnNewObjectClicked" IsEnabled="{Binding CanStartNewObject}" />
-        <Button Content="Edit object..." Click="OnEditObjectClicked" IsEnabled="{Binding Composing.CanComposeChosenObject, FallbackValue=False}" />
-        <Button Content="Duplicate..." Click="OnDuplicateObjectClicked" IsEnabled="{Binding Composing.CanComposeChosenObject, FallbackValue=False}" ToolTip="Objects &gt; Duplicate object: a new object from a copy of the chosen one." />
-        <Button Content="From map..." Click="OnNewObjectFromMapClicked" IsEnabled="{Binding CanStartObjectFromMap}" ToolTip="Objects &gt; New object from map selection: an object of the cells selected with Ctrl + drag in the Tiles tab." />
-        <Button Content="New NPC..." Click="OnNewNpcClicked" IsEnabled="{Binding CanStartNewNpc}" />
-        <Button Content="Change sprite..." Click="OnChangeNpcSpriteClicked" IsEnabled="{Binding NpcSpriteChange.CanChange, FallbackValue=False}" ToolTip="Objects &gt; Change NPC sprite: give the chosen NPC object another set-up sprite; every placed copy follows." />
-        <CheckBox Content="Snap to grid (Alt, G)" IsChecked="{Binding Placing.IsGridSnapOn, FallbackValue=False}" ToolTip="Placed and moved objects land on whole cells. Holding Alt does the opposite of this box; G ticks or unticks it." />
-      </ToolBar>
-    </ToolBarTray>
+    <DockPanel DockPanel.Dock="Top">
+      <workspaces:ModeBar DockPanel.Dock="Left" />
+      <ToolBarTray IsLocked="True" Visibility="{Binding IsWorldShown, Converter={StaticResource VisibleWhenTrue}}">
+        <ToolBar Band="0" BandIndex="0">
+          <Button Content="Save (Ctrl+S)" Command="{Binding SaveCommand}" />
+          <Button Content="Undo (Ctrl+Z)" Command="{Binding History.UndoCommand}" />
+          <Button Content="Redo (Ctrl+Y)" Command="{Binding History.RedoCommand}" />
+          <Separator />
+          <CheckBox Content="Grid" IsChecked="{Binding IsGridShown}" />
+          <CheckBox Content="Collision" IsChecked="{Binding IsCollisionShown}" ToolTip="Show what blocks the player (Ctrl+H)" />
+          <Separator />
+          <TextBlock Text="Layer" VerticalAlignment="Center" Margin="4,0" />
+          <ComboBox Width="230"
+                    ItemsSource="{Binding Layer.Presets}"
+                    SelectedValuePath="Z"
+                    SelectedValue="{Binding Layer.Z}">
+            <ComboBox.ItemTemplate>
+              <DataTemplate>
+                <TextBlock><Run Text="{Binding Name, Mode=OneWay}" /> (<Run Text="{Binding Z, Mode=OneWay}" />)</TextBlock>
+              </DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+          <TextBox Width="40"
+                   ToolTip="Layer z: any whole number"
+                   Text="{Binding Layer.Z, UpdateSourceTrigger=PropertyChanged}" />
+          <CheckBox Content="Dim and lock other layers" IsChecked="{Binding Layer.AreOtherLayersDimmed}" ToolTip="Other layers are drawn faint and ignore clicks; choose the layer of what you want to reach." />
+          <Separator />
+          <Button Content="Fit (Ctrl+0)" Click="OnFitClicked" />
+          <Button Content="100 % (Ctrl+1)" Click="OnActualSizeClicked" />
+        </ToolBar>
+        <ToolBar Band="0" BandIndex="1" Style="{StaticResource TilesBand}">
+          <TextBlock Text="Tool (B R F)" VerticalAlignment="Center" Margin="4,0" />
+          <ComboBox Width="90"
+                    ToolTip="Brush: drag. Rectangle: drag, filled on release. Fill: click (or Shift + click with any tool). Right button erases."
+                    ItemsSource="{Binding Painting.Tools}"
+                    SelectedItem="{Binding Painting.Tool}" />
+          <TextBlock Text="Brush ([ ])" VerticalAlignment="Center" Margin="4,0" />
+          <ComboBox Width="50" ItemsSource="{Binding Painting.BrushSizes}" SelectedItem="{Binding Painting.BrushSize}" />
+          <Button Content="Fill layer" Command="{Binding Painting.FillLayerCommand}" />
+          <Button Content="Clear layer" Command="{Binding Painting.ClearLayerCommand}" />
+          <Separator />
+          <CheckBox Content="Mark blocked"
+                    ToolTip="While on, a click on a sheet cell flips it between walkable and blocked (red cross) instead of choosing it."
+                    IsChecked="{Binding Marking.IsMarkingBlocked}" />
+        </ToolBar>
+        <ToolBar Band="0" BandIndex="2" Style="{StaticResource ObjectsBand}">
+          <Button Content="Edit shapes..." Click="OnEditShapesClicked" IsEnabled="{Binding Placing.CanEditShapes, FallbackValue=False}" />
+          <Button Content="New object..." Click="OnNewObjectClicked" IsEnabled="{Binding CanStartNewObject}" />
+          <Button Content="Edit object..." Click="OnEditObjectClicked" IsEnabled="{Binding Composing.CanComposeChosenObject, FallbackValue=False}" />
+          <Button Content="Duplicate..." Click="OnDuplicateObjectClicked" IsEnabled="{Binding Composing.CanComposeChosenObject, FallbackValue=False}" ToolTip="Objects &gt; Duplicate object: a new object from a copy of the chosen one." />
+          <Button Content="From map..." Click="OnNewObjectFromMapClicked" IsEnabled="{Binding CanStartObjectFromMap}" ToolTip="Objects &gt; New object from map selection: an object of the cells selected with Ctrl + drag in the Tiles tab." />
+          <Button Content="New NPC..." Click="OnNewNpcClicked" IsEnabled="{Binding CanStartNewNpc}" />
+          <Button Content="Change sprite..." Click="OnChangeNpcSpriteClicked" IsEnabled="{Binding NpcSpriteChange.CanChange, FallbackValue=False}" ToolTip="Objects &gt; Change NPC sprite: give the chosen NPC object another set-up sprite; every placed copy follows." />
+          <CheckBox Content="Snap to grid (Alt, G)" IsChecked="{Binding Placing.IsGridSnapOn, FallbackValue=False}" ToolTip="Placed and moved objects land on whole cells. Holding Alt does the opposite of this box; G ticks or unticks it." />
+        </ToolBar>
+      </ToolBarTray>
+    </DockPanel>
     <StatusBar DockPanel.Dock="Bottom">
       <StatusBarItem Content="{Binding CursorStatus}" />
       <StatusBarItem Content="{Binding History.Refusal}" Foreground="{StaticResource ProblemTextBrush}" />
@@ -165,123 +171,126 @@
       <StatusBarItem x:Name="ZoomStatus" HorizontalAlignment="Right" />
     </StatusBar>
     <Grid>
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="{StaticResource MapListWidth}" MinWidth="{StaticResource MapListMinWidth}" />
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="*" />
-        <ColumnDefinition Width="Auto" />
-        <ColumnDefinition Width="{StaticResource SidePanelWidth}" MinWidth="{StaticResource SidePanelMinWidth}" />
-      </Grid.ColumnDefinitions>
-      <local:MapListPanel x:Name="MapListPanel"
-                         FilterLeft="OnMapFilterLeft"
-                         RenameRequested="OnRenameMapClicked"
-                         MoveRequested="OnMoveToFolderRequested"
-                         NewFolderRequested="OnNewFolderRequested"
-                         RenameFolderRequested="OnRenameFolderRequested" />
-      <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
-      <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
-      <DockPanel Grid.Column="4">
-        <!-- Choosing a row chooses the layer edits go to, as the toolbar's layer box does. -->
-        <ListBox DockPanel.Dock="Top"
-                 Height="110"
-                 ItemsSource="{Binding LayerEntries}"
-                 DisplayMemberPath="Text"
-                 SelectedValuePath="Z"
-                 SelectedValue="{Binding Layer.Z}" />
-        <DockPanel DockPanel.Dock="Top" Margin="0,4">
-          <Button DockPanel.Dock="Right" Content="Add layer" Click="OnAddLayerClicked" />
-          <ComboBox x:Name="NewLayerBox"
-                    IsEditable="True"
-                    ToolTip="A preset, or any whole number for the layer's z"
-                    ItemsSource="{Binding Layer.Presets}"
-                    DisplayMemberPath="Name" />
+      <workspaces:DatabaseWorkspaceView Visibility="{Binding IsDatabaseShown, Converter={StaticResource VisibleWhenTrue}}" />
+      <Grid Visibility="{Binding IsWorldShown, Converter={StaticResource VisibleWhenTrue}}">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="{StaticResource MapListWidth}" MinWidth="{StaticResource MapListMinWidth}" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="{StaticResource SidePanelWidth}" MinWidth="{StaticResource SidePanelMinWidth}" />
+        </Grid.ColumnDefinitions>
+        <local:MapListPanel x:Name="MapListPanel"
+                           FilterLeft="OnMapFilterLeft"
+                           RenameRequested="OnRenameMapClicked"
+                           MoveRequested="OnMoveToFolderRequested"
+                           NewFolderRequested="OnNewFolderRequested"
+                           RenameFolderRequested="OnRenameFolderRequested" />
+        <GridSplitter Grid.Column="1" Width="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
+        <GridSplitter Grid.Column="3" Width="5" HorizontalAlignment="Stretch" ResizeBehavior="PreviousAndNext" />
+        <DockPanel Grid.Column="4">
+          <!-- Choosing a row chooses the layer edits go to, as the toolbar's layer box does. -->
+          <ListBox DockPanel.Dock="Top"
+                   Height="110"
+                   ItemsSource="{Binding LayerEntries}"
+                   DisplayMemberPath="Text"
+                   SelectedValuePath="Z"
+                   SelectedValue="{Binding Layer.Z}" />
+          <DockPanel DockPanel.Dock="Top" Margin="0,4">
+            <Button DockPanel.Dock="Right" Content="Add layer" Click="OnAddLayerClicked" />
+            <ComboBox x:Name="NewLayerBox"
+                      IsEditable="True"
+                      ToolTip="A preset, or any whole number for the layer's z"
+                      ItemsSource="{Binding Layer.Presets}"
+                      DisplayMemberPath="Name" />
+          </DockPanel>
+          <TabControl x:Name="EditingTabs" SelectionChanged="OnEditingTabChanged">
+            <TabItem Header="Tiles">
+              <DockPanel>
+                <Button DockPanel.Dock="Top"
+                        Margin="0,4"
+                        HorizontalAlignment="Left"
+                        Padding="8,2"
+                        Content="Import..."
+                        ToolTip="Copy PNG images into the tilesheet art; each then shows in the sheet box."
+                        Click="OnImportSheetImageClicked" />
+                <!-- Refused while a map or an object uses one of the sheet's tiles (decision 443); the line says which. -->
+                <StackPanel DockPanel.Dock="Bottom" Margin="0,4">
+                  <Button HorizontalAlignment="Left"
+                          Padding="8,2"
+                          Content="Remove sheet"
+                          ToolTip="Take the shown sheet and its tiles out of the catalog; refused while a map or object uses one. The image stays in the folder. Ctrl+Z puts it back."
+                          Command="{Binding Removal.RemoveSheetCommand}" />
+                  <Button HorizontalAlignment="Left"
+                          Margin="0,4,0,0"
+                          Padding="8,2"
+                          Content="Animate"
+                          ToolTip="Animate the cell chosen on the sheet: its frames run to its right (ADR 0039)."
+                          Command="{Binding Animating.OpenCommand}" />
+                  <TextBlock Margin="0,4,0,0" TextWrapping="Wrap" Text="{Binding Removal.Status}" />
+                </StackPanel>
+                <!-- The Animate panel (decision 467); its preview cycles on the render tick. -->
+                <tiles:TileAnimationPanel x:Name="AnimationPanel"
+                                          DockPanel.Dock="Bottom"
+                                          Margin="0,4"
+                                          DataContext="{Binding Animating}"
+                                          Visibility="{Binding IsOpen, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}" />
+                <tiles:TileBrowserView x:Name="TileBrowser" DataContext="{Binding Painting.Browser}" />
+              </DockPanel>
+            </TabItem>
+            <!-- The tooltip names the mode's mouse and key gestures; F1 lists them all. -->
+            <TabItem x:Name="ObjectsTab" Header="Objects"
+                     ToolTip="Click places the chosen object; Shift + drag moves; Ctrl + click or Ctrl + drag selects (Ctrl + click again: the next object under); arrows nudge the selection, Shift for one pixel; Esc clears it; right click or Delete removes.">
+              <DockPanel>
+                <objects:PlacedObjectPanel DockPanel.Dock="Bottom" DataContext="{Binding Placing.Editing}" EditEventsRequested="OnPlacedObjectEditEvents" />
+                <objects:ObjectBrowserView x:Name="ObjectBrowser" DataContext="{Binding Placing.Browser}" MouseDoubleClick="OnObjectBrowserDoubleClicked" />
+              </DockPanel>
+            </TabItem>
+            <TabItem x:Name="EventsTab" Header="Events">
+              <TextBlock Margin="8"
+                         TextWrapping="Wrap"
+                         Text="Click an object on the map to edit its events, or a cell without an object to edit the event that runs when the player walks onto it; right click removes a cell's event. Ctrl + click opens the event of the cell under an object; Ctrl + right click removes it. With Dim and lock other layers ticked, only the chosen layer's objects take clicks. Dots on an object show its events (yellow: pressed, cyan: walked into); a cyan square marks a cell with an event." />
+            </TabItem>
+          </TabControl>
         </DockPanel>
-        <TabControl x:Name="EditingTabs" SelectionChanged="OnEditingTabChanged">
-          <TabItem Header="Tiles">
-            <DockPanel>
-              <Button DockPanel.Dock="Top"
-                      Margin="0,4"
-                      HorizontalAlignment="Left"
-                      Padding="8,2"
-                      Content="Import..."
-                      ToolTip="Copy PNG images into the tilesheet art; each then shows in the sheet box."
-                      Click="OnImportSheetImageClicked" />
-              <!-- Refused while a map or an object uses one of the sheet's tiles (decision 443); the line says which. -->
-              <StackPanel DockPanel.Dock="Bottom" Margin="0,4">
-                <Button HorizontalAlignment="Left"
-                        Padding="8,2"
-                        Content="Remove sheet"
-                        ToolTip="Take the shown sheet and its tiles out of the catalog; refused while a map or object uses one. The image stays in the folder. Ctrl+Z puts it back."
-                        Command="{Binding Removal.RemoveSheetCommand}" />
-                <Button HorizontalAlignment="Left"
-                        Margin="0,4,0,0"
-                        Padding="8,2"
-                        Content="Animate"
-                        ToolTip="Animate the cell chosen on the sheet: its frames run to its right (ADR 0039)."
-                        Command="{Binding Animating.OpenCommand}" />
-                <TextBlock Margin="0,4,0,0" TextWrapping="Wrap" Text="{Binding Removal.Status}" />
-              </StackPanel>
-              <!-- The Animate panel (decision 467); its preview cycles on the render tick. -->
-              <tiles:TileAnimationPanel x:Name="AnimationPanel"
-                                        DockPanel.Dock="Bottom"
-                                        Margin="0,4"
-                                        DataContext="{Binding Animating}"
-                                        Visibility="{Binding IsOpen, Converter={StaticResource VisibleWhenTrue}, FallbackValue=Collapsed}" />
-              <tiles:TileBrowserView x:Name="TileBrowser" DataContext="{Binding Painting.Browser}" />
-            </DockPanel>
-          </TabItem>
-          <!-- The tooltip names the mode's mouse and key gestures; F1 lists them all. -->
-          <TabItem x:Name="ObjectsTab" Header="Objects"
-                   ToolTip="Click places the chosen object; Shift + drag moves; Ctrl + click or Ctrl + drag selects (Ctrl + click again: the next object under); arrows nudge the selection, Shift for one pixel; Esc clears it; right click or Delete removes.">
-            <DockPanel>
-              <objects:PlacedObjectPanel DockPanel.Dock="Bottom" DataContext="{Binding Placing.Editing}" EditEventsRequested="OnPlacedObjectEditEvents" />
-              <objects:ObjectBrowserView x:Name="ObjectBrowser" DataContext="{Binding Placing.Browser}" MouseDoubleClick="OnObjectBrowserDoubleClicked" />
-            </DockPanel>
-          </TabItem>
-          <TabItem x:Name="EventsTab" Header="Events">
-            <TextBlock Margin="8"
-                       TextWrapping="Wrap"
-                       Text="Click an object on the map to edit its events, or a cell without an object to edit the event that runs when the player walks onto it; right click removes a cell's event. Ctrl + click opens the event of the cell under an object; Ctrl + right click removes it. With Dim and lock other layers ticked, only the chosen layer's objects take clicks. Dots on an object show its events (yellow: pressed, cyan: walked into); a cyan square marks a cell with an event." />
-          </TabItem>
-        </TabControl>
-      </DockPanel>
-      <!-- Pan: middle drag, Space + drag, arrows. Zoom: wheel, toward the cursor. Left drag paints the chosen tile,
-           right drag erases, Alt + click picks the tile and layer under the mouse. -->
-      <Border x:Name="MapViewport"
-              Grid.Column="2"
-              Background="{StaticResource ViewportBackgroundBrush}"
-              ClipToBounds="True"
-              Focusable="True"
-              PreviewMouseDown="OnViewportMouseDown"
-              PreviewMouseMove="OnViewportMouseMove"
-              PreviewMouseUp="OnViewportMouseUp"
-              MouseWheel="OnViewportMouseWheel"
-              MouseLeave="OnViewportMouseLeave"
-              LostMouseCapture="OnViewportLostMouseCapture"
-              SizeChanged="OnViewportSizeChanged">
-        <!-- A canvas gives the map its full size, so the view's bounds clip it rather than layout. -->
-        <Canvas>
-          <!-- Nearest-pixel scaling and aliased edges keep pixel art sharp and tiles seamless, as in the game. -->
-          <Grid x:Name="MapLayers"
-                RenderOptions.BitmapScalingMode="NearestNeighbor"
-                RenderOptions.EdgeMode="Aliased">
-            <Image x:Name="MapImage" Stretch="None" />
-            <Image x:Name="CollisionImage" Stretch="None" />
-            <Image x:Name="GridImage"
-                   Stretch="None"
-                   Visibility="{Binding IsGridShown, Converter={StaticResource VisibleWhenTrue}}" />
-            <Canvas IsHitTestVisible="False">
-              <Rectangle x:Name="BrushOutline" Stroke="White" Visibility="Collapsed" />
-              <Image x:Name="ObjectGhost" Stretch="None" Opacity="0.6" Visibility="Collapsed" />
-              <Canvas x:Name="SelectionMarks" />
-              <Canvas x:Name="EventMarks" />
-              <Rectangle x:Name="SelectionOutline" Stroke="Cyan" StrokeDashArray="4 2" Visibility="Collapsed" />
-              <Rectangle x:Name="MapSelectionOutline" Stroke="Cyan" StrokeDashArray="4 2" Visibility="Collapsed" />
-              <Rectangle x:Name="DestinationMark" Stroke="Gold" StrokeThickness="3" StrokeDashArray="3 2" Visibility="Collapsed" />
-            </Canvas>
-          </Grid>
-        </Canvas>
-      </Border>
+        <!-- Pan: middle drag, Space + drag, arrows. Zoom: wheel, toward the cursor. Left drag paints the chosen tile,
+             right drag erases, Alt + click picks the tile and layer under the mouse. -->
+        <Border x:Name="MapViewport"
+                Grid.Column="2"
+                Background="{StaticResource ViewportBackgroundBrush}"
+                ClipToBounds="True"
+                Focusable="True"
+                PreviewMouseDown="OnViewportMouseDown"
+                PreviewMouseMove="OnViewportMouseMove"
+                PreviewMouseUp="OnViewportMouseUp"
+                MouseWheel="OnViewportMouseWheel"
+                MouseLeave="OnViewportMouseLeave"
+                LostMouseCapture="OnViewportLostMouseCapture"
+                SizeChanged="OnViewportSizeChanged">
+          <!-- A canvas gives the map its full size, so the view's bounds clip it rather than layout. -->
+          <Canvas>
+            <!-- Nearest-pixel scaling and aliased edges keep pixel art sharp and tiles seamless, as in the game. -->
+            <Grid x:Name="MapLayers"
+                  RenderOptions.BitmapScalingMode="NearestNeighbor"
+                  RenderOptions.EdgeMode="Aliased">
+              <Image x:Name="MapImage" Stretch="None" />
+              <Image x:Name="CollisionImage" Stretch="None" />
+              <Image x:Name="GridImage"
+                     Stretch="None"
+                     Visibility="{Binding IsGridShown, Converter={StaticResource VisibleWhenTrue}}" />
+              <Canvas IsHitTestVisible="False">
+                <Rectangle x:Name="BrushOutline" Stroke="White" Visibility="Collapsed" />
+                <Image x:Name="ObjectGhost" Stretch="None" Opacity="0.6" Visibility="Collapsed" />
+                <Canvas x:Name="SelectionMarks" />
+                <Canvas x:Name="EventMarks" />
+                <Rectangle x:Name="SelectionOutline" Stroke="Cyan" StrokeDashArray="4 2" Visibility="Collapsed" />
+                <Rectangle x:Name="MapSelectionOutline" Stroke="Cyan" StrokeDashArray="4 2" Visibility="Collapsed" />
+                <Rectangle x:Name="DestinationMark" Stroke="Gold" StrokeThickness="3" StrokeDashArray="3 2" Visibility="Collapsed" />
+              </Canvas>
+            </Grid>
+          </Canvas>
+        </Border>
+      </Grid>
     </Grid>
   </DockPanel>
 </Window>

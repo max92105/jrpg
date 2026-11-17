@@ -70,3 +70,12 @@ About 130 lines of code and XAML, 100 of tests: about 230.
 7. `.claude/scripts/open-editor-windows.ps1`: every default entry "opened" as before, no `ERROR`, no binding-error line.
 - The World-mode look (tile panels) is the developer's check (Mana Seed art); an agent may screenshot the main window
   only while Database mode is shown.
+- **Done, with deviations:** `GoBackToMapCommand` is a hand-built command in `MainViewModel.Workspaces.cs` (60 lines),
+  greyed with the navigation's Back and re-raised with it (the constructor can't read the lazy `Navigation` without a
+  nullable error), so Map > Back to previous map still greys; `ShowDatabase` ends a stroke still being dragged first;
+  the copy commands' guard is renamed `IsObjectsModeOnShownMap`; Ctrl+H (`ToggleCollisionCommand`, the one window key
+  binding that reached the hidden map) greys in Database (review); `OnGoToMapExecuted` is in
+  `MainWindow.MapSwitching.cs` (73); the F1 line also says Ctrl+N, Ctrl+M and Alt+Left show World first. 18 tests
+  instead of 9 (three re-raises, the kept selection, the greyed Undo, the stroke, Ctrl+H greyed and lit again):
+  `MainViewModelWorkspaceTests` 248 lines. `MainWindow.xaml` 296 (`VisibleWhenTrue` stays), `MainWindow.xaml.cs` 278,
+  `MainViewModel.cs` 294, `ModeBar.xaml` 35. Rows 7-10's pages for WS2-WS6: the notes from WS1 in those slices.

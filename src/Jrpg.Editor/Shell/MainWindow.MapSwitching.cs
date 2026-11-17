@@ -25,7 +25,15 @@ internal sealed partial class MainWindow
         RefitMap();
     }
 
-    private void OnGoToMapExecuted(object sender, ExecutedRoutedEventArgs e) => MapListPanel.FocusFilter();
+    // From Database mode, World is shown first: the filter box is in the map list (decision 925).
+    private void OnGoToMapExecuted(object sender, ExecutedRoutedEventArgs e)
+    {
+        _viewModel.ShowWorldCommand.Execute(null);
+        if (_viewModel.IsWorldShown)
+        {
+            MapListPanel.FocusFilter();
+        }
+    }
 
     // Esc in the filter box: the map takes the keys back, so the arrows pan again.
     private void OnMapFilterLeft(object sender, RoutedEventArgs e) => MapViewport.Focus();

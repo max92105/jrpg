@@ -56,3 +56,12 @@ the test and set on the draft first:
 ## Verify by hand
 Nothing typable in Database mode yet (WS5): Database, then World, both buttons and keys, still switch; the dialogs open
 from the menu. The run is the tests and `verify.ps1`.
+- **Note from WS1:** `CreateDatabaseWorkspace()` lists fourteen pages, titled as `Shell/DatabaseMenu.xaml`'s `Tag`s, in
+  decision 917's groups: Story: Quests, Cinematics; Battle: Enemies, Encounters, Skills, Effects (the tiered effects of
+  `effects.json`, not Effect strips), Statuses, Drop tables, Effect strips, Battle backgrounds; Items: Items, Affixes;
+  Trade: Shops; Characters: Character sprites (the order inside Battle is a default, the developer's to change). WS1's
+  `ShowWorld` already puts back `History.OpenMap` and `Placing.IsMapShown`: `TryClose` goes before them. Three callers
+  show World first and must stop when it is refused: `OnNewMapExecuted` (`MainWindow.xaml.cs`), `OnGoToMapExecuted`
+  (in `MainWindow.MapSwitching.cs`, not `MainWindow.xaml.cs`) and `GoBackToMapCommand`, a hand-built command in
+  `MainViewModel.Workspaces.cs` (built lazily, since the constructor can't read `Navigation` without a nullable
+  warning) whose action runs `ShowWorld()` then the navigation's Back with no check yet; it gets one, with a test.

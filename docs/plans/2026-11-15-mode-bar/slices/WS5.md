@@ -77,3 +77,13 @@ Agents may run steps 1-5 (Shops, Quests, Enemies, Drop tables, Effect strips and
 6. **The developer's:** the Character sprites page (Mana Seed art), through NPCs > Character sprites and the list.
 - **Note from WD7:** the Cinematics page's `Unloaded` stops the clock but leaves `Preview.IsPlaying` true; once a page
   is hidden and shown again, it comes back frozen mid-play: `Unloaded` should also call `Preview.Stop()` (WD7 review).
+- **Note from WS1:** fourteen `Register<TEdited>` lines: the WD seven plus Skills, Effects, Statuses, Items, Affixes,
+  Battle backgrounds and Encounters; the builders keep their callbacks (Items' and Cinematics' decoding at width,
+  Enemies' `EnemyArtSources` and drop-table Edit..., Effect strips' three, Battle backgrounds' two, Character sprites'
+  import). The list's groups and order are in WS3's note. The script: its default list already holds a three-part
+  entry, `Database>Effect strips...>Strip from sheet cells...` (decision 996); as a page it must find that button in
+  the main window, the tool still opening as a dialog. Captures: the Skills and Items pages show icons and Character
+  sprites shows Mana Seed sheets, so their screenshots are the developer's; the header comment's list of windows agents
+  may look at becomes a list of pages (Quests, Shops, Drop tables, Effect strips, Battle backgrounds, Cinematics,
+  Enemies, Encounters). `Shell/MainWindow.xaml` is at 296 lines after WS1: the view's content goes in
+  `DatabaseWorkspaceView`, never there.

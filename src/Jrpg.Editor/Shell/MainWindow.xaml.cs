@@ -73,6 +73,12 @@ internal sealed partial class MainWindow : Window
     {
         base.OnPreviewKeyDown(e);
 
+        // The hidden map takes no tool, object, pan or zoom key in Database mode (decision 925).
+        if (_viewModel.IsDatabaseShown)
+        {
+            return;
+        }
+
         // Space arms the pan whichever panel has focus, so Space + drag pans after a click in the Tiles or Objects panel;
         // in a text box it's only a typed space.
         _isSpaceHeld |= e.Key == Key.Space && Keyboard.FocusedElement is not TextBox;
@@ -168,9 +174,11 @@ internal sealed partial class MainWindow : Window
         _controlsHelp.Activate();
     }
 
+    // From Database mode, World is shown first so the new map opens where it is drawn (decision 925).
     private void OnNewMapExecuted(object sender, ExecutedRoutedEventArgs e)
     {
-        if (_viewModel.StartNewMap() is { } newMap)
+        _viewModel.ShowWorldCommand.Execute(null);
+        if (_viewModel.IsWorldShown && _viewModel.StartNewMap() is { } newMap)
         {
             new NewMapWindow(newMap, _viewModel.TryCreateMap) { Owner = this }.ShowDialog();
         }

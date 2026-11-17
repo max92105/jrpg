@@ -27,10 +27,10 @@ namespace Jrpg.Editor.Shell;
 
 /// <summary>
 /// The editor window's state: the loaded content, the maps open in the session and the shown one (decision 497);
-/// saving, switching, renaming, folders, settings, the sheet import and an object from the map are its partial files;
-/// painting tiles, placing objects and editing their events are <see cref="Painting"/>, <see cref="Placing"/> and
-/// <see cref="EventEditing"/>. Content that can't load is shown with the loader's message instead of crashing, so a
-/// broken file can be found and fixed.
+/// saving, switching, renaming, folders, settings, the sheet import, an object from the map and the mode bar are its
+/// partial files; painting tiles, placing objects and editing their events are <see cref="Painting"/>,
+/// <see cref="Placing"/> and <see cref="EventEditing"/>. Content that can't load is shown with the loader's message
+/// instead of crashing, so a broken file can be found and fixed.
 /// </summary>
 internal sealed partial class MainViewModel : ObservableObject
 {
@@ -239,7 +239,8 @@ internal sealed partial class MainViewModel : ObservableObject
     /// <summary>Says in the status bar why a click on the map painted nothing: no cell is chosen in the Tiles panel.</summary>
     public void ShowPaintHint() => CursorStatus = "Choose a tile in the Tiles panel";
 
-    [RelayCommand]
+    // Ctrl+H reaches only the shown map: greyed while Database hides it (decision 925).
+    [RelayCommand(CanExecute = nameof(IsWorldShown))]
     private void ToggleCollision() => IsCollisionShown = !IsCollisionShown;
 
     private void OnContentChanged(object? sender, PropertyChangedEventArgs e)

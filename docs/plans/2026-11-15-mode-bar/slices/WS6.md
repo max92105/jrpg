@@ -41,3 +41,6 @@ Agents may run it. In the editor: on the Enemies page, change an enemy's HP, pre
 tables page on that table, the HP change applied (Ctrl+Z later takes it back); add a table; Enemies in the list: the
 same enemy, the new table in the box. An enemy with an empty id typed: Edit... refused, the bar naming it. The script:
 no `ERROR`, no binding-error line.
+- **Note from WS1:** the Skills page landed without an Edit... button (its strip is a box), so the Enemies page's
+  Edit... beside the Drop table box is the only one reaching another catalog; `CatalogDialog` and `DialogBounds` have
+  no user outside `Shell/MainWindow.Database.cs` (grepped in WS1).

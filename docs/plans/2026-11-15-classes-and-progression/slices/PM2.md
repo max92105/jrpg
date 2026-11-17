@@ -48,3 +48,13 @@ must be chosen"), then any member's by id, then Data's message (`CatalogProblems
 
 ## Verify by hand
 None: the page comes in PM4.
+
+- **Done, with deviations:** no `CanApply`: no page catalog has one, the workspace greys Apply on `Problem`. The id rule
+  runs with no taken ids, as `ClassViewModel`'s: a typed id another member holds is `RecordListProblem`'s "Member x is
+  listed twice.". `Changed` comes from a hook per typed field, as `ClassViewModel`'s. `ToMember` trims the art file
+  names too, as the Enemies page does (review). `Classes` adds a `RecordChoice.Missing` per class a member names that
+  the draft lacks, so the box still shows it. Renamed `Problem_NewMemberWithUppercaseId_SaysTheIdRule` (the message
+  names no id). Nine tests beyond the list (untouched record, the art names' trim, `Changed` twice, the missing class,
+  the problem as built, chosen and another's, `ToMembers`). Sizes: `PartyMemberViewModel` 120,
+  `PartyMemberCatalogViewModel` 112; tests `PartyMemberCatalogViewModelTests` 151, `PartyMemberViewModelTests` 119,
+  `PartyMemberFixtures` 29 (531 lines, above the 220 planned: doc comments and the extra tests).

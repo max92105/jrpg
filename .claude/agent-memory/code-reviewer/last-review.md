@@ -5,15 +5,14 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-items-uniques-affixes, slice IU9 (CatalogDraft.ItemsRemovedByUndo, CatalogUsage.UsersOfItem +
-GivesItem, CombinedHistory.RefusalOfItemUndo and RefusalOfEventNamedUndo, SaveWithCellEvent moved to EditorTestContent).
-2026-11-16. Round 1. Verdict: Ready to commit (no Critical).
+Plan 2026-11-15-items-uniques-affixes, slice IU10 (ItemEquipmentViewModel: kind, weapon damage and damage type;
+ItemViewModel.Equipment relayed; Equipment section on ItemCatalogPage.xaml). 2026-11-16. Round 1. Verdict: Ready to
+commit (no Critical, no Warning).
 
-- Warning (open): third copy of the "event step names id X" pattern: UsersOfShop/UsersOfCinematic/UsersOfItem in
-  CatalogUsage and RefusalOfShop/Cinematic/ItemUndo in CombinedHistory; proposed a shared step predicate query
-  (MapsWithStep(catalog, openLayouts, Func<EventStep,bool>)) and one refusal loop.
-- Checked, no finding: refusal order kept (quest, shop, cinematic, then item, before objects/sheets/tiles); other item
-  references (shops, drop tables) only via later linear steps; NewGame starting items, party members, rules have no
-  editor setter; MapEvent has no item condition; cinematics name no item; test-world has potion, not test_tonic; no test
-  reads the old quest_check/shop_check/cinematic_check ids (shop file's own unsaved test still uses shop_check inline).
-- Dropped (IU8 optional suggestions, not carried): SpriteImageFile summary, ChosenKey raise, MissingIconNote height.
+- Suggestion (open): a catalog test that a ring turned weapon with damage typed but no type shows Data's
+  "equipment.damageType is required for a weapon." (the reason the type box has no "none").
+- Suggestion (open): ItemEquipmentViewModel.Problem summary says "null otherwise" though a weapon with a number is null too.
+- Checked, no finding: Data requires a type on a weapon (ItemCatalogValidator:126); probe (PowerShell -STA) of
+  weapon/consumable/ring switches: no write-back, null type shows blank, Kind and type shown right; no StackPanel theme
+  style, so no BasedOn needed; untouched unique and weapon round-trip equal; new equipment starts Chest.
+- IU9 Warning (event-step copies): fixed in part (CatalogUsage.MapsWithStep shared); refusal methods left, not carried.

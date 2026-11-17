@@ -15,6 +15,6 @@ internal enum CatalogGroup
     /// <summary>Shops.</summary>
     Trade,
 
-    /// <summary>Character sprites.</summary>
+    /// <summary>Character sprites, Classes.</summary>
     Characters,
 }

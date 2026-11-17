@@ -64,3 +64,8 @@ None new: the page binds CL2's and CL3's tested view models. Guard: the smoke sc
 - **Note from CL3b review:** `CatalogDraftClassTests` and `ClassEditingViewModelTests` each build the test world with
   `Classes` set to Archer and Scholar; if this slice's tests need that draft too, move it into `ClassFixtures` (e.g.
   `DraftWithClasses()`) rather than a third copy.
+- **Done, with deviations:** `Party/ClassCatalogPage.xaml` (117 lines) and `.xaml.cs` (16), registered as planned
+  (`MainViewModel.Workspaces.cs` 145, `MainWindow.Database.cs` 98, `DatabaseMenu.xaml` 24: none near 300, no move);
+  `CatalogGroup.Characters`' summary and the page-order test gain "Classes". The description box is three lines high
+  through `MinLines`/`MaxLines` rather than a height in pixels; Base, Per level and Accuracy carry tooltips from their
+  summaries beside Speed's. No new test needed the Archer and Scholar draft, so `ClassFixtures` is unchanged.

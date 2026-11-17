@@ -32,7 +32,7 @@ param(
         'Database>Quests', 'Database>Shops', 'Database>Drop tables', 'Database>Effect strips',
         'Database>Effect strips>Strip from sheet cells...', 'Database>Battle backgrounds',
         'Database>Skills', 'Database>Effects', 'Database>Statuses', 'Database>Cinematics',
-        'Database>Enemies', 'Database>Items', 'Database>Affixes', 'Database>Encounters',
+        'Database>Enemies', 'Database>Items', 'Database>Affixes', 'Database>Encounters', 'Database>Classes',
         'Help>Raise a test error'),
     [switch]$EventWindows,
     [string]$Map

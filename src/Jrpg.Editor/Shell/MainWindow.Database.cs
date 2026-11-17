@@ -7,6 +7,7 @@ using Jrpg.Editor.Effects;
 using Jrpg.Editor.Encounters;
 using Jrpg.Editor.Items;
 using Jrpg.Editor.Loot;
+using Jrpg.Editor.Party;
 using Jrpg.Editor.Quests;
 using Jrpg.Editor.Skills;
 using Jrpg.Editor.Sprites;
@@ -45,6 +46,7 @@ internal sealed partial class MainWindow
         pageViews.Register<TieredEffectCatalogViewModel>(edited => new TieredEffectCatalogPage(edited));
         pageViews.Register<StatusCatalogViewModel>(edited => new StatusCatalogPage(edited));
         pageViews.Register<EncounterCatalogViewModel>(edited => new EncounterPage(edited));
+        pageViews.Register<ClassCatalogViewModel>(edited => new ClassCatalogPage(edited));
         RegisterPicturePages(pageViews);
         RegisterPagesOnTheAnimationClock(pageViews, animationTime);
         return pageViews;

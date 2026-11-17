@@ -1,0 +1,117 @@
+<UserControl x:Class="Jrpg.Editor.Party.ClassCatalogPage"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <UserControl.Resources>
+    <Style x:Key="FieldLabel" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+      <Setter Property="Width" Value="90" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="NumberBox" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+      <Setter Property="Width" Value="60" />
+      <Setter Property="Margin" Value="0,2,12,2" />
+    </Style>
+  </UserControl.Resources>
+  <DockPanel>
+    <!-- The draft's classes in id order, the ones added this session after them; only those can be removed (decision 945). -->
+    <DockPanel DockPanel.Dock="Left" Width="240">
+      <TextBlock DockPanel.Dock="Top" Text="Classes" FontWeight="Bold" />
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
+        <Button Content="Add" Width="50" Command="{Binding AddClassCommand}" ToolTip="A new class last in the list, its id to type" />
+        <Button Content="Duplicate" Width="70" Margin="4,0,0,0" Command="{Binding DuplicateClassCommand}"
+                ToolTip="A copy of the chosen class after it, skills and resources included; type its id" />
+        <Button Content="Remove" Width="60" Margin="4,0,0,0" Command="{Binding RemoveClassCommand}"
+                ToolTip="Only a class added this session; party members may name a saved one" />
+      </StackPanel>
+      <ListBox ItemsSource="{Binding Classes}" SelectedItem="{Binding SelectedClass}" DisplayMemberPath="Label" Margin="0,4,0,0" />
+    </DockPanel>
+
+    <!-- The chosen class in tabs; Stats holds its texts, then its base and growth side by side, a row per stat. -->
+    <DockPanel Margin="12,0,0,0" DataContext="{Binding SelectedClass}" Style="{StaticResource EnabledWhenChosen}">
+      <TabControl>
+        <TabItem Header="Stats">
+          <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="8">
+              <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Id" Style="{StaticResource FieldLabel}" />
+                <TextBox Width="240"
+                         Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}"
+                         IsEnabled="{Binding IsNew}"
+                         ToolTip="Lowercase letters, digits and _; fixed once saved, since party members name it" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                <TextBlock Text="Name" Style="{StaticResource FieldLabel}" />
+                <TextBox Width="240" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+              </StackPanel>
+              <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                <TextBlock Text="Description" Style="{StaticResource FieldLabel}" VerticalAlignment="Top" />
+                <TextBox Width="400"
+                         MinLines="3"
+                         MaxLines="3"
+                         TextWrapping="Wrap"
+                         VerticalScrollBarVisibility="Auto"
+                         Text="{Binding Description, UpdateSourceTrigger=PropertyChanged}"
+                         ToolTip="Shown on the leader screen beside the class's name" />
+              </StackPanel>
+
+              <!-- The primaries follow max HP, speed and accuracy in StatKinds' order, as every screen lists them. -->
+              <Grid Margin="0,12,0,0">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="Auto" />
+                  <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                  <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Column="1" Text="Base" FontWeight="Bold" ToolTip="The stats at level 1" />
+                <TextBlock Grid.Column="2" Text="Growth (per level)" FontWeight="Bold" ToolTip="What each level after the first adds" />
+
+                <TextBlock Grid.Row="1" Text="Max HP" Style="{StaticResource FieldLabel}" />
+                <TextBox Grid.Row="1" Grid.Column="1" Style="{StaticResource NumberBox}" Text="{Binding Base.MaxHpText, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Grid.Row="1" Grid.Column="2" Style="{StaticResource NumberBox}" Text="{Binding Growth.MaxHpText, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Grid.Row="2" Text="Speed" Style="{StaticResource FieldLabel}"
+                           ToolTip="Sets the rogue's readiness charges; turn order ignores speed for now." />
+                <TextBox Grid.Row="2" Grid.Column="1" Style="{StaticResource NumberBox}" Text="{Binding Base.SpeedText, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Grid.Row="2" Grid.Column="2" Style="{StaticResource NumberBox}" Text="{Binding Growth.SpeedText, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Grid.Row="3" Text="Accuracy" Style="{StaticResource FieldLabel}" ToolTip="Points added to the rules' base accuracy" />
+                <TextBox Grid.Row="3" Grid.Column="1" Style="{StaticResource NumberBox}" Text="{Binding Base.AccuracyText, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Grid.Row="3" Grid.Column="2" Style="{StaticResource NumberBox}" Text="{Binding Growth.AccuracyText, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Grid.Row="4" Text="Power" Style="{StaticResource FieldLabel}" />
+                <TextBox Grid.Row="4" Grid.Column="1" Style="{StaticResource NumberBox}" Text="{Binding Base.PowerText, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Grid.Row="4" Grid.Column="2" Style="{StaticResource NumberBox}" Text="{Binding Growth.PowerText, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Grid.Row="5" Text="Agility" Style="{StaticResource FieldLabel}" />
+                <TextBox Grid.Row="5" Grid.Column="1" Style="{StaticResource NumberBox}" Text="{Binding Base.AgilityText, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Grid.Row="5" Grid.Column="2" Style="{StaticResource NumberBox}" Text="{Binding Growth.AgilityText, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Grid.Row="6" Text="Intelligence" Style="{StaticResource FieldLabel}" />
+                <TextBox Grid.Row="6" Grid.Column="1" Style="{StaticResource NumberBox}" Text="{Binding Base.IntelligenceText, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Grid.Row="6" Grid.Column="2" Style="{StaticResource NumberBox}" Text="{Binding Growth.IntelligenceText, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Grid.Row="7" Text="Constitution" Style="{StaticResource FieldLabel}" />
+                <TextBox Grid.Row="7" Grid.Column="1" Style="{StaticResource NumberBox}" Text="{Binding Base.ConstitutionText, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Grid.Row="7" Grid.Column="2" Style="{StaticResource NumberBox}" Text="{Binding Growth.ConstitutionText, UpdateSourceTrigger=PropertyChanged}" />
+
+                <TextBlock Grid.Row="8" Text="Will" Style="{StaticResource FieldLabel}" />
+                <TextBox Grid.Row="8" Grid.Column="1" Style="{StaticResource NumberBox}" Text="{Binding Base.WillText, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox Grid.Row="8" Grid.Column="2" Style="{StaticResource NumberBox}" Text="{Binding Growth.WillText, UpdateSourceTrigger=PropertyChanged}" />
+              </Grid>
+            </StackPanel>
+          </ScrollViewer>
+        </TabItem>
+      </TabControl>
+    </DockPanel>
+  </DockPanel>
+</UserControl>

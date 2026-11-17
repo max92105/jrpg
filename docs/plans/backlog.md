@@ -337,3 +337,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   shows no problem on the Enemies page and Save then refuses naming encounters.json; run every check that reads
   `enemies.json`, as `CheckItems` does for items (encounters and backgrounds plan, EC1 review). Unreachable today: the
   Enemies page removes only an enemy added in its session (EC2 review); it matters once a saved enemy can be removed.
+- The page-local `FieldLabel` and `NumberBox` styles are copied in about ten Database pages (Enemy, Cinematic,
+  TieredEffect, Encounter, Item, Affix, DropTable, Class...): one keyed style each in `Shell/EditorTheme.xaml` would
+  replace them (classes and progression plan, CL4 review).

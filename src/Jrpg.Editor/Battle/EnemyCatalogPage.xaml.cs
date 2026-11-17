@@ -25,7 +25,7 @@ internal sealed partial class EnemyCatalogPage : UserControl
     private const int WholeImage = -1;
 
     private readonly EnemyArtSources _art;
-    private readonly Action<Window, string> _editDropTables;
+    private readonly Action<string> _editDropTable;
     private EnemyArtViewModel? _watchedArt;
     private BitmapSource? _battler;
     private TileAnimation? _loop;
@@ -33,19 +33,19 @@ internal sealed partial class EnemyCatalogPage : UserControl
 
     /// <param name="enemies">The page's state.</param>
     /// <param name="art">What the Art tab imports with, reads the battle sprite from and plays its loop on.</param>
-    /// <param name="editDropTables">
-    /// Opens the Drop tables page in a dialog over the given window, the page's own, on the given table id, and takes
-    /// the draft's tables back when its OK applied (decision 602).
+    /// <param name="editDropTable">
+    /// Shows the Drop tables page on the given table id, this page applied first or the move refused (decision 928);
+    /// this page is detached after it.
     /// </param>
     public EnemyCatalogPage(
         EnemyCatalogViewModel enemies,
         EnemyArtSources art,
-        Action<Window, string> editDropTables)
+        Action<string> editDropTable)
     {
         InitializeComponent();
         _renderTick = new RenderTick(OnRendering);
         DataContext = _enemies = enemies;
-        (_art, _editDropTables) = (art, editDropTables);
+        (_art, _editDropTable) = (art, editDropTable);
         enemies.PropertyChanged += OnEnemiesChanged;
         enemies.ArtChoices.PropertyChanged += (_, _) => ReadAndShowArt();
         WatchChosenArt(null);
@@ -174,5 +174,5 @@ internal sealed partial class EnemyCatalogPage : UserControl
 
     // The button sits in the chosen enemy's panel, greyed while none is chosen.
     private void OnEditDropTablesClicked(object sender, RoutedEventArgs e) =>
-        _editDropTables(HostWindow, _enemies.SelectedEnemy!.DropTableId);
+        _editDropTable(_enemies.SelectedEnemy!.DropTableId);
 }

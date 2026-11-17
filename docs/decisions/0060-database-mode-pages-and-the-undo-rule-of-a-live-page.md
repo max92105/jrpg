@@ -84,10 +84,9 @@ Option A (decisions 918-924, 928, 931 and 939; options B to E set aside by decis
   without running Apply again. A page with valid typed changes is applied before the question, so it counts as the
   catalogs' unsaved change.
 - **Edit... to another catalog (928).** From WS6 the Enemies page's Edit... beside the Drop table box shows the Drop
-  tables page on the enemy's table, the Enemies page applied first (or the move refused); a Skills page's strip Edit...
-  takes the same path. The nested window and its refresh go, since the Enemies page starts again from the draft when
-  shown: **this retires ADR 0045's amendment B (decision 602)** once WS6 lands; until then the nested `CatalogDialog`
-  keeps it.
+  tables page on the enemy's table, the Enemies page applied first (or the move refused); it is the only Edit...
+  reaching another catalog, the Skills page's strip being a box (WS1). The nested window and its refresh go, since the Enemies page starts again from the draft when
+  shown: **this retires ADR 0045's amendment B (decision 602)**, done in WS6.
 - **A throwing Apply (939).** An Apply that throws (a `To...` on a state the problem line missed, Data's check) is
   turned into a refusal by `TryApplyShown`, "The Shops page can't apply: {message}", catching the two exceptions an
   apply raises (`InvalidOperationException`, `ContentValidationException`), so no move, save or close depends on it
@@ -110,4 +109,4 @@ Option A (decisions 918-924, 928, 931 and 939; options B to E set aside by decis
 - If the developer overturns the rule: a question on leave (option C, the alternative he is most likely to prefer)
   changes WS3 and WS4 only; per-edit steps (option B) rewrite every page view model.
 - Amends ADR 0045: decision 591's "no re-check" becomes the restart in Database mode, and amendment B (decision 602)
-  is retired by WS6.
+  is retired (done in WS6).

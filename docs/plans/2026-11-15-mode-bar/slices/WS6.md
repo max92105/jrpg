@@ -48,3 +48,18 @@ no `ERROR`, no binding-error line.
   `MainWindow.RegisterPagesOnTheAnimationClock` (`EditDropTables` then `RefreshDropTables` on the page's own edited
   catalog, now redundant since the dialog's OK restarts the shown session). `EnemyCatalogPage.HostWindow`'s comment
   already says the main window owns what it opens in Database mode.
+- **Done, with deviations:** no Skills strip Edit... (WS1's note), so the Enemies page's is the only caller;
+  `CatalogDialog` and `DialogBounds` had no user left in `src/` and went. The tests went to a sibling,
+  `DatabaseWorkspaceOnRecordTests` (92 lines; `DatabaseWorkspaceLeavingTests` was at 273), plus
+  `ShowPageOnRecord_NoTableNamed_ShowsTheFirstTable` (an enemy dropping nothing) and
+  `ShowPageOnRecord_TypedName_AppliesTheShownPageFirst`, and
+  `MainViewModelDatabaseWorkspaceTests.ShowDatabasePageOnRecord_DropTables_ShowsThePageOnTheTable` (151; review: on
+  vault, a table the test adds after crypt, so the content's only table can't pass it by chance); the six
+  `EnemyDropTableRefreshTests` went, so the total stays 7457. `ShowPage`, `ShowPageOnRecord` and `TryClose` share
+  `TryLeaveShown` (apply, then remember the chosen key; its third copy). `MainWindow.TryApplyShownPage` went with
+  `EditDropTables`, its only caller. `EnemyCatalogViewModel.DropTableChoices` is a plain list now (nothing inserts) and
+  `_content` readonly; the Edit... tooltip says it shows the Drop tables page; `IEditedCatalog`'s summary no longer
+  names the dialog. ADR 0045 marks amendment B retired (header line and under B), ADR 0060 and the ADR index say it is
+  done, ADR 0060's decision 928 naming the Enemies page's Edit... the only one (review).
+  `DatabaseWorkspaceViewModel.cs` 217 lines, `MainWindow.Database.cs` 96, `MainViewModel.Workspaces.cs` 143,
+  `EnemyCatalogViewModel.cs` 158, `EnemyCatalogPage.xaml.cs` 178, `EnemyEditingViewModel.cs` 22.

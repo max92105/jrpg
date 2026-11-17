@@ -1,5 +1,5 @@
 # Workspaces: the mode bar (the editor push's row 11)
-Status: approved, in progress
+Status: retro pending
 
 Drafted on 2026-11-15 from the editor push's row 11 ([roadmap](../2026-11-15-editor-push/README.md), decisions 683, 693,
 694; [design 3.1](../2026-11-15-editor-push/design.md)). The developer: "the editor became more than just a map editor.
@@ -119,7 +119,7 @@ page recipe: [page-recipe.md](page-recipe.md).
   page first** (Editor, about 250 lines) → [slices/WS4.md](slices/WS4.md)
 - [x] **WS5. The Database view hosts every page: the grouped list, the bar, focus kept; the Database menu shows pages;
   the smoke script reaches them** (Editor + script, about 260 lines) → [slices/WS5.md](slices/WS5.md)
-- [ ] **WS6. Edit... buttons show a page on a record (Enemies' drop table, Skills' strip); the nested refresh and
+- [x] **WS6. Edit... buttons show a page on a record (Enemies' drop table, Skills' strip); the nested refresh and
   `CatalogDialog` go** (Editor, about 150 lines, about 200 deleted) → [slices/WS6.md](slices/WS6.md)
 
 The rows' own editors (statuses, skills, items, affixes, encounters, backgrounds, classes...) are not slices here:

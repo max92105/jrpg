@@ -1,3 +1,4 @@
+using Jrpg.Core.Loot;
 using Jrpg.Editor.Workspaces;
 using static Jrpg.Editor.Tests.Shell.ShopsPageSteps;
 
@@ -5,8 +6,8 @@ namespace Jrpg.Editor.Tests.Shell;
 
 /// <summary>
 /// The mode bar going through the Database workspace on the test world (decisions 917, 919, 922, 926): Database opens
-/// the page list, a Database menu entry shows its page, and World or Back to previous map leave the Database mode only
-/// once the shown page applies.
+/// the page list, a Database menu entry shows its page, a page's Edit... another page on a record (decision 928), and
+/// World or Back to previous map leave the Database mode only once the shown page applies.
 /// </summary>
 public sealed class MainViewModelDatabaseWorkspaceTests : IDisposable
 {
@@ -85,6 +86,20 @@ public sealed class MainViewModelDatabaseWorkspaceTests : IDisposable
     }
 
     [Fact]
+    public void ShowDatabasePageOnRecord_DropTables_ShowsThePageOnTheTable()
+    {
+        var viewModel = _content.Open(_content.TestWorld);
+        // Vault comes after crypt in the page's id order, so it is never the table chosen first.
+        viewModel.Content!.SetDropTables([.. viewModel.Catalog!.DropTables.Values, Table("crypt"), Table("vault")]);
+        viewModel.ShowDatabasePageCommand.Execute("Enemies");
+
+        viewModel.ShowDatabasePageOnRecord("Drop tables", "vault");
+
+        var workspace = viewModel.DatabaseWorkspace!;
+        Assert.Equal(("Drop tables", "vault"), (workspace.ShownPage!.Title, workspace.Session!.Edited.ChosenKey));
+    }
+
+    [Fact]
     public void ShowWorld_TypedName_AppliesIt()
     {
         var viewModel = OpenOnArmory(_content, _content.TestWorld);
@@ -131,4 +146,6 @@ public sealed class MainViewModelDatabaseWorkspaceTests : IDisposable
 
         Assert.Equal((EditorWorkspace.Database, secondMapId), (viewModel.Workspace, viewModel.CurrentMap!.Map.Id));
     }
+
+    private static DropTable Table(string id) => new(id, [new DropEntry("potion", 10)]);
 }

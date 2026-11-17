@@ -3,6 +3,9 @@
 Status: accepted
 Date: 2026-11-13
 
+Amended by ADR 0060: in the Database mode a page's session starts again from the draft on every change, and amendment
+B, the nested window, is retired.
+
 ## Context
 The editor edits maps, tiles, objects, field sprites and quests; shops and enemies are still hand-written JSON. The
 developer wants to set up stores, quest NPCs and monsters from the editor for the introduction and the first quest
@@ -50,6 +53,8 @@ once, and the outer window then reads the draft's records it offers again, inser
 so no box loses its choice; this is the one path where a modal window re-checks the draft under it. Weighed and set
 aside: folding the inner edits into the outer session as one step (one undo for both, but a new combined setter, and
 the outer Cancel would drop a table the developer had OK'd), and no nesting at all (the menu only).
+*Retired by ADR 0060 (2026-11-17, decision 928):* the Enemies page's Edit... shows the Drop tables page on the enemy's
+table, the Enemies page applied first; the nested window and its refresh are gone.
 
 ## Consequences
 - **Easier:** a store, a quest NPC or a monster is set up without opening JSON; the editor can't save what the game

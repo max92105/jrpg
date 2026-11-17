@@ -17,13 +17,12 @@ namespace Jrpg.Editor.Battle;
 /// Every enemy as the Enemies page edits it (ADR 0045): the draft's enemies in id order, the ones added this session
 /// after them; Add starts from the tunable defaults, Duplicate from the chosen one (decision 585); only an added one
 /// can be removed, since encounters name a saved one (decision 581). <see cref="Problem"/> is an enemy's own problem
-/// first, then Data's message for the whole list (decision 580). The draft's drop tables are taken again after a Drop
-/// tables page opened from this one applies (decision 602). An enemy is chosen by its id. A rule's boxes offer every
-/// trigger and target, and the skills an enemy can use (decisions 850, 851).
+/// first, then Data's message for the whole list (decision 580). An enemy is chosen by its id. A rule's boxes offer
+/// every trigger and target, and the skills an enemy can use (decisions 850, 851).
 /// </summary>
 internal sealed partial class EnemyCatalogViewModel : ObservableObject, IEditedCatalog
 {
-    private ContentCatalog _content;
+    private readonly ContentCatalog _content;
 
     /// <param name="content">
     /// The draft as it is: the enemies edited, the skills they may name (those an enemy can use offered in a rule's Use
@@ -51,7 +50,7 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject, IEditedC
     public IReadOnlyList<DamageType> DamageTypes { get; } = Enum.GetValues<DamageType>();
 
     /// <summary>The drop tables an enemy may roll, the empty one for none first, then the draft's by id.</summary>
-    public ObservableCollection<string> DropTableChoices { get; }
+    public IReadOnlyList<string> DropTableChoices { get; }
 
     /// <summary>
     /// What a rule's Use box offers, as <see cref="TacticSkillChoice.AllIn"/> lists the draft's skills.
@@ -105,23 +104,6 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject, IEditedC
         {
             SelectedEnemy.Art.TakeLoop(loop);
         }
-    }
-
-    /// <summary>
-    /// After a Drop tables page opened from this one applied its step (decision 602): the box offers every table the
-    /// draft now holds, each new one inserted at its place in id order so no enemy's box loses its choice, and the
-    /// problem line checks the enemies against them.
-    /// </summary>
-    /// <param name="current">The draft as the Drop tables page left it.</param>
-    public void TakeDropTables(ContentCatalog current)
-    {
-        _content = current;
-        foreach (var id in current.DropTables.Keys.Where(id => !DropTableChoices.Contains(id)))
-        {
-            DropTableChoices.Insert(DropTableChoices.Count(choice => string.CompareOrdinal(choice, id) < 0), id);
-        }
-
-        RaiseProblemChanged();
     }
 
     /// <exception cref="InvalidOperationException">

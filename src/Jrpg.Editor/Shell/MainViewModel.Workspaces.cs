@@ -9,8 +9,8 @@ namespace Jrpg.Editor.Shell;
 /// The mode bar (decision 916): World shows the maps; Database hides them and puts the shown map out of reach of the
 /// undo history (its steps waiting as another map's do until World is shown again), Delete selected objects and
 /// Ctrl+H's collision (decision 925), and shows the catalog pages of <see cref="DatabaseWorkspace"/>, the Database
-/// menu's entries each showing its page. Leaving Database applies the shown page first, or stays when it refuses
-/// (decision 919); Back to previous map shows World first.
+/// menu's entries and a page's Edit... each showing a page. Leaving Database applies the shown page first, or stays
+/// when it refuses (decision 919); Back to previous map shows World first.
 /// </summary>
 internal sealed partial class MainViewModel
 {
@@ -32,6 +32,16 @@ internal sealed partial class MainViewModel
     /// refuses to apply; greyed with the map list's Back.
     /// </summary>
     public IRelayCommand GoBackToMapCommand => field ??= CreateGoBackToMapCommand();
+
+    /// <summary>
+    /// A shown page's Edit... reaching another catalog (decision 928): the page with that title on the record with that
+    /// key, the shown page applied first or, refused, kept with its refusal on the bar.
+    /// </summary>
+    public void ShowDatabasePageOnRecord(string title, string key)
+    {
+        var workspace = DatabaseWorkspace!;
+        workspace.ShowPageOnRecord(workspace.PageTitled(title), key);
+    }
 
     [RelayCommand]
     private void ShowWorld()

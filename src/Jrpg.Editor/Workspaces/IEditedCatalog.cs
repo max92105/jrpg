@@ -3,8 +3,8 @@ using System.ComponentModel;
 namespace Jrpg.Editor.Workspaces;
 
 /// <summary>
-/// A page's edited catalog as its hosts see it (design section 3 of the mode bar plan): the dialog greys OK on its
-/// problem; an opener showing a record chooses it by key.
+/// A page's edited catalog as the Database mode sees it (design section 3 of the mode bar plan): Apply greys and a move
+/// is refused on its problem; a page shown again, or on a record, starts on its key.
 /// </summary>
 internal interface IEditedCatalog : INotifyPropertyChanged
 {

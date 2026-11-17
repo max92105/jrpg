@@ -1,4 +1,3 @@
-using System.Windows;
 using Jrpg.Data.Art;
 using Jrpg.Editor.Animation;
 using Jrpg.Editor.Backgrounds;
@@ -21,7 +20,7 @@ namespace Jrpg.Editor.Shell;
 /// <summary>
 /// The Database pages' views (decision 918): each catalog's page built over its edited catalog with the callbacks it
 /// needs, registered for the Database mode, which the Database menu's entries show (decision 926). The Enemies page's
-/// Edit... still opens the Drop tables page in the catalog dialog over the main window, applying its own undo step.
+/// Edit... shows the Drop tables page on the enemy's table, the Enemies page applied first (decision 928).
 /// </summary>
 internal sealed partial class MainWindow
 {
@@ -83,7 +82,6 @@ internal sealed partial class MainWindow
     private void RegisterPagesOnTheAnimationClock(DatabasePageViews pageViews, TileAnimationTime animationTime)
     {
         var artRoot = _viewModel.ArtRoot;
-        var enemyEditing = _viewModel.EnemyEditing!;
         var art = new EnemyArtSources(
             _viewModel.ImportArtImages,
             file => SpriteImageFile.LoadFrom(artRoot, ArtFolders.Battlers, file),
@@ -91,40 +89,8 @@ internal sealed partial class MainWindow
         pageViews.Register<EnemyCatalogViewModel>(edited => new EnemyCatalogPage(
             edited,
             art,
-            (owner, tableId) =>
-            {
-                if (EditDropTables(owner, tableId))
-                {
-                    enemyEditing.RefreshDropTables(edited);
-                }
-            }));
+            tableId => _viewModel.ShowDatabasePageOnRecord("Drop tables", tableId)));
         pageViews.Register<FieldSpriteCatalogViewModel>(edited => new FieldSpritePage(
             edited, artRoot, animationTime, _viewModel.ImportFieldSprites));
-    }
-
-    // A dialog's OK changes the draft, which would start the shown Database page again under what was typed: applied
-    // first, or the dialog doesn't open and the Database mode shows why (decision 919).
-    private bool TryApplyShownPage() => _viewModel.DatabaseWorkspace?.TryApplyShown() ?? true;
-
-    // The Drop tables page in the catalog dialog over the owner, on the chosen table; its OK applies its own undo step
-    // at once, so a page under it can take the new tables (decision 602). Returns whether it applied.
-    private bool EditDropTables(Window owner, string chosenTableId)
-    {
-        if (_viewModel.DropTableEditing is not { } dropTableEditing || !TryApplyShownPage())
-        {
-            return false;
-        }
-
-        var edited = dropTableEditing.Start();
-        edited.Choose(chosenTableId);
-        var dialog = new CatalogDialog("Drop tables", new DropTableCatalogPage(edited), edited) { Owner = owner };
-        DialogBounds.FitTo(dialog, this);
-        if (dialog.ShowDialog() != true)
-        {
-            return false;
-        }
-
-        dropTableEditing.Apply(edited);
-        return true;
     }
 }

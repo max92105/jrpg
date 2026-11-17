@@ -74,12 +74,11 @@ internal sealed partial class DatabaseWorkspaceViewModel : ObservableObject
     /// </summary>
     public bool TryClose()
     {
-        if (!TryApplyShown())
+        if (!TryLeaveShown())
         {
             return false;
         }
 
-        RememberChosenKey();
         Session = null;
         return true;
     }
@@ -94,17 +93,29 @@ internal sealed partial class DatabaseWorkspaceViewModel : ObservableObject
         return Refusal is null;
     }
 
-    /// <summary>Shows the page on its record when last left, the shown page applied first; refused, it stays.</summary>
-    [RelayCommand]
-    private void ShowPage(CatalogPage page)
+    /// <summary>
+    /// Shows that page on the record with that key, its first record when none has it (an Edit... reaching another
+    /// catalog, decision 928), the shown page applied first; refused, it stays.
+    /// </summary>
+    public void ShowPageOnRecord(CatalogPage page, string key)
     {
-        if (!TryApplyShown())
+        if (!TryLeaveShown())
         {
             return;
         }
 
-        RememberChosenKey();
+        _chosenKeys[page] = key;
         Show(page);
+    }
+
+    /// <summary>Shows the page on its record when last left, the shown page applied first; refused, it stays.</summary>
+    [RelayCommand]
+    private void ShowPage(CatalogPage page)
+    {
+        if (TryLeaveShown())
+        {
+            Show(page);
+        }
     }
 
     // The draft's change starts the session again, so Apply needs no restart of its own.
@@ -148,12 +159,20 @@ internal sealed partial class DatabaseWorkspaceViewModel : ObservableObject
         }
     }
 
-    private void RememberChosenKey()
+    // The shown page applied, its chosen record remembered for its next showing; false when it refused.
+    private bool TryLeaveShown()
     {
+        if (!TryApplyShown())
+        {
+            return false;
+        }
+
         if (Session is { } session)
         {
             _chosenKeys[ShownPage!] = session.Edited.ChosenKey;
         }
+
+        return true;
     }
 
     private void Show(CatalogPage page)

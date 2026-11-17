@@ -5,12 +5,14 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-mode-bar, slice WS4 (Undo, Redo, Save, Save all, close and the catalog dialogs apply the shown
-Database page first; UnappliedPage, decision 1009). 2026-11-17. Round 1. Verdict: Ready to commit (no Critical).
+Plan 2026-11-15-mode-bar, slice WS5 (the Database view hosts every page: CatalogGroup, DatabasePageViews,
+ShowDatabasePage, menu entries as pages; decision 1010). 2026-11-17. Round 1. Verdict: Fix the Criticals.
 
-- Warning: CombinedHistory.TryApplyShownPage copies the page refusal into History.Refusal (status bar,
-  MainWindow.xaml:166), cleared only by RecordStep/Undo/Redo: fixing the problem or Revert leaves "has a problem... Fix
-  it or press Revert" in the status bar; same for SaveError's "Not saved: ..." — open
-- Suggestion: UnappliedPage is a string? line, reads as a CatalogPage; UnappliedPageEntry/Line — open
-- WS3b Suggestion GoBackToMapCommand summary names the refusal — fixed
-- WS3b Suggestion Refusal TextBlock wraps (TextWrapping, MaxWidth 640) — fixed
+- Critical: MainWindow.Database.cs:82 RegisterAnimatedPages misleading (Effect strips, Battle backgrounds animate but
+  sit in RegisterPicturePages; the split is "takes the shared animation clock"); rename e.g.
+  RegisterPagesOnTheAnimationClock, comment both pages, WS6.md:47 cites the name — open
+- Suggestion: ShowDatabasePage from World runs Open() (builds last page + view) then ShowPage replaces it — open
+- Suggestion: test ShowDatabasePageCommand_KnownTitle_IsLit -> _IsEnabled ("lit" = shown button) — open
+- Suggestion: open-editor-windows.ps1:141 page not found reports "no window opened" -> "no page shown" — open
+- WS4 Warning History.Refusal/SaveError stale after fix/revert — fixed (MainViewModel.Saving OnDatabaseWorkspaceChanged)
+- WS4 Suggestion UnappliedPage name — fixed (UnappliedPageLine)

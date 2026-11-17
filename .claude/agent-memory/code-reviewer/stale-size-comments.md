@@ -57,6 +57,10 @@ call or a rename. These cases slipped past it:
   "the open map is replaced": grep the singular noun when a single becomes a collection. MS3 (switching keeps steps)
   left a test comment "the switch drops forest's steps" and a param doc "the open map's": grep tests' comments too.
 
+- Renamed menu headers (mode bar WS5: "Shops..." -> "Shops") left `.claude/skills/slice/SKILL.md`'s
+  `-Windows 'Database>Shops...'` example and CLAUDE.md's "opens each Database window"; grep `.claude/skills/` and
+  CLAUDE.md for the old header whenever a menu entry or a script's entry syntax changes.
+
 - Deleted content files leave text a script generates (music change, decision 496: fetch-placeholder-sounds.ps1 writing
   "The music ... rendered by new-placeholder-tune.pl" into CREDITS.md) and the generator's now-unused subs; grep
   `.claude/scripts/` too, not only comments and docs.

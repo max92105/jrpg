@@ -23,7 +23,6 @@ internal sealed partial class MainWindow : Window
     private readonly MainViewModel _viewModel;
     private readonly MapDrawing? _drawing;
     private readonly ViewportTransform _viewport = new();
-    private readonly Dictionary<string, Action> _databaseOpeners;
     private bool _isSpaceHeld;
     private MouseButton? _strokeButton;
     private Point2D? _mapPoint;
@@ -35,7 +34,6 @@ internal sealed partial class MainWindow : Window
     public MainWindow(MainViewModel viewModel)
     {
         InitializeComponent();
-        _databaseOpeners = CreateDatabaseOpeners();
         _renderTick = new RenderTick(OnRendering);
         if (viewModel.Content is { } content)
         {
@@ -56,6 +54,7 @@ internal sealed partial class MainWindow : Window
         viewModel.Painting?.PropertyChanged += (_, _) => ShowBrushAt(_brushCell);
         viewModel.Placing?.PropertyChanged += (_, _) => DrawSelectionMarks();
         viewModel.Removal?.PropertyChanged += OnRemovalChanged;
+        HostDatabasePages();
         OpenCurrentMap();
     }
 

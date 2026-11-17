@@ -1,28 +1,32 @@
 namespace Jrpg.Editor.Workspaces;
 
 /// <summary>
-/// One entry of the Database mode's page list (decision 917): its title, and how its session starts from the draft, so
-/// the list holds pages of every catalog type alike.
+/// One entry of the Database mode's page list (decision 917): its title, its heading, and how its session starts from
+/// the draft, so the list holds pages of every catalog type alike.
 /// </summary>
 internal sealed class CatalogPage
 {
     private readonly Func<string?, PageSession> _start;
 
-    private CatalogPage(string title, Func<string?, PageSession> start)
+    private CatalogPage(string title, CatalogGroup group, Func<string?, PageSession> start)
     {
         Title = title;
+        Group = group;
         _start = start;
     }
 
-    /// <summary>The page's name in the list and the Database menu, as the menu entry's <c>Tag</c> spells it.</summary>
+    /// <summary>The page's name in the list and the Database menu, the menu entry's <c>CommandParameter</c>.</summary>
     public string Title { get; }
+
+    /// <summary>The heading the page is listed under.</summary>
+    public CatalogGroup Group { get; }
 
     /// <summary>
     /// A page whose session is the editing view model's own: started from the draft, applied as one step.
     /// </summary>
-    public static CatalogPage Of<TEdited>(string title, ICatalogEditing<TEdited> editing)
+    public static CatalogPage Of<TEdited>(string title, CatalogGroup group, ICatalogEditing<TEdited> editing)
         where TEdited : IEditedCatalog =>
-        new(title, chosenKey =>
+        new(title, group, chosenKey =>
         {
             var edited = editing.Start();
             if (chosenKey is not null)

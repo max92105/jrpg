@@ -26,12 +26,26 @@ public sealed class DatabaseWorkspaceViewModelTests
     {
         _draft.SetShops([_armory, _smithy]);
         _draft.StepRecorded += (_, _) => _stepsRecorded++;
-        _shopsPage = CatalogPage.Of("Shops", new ShopEditingViewModel(_draft));
-        var questsPage = CatalogPage.Of("Quests", new QuestEditingViewModel(_draft));
+        _shopsPage = CatalogPage.Of("Shops", CatalogGroup.Trade, new ShopEditingViewModel(_draft));
+        var questsPage = CatalogPage.Of("Quests", CatalogGroup.Story, new QuestEditingViewModel(_draft));
         _workspace = new DatabaseWorkspaceViewModel(_draft, [_shopsPage, questsPage]);
     }
 
     private ShopCatalogViewModel ShownShops => (ShopCatalogViewModel)_workspace.Session!.Edited;
+
+    [Fact]
+    public void PageTitled_Shops_IsTheShopsPage()
+    {
+        var page = _workspace.PageTitled("Shops");
+
+        Assert.Same(_shopsPage, page);
+    }
+
+    [Fact]
+    public void PageTitled_UnknownTitle_Throws()
+    {
+        Assert.Throws<InvalidOperationException>(() => _workspace.PageTitled("Nowhere"));
+    }
 
     [Fact]
     public void Open_FirstVisit_ShowsTheFirstPage()

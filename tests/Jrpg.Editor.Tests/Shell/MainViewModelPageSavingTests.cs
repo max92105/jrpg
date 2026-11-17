@@ -101,7 +101,7 @@ public sealed class MainViewModelPageSavingTests : IDisposable
     {
         var viewModel = _content.Open(_content.TestWorld);
         viewModel.ShowDatabaseCommand.Execute(null);
-        ShowPage(viewModel, CatalogPage.Of("Notes", new NotesEditing()));
+        ShowPage(viewModel, CatalogPage.Of("Notes", CatalogGroup.Story, new NotesEditing()));
         ((NotesCatalog)viewModel.DatabaseWorkspace!.Session!.Edited).Problem = "A note has no title.";
 
         viewModel.ShowWorldCommand.Execute(null);
@@ -154,5 +154,7 @@ public sealed class MainViewModelPageSavingTests : IDisposable
 
     // A page built here whose Apply throws, as a bug its problem line missed would (decision 939).
     private static void ShowThrowingPage(MainViewModel viewModel) =>
-        ShowPage(viewModel, CatalogPage.Of("Notes", new NotesEditing { Thrown = new InvalidOperationException("broken") }));
+        ShowPage(
+            viewModel,
+            CatalogPage.Of("Notes", CatalogGroup.Story, new NotesEditing { Thrown = new InvalidOperationException("broken") }));
 }

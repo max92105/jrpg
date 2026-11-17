@@ -4,19 +4,20 @@
           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
           Style="{StaticResource {x:Type MenuItem}}"
           Header="Database">
-  <!-- Its own file so each Database editor adds its entry here, not to the main window (decision 938). An entry's Tag is
-       the title the main window opens it by; the theme's style is set above, since an implicit style skips a subclass. -->
-  <MenuItem Header="Quests..." Tag="Quests" />
-  <MenuItem Header="Shops..." Tag="Shops" ToolTip="Each shop's name and the priced items it sells, in order; the shopkeeper preset's shop box offers them." />
-  <MenuItem Header="Items..." Tag="Items" ToolTip="Base items, equipment, uniques and materials: icons, stacks, prices, effects, bonuses and fixed affixes." />
-  <MenuItem Header="Drop tables..." Tag="Drop tables" ToolTip="Each table's items, chances and quantities; the Enemies page's Drop table box offers them." />
-  <MenuItem Header="Affixes..." Tag="Affixes" ToolTip="The affixes dropped gear may roll: stat, range, gear kinds, weight and gold value." />
-  <MenuItem Header="Effect strips..." Tag="Effect strips" ToolTip="Each effects image's frame time, the frame its hit lands on and the swing an Attack plays first." />
-  <MenuItem Header="Battle backgrounds..." Tag="Battle backgrounds" ToolTip="Every battle background, still or animated: an animated one plays here at its frame time; import PNGs, or GIFs as animations. The folder also holds the title's and the menu's pictures." />
-  <MenuItem Header="Skills..." Tag="Skills" ToolTip="Each skill's name, texts, icon, sound, own strip, costs, effect and statuses; classes and enemies still list theirs in their files." />
-  <MenuItem Header="Effects..." Tag="Effects" ToolTip="effects.json: fire_1, heal_2...; an image's pace is Effect strips" />
-  <MenuItem Header="Statuses..." Tag="Statuses" ToolTip="Poison, Stun, Guard...: each status's parts, family and timing; skills grant them with turns and a chance." />
-  <MenuItem Header="Cinematics..." Tag="Cinematics" ToolTip="Each cinematic's stills in order, their seconds, subtitles, voices and zoom, and its music." />
-  <MenuItem Header="Enemies..." Tag="Enemies" ToolTip="Each enemy's numbers, resistances, rewards, pictures, and its rules and phases on the Tactics tab." />
-  <MenuItem Header="Encounters..." Tag="Encounters" ToolTip="Each encounter's enemies in their places, its own background or the map's, and its music; Map &gt; Settings... picks which encounters a map rolls." />
+  <!-- Its own file so each Database editor adds its entry here, not to the main window (decision 938). An entry shows
+       the Database mode on the page its parameter titles (decision 926); the theme's style is set above, since an
+       implicit style skips a subclass. -->
+  <MenuItem Header="Quests" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Quests" />
+  <MenuItem Header="Shops" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Shops" ToolTip="Each shop's name and the priced items it sells, in order; the shopkeeper preset's shop box offers them." />
+  <MenuItem Header="Items" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Items" ToolTip="Base items, equipment, uniques and materials: icons, stacks, prices, effects, bonuses and fixed affixes." />
+  <MenuItem Header="Drop tables" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Drop tables" ToolTip="Each table's items, chances and quantities; the Enemies page's Drop table box offers them." />
+  <MenuItem Header="Affixes" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Affixes" ToolTip="The affixes dropped gear may roll: stat, range, gear kinds, weight and gold value." />
+  <MenuItem Header="Effect strips" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Effect strips" ToolTip="Each effects image's frame time, the frame its hit lands on and the swing an Attack plays first." />
+  <MenuItem Header="Battle backgrounds" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Battle backgrounds" ToolTip="Every battle background, still or animated: an animated one plays here at its frame time; import PNGs, or GIFs as animations. The folder also holds the title's and the menu's pictures." />
+  <MenuItem Header="Skills" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Skills" ToolTip="Each skill's name, texts, icon, sound, own strip, costs, effect and statuses; classes and enemies still list theirs in their files." />
+  <MenuItem Header="Effects" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Effects" ToolTip="effects.json: fire_1, heal_2...; an image's pace is Effect strips" />
+  <MenuItem Header="Statuses" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Statuses" ToolTip="Poison, Stun, Guard...: each status's parts, family and timing; skills grant them with turns and a chance." />
+  <MenuItem Header="Cinematics" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Cinematics" ToolTip="Each cinematic's stills in order, their seconds, subtitles, voices and zoom, and its music." />
+  <MenuItem Header="Enemies" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Enemies" ToolTip="Each enemy's numbers, resistances, rewards, pictures, and its rules and phases on the Tactics tab." />
+  <MenuItem Header="Encounters" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Encounters" ToolTip="Each encounter's enemies in their places, its own background or the map's, and its music; Map &gt; Settings... picks which encounters a map rolls." />
 </MenuItem>

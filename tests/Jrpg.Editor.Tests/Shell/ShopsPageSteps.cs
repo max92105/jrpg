@@ -34,8 +34,7 @@ internal static class ShopsPageSteps
     {
         viewModel.Content!.SetShops([.. viewModel.Catalog!.Shops.Values, _armory]);
         viewModel.ShowDatabaseCommand.Execute(null);
-        var workspace = viewModel.DatabaseWorkspace!;
-        ShowPage(viewModel, workspace.Pages.Single(page => page.Title == "Shops"));
+        ShowPage(viewModel, viewModel.DatabaseWorkspace!.PageTitled("Shops"));
         ShownShops(viewModel).Choose("armory");
     }
 

@@ -5,7 +5,7 @@ namespace Jrpg.Editor.Sprites;
 
 /// <summary>
 /// True when its two values are the same object: a facing line's Pick toggle is checked while its facing is the picking
-/// one (decision 772).
+/// one (decision 772), and the Database list's page button is lit while its page is the shown one.
 /// </summary>
 internal sealed class SameItemConverter : IMultiValueConverter
 {

@@ -163,7 +163,7 @@
                       DisplayMemberPath="Line"
                       SelectedValuePath="Id"
                       SelectedValue="{Binding TierId}"
-                      ToolTip="A named damage or heal: the user's Power times its per-Power number (Database > Effects...)" />
+                      ToolTip="A named damage or heal: the user's Power times its per-Power number (Database > Effects)" />
           </StackPanel>
           <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
             <TextBlock Text="Kind" Style="{StaticResource FieldLabel}" />

@@ -19,7 +19,7 @@
     <TextBox x:Name="IdBox" Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}" IsReadOnly="{Binding IsIdFixed}" Margin="0,2,0,2" />
     <TextBlock Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Text="{Binding IdProblem}" />
 
-    <TextBlock Text="Sprite (set up in NPCs > Character sprites...)" Margin="0,8,0,0" />
+    <TextBlock Text="Sprite (set up in NPCs > Character sprites)" Margin="0,8,0,0" />
     <ComboBox x:Name="SpriteBox" Margin="0,2,0,2" ItemsSource="{Binding SpriteFiles}" SelectedItem="{Binding SpriteFile}" />
     <TextBlock Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Text="{Binding SpriteProblem}" />
     <TextBlock x:Name="PreviewProblem" Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" />

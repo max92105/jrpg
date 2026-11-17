@@ -26,8 +26,8 @@ public sealed class DatabaseWorkspaceLeavingTests
     public DatabaseWorkspaceLeavingTests()
     {
         _draft.SetShops([_armory, _smithy]);
-        _shopsPage = CatalogPage.Of("Shops", new ShopEditingViewModel(_draft));
-        _notesPage = CatalogPage.Of("Notes", _notesEditing);
+        _shopsPage = CatalogPage.Of("Shops", CatalogGroup.Trade, new ShopEditingViewModel(_draft));
+        _notesPage = CatalogPage.Of("Notes", CatalogGroup.Story, _notesEditing);
         _workspace = new DatabaseWorkspaceViewModel(_draft, [_shopsPage, _notesPage]);
     }
 
@@ -149,6 +149,19 @@ public sealed class DatabaseWorkspaceLeavingTests
         _workspace.ShowPageCommand.Execute(_shopsPage);
 
         Assert.Equal("smithy", ShownShops.ChosenKey);
+    }
+
+    [Fact]
+    public void Open_PageLeftBeforeAnotherWasShown_OpensItOnItsChosenShop()
+    {
+        _workspace.Open();
+        ShownShops.Choose("smithy");
+        _workspace.ShowPageCommand.Execute(_notesPage);
+        _workspace.TryClose();
+
+        _workspace.Open(_shopsPage);
+
+        Assert.Equal((_shopsPage, "smithy"), (_workspace.ShownPage, ShownShops.ChosenKey));
     }
 
     [Fact]

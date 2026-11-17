@@ -24,7 +24,7 @@ public sealed class NewNpcViewModelTests
     {
         var newNpc = new NewNpcViewModel([], []);
 
-        Assert.Equal("Set up a character sprite first: NPCs > Character sprites...", newNpc.SpriteProblem);
+        Assert.Equal("Set up a character sprite first: NPCs > Character sprites", newNpc.SpriteProblem);
     }
 
     // Only set-up files are listed, but the sprite is a string to the binding: one without a record is refused too.
@@ -33,7 +33,7 @@ public sealed class NewNpcViewModelTests
     {
         var newNpc = new NewNpcViewModel([], _sheets) { SpriteFile = "missing.png" };
 
-        Assert.Equal("missing.png has no record; set it up in NPCs > Character sprites...", newNpc.SpriteProblem);
+        Assert.Equal("missing.png has no record; set it up in NPCs > Character sprites", newNpc.SpriteProblem);
     }
 
     [Fact]

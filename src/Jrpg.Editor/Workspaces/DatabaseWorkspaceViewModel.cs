@@ -55,8 +55,18 @@ internal sealed partial class DatabaseWorkspaceViewModel : ObservableObject
     public string? UnappliedPageLine =>
         _unappliedReason is { } reason ? $"the {ShownPage!.Title} page, not applied: {reason.TrimEnd('.')}" : null;
 
+    /// <summary>The page with that title; throws when the list has none.</summary>
+    public CatalogPage PageTitled(string title) => Pages.Single(page => page.Title == title);
+
+    public bool HasPage(string title) => Pages.Any(page => page.Title == title);
+
     /// <summary>Shows the last page shown on its last chosen record, the first page on the first visit.</summary>
-    public void Open() => Show(ShownPage ?? Pages[0]);
+    public void Open() => Open(ShownPage ?? Pages[0]);
+
+    /// <summary>
+    /// Shows that page on its record when last left, the Database mode being closed (nothing to apply).
+    /// </summary>
+    public void Open(CatalogPage page) => Show(page);
 
     /// <summary>
     /// Ends the shown page's session, applied first and its chosen record remembered; false when the page refused

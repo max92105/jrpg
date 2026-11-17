@@ -117,7 +117,7 @@ page recipe: [page-recipe.md](page-recipe.md).
   [slices/WS3b.md](slices/WS3b.md)
 - [x] **WS4. Undo, Redo, Save, Save all, the close question and the dialogs still opened in Database mode apply the
   page first** (Editor, about 250 lines) → [slices/WS4.md](slices/WS4.md)
-- [ ] **WS5. The Database view hosts every page: the grouped list, the bar, focus kept; the Database menu shows pages;
+- [x] **WS5. The Database view hosts every page: the grouped list, the bar, focus kept; the Database menu shows pages;
   the smoke script reaches them** (Editor + script, about 260 lines) → [slices/WS5.md](slices/WS5.md)
 - [ ] **WS6. Edit... buttons show a page on a record (Enemies' drop table, Skills' strip); the nested refresh and
   `CatalogDialog` go** (Editor, about 150 lines, about 200 deleted) → [slices/WS6.md](slices/WS6.md)
@@ -233,6 +233,10 @@ may overturn; the others follow from them, from the code or from the review.
   lists it only after a refused move, and never lists a page whose valid typed changes were not yet applied. The
   page's refusal copied into `History.Refusal` or `SaveError` clears when the workspace's `Refusal` changes. *(default
   taken while the developer was away; his to overturn)*
+- **1010.** (WS5.) Every screenshot of the main window, a Database page's included, is the developer's: agents read the
+  smoke script's lines only, since the World half and the Skills, Items and Character sprites pages show licensed art
+  (WS1's note had listed eight pages agents may look at). The shown page's view is built anew for every session (each
+  Apply, undo, redo, revert or page change), so no page outlives its edited catalog.
 
 ## Defaults to confirm
 Taken while the developer was away; each is his to overturn, and the slices that change if he does are named.

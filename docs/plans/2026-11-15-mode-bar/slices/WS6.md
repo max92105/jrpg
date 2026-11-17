@@ -44,3 +44,7 @@ no `ERROR`, no binding-error line.
 - **Note from WS1:** the Skills page landed without an Edit... button (its strip is a box), so the Enemies page's
   Edit... beside the Drop table box is the only one reaching another catalog; `CatalogDialog` and `DialogBounds` have
   no user outside `Shell/MainWindow.Database.cs` (grepped in WS1).
+- **Note from WS5:** `OpenInDialog` is gone; the Enemies page's registration is in
+  `MainWindow.RegisterPagesOnTheAnimationClock` (`EditDropTables` then `RefreshDropTables` on the page's own edited
+  catalog, now redundant since the dialog's OK restarts the shown session). `EnemyCatalogPage.HostWindow`'s comment
+  already says the main window owns what it opens in Database mode.

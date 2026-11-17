@@ -4,8 +4,9 @@ using static Jrpg.Editor.Tests.Shell.ShopsPageSteps;
 namespace Jrpg.Editor.Tests.Shell;
 
 /// <summary>
-/// The mode bar going through the Database workspace on the test world (decisions 917, 919, 922): Database opens the
-/// page list, and World or Back to previous map leave only once the shown page applies.
+/// The mode bar going through the Database workspace on the test world (decisions 917, 919, 922, 926): Database opens
+/// the page list, a Database menu entry shows its page, and World or Back to previous map leave the Database mode only
+/// once the shown page applies.
 /// </summary>
 public sealed class MainViewModelDatabaseWorkspaceTests : IDisposable
 {
@@ -43,6 +44,44 @@ public sealed class MainViewModelDatabaseWorkspaceTests : IDisposable
         viewModel.ShowDatabaseCommand.Execute(null);
 
         Assert.Equal("Old Armory", ShownShops(viewModel).SelectedShop!.Name);
+    }
+
+    [Fact]
+    public void ShowDatabasePage_Shops_ShowsDatabaseOnTheShopsPage()
+    {
+        var viewModel = _content.Open(_content.TestWorld);
+
+        viewModel.ShowDatabasePageCommand.Execute("Shops");
+
+        Assert.Equal((EditorWorkspace.Database, "Shops"), (viewModel.Workspace, viewModel.DatabaseWorkspace!.ShownPage!.Title));
+    }
+
+    [Fact]
+    public void ShowDatabasePage_ShownPageWithProblem_KeepsIt()
+    {
+        var viewModel = OpenOnArmory(_content, _content.TestWorld);
+        ShownShops(viewModel).AddShopCommand.Execute(null);
+
+        viewModel.ShowDatabasePageCommand.Execute("Quests");
+
+        Assert.Equal("Shops", viewModel.DatabaseWorkspace!.ShownPage!.Title);
+        Assert.StartsWith("The Shops page has a problem: ", viewModel.DatabaseWorkspace.Refusal);
+    }
+
+    [Fact]
+    public void ShowDatabasePageCommand_KnownTitle_IsEnabled()
+    {
+        var viewModel = _content.Open(_content.TestWorld);
+
+        Assert.True(viewModel.ShowDatabasePageCommand.CanExecute("Character sprites"));
+    }
+
+    [Fact]
+    public void ShowDatabasePageCommand_UnknownTitle_IsGreyed()
+    {
+        var viewModel = _content.Open(_content.TestWorld);
+
+        Assert.False(viewModel.ShowDatabasePageCommand.CanExecute("Nowhere"));
     }
 
     [Fact]

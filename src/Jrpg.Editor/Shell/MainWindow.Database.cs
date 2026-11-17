@@ -1,6 +1,4 @@
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 using Jrpg.Data.Art;
 using Jrpg.Editor.Animation;
 using Jrpg.Editor.Backgrounds;
@@ -14,110 +12,94 @@ using Jrpg.Editor.Quests;
 using Jrpg.Editor.Skills;
 using Jrpg.Editor.Sprites;
 using Jrpg.Editor.Statuses;
+using Jrpg.Editor.Tiles;
 using Jrpg.Editor.Trade;
 using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// The Database menu's dispatch: an entry's title runs its opener (decision 938), which edits its catalog of the draft
-/// at the main window's size (decision 930); OK applies the whole session as one undo step (ADR 0045, decision 591).
-/// Each entry opens a page in the catalog dialog, as NPCs > Character sprites... does from outside the menu.
+/// The Database pages' views (decision 918): each catalog's page built over its edited catalog with the callbacks it
+/// needs, registered for the Database mode, which the Database menu's entries show (decision 926). The Enemies page's
+/// Edit... still opens the Drop tables page in the catalog dialog over the main window, applying its own undo step.
 /// </summary>
 internal sealed partial class MainWindow
 {
-    private Dictionary<string, Action> CreateDatabaseOpeners() => new()
+    // Nothing to host when the content didn't load: the Database mode then shows no page.
+    private void HostDatabasePages()
     {
-        ["Quests"] = OpenQuests,
-        ["Shops"] = OpenShops,
-        ["Items"] = OpenItems,
-        ["Drop tables"] = () => _ = EditDropTables(this, ""),
-        ["Affixes"] = OpenAffixes,
-        ["Effect strips"] = OpenEffectStrips,
-        ["Battle backgrounds"] = OpenBattleBackgrounds,
-        ["Skills"] = OpenSkills,
-        ["Effects"] = OpenTieredEffects,
-        ["Statuses"] = OpenStatuses,
-        ["Cinematics"] = OpenCinematics,
-        ["Enemies"] = OpenEnemies,
-        ["Encounters"] = OpenEncounters,
-    };
-
-    // Only an entry raises Click, never the Database header. An entry without a known title is a typo in
-    // DatabaseMenu.xaml: thrown, so the smoke script shows it as an ERROR.
-    private void OnDatabaseMenuClicked(object sender, RoutedEventArgs e)
-    {
-        var entry = (MenuItem)e.OriginalSource;
-        if (entry.Tag is not string title || !_databaseOpeners.TryGetValue(title, out var open))
+        if (_viewModel is { DatabaseWorkspace: { } workspace, AnimationTime: { } animationTime })
         {
-            throw new InvalidOperationException($"The Database menu's '{entry.Header}' entry has no known title.");
+            DatabaseView.Host(workspace, CreatePageViews(animationTime));
         }
-
-        open();
     }
 
-    private void OpenQuests()
+    // Called once the content loaded: every editing view model and the animation clock are there.
+    private DatabasePageViews CreatePageViews(TileAnimationTime animationTime)
     {
-        if (_viewModel.QuestEditing is not { } questEditing)
-        {
-            return;
-        }
-
-        OpenInDialog("Quests", questEditing.Start, questEditing.Apply, edited => new QuestCatalogPage(edited));
+        var pageViews = new DatabasePageViews();
+        pageViews.Register<QuestCatalogViewModel>(edited => new QuestCatalogPage(edited));
+        pageViews.Register<ShopCatalogViewModel>(edited => new ShopCatalogPage(edited));
+        pageViews.Register<AffixCatalogViewModel>(edited => new AffixCatalogPage(edited));
+        pageViews.Register<DropTableCatalogViewModel>(edited => new DropTableCatalogPage(edited));
+        pageViews.Register<SkillCatalogViewModel>(edited => new SkillCatalogPage(edited));
+        pageViews.Register<TieredEffectCatalogViewModel>(edited => new TieredEffectCatalogPage(edited));
+        pageViews.Register<StatusCatalogViewModel>(edited => new StatusCatalogPage(edited));
+        pageViews.Register<EncounterCatalogViewModel>(edited => new EncounterPage(edited));
+        RegisterPicturePages(pageViews);
+        RegisterPagesOnTheAnimationClock(pageViews, animationTime);
+        return pageViews;
     }
 
-    private void OpenShops()
+    // Items and Cinematics decode each picture at the size the page shows it: the icons and the 1920 px stills are far
+    // bigger. Effect strips and Battle backgrounds decode whole: their frames are cut from the image at its own size.
+    private void RegisterPicturePages(DatabasePageViews pageViews)
     {
-        if (_viewModel.ShopEditing is not { } shopEditing)
-        {
-            return;
-        }
-
-        OpenInDialog("Shops", shopEditing.Start, shopEditing.Apply, edited => new ShopCatalogPage(edited));
-    }
-
-    // The icon is decoded at the size the page shows it: the icons folder's images are far bigger.
-    private void OpenItems()
-    {
-        if (_viewModel.ItemEditing is not { } itemEditing)
-        {
-            return;
-        }
-
         var artRoot = _viewModel.ArtRoot;
-        OpenInDialog("Items", itemEditing.Start, itemEditing.Apply, edited => new ItemCatalogPage(edited, LoadIcon));
-
-        BitmapSource? LoadIcon(string file) =>
-            SpriteImageFile.LoadAtWidth(artRoot, ArtFolders.Icons, file, (int)ItemCatalogPage.IconPictureSize);
+        pageViews.Register<ItemCatalogViewModel>(edited => new ItemCatalogPage(
+            edited,
+            file => SpriteImageFile.LoadAtWidth(artRoot, ArtFolders.Icons, file, (int)ItemCatalogPage.IconPictureSize)));
+        pageViews.Register<CinematicCatalogViewModel>(edited => new CinematicCatalogPage(
+            edited,
+            file => SpriteImageFile.LoadAtWidth(artRoot, ArtFolders.Cinematics, file, (int)CinematicCatalogPage.PreviewWidth)));
+        pageViews.Register<EffectStripCatalogViewModel>(edited => new EffectStripCatalogPage(
+            edited,
+            file => SpriteImageFile.LoadFrom(artRoot, ArtFolders.Effects, file),
+            (paths, options) => _viewModel.ImportArtImages(ArtFolders.Effects, paths, options),
+            owner =>
+            {
+                var tool = new StripFromCellsWindow(_viewModel.ImportCellStrip) { Owner = owner };
+                return tool.ShowDialog() == true ? tool.Written : null;
+            }));
+        pageViews.Register<BattleBackgroundCatalogViewModel>(edited => new BattleBackgroundPage(
+            edited,
+            file => SpriteImageFile.LoadFrom(artRoot, ArtFolders.Backgrounds, file),
+            (paths, options) => _viewModel.ImportArtImages(ArtFolders.Backgrounds, paths, options)));
     }
 
-    private void OpenAffixes()
+    // The two pages that play on the editor's shared animation clock, as the map does: the Enemies page's idle loop,
+    // and the Character sprites page's walk. Its Import... copies images through the view model, whose import event
+    // drops the replaced pictures as the tilesheet import's does (decision 569).
+    private void RegisterPagesOnTheAnimationClock(DatabasePageViews pageViews, TileAnimationTime animationTime)
     {
-        if (_viewModel.AffixEditing is not { } affixEditing)
-        {
-            return;
-        }
-
-        OpenInDialog("Affixes", affixEditing.Start, affixEditing.Apply, edited => new AffixCatalogPage(edited));
-    }
-
-    // Starts the page's session, shows it in the dialog over the main window, applies it on OK.
-    private void OpenInDialog<TEdited>(
-        string title, Func<TEdited> start, Action<TEdited> apply, Func<TEdited, FrameworkElement> buildPage)
-        where TEdited : IEditedCatalog
-    {
-        if (!TryApplyShownPage())
-        {
-            return;
-        }
-
-        var edited = start();
-        var dialog = new CatalogDialog(title, buildPage(edited), edited) { Owner = this };
-        DialogBounds.FitTo(dialog, this);
-        if (dialog.ShowDialog() == true)
-        {
-            apply(edited);
-        }
+        var artRoot = _viewModel.ArtRoot;
+        var enemyEditing = _viewModel.EnemyEditing!;
+        var art = new EnemyArtSources(
+            _viewModel.ImportArtImages,
+            file => SpriteImageFile.LoadFrom(artRoot, ArtFolders.Battlers, file),
+            animationTime);
+        pageViews.Register<EnemyCatalogViewModel>(edited => new EnemyCatalogPage(
+            edited,
+            art,
+            (owner, tableId) =>
+            {
+                if (EditDropTables(owner, tableId))
+                {
+                    enemyEditing.RefreshDropTables(edited);
+                }
+            }));
+        pageViews.Register<FieldSpriteCatalogViewModel>(edited => new FieldSpritePage(
+            edited, artRoot, animationTime, _viewModel.ImportFieldSprites));
     }
 
     // A dialog's OK changes the draft, which would start the shown Database page again under what was typed: applied
@@ -144,135 +126,5 @@ internal sealed partial class MainWindow
 
         dropTableEditing.Apply(edited);
         return true;
-    }
-
-    private void OpenEnemies()
-    {
-        if (_viewModel.EnemyEditing is not { } enemyEditing || _viewModel.AnimationTime is not { } animationTime)
-        {
-            return;
-        }
-
-        var art = new EnemyArtSources(
-            _viewModel.ImportArtImages,
-            file => SpriteImageFile.LoadFrom(_viewModel.ArtRoot, ArtFolders.Battlers, file),
-            animationTime);
-        OpenInDialog("Enemies", enemyEditing.Start, enemyEditing.Apply, edited => new EnemyCatalogPage(
-            edited,
-            art,
-            (owner, tableId) =>
-            {
-                if (EditDropTables(owner, tableId))
-                {
-                    enemyEditing.RefreshDropTables(edited);
-                }
-            }));
-    }
-
-    private void OpenEncounters()
-    {
-        if (_viewModel.EncounterEditing is not { } encounterEditing)
-        {
-            return;
-        }
-
-        OpenInDialog("Encounters", encounterEditing.Start, encounterEditing.Apply, edited => new EncounterPage(edited));
-    }
-
-    // The preview decodes each still at the preview's width, a sixteenth of the pixels of a 1920 px picture.
-    private void OpenCinematics()
-    {
-        if (_viewModel.CinematicEditing is not { } cinematicEditing)
-        {
-            return;
-        }
-
-        var artRoot = _viewModel.ArtRoot;
-        OpenInDialog(
-            "Cinematics",
-            cinematicEditing.Start,
-            cinematicEditing.Apply,
-            edited => new CinematicCatalogPage(edited, LoadPicture));
-
-        BitmapSource? LoadPicture(string file) =>
-            SpriteImageFile.LoadAtWidth(artRoot, ArtFolders.Cinematics, file, (int)CinematicCatalogPage.PreviewWidth);
-    }
-
-    private void OpenEffectStrips()
-    {
-        if (_viewModel.EffectStripEditing is not { } effectStripEditing)
-        {
-            return;
-        }
-
-        var artRoot = _viewModel.ArtRoot;
-        OpenInDialog("Effect strips", effectStripEditing.Start, effectStripEditing.Apply, edited => new EffectStripCatalogPage(
-            edited,
-            file => SpriteImageFile.LoadFrom(artRoot, ArtFolders.Effects, file),
-            (paths, options) => _viewModel.ImportArtImages(ArtFolders.Effects, paths, options),
-            owner =>
-            {
-                var tool = new StripFromCellsWindow(_viewModel.ImportCellStrip) { Owner = owner };
-                return tool.ShowDialog() == true ? tool.Written : null;
-            }));
-    }
-
-    // Decoded whole: an animated background's frames are cut from its sheet at the sheet's own size.
-    private void OpenBattleBackgrounds()
-    {
-        if (_viewModel.BattleBackgroundEditing is not { } backgroundEditing)
-        {
-            return;
-        }
-
-        var artRoot = _viewModel.ArtRoot;
-        OpenInDialog("Battle backgrounds", backgroundEditing.Start, backgroundEditing.Apply, edited => new BattleBackgroundPage(
-            edited,
-            file => SpriteImageFile.LoadFrom(artRoot, ArtFolders.Backgrounds, file),
-            (paths, options) => _viewModel.ImportArtImages(ArtFolders.Backgrounds, paths, options)));
-    }
-
-    private void OpenSkills()
-    {
-        if (_viewModel.SkillEditing is not { } skillEditing)
-        {
-            return;
-        }
-
-        OpenInDialog("Skills", skillEditing.Start, skillEditing.Apply, edited => new SkillCatalogPage(edited));
-    }
-
-    private void OpenTieredEffects()
-    {
-        if (_viewModel.TieredEffectEditing is not { } effectEditing)
-        {
-            return;
-        }
-
-        OpenInDialog("Effects", effectEditing.Start, effectEditing.Apply, edited => new TieredEffectCatalogPage(edited));
-    }
-
-    private void OpenStatuses()
-    {
-        if (_viewModel.StatusEditing is not { } statusEditing)
-        {
-            return;
-        }
-
-        OpenInDialog("Statuses", statusEditing.Start, statusEditing.Apply, edited => new StatusCatalogPage(edited));
-    }
-
-    // The sprite records (decision 569); the page's Import... copies images through the view model, whose import event
-    // drops the replaced pictures as the tilesheet import's does.
-    private void OnCharacterSpritesClicked(object sender, RoutedEventArgs e)
-    {
-        if (_viewModel.FieldSpriteEditing is not { } fieldSpriteEditing || _viewModel.AnimationTime is not { } animationTime)
-        {
-            return;
-        }
-
-        var artRoot = _viewModel.ArtRoot;
-        OpenInDialog("Character sprites", fieldSpriteEditing.Start, fieldSpriteEditing.Apply, edited => new FieldSpritePage(
-            edited, artRoot, animationTime, _viewModel.ImportFieldSprites));
     }
 }

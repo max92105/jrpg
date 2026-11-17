@@ -61,7 +61,7 @@ public sealed class MainViewModelEncounterTests : IDisposable
         Assert.Contains("town/loop.wav", encounters.SelectedEncounter!.MusicChoices);
     }
 
-    // The page's opener reaches the draft's encounters through the shell, as Database > Encounters... shows them.
+    // The page's opener reaches the draft's encounters through the shell, as Database > Encounters shows them.
     [Fact]
     public void EncounterEditing_TestWorld_StartsOnItsEncountersInIdOrder()
     {

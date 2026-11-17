@@ -153,7 +153,7 @@ internal sealed partial class FieldSpritePage : UserControl
         Preview.Source = _previewSheet is { } sheet ? _preview.Draw(sheet, _sheet!, _animationTime.Elapsed) : null;
     }
 
-    // The dialog hosting the page owns the file dialog (the mode bar plan's page recipe).
+    // The window hosting the page, the main one in Database mode, owns the file dialog (the mode bar plan's recipe).
     private void OnImportClicked(object sender, RoutedEventArgs e)
     {
         var paths = ArtImageFileDialog.Choose(Window.GetWindow(this), "Import character sheets", ArtFolders.FieldSprites);

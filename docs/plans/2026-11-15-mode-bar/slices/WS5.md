@@ -90,3 +90,23 @@ Agents may run steps 1-5 (Shops, Quests, Enemies, Drop tables, Effect strips and
 - **Note from WS4:** once a page is typable, the unexpected-error box (ADR 0050) lists a Database page only after a
   refused move (decision 1009): valid typed changes not yet applied are not named there. Say so in the hand check, or
   have the line run `TryApplyShown` first if the developer wants it (his call).
+- **Done, with deviations:** the view takes its workspace and page views through `Host(workspace, pageViews)` (called
+  by `MainWindow.HostDatabasePages`, its Visibility binding needing the main view model) rather than a `PageViews`
+  property; each session builds a new page (decision 1010), so WD7's frozen Cinematics preview can't recur (its
+  `Preview` belongs to the edited catalog). `OpenInDialog` went with the openers (no caller left); `EditDropTables`
+  stays for the Enemies page's Edit... (WS6); `CanEditFieldSprites` went, the NPCs entry greyed by the command. The
+  lit style moved into `EditorTheme.xaml` as `ShownWhenTagButton`, the mode bar's `ModeButton` based on it; the list's
+  lit test reuses `Sprites/SameItemConverter`. The three shell tests went to `MainViewModelDatabaseWorkspaceTests` (134
+  lines; `MainViewModelWorkspaceTests` is at 248), plus `ShowDatabasePageCommand_KnownTitle_IsEnabled`; `PageTitled_...`
+  two tests in `DatabaseWorkspaceViewModelTests` (227), `ShopsPageSteps` showing the Shops page through it. Every
+  capture of the main window is the developer's (decision 1010), so the header lists none of the pages for agents.
+  The script's `Find-Dialog` skips popups (no WindowPattern): the Drop tables page leaves one owned by the main window,
+  which was taken for a dialog. Menu mentions lost their "..." (help, New NPC's lines and tests, Skills' tooltip,
+  `docs/map.md`). Review: `RegisterAnimatedPages` renamed `RegisterPagesOnTheAnimationClock` (Enemies and Character
+  sprites, the two on the shared clock); from World a menu entry opens its page at once through the workspace's new
+  `Open(CatalogPage)` (the last page shown no longer built first; `PutTheMapOutOfReach` shared with `ShowDatabase`),
+  tested by `Open_PageLeftBeforeAnotherWasShown_OpensItOnItsChosenShop`; the script says "no window opened, no page
+  shown" when neither came. `DatabaseWorkspaceView.xaml` 82 lines, `.xaml.cs` 63, `DatabasePageViews` 22,
+  `CatalogGroup` 20, `MainWindow.Database.cs` 130, `MainWindow.xaml` 296, `MainWindow.xaml.cs` 277,
+  `MainViewModel.Workspaces.cs` 133, `DatabaseWorkspaceViewModel.cs` 198, `DatabaseWorkspaceLeavingTests` 273,
+  `open-editor-windows.ps1` 196.

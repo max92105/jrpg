@@ -2,16 +2,81 @@
              x:ClassModifier="internal"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:sprites="clr-namespace:Jrpg.Editor.Sprites"
              Background="{StaticResource ViewportBackgroundBrush}">
-  <!-- A placeholder until the pages move here (the mode bar plan's WS5); the refusal moves into its bar then. -->
-  <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-    <TextBlock HorizontalAlignment="Center"
-               Foreground="{StaticResource MutedTextBrush}"
-               Text="The Database editors open from the Database menu until they move here." />
-    <TextBlock HorizontalAlignment="Center"
-               MaxWidth="640"
-               TextWrapping="Wrap"
-               Foreground="{StaticResource ProblemTextBrush}"
-               Text="{Binding DatabaseWorkspace.Refusal}" />
-  </StackPanel>
+  <!-- On the main window's Database workspace (decision 917): the pages under their headings on the left, the shown
+       one under its bar. Only EditorTheme.xaml's resources: the main window's own are not found while this loads. -->
+  <UserControl.Resources>
+    <CollectionViewSource x:Key="PagesByGroup" Source="{Binding DatabaseWorkspace.Pages}">
+      <CollectionViewSource.GroupDescriptions>
+        <PropertyGroupDescription PropertyName="Group" />
+      </CollectionViewSource.GroupDescriptions>
+    </CollectionViewSource>
+    <sprites:SameItemConverter x:Key="SameItem" />
+  </UserControl.Resources>
+  <Grid DataContext="{Binding DatabaseWorkspace}">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="200" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+    <ScrollViewer Background="{StaticResource PanelBackgroundBrush}" VerticalScrollBarVisibility="Auto">
+      <ItemsControl Margin="6" ItemsSource="{Binding Source={StaticResource PagesByGroup}}">
+        <ItemsControl.GroupStyle>
+          <GroupStyle>
+            <GroupStyle.HeaderTemplate>
+              <DataTemplate>
+                <TextBlock Margin="2,8,0,2" FontWeight="Bold" Foreground="{StaticResource MutedTextBrush}" Text="{Binding Name}" />
+              </DataTemplate>
+            </GroupStyle.HeaderTemplate>
+          </GroupStyle>
+        </ItemsControl.GroupStyle>
+        <!-- Each page shows through the workspace's command, which applies the shown one first or refuses. -->
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <Button Style="{StaticResource ShownWhenTagButton}"
+                    Margin="0,1"
+                    Content="{Binding Title}"
+                    Command="{Binding DataContext.ShowPageCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                    CommandParameter="{Binding}">
+              <Button.Tag>
+                <MultiBinding Converter="{StaticResource SameItem}" Mode="OneWay">
+                  <Binding />
+                  <Binding Path="DataContext.ShownPage" RelativeSource="{RelativeSource AncestorType=ItemsControl}" />
+                </MultiBinding>
+              </Button.Tag>
+            </Button>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </ScrollViewer>
+
+    <DockPanel Grid.Column="1">
+      <Border DockPanel.Dock="Top"
+              Padding="12,6"
+              Background="{StaticResource PanelBackgroundBrush}"
+              BorderBrush="{StaticResource BorderBrush}"
+              BorderThickness="0,0,0,1">
+        <DockPanel>
+          <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Top">
+            <Button Padding="12,2"
+                    Content="Apply"
+                    ToolTip="Record what was typed on this page as one Ctrl+Z step; greyed while the page has a problem."
+                    Command="{Binding ApplyCommand}" />
+            <Button Margin="6,0,0,0"
+                    Padding="12,2"
+                    Content="Revert"
+                    ToolTip="Drop what was typed since the page was last applied."
+                    Command="{Binding RevertCommand}" />
+          </StackPanel>
+          <StackPanel>
+            <TextBlock FontWeight="Bold" Text="{Binding ShownPage.Title}" />
+            <TextBlock Foreground="{StaticResource MutedTextBrush}" Text="Applied when you leave this page, save, undo or close." />
+            <TextBlock Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Text="{Binding Session.Edited.Problem}" />
+            <TextBlock Foreground="{StaticResource ProblemTextBrush}" TextWrapping="Wrap" Text="{Binding Refusal}" />
+          </StackPanel>
+        </DockPanel>
+      </Border>
+      <ContentControl x:Name="PageHost" Margin="12" Focusable="False" />
+    </DockPanel>
+  </Grid>
 </UserControl>

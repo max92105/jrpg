@@ -52,7 +52,7 @@ internal sealed partial class EnemyCatalogPage : UserControl
         _renderTick.RunWhileLoaded(this);
     }
 
-    // The dialog hosting the page owns what it opens (the mode bar plan's page recipe).
+    // The window hosting the page, the main one in Database mode, owns what it opens (the mode bar plan's recipe).
     private Window HostWindow => Window.GetWindow(this);
 
     // Another enemy chosen: its pictures are watched instead, so the battle sprite is read only when one changes.

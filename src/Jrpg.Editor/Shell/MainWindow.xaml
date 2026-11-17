@@ -86,10 +86,10 @@
       <!-- NPCs are objects drawn from a character sprite (ADR 0015, ADR 0043); the developer wanted them apart from Objects. -->
       <MenuItem Header="NPCs" Visibility="{Binding IsWorldShown, Converter={StaticResource VisibleWhenTrue}}">
         <MenuItem Header="New NPC..." Click="OnNewNpcClicked" IsEnabled="{Binding CanStartNewNpc}" />
-        <MenuItem Header="Character sprites..." Click="OnCharacterSpritesClicked" IsEnabled="{Binding CanEditFieldSprites}" ToolTip="Import, cut and animate character sheets; New NPC uses them." />
+        <MenuItem Header="Character sprites" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Character sprites" ToolTip="Import, cut and animate character sheets; New NPC uses them." />
         <MenuItem Header="Change NPC sprite..." Click="OnChangeNpcSpriteClicked" IsEnabled="{Binding NpcSpriteChange.CanChange, FallbackValue=False}" ToolTip="Give the chosen NPC object another set-up sprite; every placed copy follows. Ctrl+Z undoes it." />
       </MenuItem>
-      <local:DatabaseMenu MenuItem.Click="OnDatabaseMenuClicked" />
+      <local:DatabaseMenu />
       <MenuItem Header="Map" Visibility="{Binding IsWorldShown, Converter={StaticResource VisibleWhenTrue}}">
         <MenuItem Header="Go to map..." Command="Find" InputGestureText="Ctrl+M" />
         <MenuItem Header="Back to previous map" Command="{Binding GoBackToMapCommand}" InputGestureText="Alt+Left" />
@@ -171,7 +171,7 @@
       <StatusBarItem x:Name="ZoomStatus" HorizontalAlignment="Right" />
     </StatusBar>
     <Grid>
-      <workspaces:DatabaseWorkspaceView Visibility="{Binding IsDatabaseShown, Converter={StaticResource VisibleWhenTrue}}" />
+      <workspaces:DatabaseWorkspaceView x:Name="DatabaseView" Visibility="{Binding IsDatabaseShown, Converter={StaticResource VisibleWhenTrue}}" />
       <Grid Visibility="{Binding IsWorldShown, Converter={StaticResource VisibleWhenTrue}}">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="{StaticResource MapListWidth}" MinWidth="{StaticResource MapListMinWidth}" />

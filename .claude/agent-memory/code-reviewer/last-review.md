@@ -5,15 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-items-uniques-affixes, slice IU11 (equipment bonus rows: StatBonusRow, ItemEquipmentViewModel Bonuses/
-Add/Remove/StatChoices, SectionRowProblem.FirstInField overload with nameOf, Catalogs/ContentSpelling). 2026-11-16.
-Round 1. Verdict: Ready to commit (no Critical, no Warning).
+Plan 2026-11-15-items-uniques-affixes, slice IU12 (consumable form: Effects/EffectKindFields shared with
+SkillEffectSection, Items/ItemEffectViewModel, Items/ItemForms, ItemViewModel.EffectFile, catalog EffectImages and
+MissingStripNote, page Effect section). 2026-11-16. Round 1. Verdict: Ready to commit (no Critical, no Warning).
 
-- Suggestion (open): an untouched round trip with several bonuses (`_armor`, given out of order); today only the axe's
-  single Power bonus is round-tripped untouched.
-- Suggestion (open): stale wording made by this slice: ItemEquipmentViewModelTests.cs:8 "the bonuses carried";
-  ItemViewModel.cs:13-14 "Problem is only the typed id's and the number boxes'" (a stat named twice now reaches it).
-- Checked, no finding: duplicate stat never reaches ToDictionary (ToEquipment, ItemViewModel.ToItem and the catalog's
-  RecordListProblem all read Problem first); StatBonuses equality is order-independent; ContentSpelling body is the old
-  expression verbatim, no other ConvertName copy left in src; TypedRow style is BasedOn; both bound sides and 0 tested.
-- IU10 Suggestions: not carried (developer's call, round closed).
+- Suggestion (open): ItemEffectViewModel.ToEffect writes power 0 for any kind without a power, so a hand-edited
+  grantStatus (or rest) record with a nonzero power, which Data accepts, differs from its source after an untouched OK.
+- Suggestion (open): ItemEffectViewModel.TakesPower's doc comment speaks of a rest only; a status grant also takes none.
+- Checked, no finding: SkillEffectSection behaviour unchanged (Kinds still omits rest, no skill test changed, no test
+  relied on the old throw); untouched Firebomb ToItem equals source (Statuses list carried by `with`, EffectFile kept);
+  KindChoices Union appends a hand-edited kind; strip box outside the Effect DataContext binds EffectFile on the item;
+  unbased StackPanel style is the file's existing pattern (no theme StackPanel style).
+- IU11 Suggestions: not carried (round closed; ItemViewModel summary wording now fixed by this slice).

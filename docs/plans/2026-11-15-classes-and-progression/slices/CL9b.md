@@ -23,3 +23,10 @@ Each in `Party/`, a `ResourceRuleBoxes<TRule>` as CL9's two, with `From(X?)`, `C
 
 ## Verify by hand
 None: the resource writes the rules in CL9c, the tab shows them in CL9d.
+
+- **Done:** as planned. `Party/StrainBoxes` (54 lines) and `Party/DominanceBoxes` (54) on CL9's base, each id as
+  typed (no `Problem` notice: Data checks it), `OnTyped` from every typed field's hook, decision 1016's blanks.
+  `Party/ResourceRivalRuleTests` (205, 19 tests: shown on and off, untouched equal, ticked on writing the blank, typed
+  rules written, each number box's problem name and `Problem` notice, `Changed` once for each typed field, `CopyFrom`
+  on and off); its two helpers copy `ResourceRuleTests`' (a second copy). About 310 lines. The id choices stay CL9d's
+  (note there). No hand check: no page change here.

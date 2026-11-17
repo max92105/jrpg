@@ -141,7 +141,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 - [x] **CL8. The Resources tab** (Editor, about 60 lines plus about 120 of XAML) → [slices/CL8.md](slices/CL8.md)
 - [x] **CL9. A resource's rules: Will scaling and backfire as typed boxes** (Editor, about 210 lines; split, strain and
   dominance are CL9b, the resource's writing CL9c, the tab CL9d) → [slices/CL9.md](slices/CL9.md)
-- [ ] **CL9b. A resource's strain and dominance as typed boxes** (Editor, about 230 lines; split from CL9) →
+- [x] **CL9b. A resource's strain and dominance as typed boxes** (Editor, about 230 lines; split from CL9) →
   [slices/CL9b.md](slices/CL9b.md)
 - [ ] **CL9c. A resource writes its four rules from the boxes** (Editor, about 200 lines; split from CL9) →
   [slices/CL9c.md](slices/CL9c.md)

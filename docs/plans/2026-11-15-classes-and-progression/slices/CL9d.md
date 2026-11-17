@@ -30,3 +30,7 @@ resource needs `classes.json` by hand.
 5. On `fighter`'s Stamina tick Backfire, type 10 and 20, Apply, Save all: `classes.json`'s Stamina gains
    `"backfire": { "chancePerPointPercent": 10, "damagePercentOfMaxHp": 20 }` (one field per line) and the game starts.
    Ctrl+Z, Save all to restore.
+
+- **Note from CL9b:** `StrainBoxes.LowersStartOf` and `DominanceBoxes.Over` are ids as typed, with no problem of their
+  own: the combos stay editable as planned. A non-editable one would have to offer every value it may hold (the
+  editor rule), so an id no longer on the class (a resource removed or renamed while new) stays listed.

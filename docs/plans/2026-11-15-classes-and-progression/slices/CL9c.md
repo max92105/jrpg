@@ -29,3 +29,6 @@ line through `CatalogProblems.OfClasses`, unchanged.
 
 ## Verify by hand
 None: the tab shows the rules in CL9d. CL8's hand checks still pass (an untouched class writes back as read).
+- **Note from CL9b review:** if this slice's tests need `NoticesOf`/`ChangesOf` (copied in `ResourceRuleTests` and
+  `ResourceRivalRuleTests`), move them to one shared test type in `Party/` rather than a third copy; and check
+  `ClassResourceViewModel.DuplicateOf` calls every rule's `CopyFrom`.

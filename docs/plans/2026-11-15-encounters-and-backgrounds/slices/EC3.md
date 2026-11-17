@@ -57,3 +57,7 @@ stopping Apply; Apply as one `CatalogDraft.SetEncounters` undo step, none when n
 
 ## Verify by hand
 None: no page yet (EC5). The suite runs green.
+- **Note from EC2:** `EncounterViewModel` raises `Changed` for the typed id, a slot added, removed or moved (and from
+  EC2b each box's pick), never for its `Label` or `Problem` notices or a slot's choice, as the affixes and items do: the
+  list subscribes to `Changed` instead of each encounter's `PropertyChanged` and `Enemies` collection, so no
+  `ListItemWatch` is needed. EC2 split: the Background and Music boxes are EC2b's, which lands before EC3.

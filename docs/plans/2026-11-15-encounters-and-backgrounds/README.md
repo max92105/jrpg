@@ -121,7 +121,9 @@ slices and Editor slices aim at about 200 lines, not because the scope grew.
 
 ### Phase 3: the Encounters page
 - [x] **EC1. The editor writes `encounters.json`** (Data, about 150 lines) → [slices/EC1.md](slices/EC1.md)
-- [ ] **EC2. One encounter as edited** (Editor, about 210 lines) → [slices/EC2.md](slices/EC2.md)
+- [x] **EC2. One encounter as edited** (Editor, about 210 lines) → [slices/EC2.md](slices/EC2.md)
+- [ ] **EC2b. One encounter's Background and Music boxes** (Editor, about 120 lines; EC2's split) →
+  [slices/EC2b.md](slices/EC2b.md)
 - [ ] **EC3. Every encounter, and Apply as one undo step** (Editor, about 250 lines) → [slices/EC3.md](slices/EC3.md)
 - [ ] **EC4. An undo can't remove an encounter a map's battles list** (Editor, about 130 lines) →
   [slices/EC4.md](slices/EC4.md)

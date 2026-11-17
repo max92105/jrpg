@@ -56,3 +56,9 @@ longer in its folder kept listed; its own problem; the record it becomes.
 
 ## Verify by hand
 None: no page yet (EC5). The suite runs green.
+- **Done, with deviations:** split at start (estimate about 420 lines with tests): the Background and Music boxes went to
+  [EC2b](EC2b.md), so `EncounterChoices` holds only `Enemies` and `ToEncounter` carries the record's own background and
+  music over (`_source with`). Added, by the editor rule on relayed changes: `EncounterViewModel.Changed` (the typed id,
+  a slot added, removed or moved), which EC3 listens to (its note), and `EnemyChoice.Label`. Code 142 lines
+  (`EncounterViewModel` 116), tests 342 in `EncounterViewModelTests` (189), `EncounterViewModelNoticeTests` (136) and
+  `EncounterFixtures` (17); 27 tests.

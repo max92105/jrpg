@@ -5,9 +5,10 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-classes-and-progression, slice PM1 (party-members.json written by the ContentWriter, sorted by id,
-checked after the classes; `CatalogProblems.OfPartyMembers` / `CheckPartyMembers`). 2026-11-17. Round 1. Verdict: Ready
-to commit.
+Plan 2026-11-15-classes-and-progression, slice PM2 (PartyMemberViewModel, PartyMemberCatalogViewModel, headless).
+2026-11-17. Round 1. Verdict: Ready to commit.
 
-- No findings. Leader order confirmed from `new-game.json` (`LeaderChoiceScene.cs:59` reads
-  `catalog.NewGame.LeaderChoices`; `PartyMembers` is a FrozenDictionary, never file-ordered).
+- Warning, open: PartyMemberViewModel.cs:103-105 ToMember copies the three art names untrimmed; EnemyArtViewModel.cs:114-116
+  trims the same three fields (typed "Omer.png " is written with the space).
+- Not raised (slice note records it): Changed via one OnPropertyChanged deny-list override instead of per-field hooks.
+- Follow-ups dropped (already in backlog.md): RecordListProblem's two blank ids "listed twice"; catalog list copies.

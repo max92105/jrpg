@@ -61,3 +61,15 @@ skill using a resource the class lacks or needing more than its max (decision 94
 3. Type `99`: the line gives LV1's "past the max level 21" message and Apply greys. Revert.
 4. Choose `fighter`, add Fireball: the line says Fireball uses mana, a resource the fighter doesn't have. Remove it: the
    line clears.
+
+- **Done, with deviations:** split on 2026-11-17, the whole slice estimated at about 480 lines with tests: CL6 built
+  `Catalogs/RecordChoice` (21 lines; `IsMissing`, a missing record's name its id) and `Party/ClassSkillRow` (36), and
+  `ClassViewModel.Skills.cs` (54): the rows from the record, named through the draft, written back by `ToClass`, the
+  first row's problem in `Problem`, a typed level raising `Problem` and `Changed`, `DuplicateOf` copying the rows as
+  typed (`ClassViewModel` 160). Tests: `RecordChoiceTests` (19, the planned two) and `Party/ClassSkillsTests` (176,
+  13 tests: the planned rows, missing, typed level and three Data messages, plus an untouched class equal to its
+  record, the level at the max accepted, the two notices and the duplicate; after review, a missing id written back
+  by `ToClass` with Data's unknown-skill message on the catalog's line). Selection, the add box, Add, Remove, Up,
+  Down, the tab's XAML and the hand checks moved to CL6b. Decision 1014: no catalog collection relay (the rows travel
+  through `ClassViewModel.Changed`); `RecordChoice`'s summary also names `Encounters/EnemyChoice`, the same shape as
+  `Loot/DropItemChoice` (neither carries an extra), beside the three that do. No hand check: no page change here.

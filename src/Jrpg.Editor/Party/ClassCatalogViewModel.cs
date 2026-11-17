@@ -96,7 +96,7 @@ internal sealed partial class ClassCatalogViewModel : ObservableObject, IEditedC
         SelectedClass = added;
     }
 
-    // Only the typed id, name, description and boxes reach here, never a class's label or problem notices, so Data's
-    // check runs once per change.
+    // Only the typed id, name, description, boxes and skill levels reach here, never a class's label or problem
+    // notices, so Data's check runs once per change.
     private void OnClassChanged(object? sender, EventArgs e) => OnPropertyChanged(nameof(Problem));
 }

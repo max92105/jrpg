@@ -126,8 +126,10 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/LV3.md](slices/LV3.md)
 
 ### Phase 3: the rest of the Classes page
-- [ ] **CL6. The Skills tab: the class's skills in menu order with the level each is learned at** (Editor, about 230
-  lines) → [slices/CL6.md](slices/CL6.md)
+- [x] **CL6. The Skills tab: the class's skills in menu order with the level each is learned at** (Editor, about 230
+  lines; split, the list's commands and the tab are CL6b) → [slices/CL6.md](slices/CL6.md)
+- [ ] **CL6b. The Skills tab on the page: Add, Remove, Up and Down over the rows** (Editor, about 230 lines; split from
+  CL6) → [slices/CL6b.md](slices/CL6b.md)
 - [ ] **CL7. One resource as typed: amounts and gains** (Editor, about 210 lines) → [slices/CL7.md](slices/CL7.md)
 - [ ] **CL8. The Resources tab** (Editor, about 60 lines plus about 120 of XAML) → [slices/CL8.md](slices/CL8.md)
 - [ ] **CL9. A resource's rules: Will scaling, backfire, strain and dominance** (Editor, about 210 lines) →
@@ -269,6 +271,9 @@ Skills learned at a level (ADR 0062):
   called by the view, so `VictoryScreen` takes no message table and its constructor's callers stay as they are; the
   screen's `OpacityOf(line)` replaces the planned `IsShown`, the fade from the fill being the rule tests check. Each
   line keeps its row from the start, so a line fading in never moves another.
+- **1014.** (CL6) A class's skill rows reach the list's problem line through `ClassViewModel.Changed`, a typed level
+  now and the list's Add, Remove and moves in CL6b, so `ClassCatalogViewModel` gains no collection relay; `ToClass`
+  keeps the record's own skills list while the rows match it in order, so an untouched class equals its record.
 
 Shared and new game:
 - **960.** A member's starting gear is not built: members join with nothing worn, and no rule says otherwise.

@@ -349,3 +349,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   (`OutcomeFrame.FooterLineTop`, 910) and go under the footer bar. The developer's options: the empty slot beside the
   fifth card, a cap with "and N more", or a dialog (decision 964's alternative). It can't happen with today's content,
   every class skill being at level 1 (classes and progression plan, LV3 review).
+- `Editor/Encounters/EnemyChoice` and `Loot/DropItemChoice` are the shape of `Catalogs/RecordChoice` (an id, a name,
+  "Name (id)"): replace them when next touched; `Trade/PricedItemChoice`, `Skills/StatusChoice` and
+  `Battle/TacticSkillChoice` each carry an extra and stay (classes and progression plan, CL6, decision 967).

@@ -5,15 +5,13 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-encounters-and-backgrounds, slice BG9 (headless part; split, BG9b holds the dialog's look, the page's
-GIF wiring and ArtImageImport's background GIFs). 2026-11-17. Round 1. Verdict: Ready to commit (no Critical).
+Plan 2026-11-15-encounters-and-backgrounds, slice BG9b (the GIF dialog's background look, ArtImageImport's
+background GIFs, the page's Import... taking GIFs). 2026-11-17. Round 1. Verdict: Ready to commit (no Critical).
 
-- Suggestion (open): SheetProblem says "choose a smaller height" with "(0 at most)" for a panorama whose frame is wider
-  than 4096 px at every offered height; no smaller height helps.
-- Suggestion (open): FrameScaler.WidthAt(gif.Width, gif.Height, height) written three times in
-  GifImportOptionsViewModel.Background.cs (SheetLine, SheetProblem, FitsOneSheet).
-- Follow-up (open): Tiles/SheetImportResult now carries battle backgrounds (Tiles -> Core.Battle); it serves every art
-  import, so Catalogs/ is its home (the slice text already says Catalogs/SheetImportResult).
-- BG8b's Warnings (image cache in three places; FieldSpriteImagesIn without caller) and Suggestion
-  (ReadableEffectImages forward): fixed (no longer in src .cs files).
-- BG8's Follow-up (fresh row instead of mutating TakeAnimation): fixed (TakeImport builds with From(file, record, size)).
+- Suggestion (open): ArtImageImport.Import evaluates IsGif(path) three times per path (copiedName, GifRefusalOf, the
+  try); one local `isGif` reads better.
+- Follow-up (open): GifImportWindow.AskFor tests ".gif" with its own Path.GetExtension check, a copy of
+  ArtImageImport.IsGif.
+- BG9's Suggestions (panorama "choose a smaller height"; FrameScaler.WidthAt written three times): fixed (separate
+  panorama message; FrameWidthAt in GifImportOptionsViewModel.Background).
+- BG9's Follow-up (SheetImportResult home in Tiles): dropped, docs/plans/backlog.md lists it.

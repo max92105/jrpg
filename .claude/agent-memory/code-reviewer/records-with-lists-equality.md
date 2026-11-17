@@ -23,3 +23,7 @@ the list-member compare fails. Choose the catalog's stored instance by id instea
 
 Seen in MV1 (2026-11-12): `MoveNpcStep` overrode Equals with `Path.SequenceEqual` and shipped no equality test, though
 every precedent (GearPiece, SavedGear, ShopDefinition) has one. A custom Equals is new behavior: ask for its test.
+
+Seen in IU14 (2026-11-16): `AffixDefinition.Kinds` by reference, while `ItemDefinition` overrides Equals with
+SequenceEqual; the editor worked around it (always-new list, tests' `AssertSameContent`, IU15's content helper for
+"untouched page, no step"). Raised as a Follow-up (Core Equals); in IU15 check the untouched-page test exists.

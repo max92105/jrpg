@@ -34,3 +34,12 @@ resource needs `classes.json` by hand.
 - **Note from CL9b:** `StrainBoxes.LowersStartOf` and `DominanceBoxes.Over` are ids as typed, with no problem of their
   own: the combos stay editable as planned. A non-editable one would have to offer every value it may hold (the
   editor rule), so an id no longer on the class (a resource removed or renamed while new) stays listed.
+- **Done, with deviations:** no `ClassViewModel.ResourceIds`: the review's runtime probe found the id combos, listing
+  the class's ids while their text followed the chosen resource, emptied a rule's id on a class switch or a rename.
+  Decision 1017: each id box lists its own choices (`StrainBoxes.LowersStartOfChoices`, `DominanceBoxes.OverChoices`,
+  69 and 68 lines), the ids `OfferIds` gave and the id as typed (`Party/ResourceIdChoices`, 18), offered by
+  `ClassViewModel.Resources` (134) at start, on an id typed and on a list change only. `WillScalingBoxes` (55)
+  `EffectChoices`. `ClassResourcesView.xaml` (194): the Rules group, a check box per rule enabling its indented boxes,
+  a wider `RuleLabel`, Core's effect names (`LowerGain`). Tests: `ClassRuleIdChoicesTests` (136, 12),
+  `ResourceIdChoicesTests` (20, 3), `ResourceRivalRuleTests` (247) 4, `ResourceRuleTests` (277) the effect choices
+  pinned. About 390 lines with XAML. The probe's repros keep every id; `open-editor-windows.ps1`: no `ERROR` line.

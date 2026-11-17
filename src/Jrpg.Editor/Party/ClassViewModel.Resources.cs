@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Jrpg.Core.Resources;
@@ -11,7 +12,8 @@ namespace Jrpg.Editor.Party;
 /// <summary>
 /// The class's battle resources as the Resources tab types them (decision 950), in the order the game draws them: a
 /// blank added after the chosen one, any removed, moved. A resource's typed field and every change of the list raise
-/// <see cref="Changed"/> once (decision 1014).
+/// <see cref="Changed"/> once (decision 1014); an id typed and every change of the list offer each resource's strain
+/// and dominance combos the others' ids.
 /// </summary>
 internal sealed partial class ClassViewModel
 {
@@ -35,6 +37,17 @@ internal sealed partial class ClassViewModel
 
     private string[] ClassmateIdsOf(ClassResourceViewModel resource) =>
         [.. Resources.Where(other => other != resource).Select(other => other.Id)];
+
+    // Each rule names another resource (Data's line names its own id): a new one's empty id isn't offered.
+    private void OfferClassmateIds()
+    {
+        foreach (var resource in Resources)
+        {
+            string[] classmateIds = [.. ClassmateIdsOf(resource).Where(id => id.Length > 0)];
+            resource.Strain.OfferIds(classmateIds);
+            resource.Dominance.OfferIds(classmateIds);
+        }
+    }
 
     // The record's own list while the resources as typed equal it in order, so an untouched class equals its record
     // (the record compares its lists by reference, decision 1014).
@@ -74,19 +87,30 @@ internal sealed partial class ClassViewModel
     {
         foreach (var resource in Resources)
         {
-            resource.Changed += OnResourceTyped;
+            WatchResource(resource);
         }
 
         Resources.CollectionChanged += OnResourcesListChanged;
+        OfferClassmateIds();
+    }
+
+    private void WatchResource(ClassResourceViewModel resource)
+    {
+        resource.Changed += OnResourceTyped;
+        resource.PropertyChanged += OnResourcePropertyChanged;
+    }
+
+    private void UnwatchResource(ClassResourceViewModel resource)
+    {
+        resource.Changed -= OnResourceTyped;
+        resource.PropertyChanged -= OnResourcePropertyChanged;
     }
 
     // A move changes where the chosen resource stands, so the moves' greying is read again with the list.
     private void OnResourcesListChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
-        ListItemWatch.Follow<ClassResourceViewModel>(
-            e,
-            resource => resource.Changed += OnResourceTyped,
-            resource => resource.Changed -= OnResourceTyped);
+        ListItemWatch.Follow<ClassResourceViewModel>(e, WatchResource, UnwatchResource);
+        OfferClassmateIds();
         MoveResourceUpCommand.NotifyCanExecuteChanged();
         MoveResourceDownCommand.NotifyCanExecuteChanged();
         OnPropertyChanged(nameof(Problem));
@@ -97,5 +121,14 @@ internal sealed partial class ClassViewModel
     {
         OnPropertyChanged(nameof(Problem));
         Changed?.Invoke(this, EventArgs.Empty);
+    }
+
+    // Only an id's change: the strain and dominance combos build their lists again then, not at every box typed.
+    private void OnResourcePropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ClassResourceViewModel.Id))
+        {
+            OfferClassmateIds();
+        }
     }
 }

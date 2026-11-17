@@ -10,6 +10,10 @@
       <Setter Property="Width" Value="120" />
       <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
+    <!-- Wider again, for "Backfire chance per point", the rows indented under their check box. -->
+    <Style x:Key="RuleLabel" TargetType="TextBlock" BasedOn="{StaticResource ResourceLabel}">
+      <Setter Property="Width" Value="160" />
+    </Style>
     <Style x:Key="SectionHeader" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
       <Setter Property="FontWeight" Value="Bold" />
       <Setter Property="Margin" Value="0,12,0,4" />
@@ -125,6 +129,65 @@
                      ToolTip="Once each battle ends, whatever the outcome, for a lasting resource" />
           <TextBox Grid.Row="3" Grid.Column="3" Style="{DynamicResource NumberBox}" Text="{Binding PerBattleFoughtText, UpdateSourceTrigger=PropertyChanged}" />
         </Grid>
+
+        <!-- Each rule's boxes count only while it is ticked (decision 951), labelled as the problem line names them. The
+             id combos are editable over their own box's choices, the class's other ids and the id as typed: a list from
+             elsewhere (the class) changed apart from the text and the combo cleared the id. Data's line names a wrong
+             one. -->
+        <TextBlock Text="Rules" Style="{StaticResource SectionHeader}" />
+        <CheckBox Content="Will scaling" IsChecked="{Binding WillScaling.IsOn}"
+                  ToolTip="The holder's Will gives one point per Will per point, applied as the effect says" />
+        <StackPanel Orientation="Horizontal" Margin="20,4,0,0" DataContext="{Binding WillScaling}" IsEnabled="{Binding IsOn, FallbackValue=False}">
+          <TextBlock Text="Will per point" Style="{StaticResource RuleLabel}" />
+          <TextBox Style="{DynamicResource NumberBox}" Text="{Binding WillPerPointText, UpdateSourceTrigger=PropertyChanged}" />
+          <ComboBox Width="110" Margin="6,0,0,0" ItemsSource="{Binding EffectChoices}" SelectedItem="{Binding Effect}"
+                    ToolTip="RaiseStart: added to the start; RaiseMax: added to the max; LowerGain: every gain lower, never below 1" />
+        </StackPanel>
+
+        <CheckBox Content="Backfire" Margin="0,8,0,0" IsChecked="{Binding Backfire.IsOn}"
+                  ToolTip="Each point held after a cast is a chance that the spell turns on its caster" />
+        <StackPanel Margin="20,4,0,0" DataContext="{Binding Backfire}" IsEnabled="{Binding IsOn, FallbackValue=False}">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Backfire chance per point" Style="{StaticResource RuleLabel}" ToolTip="In percent, per point held" />
+            <TextBox Style="{DynamicResource NumberBox}" Text="{Binding ChancePerPointText, UpdateSourceTrigger=PropertyChanged}" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Backfire damage" Style="{StaticResource RuleLabel}" ToolTip="In percent of the caster's max HP" />
+            <TextBox Style="{DynamicResource NumberBox}" Text="{Binding DamagePercentText, UpdateSourceTrigger=PropertyChanged}" />
+          </StackPanel>
+        </StackPanel>
+
+        <CheckBox Content="Strain" Margin="0,8,0,0" IsChecked="{Binding Strain.IsOn}"
+                  ToolTip="For a lasting resource: each point below its max lowers another resource's start, never below 0" />
+        <StackPanel Margin="20,4,0,0" DataContext="{Binding Strain}" IsEnabled="{Binding IsOn, FallbackValue=False}">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Lowers start of" Style="{StaticResource RuleLabel}" />
+            <ComboBox Width="140" IsEditable="True"
+                      ItemsSource="{Binding LowersStartOfChoices}"
+                      Text="{Binding LowersStartOf, UpdateSourceTrigger=PropertyChanged}"
+                      ToolTip="Another resource of the class, not a lasting one" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Strain per missing point" Style="{StaticResource RuleLabel}" />
+            <TextBox Style="{DynamicResource NumberBox}" Text="{Binding PerMissingPointText, UpdateSourceTrigger=PropertyChanged}" />
+          </StackPanel>
+        </StackPanel>
+
+        <CheckBox Content="Dominance" Margin="0,8,0,0" IsChecked="{Binding Dominance.IsOn}"
+                  ToolTip="A force rivalling another resource: while it dominates, the skills feeding it land stronger" />
+        <StackPanel Margin="20,4,0,0" DataContext="{Binding Dominance}" IsEnabled="{Binding IsOn, FallbackValue=False}">
+          <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Over" Style="{StaticResource RuleLabel}" />
+            <ComboBox Width="140" IsEditable="True"
+                      ItemsSource="{Binding OverChoices}"
+                      Text="{Binding Over, UpdateSourceTrigger=PropertyChanged}"
+                      ToolTip="The rival force, another resource of the class whose dominance names this one back" />
+          </StackPanel>
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Dominance bonus" Style="{StaticResource RuleLabel}" ToolTip="In percent" />
+            <TextBox Style="{DynamicResource NumberBox}" Text="{Binding BonusPercentText, UpdateSourceTrigger=PropertyChanged}" />
+          </StackPanel>
+        </StackPanel>
       </StackPanel>
     </ScrollViewer>
   </Grid>

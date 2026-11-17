@@ -36,6 +36,13 @@ public sealed class ResourceRuleTests
     [Fact]
     public void From_NoWillScaling_ShowsItOff() => Assert.False(WillScalingBoxes.From(null).IsOn);
 
+    // The combo isn't editable, so it must offer every value the box may hold (ADR 0045).
+    [Fact]
+    public void EffectChoices_AnyBoxes_AreCoresEveryEffect() =>
+        Assert.Equal(
+            [WillEffect.RaiseStart, WillEffect.RaiseMax, WillEffect.LowerGain],
+            WillScalingBoxes.From(_willScaling).EffectChoices);
+
     [Fact]
     public void ToRule_Off_IsNull()
     {

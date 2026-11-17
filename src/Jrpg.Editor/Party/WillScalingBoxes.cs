@@ -32,6 +32,9 @@ internal sealed partial class WillScalingBoxes : ResourceRuleBoxes<WillScaling>
     [ObservableProperty]
     public partial WillEffect Effect { get; set; }
 
+    /// <summary>Core's every effect, which the effect's combo offers (ADR 0045).</summary>
+    public IReadOnlyList<WillEffect> EffectChoices { get; } = Enum.GetValues<WillEffect>();
+
     protected override string? BoxesProblem => TypedNumber.ProblemOf("Will per point", WillPerPointText);
 
     /// <summary>

@@ -145,7 +145,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/CL9b.md](slices/CL9b.md)
 - [x] **CL9c. A resource writes its four rules from the boxes** (Editor, about 200 lines; split from CL9) →
   [slices/CL9c.md](slices/CL9c.md)
-- [ ] **CL9d. The Rules group on the Resources tab** (Editor, about 40 lines plus about 60 of XAML; split from CL9) →
+- [x] **CL9d. The Rules group on the Resources tab** (Editor, about 40 lines plus about 60 of XAML; split from CL9) →
   [slices/CL9d.md](slices/CL9d.md)
 
 ### Phase 4: party members
@@ -294,6 +294,10 @@ Skills learned at a level (ADR 0062):
   resource: Will per point 1 raising the max (a lasting resource refuses a raised start), backfire 1 % and 1 %, strain 1
   per missing point and dominance a bonus of 0, the last two naming no resource until one is chosen. The four boxes
   share one base, `Party/ResourceRuleBoxes<TRule>`: the on box, the problem only while on, the rule or null, `Changed`.
+- **1017.** (CL9d review) A strain or dominance id combo lists its own box's choices: the class's other resources' ids
+  (its own and an empty one left out), plus the id as typed when it isn't one of them. A list from the class, apart
+  from the text, cleared the id on a class switch or a rename (WPF empties an editable combo's text when its matched
+  item leaves the list); the typed id stays listed until retyped, and Data's line names a wrong one.
 
 Shared and new game:
 - **960.** A member's starting gear is not built: members join with nothing worn, and no rule says otherwise.

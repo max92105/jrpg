@@ -6,7 +6,7 @@ namespace Jrpg.Editor.Tests.Party;
 
 // The two rules naming another resource of the class as typed (decision 951), strain and dominance: on or off as the
 // record has them, the blank an off rule shows (decision 1016), the other resource's id written as typed, the number
-// box's problem, the Changed event for every typed field, and the copy a duplicated resource makes.
+// box's problem, the ids its combo lists, the Changed event for every typed field, and a duplicated resource's copy.
 public sealed class ResourceRivalRuleTests
 {
     // Every number differs from the blank's, and each id from the blank's none.
@@ -153,6 +153,48 @@ public sealed class ResourceRivalRuleTests
         var dominance = DominanceBoxes.From(_dominance);
 
         Assert.Equal(1, ChangesOf(dominance, () => dominance.BonusPercentText = "40"));
+    }
+
+    // The combo lists the id as typed, so its list follows the id.
+    [Fact]
+    public void LowersStartOfChoices_IdTyped_ListsIt()
+    {
+        var strain = StrainBoxes.From(_strain);
+        strain.OfferIds(["mana", "fury"]);
+
+        var raised = NoticesOf(strain, () => strain.LowersStartOf = "calm");
+
+        Assert.Contains(nameof(StrainBoxes.LowersStartOfChoices), raised);
+        Assert.Equal(["mana", "fury", "calm"], strain.LowersStartOfChoices);
+    }
+
+    [Fact]
+    public void OverChoices_RivalTyped_ListsIt()
+    {
+        var dominance = DominanceBoxes.From(_dominance);
+        dominance.OfferIds(["growth"]);
+
+        var raised = NoticesOf(dominance, () => dominance.Over = "calm");
+
+        Assert.Contains(nameof(DominanceBoxes.OverChoices), raised);
+        Assert.Equal(["growth", "calm"], dominance.OverChoices);
+    }
+
+    // The class offers its ids on every id typed: not a change of the rule.
+    [Fact]
+    public void Changed_StrainIdsOffered_IsNotRaised()
+    {
+        var strain = StrainBoxes.From(_strain);
+
+        Assert.Equal(0, ChangesOf(strain, () => strain.OfferIds(["fury"])));
+    }
+
+    [Fact]
+    public void Changed_DominanceIdsOffered_IsNotRaised()
+    {
+        var dominance = DominanceBoxes.From(_dominance);
+
+        Assert.Equal(0, ChangesOf(dominance, () => dominance.OfferIds(["fury"])));
     }
 
     [Fact]

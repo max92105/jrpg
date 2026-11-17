@@ -33,3 +33,9 @@ columns, each with the tooltip from `ResourceGains`' own summaries: "At the end 
    Save all to restore.
 5. Add a resource to `fighter`: id `focus`, name `Focus`, max 3: Apply, Save all: `classes.json`'s fighter lists it
    after Stamina with no `isLasting` or rule fields. Ctrl+Z, Save all.
+
+- **Note from CL7:** CL7 was split in three: the gain boxes (CL7), one resource as typed (CL7b,
+  `Party/ClassResourceViewModel`) and the class's list (CL7c, `ClassViewModel.Resources`); this slice needs CL7c. The
+  gain boxes read their gains through `Typed` (null while a box doesn't read), not a throwing `ToGains`.
+- **Note from CL7 review:** the Gains labels on the tab use the names `ResourceGainsBoxes.Problem` uses ("Per turn" ...
+  "Per battle fought", "Heavy hit share"), so the problem line names a box the form shows.

@@ -130,7 +130,12 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   lines; split, the list's commands and the tab are CL6b) → [slices/CL6.md](slices/CL6.md)
 - [x] **CL6b. The Skills tab on the page: Add, Remove, Up and Down over the rows** (Editor, about 230 lines; split from
   CL6) → [slices/CL6b.md](slices/CL6b.md)
-- [ ] **CL7. One resource as typed: amounts and gains** (Editor, about 210 lines) → [slices/CL7.md](slices/CL7.md)
+- [x] **CL7. One resource as typed: amounts and gains** (Editor, about 210 lines; split, the resource is CL7b and the
+  class's list CL7c) → [slices/CL7.md](slices/CL7.md)
+- [ ] **CL7b. One resource as typed: id, name, color, lasting, amounts and gains** (Editor, about 300 lines; split from
+  CL7) → [slices/CL7b.md](slices/CL7b.md)
+- [ ] **CL7c. A class's resources as typed: the list, Add, Remove and moves** (Editor, about 250 lines; split from CL7)
+  → [slices/CL7c.md](slices/CL7c.md)
 - [ ] **CL8. The Resources tab** (Editor, about 60 lines plus about 120 of XAML) → [slices/CL8.md](slices/CL8.md)
 - [ ] **CL9. A resource's rules: Will scaling, backfire, strain and dominance** (Editor, about 210 lines) →
   [slices/CL9.md](slices/CL9.md)

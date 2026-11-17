@@ -54,3 +54,6 @@ on a problem), `From(X?)` and `CopyFrom`:
 5. On `fighter`'s Stamina tick Backfire, type 10 and 20, Apply, Save all: `classes.json`'s Stamina gains
    `"backfire": { "chancePerPointPercent": 10, "damagePercentOfMaxHp": 20 }` (one field per line) and the game starts.
    Ctrl+Z, Save all to restore.
+
+- **Note from CL7:** CL7 was split in three; `Party/ClassResourceViewModel` comes from CL7b and
+  `Party/ClassResourceListTests` from CL7c (the "after CL7" and "CL7's file" above mean those).

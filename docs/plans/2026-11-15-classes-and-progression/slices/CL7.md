@@ -53,3 +53,12 @@ change yet (CL8): the class's record now comes from the boxes.
 
 ## Verify by hand
 None: the tab comes in CL8. CL4's hand check 3 still passes (the resources go through the boxes unchanged).
+
+- **Done, with deviations:** split on 2026-11-17, the whole slice estimated at about 700 lines with tests: CL7 built
+  `Party/ResourceGainsBoxes` (106 lines), whose gains read through `Typed` (null while a box doesn't read, as
+  `ClassStatsBoxes`) rather than a throwing `ToGains`; its labels "Per turn" to "Per battle fought" and "Heavy hit
+  share". `ClassFixtures` (116) gains `Fury`, a resource with every gain different and one a drain, and the gain boxes'
+  `TextsOf`. `Party/ResourceGainsBoxesTests` (113, 11 tests: the numbers, `Typed` untouched, typed and unreadable, the
+  problem's first, share and last box and its order, a drain read, `CopyFrom` with a half-typed box, the notices).
+  `Party/ClassResourceViewModel` and its tests moved to CL7b, the class's list and `ClassResourceListTests` to CL7c,
+  with notes in CL8 and CL9. No hand check: no page change here.

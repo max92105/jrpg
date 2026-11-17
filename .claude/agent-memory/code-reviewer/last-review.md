@@ -5,14 +5,12 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-mode-bar, slice WS5 (the Database view hosts every page: CatalogGroup, DatabasePageViews,
-ShowDatabasePage, menu entries as pages; decision 1010). 2026-11-17. Round 1. Verdict: Fix the Criticals.
+Plan 2026-11-15-mode-bar, slice WS6 (Edit... shows a page on a record: ShowPageOnRecord, ShowDatabasePageOnRecord,
+TryLeaveShown; CatalogDialog, DialogBounds, TakeDropTables, RefreshDropTables gone; decision 928). 2026-11-17.
+Round 1. Verdict: Ready to commit.
 
-- Critical: MainWindow.Database.cs:82 RegisterAnimatedPages misleading (Effect strips, Battle backgrounds animate but
-  sit in RegisterPicturePages; the split is "takes the shared animation clock"); rename e.g.
-  RegisterPagesOnTheAnimationClock, comment both pages, WS6.md:47 cites the name — open
-- Suggestion: ShowDatabasePage from World runs Open() (builds last page + view) then ShowPage replaces it — open
-- Suggestion: test ShowDatabasePageCommand_KnownTitle_IsLit -> _IsEnabled ("lit" = shown button) — open
-- Suggestion: open-editor-windows.ps1:141 page not found reports "no window opened" -> "no page shown" — open
-- WS4 Warning History.Refusal/SaveError stale after fix/revert — fixed (MainViewModel.Saving OnDatabaseWorkspaceChanged)
-- WS4 Suggestion UnappliedPage name — fixed (UnappliedPageLine)
+- Warning: MainViewModelDatabaseWorkspaceTests ShowDatabasePageOnRecord_DropTables_ShowsThePageOnTheTable targets
+  "goblin", the only drop table in content/, so the shell dropping the key still passes; add a table, target it — open
+- Suggestion: ADR 0060 line 87 still says "a Skills page's strip Edit... takes the same path"; none exists (WS1 note) — open
+- WS5 Critical RegisterAnimatedPages name — fixed (RegisterPagesOnTheAnimationClock)
+- WS5 Suggestions (ShowDatabasePage from World, _IsLit test name, script message) — fixed

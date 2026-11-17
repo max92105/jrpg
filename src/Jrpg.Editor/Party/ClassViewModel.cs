@@ -9,10 +9,10 @@ namespace Jrpg.Editor.Party;
 /// <summary>
 /// One class as the Classes page types it (decisions 945-948): its id (typed while the class is new, fixed once the
 /// draft holds it, decision 582), name, description, and its base and growth as the same eight boxes each, written over
-/// the record it came from, so the resources no tab edits yet are carried as they are; its skills as typed (the
-/// <c>.Skills</c> partial); and the Levels tab's rows, read from the boxes as typed against the draft's experience
-/// table and stat rules. <see cref="Problem"/> is only the typed id's, the boxes' and the skill levels'; the rest is
-/// Data's rules, which the list shows.
+/// the record it came from, so the resources no tab edits yet are carried as they are; its skills as typed, added,
+/// removed and moved (the <c>.Skills</c> partial); and the Levels tab's rows, read from the boxes as typed against the
+/// draft's experience table and stat rules. <see cref="Problem"/> is only the typed id's, the boxes' and the skill
+/// levels'; the rest is Data's rules, which the list shows.
 /// </summary>
 internal sealed partial class ClassViewModel : ObservableObject
 {
@@ -35,23 +35,30 @@ internal sealed partial class ClassViewModel : ObservableObject
         Growth.PropertyChanged += OnBoxTyped;
         Skills = [.. skillRows];
         WatchSkillRows();
+        SelectedSkill = Skills.FirstOrDefault();
     }
 
     /// <summary>
-    /// The id, the name, the description, a box or a skill's level typed: what the list's problem line listens to,
-    /// never the label's or the problem's own notices, so the list runs Data's check once per change.
+    /// The id, the name, the description, a box or a skill's level typed, or a skill added, removed or moved: what the
+    /// list's problem line listens to, never the label's or the problem's own notices, so the list runs Data's check
+    /// once per change.
     /// </summary>
     public event EventHandler? Changed;
 
     /// <param name="classDefinition">The record as the draft holds it.</param>
-    /// <param name="content">The draft as it is: the experience table and the stat rules the Levels tab reads.</param>
+    /// <param name="content">
+    /// The draft as it is: the experience table and the stat rules the Levels tab reads, the skills its rows are named
+    /// through and its add box offers.
+    /// </param>
     public static ClassViewModel From(ClassDefinition classDefinition, ContentCatalog content) =>
         new(classDefinition, content, SkillRowsOf(classDefinition, content));
 
     /// <summary>
-    /// A class added this session: its id, name and description left to type, the lowest legal numbers.
+    /// A class added this session: its id, name and description left to type, the lowest legal numbers, no skill.
     /// </summary>
-    /// <param name="content">The draft as it is: the experience table and the stat rules the Levels tab reads.</param>
+    /// <param name="content">
+    /// The draft as it is: the experience table and the stat rules the Levels tab reads, the skills its add box offers.
+    /// </param>
     public static ClassViewModel New(ContentCatalog content) => new(_blank, content, []) { IsNew = true };
 
     /// <summary>

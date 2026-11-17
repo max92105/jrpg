@@ -1,6 +1,7 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Party;
 using Jrpg.Core.Resources;
+using Jrpg.Core.Skills;
 using Jrpg.Core.Stats;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Party;
@@ -10,7 +11,8 @@ namespace Jrpg.Editor.Tests.Party;
 /// <summary>
 /// The Classes page tests' own classes, so no repository number is pinned: every base and growth number of the scholar
 /// differs from the others and from a new class's, so a box that drops or swaps one shows in a record compared whole; a
-/// second class for the list; the test world holding the two; and the boxes' texts read in the page's order.
+/// second class for the list; the test world holding the two; the Skills tab's draft of three skills; and the boxes'
+/// texts read in the page's order.
 /// </summary>
 internal static class ClassFixtures
 {
@@ -44,6 +46,36 @@ internal static class ClassFixtures
         {
             Classes = new Dictionary<string, ClassDefinition> { [Scholar.Id] = Scholar, [Archer.Id] = Archer },
         };
+
+    /// <summary>
+    /// A skill built for the Skills tab's tests: it spends mana, which the scholar lacks, and its name, Zap, sorts
+    /// after taunt while its id sorts before it, so a list by name differs from one by id.
+    /// </summary>
+    public static SkillDefinition Spark { get; } = World.Skills["expose"] with
+    {
+        Id = "spark",
+        Name = "Zap",
+        ResourceChanges = [new ResourceChange("mana", -1)],
+    };
+
+    /// <summary>The archer with two skills opposite to id order, taunt at level 1 and expose at 4.</summary>
+    public static ClassDefinition SkilledArcher { get; } =
+        Archer with { Skills = [new("taunt"), new("expose") { Level = 4 }] };
+
+    /// <summary>
+    /// The test world with only three skills, the repository's expose and taunt (neither spends a resource) and
+    /// <see cref="Spark"/>, in an order neither by id nor by name, and the skilled archer and the scholar as classes.
+    /// </summary>
+    public static ContentCatalog SkillsDraft { get; } = World with
+    {
+        Skills = new Dictionary<string, SkillDefinition>
+        {
+            [Spark.Id] = Spark,
+            ["expose"] = World.Skills["expose"],
+            ["taunt"] = World.Skills["taunt"],
+        },
+        Classes = new Dictionary<string, ClassDefinition> { [SkilledArcher.Id] = SkilledArcher, [Scholar.Id] = Scholar },
+    };
 
     /// <summary>The eight boxes' texts in the page's order: max HP, speed, accuracy, then the five primaries.</summary>
     public static string[] TextsOf(ClassStatsBoxes boxes) =>

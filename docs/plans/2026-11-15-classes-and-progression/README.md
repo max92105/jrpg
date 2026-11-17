@@ -128,7 +128,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 ### Phase 3: the rest of the Classes page
 - [x] **CL6. The Skills tab: the class's skills in menu order with the level each is learned at** (Editor, about 230
   lines; split, the list's commands and the tab are CL6b) → [slices/CL6.md](slices/CL6.md)
-- [ ] **CL6b. The Skills tab on the page: Add, Remove, Up and Down over the rows** (Editor, about 230 lines; split from
+- [x] **CL6b. The Skills tab on the page: Add, Remove, Up and Down over the rows** (Editor, about 230 lines; split from
   CL6) → [slices/CL6b.md](slices/CL6b.md)
 - [ ] **CL7. One resource as typed: amounts and gains** (Editor, about 210 lines) → [slices/CL7.md](slices/CL7.md)
 - [ ] **CL8. The Resources tab** (Editor, about 60 lines plus about 120 of XAML) → [slices/CL8.md](slices/CL8.md)

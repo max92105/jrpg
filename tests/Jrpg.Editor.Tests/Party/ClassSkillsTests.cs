@@ -1,7 +1,4 @@
-using Jrpg.Core.Content;
 using Jrpg.Core.Party;
-using Jrpg.Core.Resources;
-using Jrpg.Core.Skills;
 using Jrpg.Editor.Party;
 using static Jrpg.Editor.Tests.Party.ClassFixtures;
 
@@ -11,35 +8,12 @@ namespace Jrpg.Editor.Tests.Party;
 // written back as typed, a level that isn't a whole number the class's own problem, the rest Data's message.
 public sealed class ClassSkillsTests
 {
-    // Built here: it spends mana, which the scholar lacks.
-    private static readonly SkillDefinition _spark = World.Skills["expose"] with
-    {
-        Id = "spark",
-        Name = "Spark",
-        ResourceChanges = [new ResourceChange("mana", -1)],
-    };
-
-    // Opposite to id order, so a list sorted by id would show.
-    private static readonly ClassDefinition _archer =
-        Archer with { Skills = [new("taunt"), new("expose") { Level = 4 }] };
-
-    private static readonly ContentCatalog _draft = World with
-    {
-        Skills = new Dictionary<string, SkillDefinition>
-        {
-            ["expose"] = World.Skills["expose"],
-            ["taunt"] = World.Skills["taunt"],
-            [_spark.Id] = _spark,
-        },
-        Classes = new Dictionary<string, ClassDefinition> { [_archer.Id] = _archer, [Scholar.Id] = Scholar },
-    };
-
-    private static readonly int _maxLevel = _draft.Rules.Experience.MaxLevel;
+    private static readonly int _maxLevel = SkillsDraft.Rules.Experience.MaxLevel;
 
     [Fact]
     public void Skills_FromClass_ListsThemInItsOrderWithLevels()
     {
-        var archer = ClassViewModel.From(_archer, _draft);
+        var archer = ClassViewModel.From(SkilledArcher, SkillsDraft);
 
         Assert.Equal(
             [("Taunt (taunt)", "1"), ("Expose (expose)", "4")],
@@ -49,7 +23,7 @@ public sealed class ClassSkillsTests
     [Fact]
     public void Skills_IdTheDraftLacks_ShowsItAsMissing()
     {
-        var archer = ClassViewModel.From(_archer with { Skills = [new("volley")] }, _draft);
+        var archer = ClassViewModel.From(SkilledArcher with { Skills = [new("volley")] }, SkillsDraft);
 
         Assert.Equal("(missing) volley", Assert.Single(archer.Skills).Skill.Label);
     }
@@ -58,10 +32,10 @@ public sealed class ClassSkillsTests
     [Fact]
     public void Problem_IdTheDraftLacks_ShowsDataMessage()
     {
-        var archer = _archer with { Skills = [new("volley")] };
+        var archer = SkilledArcher with { Skills = [new("volley")] };
 
         var catalog = new ClassCatalogViewModel(
-            _draft with { Classes = new Dictionary<string, ClassDefinition> { [archer.Id] = archer } });
+            SkillsDraft with { Classes = new Dictionary<string, ClassDefinition> { [archer.Id] = archer } });
 
         Assert.Equal(["volley"], catalog.SelectedClass!.ToClass().SkillIds);
         Assert.Equal("classes.json: class 'archer': skills has unknown skill id 'volley'.", catalog.Problem);
@@ -69,12 +43,12 @@ public sealed class ClassSkillsTests
 
     [Fact]
     public void ToClass_UntouchedSkills_EqualsTheSource() =>
-        Assert.Equal(_archer, ClassViewModel.From(_archer, _draft).ToClass());
+        Assert.Equal(SkilledArcher, ClassViewModel.From(SkilledArcher, SkillsDraft).ToClass());
 
     [Fact]
     public void ToClass_TypedLevel_WritesIt()
     {
-        var archer = ClassViewModel.From(_archer, _draft);
+        var archer = ClassViewModel.From(SkilledArcher, SkillsDraft);
 
         archer.Skills[0].LevelText = "6";
 
@@ -84,7 +58,7 @@ public sealed class ClassSkillsTests
     [Fact]
     public void Problem_LevelNotANumber_NamesTheSkill()
     {
-        var archer = ClassViewModel.From(_archer, _draft);
+        var archer = ClassViewModel.From(SkilledArcher, SkillsDraft);
 
         archer.Skills[1].LevelText = "x";
 
@@ -94,7 +68,7 @@ public sealed class ClassSkillsTests
     [Fact]
     public void PropertyChanged_LevelTyped_RaisesProblem()
     {
-        var archer = ClassViewModel.From(_archer, _draft);
+        var archer = ClassViewModel.From(SkilledArcher, SkillsDraft);
         var raised = new List<string?>();
         archer.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
 
@@ -106,7 +80,7 @@ public sealed class ClassSkillsTests
     [Fact]
     public void Changed_LevelTyped_IsRaisedOnce()
     {
-        var archer = ClassViewModel.From(_archer, _draft);
+        var archer = ClassViewModel.From(SkilledArcher, SkillsDraft);
         var raised = 0;
         archer.Changed += (_, _) => raised++;
 
@@ -118,7 +92,7 @@ public sealed class ClassSkillsTests
     [Fact]
     public void DuplicateOf_TypedLevel_CopiesTheRowsAsTyped()
     {
-        var archer = ClassViewModel.From(_archer, _draft);
+        var archer = ClassViewModel.From(SkilledArcher, SkillsDraft);
         archer.Skills[1].LevelText = "x";
 
         var copy = ClassViewModel.DuplicateOf(archer);
@@ -130,7 +104,7 @@ public sealed class ClassSkillsTests
     [Fact]
     public void PropertyChanged_LevelTypedInTheList_RaisesProblem()
     {
-        var catalog = new ClassCatalogViewModel(_draft);
+        var catalog = new ClassCatalogViewModel(SkillsDraft);
         var raised = new List<string?>();
         catalog.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
 
@@ -142,7 +116,7 @@ public sealed class ClassSkillsTests
     [Fact]
     public void Problem_LevelAtMax_IsNull()
     {
-        var catalog = new ClassCatalogViewModel(_draft);
+        var catalog = new ClassCatalogViewModel(SkillsDraft);
 
         catalog.SelectedClass!.Skills[1].LevelText = $"{_maxLevel}";
 
@@ -152,7 +126,7 @@ public sealed class ClassSkillsTests
     [Fact]
     public void Problem_LevelPastMax_ShowsDataMessage()
     {
-        var catalog = new ClassCatalogViewModel(_draft);
+        var catalog = new ClassCatalogViewModel(SkillsDraft);
 
         catalog.SelectedClass!.Skills[1].LevelText = $"{_maxLevel + 1}";
 
@@ -164,10 +138,10 @@ public sealed class ClassSkillsTests
     [Fact]
     public void Problem_SkillUsingResourceTheClassLacks_ShowsDataMessage()
     {
-        var scholar = Scholar with { Skills = [new(_spark.Id)] };
+        var scholar = Scholar with { Skills = [new(Spark.Id)] };
 
         var catalog = new ClassCatalogViewModel(
-            _draft with { Classes = new Dictionary<string, ClassDefinition> { [scholar.Id] = scholar } });
+            SkillsDraft with { Classes = new Dictionary<string, ClassDefinition> { [scholar.Id] = scholar } });
 
         Assert.Equal(
             "classes.json: class 'scholar': skills lists 'spark', which uses 'mana', a resource scholar doesn't have.",

@@ -11,6 +11,9 @@ namespace Jrpg.Editor.Party;
 /// </summary>
 internal sealed partial class ClassSkillRow : ObservableObject
 {
+    // An added skill is known from the start, as an entry naming no level (ADR 0062).
+    private const int AddedLevel = 1;
+
     /// <param name="skill">The skill, or a missing one when the draft lacks its id.</param>
     /// <param name="levelText">The level as typed.</param>
     public ClassSkillRow(RecordChoice skill, string levelText)
@@ -18,6 +21,9 @@ internal sealed partial class ClassSkillRow : ObservableObject
         Skill = skill;
         LevelText = levelText;
     }
+
+    /// <summary>A row as Add starts it: the skill known from level 1.</summary>
+    public static ClassSkillRow New(RecordChoice skill) => new(skill, TypedNumber.Text(AddedLevel));
 
     public RecordChoice Skill { get; }
 

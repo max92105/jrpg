@@ -352,3 +352,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Editor/Encounters/EnemyChoice` and `Loot/DropItemChoice` are the shape of `Catalogs/RecordChoice` (an id, a name,
   "Name (id)"): replace them when next touched; `Trade/PricedItemChoice`, `Skills/StatusChoice` and
   `Battle/TacticSkillChoice` each carry an extra and stay (classes and progression plan, CL6, decision 967).
+- The `ListBoxItem` style setting `RowFocus.ChoosesRow` is copied in four pages (Item, Skill, Class as `TypedRow`,
+  DropTable inline): one keyed style in `Shell/EditorTheme.xaml` would replace them (classes and progression plan, CL6b
+  review).

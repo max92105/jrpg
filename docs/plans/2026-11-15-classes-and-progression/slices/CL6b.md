@@ -44,3 +44,13 @@ reach the problem line through `ClassViewModel.Changed` (decision 1014).
 3. Type `99`: the line gives LV1's "past the max level 21" message and Apply greys. Revert.
 4. Choose `fighter`, add Fireball: the line says Fireball uses mana, a resource the fighter doesn't have. Remove it: the
    line clears.
+
+- **Done, with deviations:** `ClassViewModel.Skills.cs` (128 lines) gains the selection (the first row at start, as
+  the other row lists), the add box, cleared after Add so it never holds a skill it no longer offers, and the four
+  commands; `ClassSkillRow.New` (42) starts a row at level 1. The tab sits after Levels in `ClassCatalogPage.xaml`
+  (249; its code-behind's summary, 17, names the three tabs). Tests in the new `Party/ClassSkillListTests` (214, 20
+  tests), so `ClassSkillsTests` stays under 300: the planned ones, plus the box listing the draft's skills by name,
+  Remove greyed, the added row watched, the four commands' `CanExecuteChanged` and the line clearing on Remove.
+  `ClassFixtures` (86) holds CL6's draft (`Spark`, `SkilledArcher`, `SkillsDraft`), moved from `ClassSkillsTests` (150)
+  so both files share it; after review Spark is named "Zap" and listed first, so by name, by id and as listed are three
+  orders. About 340 lines in all. Backlog: the `RowFocus.ChoosesRow` row style copied in four pages.

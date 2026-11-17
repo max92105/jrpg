@@ -5,15 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-encounters-and-backgrounds, slice BG8b (BG8's split: Backgrounds/BattleBackgroundPage, FramePreview
-Stretch and PictureHeight, row FrameMilliseconds, shell ReadableImagesIn/ReadableSizeOf, menu wiring).
-2026-11-17. Round 1. Verdict: Ready to commit (no Critical).
+Plan 2026-11-15-encounters-and-backgrounds, slice BG9 (headless part; split, BG9b holds the dialog's look, the page's
+GIF wiring and ArtImageImport's background GIFs). 2026-11-17. Round 1. Verdict: Ready to commit (no Critical).
 
-- Warning (open): decode-once image cache now in three places (BattleBackgroundPage.ImageOf,
-  EffectStripCatalogPage.ImageOf, Catalogs/ArtPictureConverter); proposed shared Catalogs type with Of(file) and
-  Forget(files).
-- Warning (open): ArtFolders.FieldSpriteImagesIn (Data/Art/ArtFolders.cs:42) lost its only caller; only its test uses it.
-- Suggestion (open): ReadableEffectImages is now a one-line forward to ReadableImagesIn(ArtFolders.Effects).
-- BG8's Suggestion (Gone.png import test): fixed (BattleBackgroundImportTests).
-- BG8's Follow-up (BG9.md plans a mutating TakeAnimation; build a fresh row and share TakeStillImage's
-  replace-and-insert): open, for BG9.
+- Suggestion (open): SheetProblem says "choose a smaller height" with "(0 at most)" for a panorama whose frame is wider
+  than 4096 px at every offered height; no smaller height helps.
+- Suggestion (open): FrameScaler.WidthAt(gif.Width, gif.Height, height) written three times in
+  GifImportOptionsViewModel.Background.cs (SheetLine, SheetProblem, FitsOneSheet).
+- Follow-up (open): Tiles/SheetImportResult now carries battle backgrounds (Tiles -> Core.Battle); it serves every art
+  import, so Catalogs/ is its home (the slice text already says Catalogs/SheetImportResult).
+- BG8b's Warnings (image cache in three places; FieldSpriteImagesIn without caller) and Suggestion
+  (ReadableEffectImages forward): fixed (no longer in src .cs files).
+- BG8's Follow-up (fresh row instead of mutating TakeAnimation): fixed (TakeImport builds with From(file, record, size)).

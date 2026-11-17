@@ -5,15 +5,17 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-encounters-and-backgrounds, slice BG4 (startup art check on backgrounds' size and animated grid,
-import refuses backgrounds over 4096 a side, placeholder ForestPulse.png + script).
+Plan 2026-11-15-encounters-and-backgrounds, slice BG5 (BattleBackdrop plays animated backgrounds; ExplorationScene
+decodes a map's battle backgrounds on entry and releases the last map's via BackgroundRelease/TextureLibrary.Release;
+Core EncounterBackground.PossibleOn).
 2026-11-17. Round 1. Verdict: Ready to commit (no Critical, no Warning).
 
-- Fixed (from BG3): FrameOrigin's row overflow is now bounded: the art check requires rows needed <= height /
-  frameHeight, so a passing record's row origin is <= image height.
-- Suggestion (open): TextureLimit summary "The import checks a battle image's width only" reads against the next
-  sentence; say "a battler's or effect strip's width".
-- Suggestion (open): GridProblemOf_ImageOneFrameWide_HoldsOneColumn asserts Null; name it _IsNull like its siblings.
-- Suggestion (open): no test for an animated record's sheet named in the wrong case (shared path with maps, tested).
-- Follow-up (BG7): GridProblemOf divides by FrameWidth/FrameHeight and reads Animation; the editor must call it only
-  on a record its validator passed.
+- Checked: warp's map change happens in EventPresenter.ShowWarp at FadePhase.Holding, so the next Draw decodes under
+  black; only random encounters start battles (ExplorationState.TryStartEncounter), so PossibleOn covers every battle;
+  only BattleScene draws non-title/menu backgrounds, fetched per frame, so a release can't dispose a held texture.
+- Suggestion (open): ExplorationScene.DecodeBattleBackgrounds also releases; a name like
+  SwapDecodedBattleBackgrounds says both.
+- Follow-up (open): a new game or load builds a new ExplorationScene with nothing decoded, so the last playthrough's
+  map backgrounds stay cached for the session (implementer's note).
+- Follow-up (BG7, open): GridProblemOf divides by FrameWidth/FrameHeight and reads Animation; the editor must call it
+  only on a record its validator passed.

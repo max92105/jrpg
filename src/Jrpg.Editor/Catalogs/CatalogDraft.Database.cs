@@ -8,7 +8,8 @@ namespace Jrpg.Editor.Catalogs;
 
 /// <summary>
 /// The catalogs the Database windows edit (ADR 0045): the shops, the enemies, the drop tables, the cinematics, the
-/// effect strips, the items and the affix pool, the whole session of each window recorded as one undo step.
+/// effect strips, the animated backgrounds, the items and the affix pool, the whole session of each window recorded as
+/// one undo step.
 /// </summary>
 internal sealed partial class CatalogDraft
 {
@@ -43,6 +44,24 @@ internal sealed partial class CatalogDraft
         }
 
         Do(new CatalogEdit(catalog => catalog with { EffectStrips = after }, catalog => catalog with { EffectStrips = before }));
+    }
+
+    /// <summary>
+    /// Replaces the animated battle backgrounds' records as one undo step (decision 901); nothing when they are the
+    /// same by content. No undo refusal: nothing refers to a record, a background is named by its file.
+    /// </summary>
+    public void SetAnimatedBackgrounds(IReadOnlyList<AnimatedBackgroundDefinition> backgrounds)
+    {
+        var before = Current.AnimatedBackgrounds;
+        var after = backgrounds.ToDictionary(background => background.File, StringComparer.Ordinal);
+        if (HasSameRecords(before, after, EqualityComparer<AnimatedBackgroundDefinition>.Default.Equals))
+        {
+            return;
+        }
+
+        Do(new CatalogEdit(
+            catalog => catalog with { AnimatedBackgrounds = after },
+            catalog => catalog with { AnimatedBackgrounds = before }));
     }
 
     /// <summary>

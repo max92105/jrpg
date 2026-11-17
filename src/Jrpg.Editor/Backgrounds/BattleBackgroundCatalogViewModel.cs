@@ -14,16 +14,20 @@ namespace Jrpg.Editor.Backgrounds;
 /// or animated by its record, then each record whose image is missing (still listed and saved, decision 442). The
 /// problem line is the chosen background's own, then another's named by file, then Data's for the whole list; Apply
 /// greys while there is one. Nothing names a record by id, so no undo is refused, and a background is chosen by its
-/// file. Reads no file itself: the folder's listing and an image's size come in as lookups.
+/// file. Reads no file itself: the folder's listing and an image's size come in as lookups. A PNG imported into the
+/// folder enters the session as a still (decision 902), over an animated one's file too.
 /// </summary>
 internal sealed partial class BattleBackgroundCatalogViewModel : ObservableObject, IEditedCatalog
 {
+    private readonly Func<string, (int Width, int Height)?> _sizeOf;
+
     /// <param name="current">The records as they are now.</param>
     /// <param name="images">The readable images in the backgrounds folder, in any order.</param>
     /// <param name="sizeOf">A backgrounds image's size by file name; null when the folder lacks it.</param>
     public BattleBackgroundCatalogViewModel(
         ContentCatalog current, IReadOnlyList<string> images, Func<string, (int Width, int Height)?> sizeOf)
     {
+        _sizeOf = sizeOf;
         var rows = ArtImageRows.Of([.. images.Order(StringComparer.Ordinal)], current.AnimatedBackgrounds.Keys);
         Backgrounds = [.. rows.Select(row => BattleBackgroundViewModel.From(
             row.File, current.AnimatedBackgrounds.GetValueOrDefault(row.File), SizeOf(row, sizeOf)))];
@@ -55,6 +59,27 @@ internal sealed partial class BattleBackgroundCatalogViewModel : ObservableObjec
     public IReadOnlyList<AnimatedBackgroundDefinition> ToRecords() =>
         Problem is { } problem ? throw new InvalidOperationException(problem) : AnimatedRecords();
 
+    /// <summary>
+    /// After PNGs were copied into the backgrounds folder (decision 902): each one's row is built again as a still at
+    /// its new size, an animated one's record dropped, and put back in name order among the folder's images; the last
+    /// one is chosen.
+    /// </summary>
+    /// <param name="files">The file names the import copied, in the order chosen; none changes nothing.</param>
+    public void RefreshAfterStillImport(IReadOnlyList<string> files)
+    {
+        if (files.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var file in files)
+        {
+            TakeStillImage(file);
+        }
+
+        SelectedBackground = Backgrounds.Single(background => background.File == files[^1]);
+    }
+
     // Read only once no row has a problem, as a row's record throws on one.
     private List<AnimatedBackgroundDefinition> AnimatedRecords() =>
         [.. Backgrounds
@@ -66,6 +91,23 @@ internal sealed partial class BattleBackgroundCatalogViewModel : ObservableObjec
     // the game's exact-case check refuses (decision 895).
     private static (int Width, int Height)? SizeOf(ArtImageRow row, Func<string, (int Width, int Height)?> sizeOf) =>
         row.IsImageMissing ? null : sizeOf(row.File);
+
+    // The imported file is in the folder now, so its size is looked up whatever its old row said.
+    private void TakeStillImage(string file)
+    {
+        if (Backgrounds.SingleOrDefault(background => background.File == file) is { } replaced)
+        {
+            replaced.PropertyChanged -= OnBackgroundChanged;
+            Backgrounds.Remove(replaced);
+        }
+
+        var still = BattleBackgroundViewModel.From(file, null, _sizeOf(file));
+        still.PropertyChanged += OnBackgroundChanged;
+        // Counting the folder's rows before it works since the rows whose image is missing always come after them.
+        Backgrounds.Insert(
+            Backgrounds.Count(background => !background.IsImageMissing && string.CompareOrdinal(background.File, file) < 0),
+            still);
+    }
 
     // A row's typed frame time moves the problem line; its own computed notices are skipped.
     private void OnBackgroundChanged(object? sender, PropertyChangedEventArgs e)

@@ -7,7 +7,8 @@ using static Jrpg.Editor.Tests.Backgrounds.BackgroundFixtures;
 namespace Jrpg.Editor.Tests.Backgrounds;
 
 // The Battle backgrounds page's rules (decisions 901, 902): the test world's catalog with records built here, over a
-// folder the test lists: A.png (a still), Pulse.png (animated), and a record for Gone.png, missing from the folder.
+// folder the test lists: A.png (a still), Pulse.png (animated), and a record for Gone.png, missing from the folder; a
+// file an import copies in reads the pulse sheet's size.
 public sealed class BattleBackgroundCatalogViewModelTests
 {
     private static readonly ContentCatalog _testWorld =
@@ -162,11 +163,74 @@ public sealed class BattleBackgroundCatalogViewModelTests
         Assert.Equal(_gone.File, catalog.ChosenKey);
     }
 
+    [Fact]
+    public void RefreshAfterStillImport_OverAnimated_MakesItStillAtTheNewSize()
+    {
+        var size = PulseSheet;
+        var catalog = new BattleBackgroundCatalogViewModel(WithRecords(), _images, _ => size);
+        size = (1280, 720);
+
+        catalog.RefreshAfterStillImport([Pulse.File]);
+
+        var row = Row(catalog, Pulse.File);
+        Assert.Equal((false, "Still, 1280 x 720 px"), (row.IsAnimated, row.KindLine));
+    }
+
+    [Fact]
+    public void RefreshAfterStillImport_NewFile_InsertedInNameOrderAndChosen()
+    {
+        var catalog = Catalog(_images);
+
+        catalog.RefreshAfterStillImport(["Zed.png", "M.png"]);
+
+        Assert.Equal(
+            ("M.png", "A.png, M.png, Pulse.png, Zed.png, Gone.png"),
+            (catalog.ChosenKey, string.Join(", ", catalog.Backgrounds.Select(row => row.File))));
+    }
+
+    [Fact]
+    public void RefreshAfterStillImport_NoFiles_KeepsTheRowsAndChoice()
+    {
+        var catalog = Catalog(_images);
+        catalog.Choose(Pulse.File);
+
+        catalog.RefreshAfterStillImport([]);
+
+        Assert.Equal((Pulse.File, 3), (catalog.ChosenKey, catalog.Backgrounds.Count));
+    }
+
+    [Fact]
+    public void RefreshAfterStillImport_ImportedRowTyped_RaisesProblemsChange()
+    {
+        var catalog = Catalog(_images);
+        catalog.RefreshAfterStillImport(["M.png"]);
+        List<string?> raised = [];
+        catalog.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        Row(catalog, "M.png").FrameMillisecondsText = "0";
+
+        Assert.Contains(nameof(BattleBackgroundCatalogViewModel.Problem), raised);
+    }
+
+    [Fact]
+    public void RefreshAfterStillImport_ReplacedRowTyped_RaisesNothing()
+    {
+        var catalog = Catalog(_images);
+        var replaced = Row(catalog, Pulse.File);
+        catalog.RefreshAfterStillImport([Pulse.File]);
+        List<string?> raised = [];
+        catalog.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        replaced.FrameMillisecondsText = "0";
+
+        Assert.Empty(raised);
+    }
+
     private static BattleBackgroundCatalogViewModel Catalog(string[] images) =>
         new(WithRecords(), images, file => file switch
         {
-            "A.png" or "Pulse.png" => PulseSheet,
-            _ => null,
+            "Gone.png" => null,
+            _ => PulseSheet,
         });
 
     // The records are set up out of order, so the list's order is the page's own.

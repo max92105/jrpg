@@ -11,8 +11,8 @@ namespace Jrpg.Editor.Backgrounds;
 /// One image of the backgrounds folder as the Battle backgrounds page shows it (decisions 901, 902): a still picture
 /// while no record describes it, else animated, its frame time kept as typed, the only field the page edits (its frame
 /// size and count come from its import). <see cref="Problem"/> is the typed time, then Data's rules for the record and
-/// its grid, which the page's problem line shows. Reads no file: the image's size comes in from the list's lookup. The
-/// imports' members come with their callers: a PNG over its file with the page's import (BG8), a GIF with BG9's.
+/// its grid, which the page's problem line shows. Reads no file: the image's size comes in from the list's lookup. A
+/// PNG imported over its file makes the list build a still row in its place; a GIF's member comes with BG9's import.
 /// </summary>
 internal sealed partial class BattleBackgroundViewModel : ObservableObject
 {

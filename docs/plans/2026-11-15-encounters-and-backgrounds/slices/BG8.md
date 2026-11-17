@@ -83,3 +83,14 @@ records one undo step; Ctrl+Z undoes it; Save all writes `animated-backgrounds.j
   one unsubscribed) there, as `EffectStripCatalogViewModel.TakeImportedImage` does, with a test typing into an imported
   row. The problem line's row part is `Catalogs/ArtImageRowProblem`, shared with the Effect strips and Character
   sprites pages.
+- **Done, with deviations:** split at the start (count about 375 with tests, past 320, no split point named): this
+  commit holds `Backgrounds/BattleBackgroundEditingViewModel` (20 lines; `Apply` returns nothing, as every page's, since
+  `MainWindow.OpenInDialog` takes an `Action` and OK greys on the problem), `CatalogDraft.SetAnimatedBackgrounds`
+  (`CatalogDraft.Database.cs` 187) and `BattleBackgroundCatalogViewModel.RefreshAfterStillImport` (120 lines). No
+  `BattleBackgroundViewModel.TakeStillImage`: the list builds a still row in the imported file's place, unsubscribing
+  the replaced row and subscribing the new one (BG7c's note), as `EffectStripCatalogViewModel.TakeImportedImage` does,
+  so a row stays immutable but for its typed time; its test is the list's
+  `RefreshAfterStillImport_OverAnimated_MakesItStillAtTheNewSize`. Tests (`BattleBackgroundEditingViewModelTests` 80,
+  5 tests, one more: a still imported over the animated drops its record at Apply; `BattleBackgroundCatalogViewModelTests`
+  248, 5 more: no files keeps the choice, an imported row's typing relayed, a replaced row's not): 7253. The page, the
+  preview's cover-fit, the menu wiring, the smoke script and the hand checks moved to [BG8b](BG8b.md).

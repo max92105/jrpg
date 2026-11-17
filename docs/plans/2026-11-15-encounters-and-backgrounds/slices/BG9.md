@@ -90,3 +90,7 @@ None.
 
 - **Note from BG6 review:** `GifImportOptions.BattleHeight` now also means a background sheet's frame height; consider
   a neutral name (`FrameHeight`) once the dialog's background kind settles.
+- **Note from BG8 review:** BG8 keeps a row unchanged and has the list build a fresh one on import
+  (`BattleBackgroundCatalogViewModel.RefreshAfterStillImport`): build the imported animation's row with
+  `BattleBackgroundViewModel.From(file, record, size)` and share the still import's replace-and-insert step instead of a
+  `TakeAnimation` changing the row in place; the planned `TakeAnimation_Still_...` test goes with it.

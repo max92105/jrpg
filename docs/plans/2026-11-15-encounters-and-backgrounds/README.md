@@ -110,8 +110,10 @@ slices and Editor slices aim at about 200 lines, not because the scope grew.
   split again at its named point) → [slices/BG7b.md](slices/BG7b.md)
 - [x] **BG7c. The Battle backgrounds page's rules, the list view model** (Editor, about 200 lines; BG7b's split) →
   [slices/BG7c.md](slices/BG7c.md)
-- [ ] **BG8. The Battle backgrounds page: the shared preview, cover-fit, PNG import, Apply as one undo step** (Editor,
+- [x] **BG8. The Battle backgrounds page: the shared preview, cover-fit, PNG import, Apply as one undo step** (Editor,
   about 200 lines) → [slices/BG8.md](slices/BG8.md)
+- [ ] **BG8b. The Battle backgrounds page and Database > Battle backgrounds** (Editor, about 200 lines; BG8's split) →
+  [slices/BG8b.md](slices/BG8b.md)
 - [ ] **BG9. AN2's GIF dialog gains a background kind: the GIF plays at the chosen height before it is written**
   (Editor, about 250 lines) → [slices/BG9.md](slices/BG9.md)
 

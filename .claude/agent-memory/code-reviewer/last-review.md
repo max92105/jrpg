@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-classes-and-progression, slice CL7 (first part of a three-way split: `Party/ResourceGainsBoxes`;
-CL7b one resource, CL7c the class's list; decision 950). 2026-11-17. Round 1. Verdict: Ready to commit.
+Plan 2026-11-15-classes-and-progression, slice CL7b (one resource as typed: `Party/ClassResourceViewModel`; decision
+1015; `DuplicateOf` moved to CL7c by the slice note). 2026-11-17. Round 1. Verdict: Ready to commit.
 No Critical, no Warning.
 
+- Suggestion: third private `NumberIn` (`TypedNumber.Parse(text)!.Value`) in Party/ — open (suggestion; fold into the
+  backlog's TypedNumber line rather than carry)
+- Suggestion: no test that From speed ignores a bad Starts at box (only Max tested on that side) — open (suggestion)
 - Follow-up: CL8's Gains column headers must use the same names as ResourceGainsBoxes.Problem ("Heavy hit share" etc.) — open
-- From CL6b: TypedRow ListBoxItem style copies — dropped (backlog.md line ~355 lists it).
-- From CL6b: ClassCatalogPage.xaml.cs summary missing Levels/Skills — fixed (summary names all three tabs).
-- CL6b suggestions (SkillsToAdd sort test, map Party row wording) — not carried (suggestions, slice closed).

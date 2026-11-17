@@ -39,3 +39,10 @@ No page change yet (CL8): the class's record now comes from the resources as typ
 
 ## Verify by hand
 None: the tab comes in CL8. CL4's hand check 3 still passes (the resources go through the boxes unchanged).
+
+- **Note from CL7b:** `ClassResourceViewModel.DuplicateOf` moved here with its user, the class's Duplicate, to keep
+  CL7b near its size: a copy of every text as typed (`Gains.CopyFrom`), the id kept since the class's skills name it,
+  `IsNew` true as the draft holds no resource of the new class; tests `DuplicateOf_HalfTypedBox_CopiesTheTextsAndId`,
+  `DuplicateOf_TypedSpeedResource_WritesTheSameRecord` and `DuplicateOf_TypedFixedAmounts_WritesTheSameRecord`. A
+  resource's problem is `ProblemAmong(classmateIds)`: the class passes the other resources' ids (by position for a
+  new one without an id), and `ToResource` checks only the boxes.

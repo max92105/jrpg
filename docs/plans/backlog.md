@@ -202,6 +202,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Events/ListOrder`'s summary still says "the event dialog's lists" while the Quests and Shops windows use it too: reword it or move it to a shared folder (SH2's review).
 - `ArtFolders.ImagesIn` (and the two older folder lookups) throws when a `--content` folder lacks the art folder asked for; the pickers could offer nothing instead (NP2's review).
 - Six editor boxes parse a whole number their own way (`EventStepViewModel.WholeNumber`, `TypedCounts.Parse`, `TileAnimationViewModel.WholeNumberOf`, `PlacedObjectEditing.Layer`, `LayerChoiceViewModel`, `Catalogs/TypedNumber`): fold them onto one parser in a shared folder (EN2's review).
+- `TypedNumber.Parse(text)!.Value` is written at about 40 sites and as a private `NumberIn` in three Party types (`ClassStatsBoxes`, `ResourceGainsBoxes`, `ClassResourceViewModel`): a `TypedNumber.ValueOf(string)` would replace them (CL7b review).
 - `Shell/ArtStatus` refreshes the art warning only when the sheets or objects change: an Enemies window OK (or its undo) that renames a picture leaves the enemy-art lines stale until the next save (EN7's review).
 - `Shell/MainViewModel.cs` is at 285 lines after the cinematics plan (`CinematicEditing` set beside its siblings); the drop table editor plan set `DropTableEditing` in the constructor beside its siblings (283 with its using, DT5, decision 605): the next window's editing view model is built in its own partial (as `MainViewModel.Database.cs`), not in the constructor's list.
 

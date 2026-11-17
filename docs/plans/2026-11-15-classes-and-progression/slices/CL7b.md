@@ -44,3 +44,14 @@ backfire, strain, dominance) are carried silently from the record until CL9.
 
 ## Verify by hand
 None: the tab comes in CL8.
+
+- **Done, with deviations:** `Party/ClassResourceViewModel` (156 lines): the problem is `ProblemAmong(classmateIds)`,
+  the class's list passing the other resources' ids, and `ToResource` checks only the boxes (the id is the list's);
+  `Changed` from one partial method per typed field and the gains' `Problem` notice, never the label's. Decision 1015:
+  a resource with fixed amounts shows 1 as its speed per charge (`LowestSpeedPerCharge`). `DuplicateOf` and its three
+  tests moved to CL7c with their user, the class's Duplicate (note there), to keep this slice nearer its size.
+  `ClassFixtures` (128) gains `Surge`, a speed resource with backfire and Will scaling.
+  `Party/ClassResourceViewModelTests` (249, 26 tests: the planned ones but the duplicate, plus the fields shown, the
+  blank, typed fields trimmed, the start box named with fixed amounts and ignored from speed (after review), the throw,
+  a free new id, both labels and every typed field raising `Changed` once). About 420 lines, above the 300 planned.
+  Backlog, after review: a `TypedNumber.ValueOf` for the `Parse(text)!.Value` sites and the three `NumberIn` copies.

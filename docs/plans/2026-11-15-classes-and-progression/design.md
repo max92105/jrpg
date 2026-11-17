@@ -10,7 +10,7 @@ behind ADR 0062 (section 5), the file layouts and what is left for later (sectio
 |---|---|---|---|
 | New class | `Party/ClassViewModel` (`_blank`) | name and description empty, base max HP 1, every other base and growth number 0, no skills, no resources | Add's starting record: the validator's lowest legal numbers, as the Enemies page's blank (decision 585's pattern). |
 | New skill entry's level | `Party/ClassViewModel.Skills` (CL6) | 1 | What Add writes in the Level box: known from the start, as every entry today. |
-| New resource | `Party/ClassResourceViewModel` (`_blank`) | id and name empty, color `#FFFFFF`, max 1, starts at 0, no gains, no rules | Add's starting resource. |
+| New resource | `Party/ClassResourceViewModel` (`_blank`) | id and name empty, color `#FFFFFF`, max 1, starts at 0, no gains, no rules; speed per charge 1 if From speed is ticked (decision 1015) | Add's starting resource. |
 | New member | `Party/PartyMemberViewModel` (`_blank`) | every text empty, no class | Add's starting member. |
 | New starting item row | `NewGame/StartingItemRow` | no item, quantity 1 | Add's row on the New game page. |
 | Added level | `Progression/ExperienceTableViewModel` | the last row's amount | What Add level puts in the new last row. |

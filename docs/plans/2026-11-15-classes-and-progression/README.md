@@ -132,7 +132,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   CL6) → [slices/CL6b.md](slices/CL6b.md)
 - [x] **CL7. One resource as typed: amounts and gains** (Editor, about 210 lines; split, the resource is CL7b and the
   class's list CL7c) → [slices/CL7.md](slices/CL7.md)
-- [ ] **CL7b. One resource as typed: id, name, color, lasting, amounts and gains** (Editor, about 300 lines; split from
+- [x] **CL7b. One resource as typed: id, name, color, lasting, amounts and gains** (Editor, about 300 lines; split from
   CL7) → [slices/CL7b.md](slices/CL7b.md)
 - [ ] **CL7c. A class's resources as typed: the list, Add, Remove and moves** (Editor, about 250 lines; split from CL7)
   → [slices/CL7c.md](slices/CL7c.md)
@@ -279,6 +279,9 @@ Skills learned at a level (ADR 0062):
 - **1014.** (CL6) A class's skill rows reach the list's problem line through `ClassViewModel.Changed`, a typed level
   now and the list's Add, Remove and moves in CL6b, so `ClassCatalogViewModel` gains no collection relay; `ToClass`
   keeps the record's own skills list while the rows match it in order, so an untouched class equals its record.
+- **1015.** (CL7b) A resource with fixed amounts shows 1 in its Speed per charge box, the validator's lowest, so ticking
+  From speed starts on a number Data takes; a speed resource unticked shows its record's max and start, 0 and 0, and
+  Data's "max must be at least 1" asks for a max.
 
 Shared and new game:
 - **960.** A member's starting gear is not built: members join with nothing worn, and no rule says otherwise.

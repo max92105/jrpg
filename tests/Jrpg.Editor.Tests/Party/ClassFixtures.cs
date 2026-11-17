@@ -12,7 +12,7 @@ namespace Jrpg.Editor.Tests.Party;
 /// The Classes page tests' own classes, so no repository number is pinned: every base and growth number of the scholar
 /// differs from the others and from a new class's, so a box that drops or swaps one shows in a record compared whole; a
 /// second class for the list; the test world holding the two; the Skills tab's draft of three skills; a resource
-/// gaining on every trigger; and the stat and gain boxes' texts read in the form's order.
+/// gaining on every trigger and one from speed with rules; and the stat and gain boxes' texts read in the form's order.
 /// </summary>
 internal static class ClassFixtures
 {
@@ -95,6 +95,18 @@ internal static class ClassFixtures
             PerEnemyFallen = 7,
             PerBattleFought = -8,
         },
+    };
+
+    /// <summary>
+    /// A resource taking its max from speed, one charge per 10, with a backfire and a Will scaling (lower gain, not the
+    /// first effect) that no box edits yet, so a resource written back shows whether its rules were carried.
+    /// </summary>
+    public static ResourceDefinition Surge { get; } = new("surge", "Surge")
+    {
+        Color = "#9AD1C9",
+        MaxFromSpeed = new SpeedScaling(10),
+        Backfire = new BackfireRule(5, 15),
+        WillScaling = new WillScaling(4, WillEffect.LowerGain),
     };
 
     /// <summary>The eight boxes' texts in the page's order: max HP, speed, accuracy, then the five primaries.</summary>

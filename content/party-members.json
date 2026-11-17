@@ -1,14 +1,5 @@
 [
   {
-    "id": "sarxian",
-    "name": "Sarxian",
-    "classId": "warlock",
-    "summary": "A warlock who bargained with something old for the fire he carries. Placeholder: the developer writes who Sarxian is.",
-    "portraitFile": "Sarxian.png",
-    "battleSpriteFile": "Sarxian.png",
-    "attackEffectFile": "GoldenSlashImpact.png"
-  },
-  {
     "id": "jazog",
     "name": "Jazog",
     "classId": "barbarian",
@@ -18,48 +9,12 @@
     "attackEffectFile": "GoldenSlashImpact.png"
   },
   {
-    "id": "teelle",
-    "name": "Teelle",
-    "classId": "paladin",
-    "summary": "A paladin sworn to a temple that no longer stands. Placeholder: the developer writes who Teelle is.",
-    "portraitFile": "Teelle.png",
-    "battleSpriteFile": "Teelle.png",
-    "attackEffectFile": "GoldenSlashImpact.png"
-  },
-  {
-    "id": "zaruk",
-    "name": "Zaruk",
-    "classId": "monk",
-    "summary": "A monk who left his order to see the world he was taught to ignore. Placeholder: the developer writes who Zaruk is.",
-    "portraitFile": "Zaruk.png",
-    "battleSpriteFile": "Zaruk.png",
-    "attackEffectFile": "GoldenSlashImpact.png"
-  },
-  {
-    "id": "zanyr",
-    "name": "Zanyr",
-    "classId": "cleric",
-    "summary": "A cleric who heals the wounded on every side of a war. Placeholder: the developer writes who Zanyr is.",
-    "portraitFile": "Zanyr.png",
-    "battleSpriteFile": "Zanyr.png",
-    "attackEffectFile": "GoldenSlashImpact.png"
-  },
-  {
-    "id": "thaali",
-    "name": "Thaali",
-    "classId": "druid",
-    "summary": "A druid who hears the forest and does not always like what it says. Placeholder: the developer writes who Thaali is.",
-    "portraitFile": "Thaali.png",
-    "battleSpriteFile": "Thaali.png",
-    "attackEffectFile": "GoldenSlashImpact.png"
-  },
-  {
-    "id": "ragnir",
-    "name": "Ragnir",
-    "classId": "fighter",
-    "summary": "A sellsword who has fought for every banner and believes in none. Placeholder: the developer writes who Ragnir is.",
-    "portraitFile": "Ragnir.png",
-    "battleSpriteFile": "Ragnir.png",
+    "id": "lazarus",
+    "name": "Lazarus",
+    "classId": "rogue",
+    "summary": "A thief who came back from a hanging and will not say how. Placeholder: the developer writes who Lazarus is.",
+    "portraitFile": "Lazarus.png",
+    "battleSpriteFile": "Lazarus.png",
     "attackEffectFile": "GoldenSlashImpact.png"
   },
   {
@@ -72,12 +27,57 @@
     "attackEffectFile": "GoldenSlashImpact.png"
   },
   {
-    "id": "lazarus",
-    "name": "Lazarus",
-    "classId": "rogue",
-    "summary": "A thief who came back from a hanging and will not say how. Placeholder: the developer writes who Lazarus is.",
-    "portraitFile": "Lazarus.png",
-    "battleSpriteFile": "Lazarus.png",
+    "id": "ragnir",
+    "name": "Ragnir",
+    "classId": "fighter",
+    "summary": "A sellsword who has fought for every banner and believes in none. Placeholder: the developer writes who Ragnir is.",
+    "portraitFile": "Ragnir.png",
+    "battleSpriteFile": "Ragnir.png",
+    "attackEffectFile": "GoldenSlashImpact.png"
+  },
+  {
+    "id": "sarxian",
+    "name": "Sarxian",
+    "classId": "warlock",
+    "summary": "A warlock who bargained with something old for the fire he carries. Placeholder: the developer writes who Sarxian is.",
+    "portraitFile": "Sarxian.png",
+    "battleSpriteFile": "Sarxian.png",
+    "attackEffectFile": "GoldenSlashImpact.png"
+  },
+  {
+    "id": "teelle",
+    "name": "Teelle",
+    "classId": "paladin",
+    "summary": "A paladin sworn to a temple that no longer stands. Placeholder: the developer writes who Teelle is.",
+    "portraitFile": "Teelle.png",
+    "battleSpriteFile": "Teelle.png",
+    "attackEffectFile": "GoldenSlashImpact.png"
+  },
+  {
+    "id": "thaali",
+    "name": "Thaali",
+    "classId": "druid",
+    "summary": "A druid who hears the forest and does not always like what it says. Placeholder: the developer writes who Thaali is.",
+    "portraitFile": "Thaali.png",
+    "battleSpriteFile": "Thaali.png",
+    "attackEffectFile": "GoldenSlashImpact.png"
+  },
+  {
+    "id": "zanyr",
+    "name": "Zanyr",
+    "classId": "cleric",
+    "summary": "A cleric who heals the wounded on every side of a war. Placeholder: the developer writes who Zanyr is.",
+    "portraitFile": "Zanyr.png",
+    "battleSpriteFile": "Zanyr.png",
+    "attackEffectFile": "GoldenSlashImpact.png"
+  },
+  {
+    "id": "zaruk",
+    "name": "Zaruk",
+    "classId": "monk",
+    "summary": "A monk who left his order to see the world he was taught to ignore. Placeholder: the developer writes who Zaruk is.",
+    "portraitFile": "Zaruk.png",
+    "battleSpriteFile": "Zaruk.png",
     "attackEffectFile": "GoldenSlashImpact.png"
   }
 ]

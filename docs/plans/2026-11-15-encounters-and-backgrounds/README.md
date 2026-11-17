@@ -104,8 +104,10 @@ slices and Editor slices aim at about 200 lines, not because the scope grew.
 - [x] **BG5. The battle plays an animated background; a map's backgrounds decoded on entry, the last map's released**
   (Core, Game, about 250 lines, the 1.6x included) → [slices/BG5.md](slices/BG5.md)
 - [x] **BG6. A GIF into a background sheet, headless** (Editor, about 190 lines) → [slices/BG6.md](slices/BG6.md)
-- [ ] **BG7. The Battle backgrounds page's rules: every background, still or animated, and its problem line** (Editor,
+- [x] **BG7. The Battle backgrounds page's rules: every background, still or animated, and its problem line** (Editor,
   about 320 lines, its split point named) → [slices/BG7.md](slices/BG7.md)
+- [ ] **BG7b. The Battle backgrounds page's rules, the two view models** (Editor, about 450 lines; BG7's split, its own
+  split point named) → [slices/BG7b.md](slices/BG7b.md)
 - [ ] **BG8. The Battle backgrounds page: the shared preview, cover-fit, PNG import, Apply as one undo step** (Editor,
   about 200 lines) → [slices/BG8.md](slices/BG8.md)
 - [ ] **BG9. AN2's GIF dialog gains a background kind: the GIF plays at the chosen height before it is written**

@@ -89,3 +89,11 @@ is the developer's to look at (he checks its list is in the same order as before
 - **Note from BG4 review:** `ArtReferenceCheck.GridProblemOf` divides by the frame size and reads `Animation`: the
   page's problem line calls it only on a record `AnimatedBackgroundCatalogValidator` accepts (a 0 frame width throws
   `DivideByZeroException`; the page may hold a record with no animation, BG3).
+- **Note from BG7 (the split):** the size check estimated about 580 lines with tests (the two view models about 230 of
+  code with their doc comments, 15 tests and a fixture), past ~320, so this run stopped at the named split point; the
+  two view models, their tests, the map's `Backgrounds` row and the BG3 and BG4 review notes moved to
+  [BG7b](BG7b.md), which names its own split point (about 450 lines).
+- **Done, with deviations:** split at the named point: `Catalogs/ArtImageRows` (23 lines) and `ArtImageRow` (6) under
+  the Effect strips (168) and Character sprites (193) pages' lists, their tests unchanged; `ArtImageRowsTests` (36, 3
+  tests). The Effect strips list keeps its name order by passing the folder's images sorted. Tests: 7199. The smoke
+  script opened both pages with no `ERROR` line; the Character sprites capture is the developer's to look at.

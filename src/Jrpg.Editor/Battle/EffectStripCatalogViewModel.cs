@@ -33,15 +33,12 @@ internal sealed partial class EffectStripCatalogViewModel : ObservableObject, IE
         ContentCatalog current, IReadOnlyList<string> images, Func<string, (int Width, int Height)?> sizeOf)
     {
         (_current, _sizeOf) = (current, sizeOf);
-        var inFolder = images.Order(StringComparer.Ordinal).Select(file => current.EffectStrips.TryGetValue(file, out var strip)
+        string[] inNameOrder = [.. images.Order(StringComparer.Ordinal)];
+        var rows = ArtImageRows.Of(inNameOrder, current.EffectStrips.Keys);
+        Strips = [.. rows.Select(row => current.EffectStrips.TryGetValue(row.File, out var strip)
             ? EffectStripViewModel.From(strip, sizeOf)
-            : EffectStripViewModel.Unlisted(file, sizeOf));
-        var missing = current.EffectStrips.Values
-            .Where(strip => !images.Contains(strip.File, StringComparer.Ordinal))
-            .OrderBy(strip => strip.File, StringComparer.Ordinal)
-            .Select(strip => EffectStripViewModel.From(strip, sizeOf));
-        Strips = [.. inFolder.Concat(missing)];
-        SwingChoices = [.. images.Order(StringComparer.Ordinal)];
+            : EffectStripViewModel.Unlisted(row.File, sizeOf))];
+        SwingChoices = [.. inNameOrder];
         foreach (var strip in Strips)
         {
             strip.PropertyChanged += OnStripChanged;

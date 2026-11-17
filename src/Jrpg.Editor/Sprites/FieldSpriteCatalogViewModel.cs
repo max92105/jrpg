@@ -183,14 +183,11 @@ internal sealed partial class FieldSpriteCatalogViewModel : ObservableObject, IE
     // The folder's images in its order, then the records whose image is missing, by file.
     private List<FieldSpriteChoice> BuildChoices()
     {
-        var files = _listFiles();
-        var listed = files.ToHashSet(StringComparer.Ordinal);
-        var records = _catalog.Current.FieldSprites.Keys;
-        var withoutImages = records.Where(file => !listed.Contains(file)).Order(StringComparer.Ordinal);
+        var records = _catalog.Current.FieldSprites;
         return
         [
-            .. files.Select(file => new FieldSpriteChoice(file, records.Contains(file))),
-            .. withoutImages.Select(file => new FieldSpriteChoice(file, IsSetUp: true, IsImageMissing: true)),
+            .. ArtImageRows.Of(_listFiles(), records.Keys)
+                .Select(row => new FieldSpriteChoice(row.File, records.ContainsKey(row.File), row.IsImageMissing)),
         ];
     }
 }

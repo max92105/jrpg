@@ -5,15 +5,20 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-classes-and-progression, slice LV2 (SkillsByLevel, LearnedSkill, PartyMember.Skills by level,
-SkillsLearnedAt, ExperienceGain.LearnedSkills filled by BattleRewards.LearnedOn; ADR 0062).
-2026-11-17. Round 1. Verdict: Ready to commit. No Critical, no Warning.
+Plan 2026-11-15-classes-and-progression, slice LV3 (victory screen's "X learned Y." lines: LearnedSkillLine.AllOf,
+VictoryLearnedSkillsView, VictoryScreen.OpacityOf; decisions 964, 1013).
+2026-11-17. Round 1. Verdict: Ready to commit. No Critical.
 
-- Checked: `step.Level + 1` is right (PartyMember.cs:226 builds the step with Level before LevelUp at :230; the
-  two-levels test would read (1,spark),(2,flame) if off by one); level-1 skills never re-listed (LearnedAt exact
-  level, steps reach >= 2); Skills keep class order (test class lists meteor(3), spark(1), flame(3)); Combatant.cs:62
-  snapshots Skills at battle start, Game's BattleSkillChoice/StatusSheet read fresh.
-- Suggestion: PartyMember.SkillsLearnedAt public with only a Core reader (BattleRewards); internal like RestoreProgress — open
-- Follow-up: SkillDefinition test factory copied in ~29 test files (2 more in this diff); a Builders/SkillDefinitionBuilder — open
-- Follow-up: eight stat labels in page order in ClassStatsBoxes.Problem and ClassLevelPreview.StatsOf — open (from CL5, grep 2026-11-17 still present)
-- From LV1: CatalogProblems.OfClasses level-check test Suggestion — not carried (other slice's taste)
+- Checked: fade vs a later level-up resetting SinceLastLevelUp is right (only the line whose LevelsToFill equals
+  LevelUps reads the timer; OpacityOf_FirstLevelSkillJustAfterTheSecondFill_StaysWhole at 3.3 s discriminates); skip
+  nulls SinceLastLevelUp -> 1; LevelsToFill = learned.Level - Steps[0].Level right incl. a gain ending on a level up.
+- Warning: third victory test file copies Sarxian/half-a-level/spoils builders; backlog.md:145 says share them at the
+  third file -> a VictoryScenarios test builder — open
+- Warning: five cards fit two lines; a third crosses FooterLineTop (910), 4th+ under the footer bar; unreachable today
+  (no skill in content/classes.json above level 1); not in backlog.md -> add a backlog line naming the options — open
+- Suggestion: one card -> lines centered between both columns, off the lone left card — open
+- Suggestion: Update_NothingLearned_AsksNothing has no level up either, so it repeats the existing no-sound case — open
+- Follow-up: backlog.md:86 VictoryScreenView "277 lines" now 281; its split trigger is met — open
+- Follow-up: ExperienceBarAnimation.SinceLastLevelUp doc says "for the pop"; now also the learned line's fade — open
+- From LV2: SkillsLearnedAt Suggestion — fixed (internal, PartyMember.cs:110); SkillDefinition factory and stat-label
+  follow-ups — dropped (backlog.md:347, :349 list them)

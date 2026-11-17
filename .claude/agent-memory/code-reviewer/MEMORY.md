@@ -7,3 +7,4 @@
 - [Detached comments](detached-comments.md) — a member inserted under, or removed from under, a comment leaves it describing the wrong code
 - [Lax test JSON readers](lax-test-json-readers.md) — test-only manifest readers skip required/nullable checks; ContentJsonOptions.Strict exists
 - [Dead-member listing gap](dead-member-listing-gap.md) — bare-name dead-code greps miss members sharing a name; type-scoped recheck recipe
+- [Backlog triggers](backlog-triggers.md) — grep backlog.md for touched files: "when the third file comes" / "next growth splits" lines

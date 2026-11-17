@@ -1,14 +1,14 @@
 namespace Jrpg.Editor.GifImport;
 
 /// <summary>What one GIF import asks (decisions 637, 638, 904, 987).</summary>
-/// <param name="BattleHeight">
+/// <param name="FrameHeight">
 /// Each frame's height in a strip (screen pixels) or a background's sheet, at least 1; the width follows.
 /// </param>
 /// <param name="RemovesBackground">
 /// Whether the top-left pixel's color becomes transparent, for a GIF on a solid color; a battle background is never
 /// cleared (decision 904).
 /// </param>
-internal sealed record GifImportOptions(int BattleHeight, bool RemovesBackground)
+internal sealed record GifImportOptions(int FrameHeight, bool RemovesBackground)
 {
     // The goblin's drawn height under decision 100, so an imported monster stands as tall as the battle's first one.
     private const int DefaultBattleHeight = 128;

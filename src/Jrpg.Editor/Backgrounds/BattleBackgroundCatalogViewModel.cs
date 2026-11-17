@@ -5,6 +5,7 @@ using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Tiles;
 using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Backgrounds;
@@ -15,7 +16,8 @@ namespace Jrpg.Editor.Backgrounds;
 /// problem line is the chosen background's own, then another's named by file, then Data's for the whole list; Apply
 /// greys while there is one. Nothing names a record by id, so no undo is refused, and a background is chosen by its
 /// file. Reads no file itself: the folder's listing and an image's size come in as lookups. A PNG imported into the
-/// folder enters the session as a still (decision 902), over an animated one's file too.
+/// folder enters the session as a still (decision 902), over an animated one's file too; a GIF's sheet as animated by
+/// the record its import made (decision 903).
 /// </summary>
 internal sealed partial class BattleBackgroundCatalogViewModel : ObservableObject, IEditedCatalog
 {
@@ -60,24 +62,24 @@ internal sealed partial class BattleBackgroundCatalogViewModel : ObservableObjec
         Problem is { } problem ? throw new InvalidOperationException(problem) : AnimatedRecords();
 
     /// <summary>
-    /// After PNGs were copied into the backgrounds folder (decision 902): each one's row is built again as a still at
-    /// its new size, an animated one's record dropped, and put back in name order among the folder's images; the last
-    /// one is chosen.
+    /// After images were copied into the backgrounds folder (decision 902): each one's row is built again at its new
+    /// size, animated by the record a GIF's sheet came with, else a still, an earlier record dropped, and put back in
+    /// name order among the folder's images; the last one is chosen.
     /// </summary>
-    /// <param name="files">The file names the import copied, in the order chosen; none changes nothing.</param>
-    public void RefreshAfterStillImport(IReadOnlyList<string> files)
+    /// <param name="result">What the import copied, a GIF's records among them; nothing copied changes nothing.</param>
+    public void TakeImport(SheetImportResult result)
     {
-        if (files.Count == 0)
+        if (result.LastImported is not { } last)
         {
             return;
         }
 
-        foreach (var file in files)
+        foreach (var file in result.Imported)
         {
-            TakeStillImage(file);
+            TakeImportedImage(file, result.Backgrounds.GetValueOrDefault(file));
         }
 
-        SelectedBackground = Backgrounds.Single(background => background.File == files[^1]);
+        SelectedBackground = Backgrounds.Single(background => background.File == last);
     }
 
     // Read only once no row has a problem, as a row's record throws on one.
@@ -93,7 +95,7 @@ internal sealed partial class BattleBackgroundCatalogViewModel : ObservableObjec
         row.IsImageMissing ? null : sizeOf(row.File);
 
     // The imported file is in the folder now, so its size is looked up whatever its old row said.
-    private void TakeStillImage(string file)
+    private void TakeImportedImage(string file, AnimatedBackgroundDefinition? record)
     {
         if (Backgrounds.SingleOrDefault(background => background.File == file) is { } replaced)
         {
@@ -101,12 +103,12 @@ internal sealed partial class BattleBackgroundCatalogViewModel : ObservableObjec
             Backgrounds.Remove(replaced);
         }
 
-        var still = BattleBackgroundViewModel.From(file, null, _sizeOf(file));
-        still.PropertyChanged += OnBackgroundChanged;
+        var imported = BattleBackgroundViewModel.From(file, record, _sizeOf(file));
+        imported.PropertyChanged += OnBackgroundChanged;
         // Counting the folder's rows before it works since the rows whose image is missing always come after them.
         Backgrounds.Insert(
             Backgrounds.Count(background => !background.IsImageMissing && string.CompareOrdinal(background.File, file) < 0),
-            still);
+            imported);
     }
 
     // A row's typed frame time moves the problem line; its own computed notices are skipped.

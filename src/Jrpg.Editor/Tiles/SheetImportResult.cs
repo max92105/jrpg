@@ -1,3 +1,4 @@
+using Jrpg.Core.Battle;
 using Jrpg.Core.Maps;
 
 namespace Jrpg.Editor.Tiles;
@@ -9,6 +10,12 @@ internal sealed record SheetImportResult(IReadOnlyList<string> Imported, IReadOn
 {
     /// <summary>The loop each strip imported from a GIF carries, by its PNG name (ADR 0047).</summary>
     public IReadOnlyDictionary<string, TileAnimation> Animations { get; init; } = new Dictionary<string, TileAnimation>();
+
+    /// <summary>
+    /// The record each battle background sheet imported from a GIF needs, by its PNG name (ADR 0059).
+    /// </summary>
+    public IReadOnlyDictionary<string, AnimatedBackgroundDefinition> Backgrounds { get; init; } =
+        new Dictionary<string, AnimatedBackgroundDefinition>();
 
     /// <summary>
     /// What the status line says of an imported file beside its name, by name: a strip's frames and time.

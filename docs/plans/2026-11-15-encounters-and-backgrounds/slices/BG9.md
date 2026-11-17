@@ -94,3 +94,21 @@ None.
   (`BattleBackgroundCatalogViewModel.RefreshAfterStillImport`): build the imported animation's row with
   `BattleBackgroundViewModel.From(file, record, size)` and share the still import's replace-and-insert step instead of a
   `TakeAnimation` changing the row in place; the planned `TakeAnimation_Still_...` test goes with it.
+- **Done, with deviations:** split at the start (counted about 435 lines with tests, past 320): this commit holds the
+  dialog view model's background kind, `Battle/GifImportOptionsViewModel.Background.cs` (143 lines; the main file 120):
+  `ForBackground(ComposedGif?)`, `HeightChoices` of `Battle/BackgroundHeightChoice` (7 lines, a new type: a height and
+  its words, for the combo's labels), `SelectedHeight`, `SheetLine`, the sheet's problem after the pace (the review's:
+  frames wider than 4096 px at the smallest height offered say no height fits, not "choose a smaller height"),
+  `PreviewAtChosenHeight` (the planned `PreviewFrameSource`: the GIF at the chosen height, averaged once per height),
+  `ToOptions` carrying the chosen height; `Tiles/SheetImportResult.Backgrounds` (43); and the list's import step:
+  BG8's `RefreshAfterStillImport(files)` became `TakeImport(SheetImportResult)` (`BattleBackgroundCatalogViewModel` 122),
+  each imported file's row built fresh with `BattleBackgroundViewModel.From(file, record, size)`, the record a GIF's
+  sheet came with or none (BG8 review's note: no `TakeAnimation`, no `TakeImportedAnimation`), BG8's tests renamed with
+  it. A GIF the dialog can't read offers the divisors, 1080 chosen (decision 1005). `GifImportOptions.BattleHeight` is
+  now `FrameHeight` (BG6 review's note). Tests: `GifImportOptionsViewModelBackgroundTests` (247 lines, 24 runs: the
+  planned 8, plus the bounds at 1080 and 180, 6 and 7 full-screen frames, an unread GIF, the other kinds' empty sheet
+  line and preview, the hidden height box ignored, frames too wide at every height and at the chosen one only, the
+  preview averaged, its own height as read and cached),
+  `BattleBackgroundImportTests` 93 (3 more: a GIF's sheet as a new row, over a still at the record's time, among the
+  records); 7289. `ArtImageImport`'s background GIFs, the dialog's look, the page's and shell's wiring, the menu
+  tooltip and the hand checks moved to [BG9b](BG9b.md).

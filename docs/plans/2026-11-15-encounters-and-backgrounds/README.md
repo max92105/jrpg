@@ -17,7 +17,7 @@ always want a preview and be able to tweak them: frame rate etc."; he confirmed 
 background a map's battles use (decision 700). The developer was away while this was planned: the decisions marked
 "(default taken while the developer was away; his to overturn)" are listed under [Defaults to confirm](#defaults-to-confirm).
 
-- Numbers: decisions 891-910 (911-915 unused). ADR 0059.
+- Numbers: decisions 891-910 (911-915 unused), and 1005 from the shared line (BG9). ADR 0059.
 - Projects: Core (a map setting, an optional encounter field, the background rule, the animated background record), Data
   (validators, the startup art check, the writer taking over `encounters.json` and the new `animated-backgrounds.json`),
   Game (the battle plays an animated background; backgrounds decoded and released on map entry), Editor (Map settings'
@@ -114,8 +114,10 @@ slices and Editor slices aim at about 200 lines, not because the scope grew.
   about 200 lines) → [slices/BG8.md](slices/BG8.md)
 - [x] **BG8b. The Battle backgrounds page and Database > Battle backgrounds** (Editor, about 200 lines; BG8's split) →
   [slices/BG8b.md](slices/BG8b.md)
-- [ ] **BG9. AN2's GIF dialog gains a background kind: the GIF plays at the chosen height before it is written**
+- [x] **BG9. AN2's GIF dialog gains a background kind: the GIF plays at the chosen height before it is written**
   (Editor, about 250 lines) → [slices/BG9.md](slices/BG9.md)
+- [ ] **BG9b. The GIF dialog's background look, the backgrounds' GIF import and the page's Import... taking GIFs**
+  (Editor, about 200 lines; BG9's split) → [slices/BG9b.md](slices/BG9b.md)
 
 ### Phase 3: the Encounters page
 - [ ] **EC1. The editor writes `encounters.json`** (Data, about 150 lines) → [slices/EC1.md](slices/EC1.md)
@@ -200,6 +202,10 @@ slices and Editor slices aim at about 200 lines, not because the scope grew.
   hand-laid 2 x 2 grid (1920 x 1080: not the writer's one row, so the game's column rule is exercised), a slow
   brightness pulse at 200 ms a frame, made by a script in `art-src/backgrounds/` and listed under `generated`; no map
   names it. (default taken while the developer was away; his to overturn)
+- **1005.** (BG9) In the GIF dialog's background kind, a GIF the dialog can't read offers the divisors of 1080, the
+  tallest chosen, with no sheet line and no preview; OK imports it, and the import reads the file again and names the
+  decoder's refusal, as the battlers' and effects' kinds do with a GIF they can't read. (taken during the slice; the
+  developer's to overturn)
 
 ## Defaults to confirm
 - **892**: backgrounds both per map (required with random battles) and per encounter, the encounter's own winning. The

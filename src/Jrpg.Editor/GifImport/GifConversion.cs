@@ -27,10 +27,10 @@ internal static class GifConversion
     public static ConvertedGif Convert(string gifPath, GifImportOptions options)
     {
         var gif = Prepared(gifPath, options);
-        var stripPath = Written(gifPath, path => FrameStrip.WritePng(gif.Frames, gif.FrameWidth, options.BattleHeight, path));
+        var stripPath = Written(gifPath, path => FrameStrip.WritePng(gif.Frames, gif.FrameWidth, options.FrameHeight, path));
         var frameTime = options.FrameMilliseconds ?? GifFrameTiming.FrameMilliseconds(gif.Stored);
         var loop = new TileAnimation { FrameCount = gif.Frames.Count, FrameMilliseconds = frameTime };
-        var size = $"{loop.FrameCount} frames of {gif.FrameWidth} x {options.BattleHeight} px";
+        var size = $"{loop.FrameCount} frames of {gif.FrameWidth} x {options.FrameHeight} px";
         return new ConvertedGif(stripPath, loop, $"{size}, {PaceNoteOf(options.FrameMilliseconds, gif.Stored)}");
     }
 
@@ -41,7 +41,7 @@ internal static class GifConversion
     {
         var gif = Prepared(gifPath, options);
         var stripPath = Written(
-            gifPath, path => FrameStrip.WriteSquarePng(gif.Frames, gif.FrameWidth, options.BattleHeight, path));
+            gifPath, path => FrameStrip.WriteSquarePng(gif.Frames, gif.FrameWidth, options.FrameHeight, path));
         if (options.FrameMilliseconds is not { } typed)
         {
             return new ConvertedGif(stripPath, null, EffectNoteOf(gif.Frames.Count, gif.Stored));
@@ -67,7 +67,7 @@ internal static class GifConversion
     public static ConvertedGif ConvertToBackground(string gifPath, ComposedGif gif, GifImportOptions options)
     {
         RefuseOneFrame(gifPath, gif.Frames.Count);
-        var height = options.BattleHeight;
+        var height = options.FrameHeight;
         ArgumentOutOfRangeException.ThrowIfGreaterThan(height, gif.Height, nameof(options));
         var frames = height == gif.Height ? gif.Frames : FrameScaler.ScaleAveraged(gif.Frames, gif.Width, gif.Height, height);
         var width = FrameScaler.WidthAt(gif.Width, gif.Height, height);
@@ -91,8 +91,8 @@ internal static class GifConversion
         RefuseOneFrame(gifPath, image.Frames.Count);
         var frames = GifFrameComposer.Compose(image);
         var cleared = options.RemovesBackground ? BackgroundRemoval.Apply(frames) : frames;
-        var scaled = FrameScaler.Scale(cleared, image.Width, image.Height, options.BattleHeight);
-        return new PreparedGif(scaled, FrameScaler.WidthAt(image.Width, image.Height, options.BattleHeight), image.Frames);
+        var scaled = FrameScaler.Scale(cleared, image.Width, image.Height, options.FrameHeight);
+        return new PreparedGif(scaled, FrameScaler.WidthAt(image.Width, image.Height, options.FrameHeight), image.Frames);
     }
 
     private static void RefuseOneFrame(string gifPath, int frameCount)

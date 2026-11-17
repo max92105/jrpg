@@ -80,6 +80,6 @@ internal sealed partial class BattleBackgroundPage : UserControl
         ImportStatusText.Text = result.Summary;
         _images.Forget(result.Imported);
 
-        _backgrounds.RefreshAfterStillImport(result.Imported);
+        _backgrounds.TakeImport(result);
     }
 }

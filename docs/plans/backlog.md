@@ -329,3 +329,5 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - A new game or a load builds a new `Game/Exploration/ExplorationScene` with nothing decoded, so the last playthrough's
   map backgrounds stay in `TextureLibrary` until the session ends (bounded by the background files): release them
   when the session ends a playthrough (encounters and backgrounds plan, BG5 review).
+- `Editor/Tiles/SheetImportResult` now carries battle-background records too (so `Tiles` uses `Core.Battle`); it serves
+  every art import, so `Catalogs/` is its home (encounters and backgrounds plan, BG9 review).

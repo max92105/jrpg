@@ -8,7 +8,8 @@ namespace Jrpg.Editor.Battle;
 /// <summary>
 /// The GIF import's dialog as typed (decisions 637, 638, 987): the battle height each frame is scaled to, with a note
 /// on whether that keeps pixel art crisp, whether the top-left color is a background to clear, and the frame time the
-/// first chosen GIF plays at, typed only where the import keeps it. Built by one factory per place that imports GIFs.
+/// first chosen GIF plays at, typed only where the import keeps it. Built by one factory per place that imports GIFs;
+/// the Battle backgrounds page's kind chooses a sheet's frame height instead of typing one (decision 903).
 /// </summary>
 internal sealed partial class GifImportOptionsViewModel : ObservableObject
 {
@@ -26,7 +27,7 @@ internal sealed partial class GifImportOptionsViewModel : ObservableObject
     private GifImportOptionsViewModel(ComposedGif? gif)
     {
         Gif = gif;
-        HeightText = TypedNumber.Text(GifImportOptions.Default.BattleHeight);
+        HeightText = TypedNumber.Text(GifImportOptions.Default.FrameHeight);
         RemovesBackground = GifImportOptions.Default.RemovesBackground;
         FrameMillisecondsText = TypedNumber.Text(gif?.FrameMilliseconds ?? UnreadFrameMilliseconds);
     }
@@ -59,11 +60,11 @@ internal sealed partial class GifImportOptionsViewModel : ObservableObject
     public int? FrameMilliseconds =>
         TypedNumber.Parse(FrameMillisecondsText) is { } frameTime and >= LowestFrameMilliseconds ? frameTime : null;
 
-    public string? Problem => (TypedHeight(), IsPaceTyped, FrameMilliseconds) switch
+    public string? Problem => (ChosenHeight(), IsPaceTyped, FrameMilliseconds) switch
     {
         (null, _, _) => $"Battle height must be a whole number from {LowestHeight} to {HighestHeight}.",
         (_, true, null) => $"Frame time must be a whole number from {LowestFrameMilliseconds}.",
-        _ => null,
+        _ => SheetProblem(),
     };
 
     public bool CanApply => Problem is null;
@@ -102,12 +103,17 @@ internal sealed partial class GifImportOptionsViewModel : ObservableObject
     public static GifImportOptionsViewModel ForEffectStrips(ComposedGif? first, int gifCount) =>
         gifCount == 1 ? new(first) { IsPaceTyped = true } : new(first) { PaceNote = "set each one's pace in the list" };
 
-    /// <summary>The typed pace is carried only while <see cref="IsPaceTyped"/>.</summary>
+    /// <summary>
+    /// The typed pace is carried only while <see cref="IsPaceTyped"/>; the height is the background kind's chosen one,
+    /// else the typed one.
+    /// </summary>
     /// <exception cref="InvalidOperationException">There is a <see cref="Problem"/>; OK is greyed then.</exception>
     public GifImportOptions ToOptions() =>
-        TypedHeight() is { } height && CanApply
+        ChosenHeight() is { } height && CanApply
             ? new GifImportOptions(height, RemovesBackground) { FrameMilliseconds = IsPaceTyped ? FrameMilliseconds : null }
             : throw new InvalidOperationException(Problem);
+
+    private int? ChosenHeight() => IsBackground ? SelectedHeight : TypedHeight();
 
     private int? TypedHeight() =>
         TypedNumber.Parse(HeightText) is { } height and >= LowestHeight and <= HighestHeight ? height : null;

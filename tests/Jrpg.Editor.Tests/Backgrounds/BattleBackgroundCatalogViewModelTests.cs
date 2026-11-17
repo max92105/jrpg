@@ -2,6 +2,7 @@ using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Backgrounds;
+using Jrpg.Editor.Tiles;
 using static Jrpg.Editor.Tests.Backgrounds.BackgroundFixtures;
 
 namespace Jrpg.Editor.Tests.Backgrounds;
@@ -164,24 +165,24 @@ public sealed class BattleBackgroundCatalogViewModelTests
     }
 
     [Fact]
-    public void RefreshAfterStillImport_OverAnimated_MakesItStillAtTheNewSize()
+    public void TakeImport_OverAnimated_MakesItStillAtTheNewSize()
     {
         var size = PulseSheet;
         var catalog = new BattleBackgroundCatalogViewModel(WithRecords(), _images, _ => size);
         size = (1280, 720);
 
-        catalog.RefreshAfterStillImport([Pulse.File]);
+        catalog.TakeImport(new SheetImportResult([Pulse.File], []));
 
         var row = Row(catalog, Pulse.File);
         Assert.Equal((false, "Still, 1280 x 720 px"), (row.IsAnimated, row.KindLine));
     }
 
     [Fact]
-    public void RefreshAfterStillImport_NewFile_InsertedInNameOrderAndChosen()
+    public void TakeImport_NewFile_InsertedInNameOrderAndChosen()
     {
         var catalog = Catalog(_images);
 
-        catalog.RefreshAfterStillImport(["Zed.png", "M.png"]);
+        catalog.TakeImport(new SheetImportResult(["Zed.png", "M.png"], []));
 
         Assert.Equal(
             ("M.png", "A.png, M.png, Pulse.png, Zed.png, Gone.png"),
@@ -189,21 +190,21 @@ public sealed class BattleBackgroundCatalogViewModelTests
     }
 
     [Fact]
-    public void RefreshAfterStillImport_NoFiles_KeepsTheRowsAndChoice()
+    public void TakeImport_NoFiles_KeepsTheRowsAndChoice()
     {
         var catalog = Catalog(_images);
         catalog.Choose(Pulse.File);
 
-        catalog.RefreshAfterStillImport([]);
+        catalog.TakeImport(new SheetImportResult([], []));
 
         Assert.Equal((Pulse.File, 3), (catalog.ChosenKey, catalog.Backgrounds.Count));
     }
 
     [Fact]
-    public void RefreshAfterStillImport_ImportedRowTyped_RaisesProblemsChange()
+    public void TakeImport_ImportedRowTyped_RaisesProblemsChange()
     {
         var catalog = Catalog(_images);
-        catalog.RefreshAfterStillImport(["M.png"]);
+        catalog.TakeImport(new SheetImportResult(["M.png"], []));
         List<string?> raised = [];
         catalog.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
 
@@ -213,11 +214,11 @@ public sealed class BattleBackgroundCatalogViewModelTests
     }
 
     [Fact]
-    public void RefreshAfterStillImport_ReplacedRowTyped_RaisesNothing()
+    public void TakeImport_ReplacedRowTyped_RaisesNothing()
     {
         var catalog = Catalog(_images);
         var replaced = Row(catalog, Pulse.File);
-        catalog.RefreshAfterStillImport([Pulse.File]);
+        catalog.TakeImport(new SheetImportResult([Pulse.File], []));
         List<string?> raised = [];
         catalog.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
 

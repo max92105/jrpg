@@ -2,6 +2,7 @@ using Jrpg.Core.Battle;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Backgrounds;
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Tiles;
 using static Jrpg.Editor.Tests.Backgrounds.BackgroundFixtures;
 
 namespace Jrpg.Editor.Tests.Backgrounds;
@@ -64,7 +65,7 @@ public sealed class BattleBackgroundEditingViewModelTests
     public void Apply_StillImportedOverTheAnimated_DropsItsRecord()
     {
         var edited = _editing.Start();
-        edited.RefreshAfterStillImport([Pulse.File]);
+        edited.TakeImport(new SheetImportResult([Pulse.File], []));
 
         _editing.Apply(edited);
 

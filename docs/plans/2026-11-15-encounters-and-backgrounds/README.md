@@ -97,7 +97,7 @@ slices and Editor slices aim at about 200 lines, not because the scope grew.
 ### Phase 2: animated backgrounds
 - [x] **ADR 0059, animated battle backgrounds as grid sheets.** Write it from the entry under "ADRs needed" below
   (decisions 896-900, 904; a default taken while the developer was away, so it is marked as such in its Status line).
-- [ ] **BG3. The animated background record, loaded, validated and written** (Core, Data, about 230 lines) →
+- [x] **BG3. The animated background record, loaded, validated and written** (Core, Data, about 230 lines) →
   [slices/BG3.md](slices/BG3.md)
 - [ ] **BG4. The startup art check on backgrounds, and a placeholder animated background** (Data, content, script,
   about 200 lines) → [slices/BG4.md](slices/BG4.md)

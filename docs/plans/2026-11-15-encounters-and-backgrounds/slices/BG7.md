@@ -84,3 +84,5 @@ editor, is extracted.
 None: no page yet (BG8). Open the Effect strips and Character sprites pages once (`open-editor-windows.ps1`'s default
 list): no `ERROR` line. Read the script's lines only: the Character sprites page shows Mana Seed sheets, so its capture
 is the developer's to look at (he checks its list is in the same order as before).
+- **Note from BG3 review:** the Data validator and problems tests each build the same `_pulse` record (960 x 540, 4
+  frames, 200 ms); if this slice's tests need it a third time, move it to one shared test fixture.

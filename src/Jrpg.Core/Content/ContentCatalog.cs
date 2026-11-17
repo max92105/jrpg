@@ -68,6 +68,13 @@ public sealed record ContentCatalog
     public IReadOnlyDictionary<string, EffectStripDefinition> EffectStrips { get; init; } =
         new Dictionary<string, EffectStripDefinition>(StringComparer.Ordinal);
 
+    /// <summary>
+    /// The animated battle backgrounds' frame sizes and paces by file name, exact case (ADR 0059); a background with
+    /// none is a still picture.
+    /// </summary>
+    public IReadOnlyDictionary<string, AnimatedBackgroundDefinition> AnimatedBackgrounds { get; init; } =
+        new Dictionary<string, AnimatedBackgroundDefinition>(StringComparer.Ordinal);
+
     /// <summary>The cinematics an event's <c>cinematic</c> step plays, by id (ADR 0046).</summary>
     public IReadOnlyDictionary<string, CinematicDefinition> Cinematics { get; init; } =
         new Dictionary<string, CinematicDefinition>(StringComparer.Ordinal);

@@ -50,6 +50,12 @@ public static partial class CatalogProblems
         FirstProblem(() => CheckEffectStrips(strips));
 
     /// <summary>
+    /// The first problem in the animated backgrounds' records (ADR 0059), as the loader words it; null when none.
+    /// </summary>
+    public static string? OfAnimatedBackgrounds(IReadOnlyList<AnimatedBackgroundDefinition> backgrounds) =>
+        FirstProblem(() => CheckAnimatedBackgrounds(backgrounds));
+
+    /// <summary>
     /// The first problem in the shops (ADR 0031, ADR 0045): a shop's own rule, or an item it sells that the content
     /// doesn't price; null when the loader would take them.
     /// </summary>
@@ -164,6 +170,13 @@ public static partial class CatalogProblems
     /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
     internal static void CheckEffectStrips(IReadOnlyList<EffectStripDefinition> strips) =>
         EffectStripCatalogValidator.Validate(ContentCatalogLoader.EffectStripsFile, strips);
+
+    /// <summary>
+    /// The checks the loader makes on <c>animated-backgrounds.json</c>, for the writer and the problem line alike.
+    /// </summary>
+    /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
+    internal static void CheckAnimatedBackgrounds(IReadOnlyList<AnimatedBackgroundDefinition> backgrounds) =>
+        AnimatedBackgroundCatalogValidator.Validate(ContentCatalogLoader.AnimatedBackgroundsFile, backgrounds);
 
     /// <summary>The checks the loader makes on <c>shops.json</c>, for the writer and the problem line alike.</summary>
     /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>

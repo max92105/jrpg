@@ -64,3 +64,8 @@ frame sits in its sheet. Nothing draws a record yet; no content lists one (BG4 a
 1. The game and the editor start with the empty file as before.
 2. Add a record by hand to `content/animated-backgrounds.json` with `"frameWidth": 0`: the game's start names the file
    and "frameWidth". Revert.
+
+- **Done, with deviations:** 424 lines with tests, not about 230 (about 110 of code; the listed tests alone are
+  about 280). `OfAnimatedBackgrounds`'s two tests went to a new `CatalogProblemsAnimatedBackgroundTests` (30 lines),
+  since `CatalogProblemsTests` is 268; `AnimatedBackgroundDefinitionTests` (97) adds the last frame, a one-frame-wide
+  image, an `int.MaxValue`-wide image, frame `int.MaxValue` and the last frame time. `CatalogProblems.cs` is 256.

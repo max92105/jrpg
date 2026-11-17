@@ -43,10 +43,11 @@ public sealed partial class ContentWriter
         CatalogProblems.CheckEnemies(SortedEnemies(catalog), catalog);
         CatalogProblems.CheckCinematics(SortedCinematics(catalog));
         CatalogProblems.CheckEffectStrips(SortedEffectStrips(catalog));
+        CatalogProblems.CheckAnimatedBackgrounds(SortedAnimatedBackgrounds(catalog));
     }
 
-    // Each catalog file's bytes as it would be written, sorted by id (the effect strips by file): what the stamps
-    // compare and the writes carry.
+    // Each catalog file's bytes as it would be written, sorted by id (the effect strips and animated backgrounds by
+    // file): what the stamps compare and the writes carry.
     private static List<CatalogWrite> SerializedCatalogs(ContentCatalog catalog) =>
     [
         new(ContentCatalogLoader.TilesheetsFile, ContentFileWriter.Serialize(SortedSheets(catalog))),
@@ -59,6 +60,7 @@ public sealed partial class ContentWriter
         new(ContentCatalogLoader.DropTablesFile, ContentFileWriter.Serialize(SortedDropTables(catalog))),
         new(ContentCatalogLoader.CinematicsFile, ContentFileWriter.Serialize(SortedCinematics(catalog))),
         new(ContentCatalogLoader.EffectStripsFile, ContentFileWriter.Serialize(SortedEffectStrips(catalog))),
+        new(ContentCatalogLoader.AnimatedBackgroundsFile, ContentFileWriter.Serialize(SortedAnimatedBackgrounds(catalog))),
         new(ContentCatalogLoader.EffectsFile, ContentFileWriter.Serialize(SortedTieredEffects(catalog))),
         new(ContentCatalogLoader.StatusesFile, ContentFileWriter.Serialize(SortedStatuses(catalog))),
         new(ContentCatalogLoader.SkillsFile, ContentFileWriter.Serialize(SortedSkills(catalog), ReferenceConverters(catalog))),
@@ -107,6 +109,9 @@ public sealed partial class ContentWriter
 
     private static List<EffectStripDefinition> SortedEffectStrips(ContentCatalog catalog) =>
         [.. catalog.EffectStrips.Values.OrderBy(strip => strip.File, StringComparer.Ordinal)];
+
+    private static List<AnimatedBackgroundDefinition> SortedAnimatedBackgrounds(ContentCatalog catalog) =>
+        [.. catalog.AnimatedBackgrounds.Values.OrderBy(background => background.File, StringComparer.Ordinal)];
 
     private static List<TieredEffect> SortedTieredEffects(ContentCatalog catalog) =>
         [.. catalog.TieredEffects.Values.OrderBy(effect => effect.Id, StringComparer.Ordinal)];

@@ -51,6 +51,7 @@ public static class ContentCatalogLoader
     internal const string ObjectsFile = "objects.json";
     internal const string FieldSpritesFile = "field-sprites.json";
     internal const string EffectStripsFile = "effect-strips.json";
+    internal const string AnimatedBackgroundsFile = "animated-backgrounds.json";
     internal const string EffectsFile = "effects.json";
     internal const string StatusesFile = "statuses.json";
 
@@ -120,6 +121,8 @@ public static class ContentCatalogLoader
         var fieldSpritesByFile = fieldSprites.ToFrozenDictionary(sheet => sheet.File, StringComparer.Ordinal);
         var effectStrips = ReadValidated<IReadOnlyList<EffectStripDefinition>>(
             contentRoot, EffectStripsFile, EffectStripCatalogValidator.Validate);
+        var animatedBackgrounds = ReadValidated<IReadOnlyList<AnimatedBackgroundDefinition>>(
+            contentRoot, AnimatedBackgroundsFile, AnimatedBackgroundCatalogValidator.Validate);
         var mapContent = new MapContentReferences(
             tileIds,
             objectsById,
@@ -161,6 +164,7 @@ public static class ContentCatalogLoader
             Quests = questsById,
             FieldSprites = fieldSpritesByFile,
             EffectStrips = effectStrips.ToFrozenDictionary(strip => strip.File, StringComparer.Ordinal),
+            AnimatedBackgrounds = animatedBackgrounds.ToFrozenDictionary(background => background.File, StringComparer.Ordinal),
             TieredEffects = tieredEffects,
             Statuses = statuses,
             Cinematics = cinematics.ToFrozenDictionary(cinematic => cinematic.Id),

@@ -70,3 +70,9 @@ an art-src script without its last calls (sed) plus Write-Host lines prints its 
 WPF lifetime fact (probed 2026-11-16, WD5 review, PowerShell -STA): a modal Window closed by DialogResult raises
 Closed, ShowDialog returns, then Unloaded reaches its content's UserControl at the next dispatcher pump; so
 Loaded/Unloaded-paired work stops a few frames after the opener's apply runs, not before it.
+Editable ComboBox (probed 2026-11-17, CL9d, .NET 10): once its Text matched an item (loaded or picked), that item
+leaving ItemsSource (list replaced) clears Text and writes "" to the source; `IsTextSearchEnabled=False` only saves a
+value never picked; a switch of one DataContext feeding both ItemsSource and Text clears nothing, but ItemsSource from
+an ancestor's DataContext and Text from an inner one (class vs chosen resource) clears on a class switch. Flag any
+editable combo whose list can lose the typed value. Fix that held (CL9d, decision 1017): choices on the same
+DataContext as Text, always holding the typed value (`ResourceIdChoices.Of`).

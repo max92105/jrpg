@@ -5,8 +5,10 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-classes-and-progression, slice CL9c (`Party/ClassResourceViewModel` writes its four rules from
-`WillScaling`, `Backfire`, `Strain`, `Dominance` boxes; `Party/ClassResourceRuleTests`; CL9d shows them on the tab).
-2026-11-17. Round 1. Verdict: Ready to commit. No Critical, no Warning, no Suggestion.
+Plan 2026-11-15-classes-and-progression, slice CL9d (the Rules group on the Classes page's Resources tab; decision
+1017: per-box id choices `StrainBoxes.LowersStartOfChoices` / `DominanceBoxes.OverChoices` via `ResourceIdChoices.Of`).
+2026-11-17. Round 2. Verdict: Ready to commit.
 
-- (CL9b's Suggestion on `NoticesOf`/`ChangesOf`: CL9c's tests needed neither, so no third copy was made — closed.)
+- Critical (editable id combos blanking a rule's id on a class switch or a rename): fixed. Re-probed (scratchpad
+  cl9dprobe, cl9dtyping): repros keep every id, keystroke typing and backspace keep text and caret, 0 trace lines.
+- Suggestion (tautological EffectChoices test): fixed, now pins the three values.

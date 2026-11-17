@@ -5,11 +5,10 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-classes-and-progression, slice CL7c (first part; split, the list's selection, Add, Remove, Up, Down
-and list relay are CL7d per the slice's Done note). 2026-11-17. Round 1. Verdict: Ready to commit.
-No Critical, no Warning, no Suggestion.
+Plan 2026-11-15-classes-and-progression, slice CL7d (CL7c's split: the resource list's Add, Remove, Up, Down,
+selection and list relay). 2026-11-17. Round 1. Verdict: Ready to commit.
+No Critical, no Warning.
 
-Carried from CL7b and closed:
-- Suggestion: third private `NumberIn` — dropped (backlog.md line about `TypedNumber.ValueOf` records it)
-- Suggestion: From speed ignoring a bad Starts at box untested — dropped (CL7b suggestion, not carried)
-- Follow-up: CL8's Gains headers use ResourceGainsBoxes.Problem's names — dropped (CL8.md "Note from CL7 review")
+- Suggestion: no test removes the only resource (nothing chosen after, Remove and moves greyed) — open (optional)
+- Follow-up: selected-row move greying + list relay now twice in ClassViewModel (.Skills, .Resources); add a backlog
+  third-copy line — open

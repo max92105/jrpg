@@ -120,7 +120,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   separate level-up table). The developer delegated approval; the rule is the first of "Defaults to confirm".
 - [x] **LV1. A class's skill entry may name a level: the file shape, its checks, every level 1** (Core + Data + content,
   about 240 lines) → [slices/LV1.md](slices/LV1.md)
-- [ ] **LV2. A member knows the class skills at or below its level, and learns on a level up** (Core, about 220 lines)
+- [x] **LV2. A member knows the class skills at or below its level, and learns on a level up** (Core, about 220 lines)
   → [slices/LV2.md](slices/LV2.md)
 - [ ] **LV3. The victory screen says "Omer learned Meteor."** (Game + content, about 200 lines) →
   [slices/LV3.md](slices/LV3.md)

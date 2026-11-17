@@ -12,15 +12,18 @@ public sealed class PartyMember
 {
     private readonly Dictionary<string, int> _lastingAmounts;
     private readonly WornEquipment _worn = new();
+    private readonly SkillsByLevel _skillsByLevel;
 
     // A new member: level 1, no experience, full HP, every lasting resource at its start (decision 168).
-    private PartyMember(PartyMemberDefinition definition, ClassDefinition characterClass, IReadOnlyList<SkillDefinition> skills, StatRules rules)
+    private PartyMember(
+        PartyMemberDefinition definition, ClassDefinition characterClass, SkillsByLevel skillsByLevel, StatRules rules)
     {
         Definition = definition;
         Class = characterClass;
-        Skills = [.. skills];
+        _skillsByLevel = skillsByLevel;
         Rules = rules;
         Level = 1;
+        Skills = skillsByLevel.KnownAt(Level);
         RebuildStats();
         Vitals = new Vitals(Sheet.MaxHp, Sheet.MaxHp);
         _lastingAmounts = characterClass.Resources
@@ -51,7 +54,11 @@ public sealed class PartyMember
     /// <summary>What the basic attack is dealt with; null when unarmed (decision 330).</summary>
     public GearPiece? Weapon => _worn.In(EquipmentSlot.Weapon);
 
-    public IReadOnlyList<SkillDefinition> Skills { get; }
+    /// <summary>
+    /// The class's skills learned at the member's level or below, in the class's order (ADR 0062); a level up and a
+    /// restore refresh them.
+    /// </summary>
+    public IReadOnlyList<SkillDefinition> Skills { get; private set; }
 
     /// <summary>The stat conversions the sheet is built with; the battle also reads the unarmed type.</summary>
     internal StatRules Rules { get; }
@@ -65,16 +72,19 @@ public sealed class PartyMember
     /// <summary>A new member joins at level 1 with 0 experience and full HP (decision 168).</summary>
     /// <param name="definition">Who joins.</param>
     /// <param name="characterClass">The member's class, which gives their stats at their level (ADR 0017).</param>
-    /// <param name="skillCatalog">All skills by id; the member gets their class's, in its order (ADR 0020).</param>
+    /// <param name="skillCatalog">
+    /// All skills by id; the member knows the class's skills learned at level 1, in its order (ADR 0020, ADR 0062).
+    /// </param>
     /// <param name="rules">The stat conversions, kept: max HP follows Constitution at every level (ADR 0026).</param>
     /// <exception cref="ArgumentException">A skill id isn't in the catalog.</exception>
     public static PartyMember Recruit(
         PartyMemberDefinition definition, ClassDefinition characterClass, IReadOnlyDictionary<string, SkillDefinition> skillCatalog, StatRules rules) =>
-        new(definition, characterClass, SkillsOf(characterClass, skillCatalog), rules);
+        new(definition, characterClass, SkillsByLevel.Resolve(characterClass, skillCatalog), rules);
 
     /// <summary>
     /// Puts a saved member's progress back on a new recruit: level, experience, lasting amounts, and HP within that
-    /// level's max. <c>GameSession</c> puts the worn items on first, so the saved HP fits a max their bonuses raise.
+    /// level's max; the member knows every class skill up to that level, since saves hold none (decision 966).
+    /// <c>GameSession</c> puts the worn items on first, so the saved HP fits a max their bonuses raise.
     /// </summary>
     /// <remarks>The progress is assumed repaired against current content by Data (ADR 0007).</remarks>
     internal void RestoreProgress(PartyMemberProgress progress)
@@ -82,6 +92,7 @@ public sealed class PartyMember
         Level = progress.Level;
         Experience = progress.Experience;
         RebuildStats();
+        Skills = _skillsByLevel.KnownAt(Level);
         Vitals.ResizeMax(Sheet.MaxHp);
 
         // A recruit is standing at full HP: fill it to the new max, then take off what the save had lost.
@@ -92,6 +103,11 @@ public sealed class PartyMember
             _lastingAmounts[resource.Id] = progress.LastingAmounts.GetValueOrDefault(resource.Id, RestAmountOf(resource));
         }
     }
+
+    /// <summary>
+    /// The class's skills learned at exactly <paramref name="level"/>, in the class's order: what reaching it taught.
+    /// </summary>
+    internal IReadOnlyList<SkillDefinition> SkillsLearnedAt(int level) => _skillsByLevel.LearnedAt(level);
 
     /// <summary>What a save keeps of this member.</summary>
     public PartyMemberProgress CaptureProgress() =>
@@ -199,18 +215,6 @@ public sealed class PartyMember
     private StatSheet SheetWearing(WornEquipment worn) =>
         MemberSheet.Of(ClassGrowth.StatsAt(Class, Level), worn.Bonuses, worn.WeaponDamage, Rules);
 
-    /// <exception cref="ArgumentException">A skill id isn't in the catalog.</exception>
-    private static List<SkillDefinition> SkillsOf(ClassDefinition characterClass, IReadOnlyDictionary<string, SkillDefinition> skillCatalog)
-    {
-        var unknownSkillId = characterClass.SkillIds.FirstOrDefault(id => !skillCatalog.ContainsKey(id));
-        if (unknownSkillId is not null)
-        {
-            throw new ArgumentException($"Class '{characterClass.Id}' has unknown skill id '{unknownSkillId}'.", nameof(skillCatalog));
-        }
-
-        return [.. characterClass.SkillIds.Select(id => skillCatalog[id])];
-    }
-
     // The class's numbers at the member's level, the one formula (ADR 0017), with what they wear.
     [MemberNotNull(nameof(Sheet))]
     private void RebuildStats() => Sheet = SheetWearing(_worn);
@@ -236,6 +240,7 @@ public sealed class PartyMember
         Level++;
         Experience = 0;
         RebuildStats();
+        Skills = _skillsByLevel.KnownAt(Level);
         Vitals.RaiseMaxima(Sheet.MaxHp - maxHpBefore);
     }
 }

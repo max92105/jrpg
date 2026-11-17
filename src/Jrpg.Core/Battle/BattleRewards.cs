@@ -4,8 +4,8 @@ using Jrpg.Core.Progression;
 namespace Jrpg.Core.Battle;
 
 /// <summary>
-/// Experience earned from defeated enemies, split evenly between the living active members.
-/// Fallen members get nothing and the remainder of the split is dropped (developer decision 13).
+/// Experience earned from defeated enemies, split evenly between the living active members, with the skills their level
+/// ups taught. Fallen members get nothing and the split's remainder is dropped (developer decision 13).
 /// </summary>
 internal static class BattleRewards
 {
@@ -38,6 +38,18 @@ internal static class BattleRewards
     private static ExperienceGain GainOf(PartyMember member, int share, ExperienceTable table)
     {
         var steps = member.GainExperience(share, table);
-        return new ExperienceGain(member, share, steps, table.IsMaxLevel(member.Level));
+        return new ExperienceGain(member, share, steps, table.IsMaxLevel(member.Level))
+        {
+            LearnedSkills = LearnedOn(member, steps),
+        };
     }
+
+    // A level-up step names the level it left, so the level it reached is the next one.
+    private static List<LearnedSkill> LearnedOn(PartyMember member, IReadOnlyList<LevelProgressStep> steps) =>
+    [
+        .. steps
+            .Where(step => step.IsLevelUp)
+            .Select(step => step.Level + 1)
+            .SelectMany(level => member.SkillsLearnedAt(level).Select(skill => new LearnedSkill(level, skill))),
+    ];
 }

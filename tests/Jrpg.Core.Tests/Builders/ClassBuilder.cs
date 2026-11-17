@@ -10,7 +10,7 @@ internal sealed class ClassBuilder
     private string _id = "fighter";
     private ClassStats _base = new(MaxHp: 100, Speed: 10);
     private ClassStats _growth = new(0, 0);
-    private string[] _skillIds = [];
+    private ClassSkill[] _skills = [];
     private ResourceDefinition[] _resources = [];
     private PrimaryStats? _basePrimaries;
     private PrimaryStats? _growthPrimaries;
@@ -43,7 +43,14 @@ internal sealed class ClassBuilder
 
     public ClassBuilder WithSkills(params string[] ids)
     {
-        _skillIds = ids;
+        _skills = [.. ids.Select(id => new ClassSkill(id))];
+        return this;
+    }
+
+    /// <summary>Skills each naming the level it is learned at (ADR 0062).</summary>
+    public ClassBuilder WithSkills(params ClassSkill[] skills)
+    {
+        _skills = skills;
         return this;
     }
 
@@ -55,7 +62,7 @@ internal sealed class ClassBuilder
 
     public ClassDefinition Build() => new(_id, _id, $"{_id} description", WithOwnPrimaries(_base, _basePrimaries), WithOwnPrimaries(_growth, _growthPrimaries))
     {
-        Skills = [.. _skillIds.Select(id => new ClassSkill(id))],
+        Skills = _skills,
         Resources = _resources,
     };
 

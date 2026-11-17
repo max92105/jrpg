@@ -50,3 +50,11 @@ levels of their own.
    battle's Skills menu lacks Meteor; win battles until level 2; in the next battle Meteor is listed. The Status page
    shows it after the level up, not before.
 2. Undo the hand edit; the game plays as before.
+
+- **Done, with deviations:** the restore tests sit at the bound, `RestoreProgress_LevelThree_KnowsEverySkillUpToIt`
+  and `RestoreProgress_LevelTwo_KnowsOnlyLevelOne`; the moved check's test is
+  `Recruit_UnknownSkillIdAtALaterLevel_Throws` (`PartyMemberTests` already holds the level-1 case); one test beyond the
+  list, `SkillsLearnedAt_LevelTwo_NamesNone`. `ClassBuilder.WithSkills` gains a `ClassSkill` overload; the rewards
+  tests' class has skills at levels 1, 2 and 3 so both levels reached name one. The simulations' output identical;
+  `formatVersion` stays 7. Sizes: `SkillsByLevel` 35, `LearnedSkill` 6, `PartyMember` 246, `BattleRewards` 55;
+  `PartyMemberSkillLevelTests` 119, `BattleRewardsTests` 210.

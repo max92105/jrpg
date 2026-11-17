@@ -1,6 +1,8 @@
 using Jrpg.Core.Battle;
+using Jrpg.Core.Effects;
 using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
+using Jrpg.Core.Skills;
 using Jrpg.Core.Tests.Builders;
 
 namespace Jrpg.Core.Tests.Battle;
@@ -8,6 +10,8 @@ namespace Jrpg.Core.Tests.Battle;
 public sealed class BattleRewardsTests
 {
     private static readonly ExperienceTable _table = new([1000, 1000]);
+
+    private static readonly ExperienceTable _shortTable = new([50, 50, 50]);
 
     private static readonly EnemyDefinition[] _goblinTrio =
     [
@@ -150,4 +154,57 @@ public sealed class BattleRewardsTests
 
         Assert.False(gain.IsAtMaxLevel);
     }
+
+    // 120 passes the 50 each of levels 1 and 2 needs: levels 2 and 3 reached.
+    [Fact]
+    public void GrantExperience_TwoLevelsGained_NamesTheSkillsOfBoth()
+    {
+        var omer = RecruitMage();
+
+        var gain = Assert.Single(BattleRewards.GrantExperience(_goblinTrio, [omer], _shortTable));
+
+        Assert.Equal([(2, "flame"), (3, "meteor")], gain.LearnedSkills.Select(learned => (learned.Level, learned.Skill.Id)));
+    }
+
+    [Fact]
+    public void GrantExperience_NoLevelUp_NamesNone()
+    {
+        var omer = RecruitMage();
+
+        var gain = Assert.Single(BattleRewards.GrantExperience(_goblinTrio, [omer], _table));
+
+        Assert.Empty(gain.LearnedSkills);
+    }
+
+    [Fact]
+    public void GrantExperience_FallenMember_NamesNone()
+    {
+        var omer = RecruitMage();
+        var fallen = RecruitMage();
+        fallen.Vitals.TakeDamage(999);
+
+        var gains = BattleRewards.GrantExperience(_goblinTrio, [omer, fallen], _shortTable);
+
+        Assert.Same(omer, Assert.Single(gains).Member);
+        Assert.Equal(["spark"], fallen.Skills.Select(skill => skill.Id));
+    }
+
+    private static PartyMember RecruitMage()
+    {
+        var mage = new ClassBuilder()
+            .WithId("mage")
+            .WithSkills(new ClassSkill("spark"), new ClassSkill("flame") { Level = 2 }, new ClassSkill("meteor") { Level = 3 })
+            .Build();
+        var catalog = new[] { Skill("spark"), Skill("flame"), Skill("meteor") }.ToDictionary(skill => skill.Id);
+        return PartyMember.Recruit(new PartyMemberBuilder().BuildDefinition(), mage, catalog, TestStatRules.Neutral);
+    }
+
+    private static SkillDefinition Skill(string id) => new()
+    {
+        Id = id,
+        Name = id,
+        Description = "",
+        IconFile = "",
+        Effect = new Effect(EffectKind.Damage, 10, Targeting.SingleEnemy),
+    };
 }

@@ -344,3 +344,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   growth (e.g. max HP growth 100,000,000 over 21 levels) Constitution's share wraps negative and `MemberSheet` shows
   max HP 1 instead of the Levels tab's "too large" problem; cap both at int's bounds in one place, with a test (classes
   and progression plan, CL5 review).
+- About 29 Core test files each hold a `private static SkillDefinition Skill(string id)` factory: one shared builder in
+  `tests/Jrpg.Core.Tests/Builders/` would replace them (classes and progression plan, LV2 review).
+- The eight class stat labels in page order are written twice, in `Editor/Party/ClassStatsBoxes.Problem` and
+  `ClassLevelPreview.StatsOf`: share one ordered list at a third copy (classes and progression plan, CL5 and LV2 reviews).

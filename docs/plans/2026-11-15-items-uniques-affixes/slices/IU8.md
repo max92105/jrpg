@@ -58,3 +58,6 @@ equipment, a unique or a consumable shows its general fields only.
 - **Note from IU7:** the four Add buttons bind `AddItemCommand` with `CommandParameter="{x:Static items:ItemCategory.X}"`
   (the toolkit's `RelayCommand<ItemCategory>` throws on a string parameter); the others are `DuplicateCommand` and
   `RemoveItemCommand`; `Problem` is already raised when `SelectedItem` changes (the chosen item's problem comes first).
+- **Done, with deviations:** the Cinematics page's converter moved to `Catalogs/ArtPictureConverter` for the icon; the
+  icon decodes at 64 px (`LoadAtWidth`: the icons are 1024 px); the note ignores case, as the game's item icon check
+  does, and an empty box gets its own; no `ICatalogEditing` (WS2 not landed). Hand checks are the developer's.

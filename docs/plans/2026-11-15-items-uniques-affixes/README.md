@@ -121,7 +121,7 @@ slices run; IU5 is optional and IU16 merged into IU15.
   [slices/IU6.md](slices/IU6.md)
 - [x] **IU7. The Items list and its undo step: add by category, unique included, duplicate, remove while new** (Editor
   + Data, about 220 lines) → [slices/IU7.md](slices/IU7.md)
-- [ ] **IU8. Database > Items opens the Items page** (Editor, about 190 lines) → [slices/IU8.md](slices/IU8.md)
+- [x] **IU8. Database > Items opens the Items page** (Editor, about 190 lines) → [slices/IU8.md](slices/IU8.md)
 - [ ] **IU9. An undo removing an item a map gives is refused** (Editor, about 120 lines) →
   [slices/IU9.md](slices/IU9.md)
 - [ ] **IU10. The equipment form: kind, damage and damage type** (Editor, about 170 lines) →

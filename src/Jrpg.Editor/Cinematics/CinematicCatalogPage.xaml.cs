@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Hosting;
 
 namespace Jrpg.Editor.Cinematics;
@@ -36,7 +37,7 @@ internal sealed partial class CinematicCatalogPage : UserControl
     /// </param>
     public CinematicCatalogPage(CinematicCatalogViewModel cinematics, Func<string, BitmapSource?> loadPicture)
     {
-        Resources.Add("PictureOf", new CinematicPictureConverter(loadPicture));
+        Resources.Add("PictureOf", new ArtPictureConverter(loadPicture));
         InitializeComponent();
         _renderTick = new RenderTick(OnRendering);
         DataContext = cinematics;

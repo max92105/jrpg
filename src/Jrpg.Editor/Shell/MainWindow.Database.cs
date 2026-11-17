@@ -6,6 +6,7 @@ using Jrpg.Editor.Animation;
 using Jrpg.Editor.Battle;
 using Jrpg.Editor.Cinematics;
 using Jrpg.Editor.Effects;
+using Jrpg.Editor.Items;
 using Jrpg.Editor.Loot;
 using Jrpg.Editor.Quests;
 using Jrpg.Editor.Skills;
@@ -27,6 +28,7 @@ internal sealed partial class MainWindow
     {
         ["Quests"] = OpenQuests,
         ["Shops"] = OpenShops,
+        ["Items"] = OpenItems,
         ["Drop tables"] = () => _ = EditDropTables(this, ""),
         ["Effect strips"] = OpenEffectStrips,
         ["Skills"] = OpenSkills,
@@ -67,6 +69,21 @@ internal sealed partial class MainWindow
         }
 
         OpenInDialog("Shops", shopEditing.Start, shopEditing.Apply, edited => new ShopCatalogPage(edited));
+    }
+
+    // The icon is decoded at the size the page shows it: the icons folder's images are far bigger.
+    private void OpenItems()
+    {
+        if (_viewModel.ItemEditing is not { } itemEditing)
+        {
+            return;
+        }
+
+        var artRoot = _viewModel.ArtRoot;
+        OpenInDialog("Items", itemEditing.Start, itemEditing.Apply, edited => new ItemCatalogPage(edited, LoadIcon));
+
+        BitmapSource? LoadIcon(string file) =>
+            SpriteImageFile.LoadAtWidth(artRoot, ArtFolders.Icons, file, (int)ItemCatalogPage.IconPictureSize);
     }
 
     // Starts the page's session, shows it in the dialog over the main window, applies it on OK.

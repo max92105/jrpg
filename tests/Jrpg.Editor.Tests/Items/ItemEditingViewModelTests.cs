@@ -9,7 +9,7 @@ public sealed class ItemEditingViewModelTests
     private readonly CatalogDraft _draft = new(ItemFixtures.Catalog);
     private readonly ItemEditingViewModel _itemEditing;
 
-    public ItemEditingViewModelTests() => _itemEditing = new ItemEditingViewModel(_draft);
+    public ItemEditingViewModelTests() => _itemEditing = new ItemEditingViewModel(_draft, () => []);
 
     [Fact]
     public void Apply_NameChanged_IsOneUndoStep()
@@ -43,6 +43,19 @@ public sealed class ItemEditingViewModelTests
         _draft.Undo();
 
         Assert.Same(ItemFixtures.Tonic, _draft.Current.Items["tonic"]);
+    }
+
+    // An icon dropped into the folder while the editor runs is offered the next time the page opens.
+    [Fact]
+    public void Start_ReadsTheIconFilesEachTime()
+    {
+        var folder = new Queue<IReadOnlyList<string>>([["Ore.png"], ["Ore.png", "Vest.png"]]);
+        var itemEditing = new ItemEditingViewModel(_draft, folder.Dequeue);
+        itemEditing.Start();
+
+        var second = itemEditing.Start();
+
+        Assert.Equal(["Ore.png", "Vest.png"], second.IconFiles);
     }
 
     private ItemCatalogViewModel TonicRenamed()

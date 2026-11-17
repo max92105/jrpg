@@ -28,6 +28,7 @@ param(
         'Database>Enemies...',
         'NPCs>Character sprites...',
         'Map>Settings...',
+        'Database>Items...',
         'Help>Raise a test error'),
     [switch]$EventWindows,
     [string]$Map

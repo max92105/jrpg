@@ -8,6 +8,7 @@
        the title the main window opens it by; the theme's style is set above, since an implicit style skips a subclass. -->
   <MenuItem Header="Quests..." Tag="Quests" />
   <MenuItem Header="Shops..." Tag="Shops" ToolTip="Each shop's name and the priced items it sells, in order; the shopkeeper preset's shop box offers them." />
+  <MenuItem Header="Items..." Tag="Items" ToolTip="Base items, equipment, uniques and materials: icons, stacks, prices, effects, bonuses and fixed affixes." />
   <MenuItem Header="Drop tables..." Tag="Drop tables" ToolTip="Each table's items, chances and quantities; the Enemies page's Drop table box offers them." />
   <MenuItem Header="Effect strips..." Tag="Effect strips" ToolTip="Each effects image's frame time, the frame its hit lands on and the swing an Attack plays first." />
   <MenuItem Header="Skills..." Tag="Skills" ToolTip="Each skill's name, texts, icon, sound, own strip, costs, effect and statuses; classes and enemies still list theirs in their files." />

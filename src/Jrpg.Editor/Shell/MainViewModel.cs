@@ -13,6 +13,7 @@ using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Cinematics;
 using Jrpg.Editor.Effects;
 using Jrpg.Editor.Events;
+using Jrpg.Editor.Items;
 using Jrpg.Editor.Loot;
 using Jrpg.Editor.Maps;
 using Jrpg.Editor.Objects;
@@ -105,6 +106,7 @@ internal sealed partial class MainViewModel : ObservableObject
             SkillEditing = new SkillEditingViewModel(Content, ReadSkillChoices);
             TieredEffectEditing = new TieredEffectEditingViewModel(Content);
             StatusEditing = new StatusEditingViewModel(Content);
+            ItemEditing = new ItemEditingViewModel(Content, () => ArtFolders.ImagesIn(ArtRoot, ArtFolders.Icons));
             NpcSpriteChange = new NpcSpriteChange(Content, Placing.Browser);
             if (MapIds.Count > 0)
             {

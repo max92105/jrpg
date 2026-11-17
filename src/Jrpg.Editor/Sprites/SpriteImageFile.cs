@@ -6,9 +6,9 @@ namespace Jrpg.Editor.Sprites;
 
 /// <summary>
 /// A sprite image of an art folder read whole for the editor's own drawing (the field sprites, the Enemies page's
-/// battle sprite), or at a width for a preview (the Cinematics page's still); read again each time, since an import may
-/// replace the file. <see cref="Read"/> is the one decode of a whole PNG by its path, the tilesheets' and the strip
-/// tool's sheet included.
+/// battle sprite), or at a width for a preview (the Cinematics page's still, the Items page's icon); read again each
+/// time, since an import may replace the file. <see cref="Read"/> is the one decode of a whole PNG by its path, the
+/// tilesheets' and the strip tool's sheet included.
 /// </summary>
 internal static class SpriteImageFile
 {

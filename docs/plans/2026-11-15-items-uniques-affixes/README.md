@@ -133,7 +133,7 @@ slices run; IU5 is optional and IU16 merged into IU15.
   [slices/IU13.md](slices/IU13.md)
 
 ### Phase 4: the Affixes page
-- [ ] **IU14. One affix as the Affixes page types it** (Editor, about 190 lines) → [slices/IU14.md](slices/IU14.md)
+- [x] **IU14. One affix as the Affixes page types it** (Editor, about 190 lines) → [slices/IU14.md](slices/IU14.md)
 - [ ] **IU15. The Affixes list, its undo step and Database > Affixes, uniques following their affixes' stats** (Editor
   + Data, about 290 lines; IU16 merged in, decision 885) → [slices/IU15.md](slices/IU15.md)
 

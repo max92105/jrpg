@@ -98,6 +98,9 @@ call or a rename. These cases slipped past it:
   old member names across docs/map.md after every rename. Mode bar WD3: a deleted partial (`MainWindow.QuestEditing`)
   stayed in map.md's Shell row list of partial files though the Quests row was updated; grep `.<Partial>` there.
 
+- A page gaining a tab (classes CL5b Levels, CL6b Skills) left the code-behind's summary listing only its first tab
+  (`ClassCatalogPage.xaml.cs`: "Stats its texts and its base and growth boxes"); reread a page's `.xaml.cs` summary.
+
 **Why:** a comment or doc stating a wrong rule, name or number misleads the next reader.
 
 **How to apply:** after the rule's grep, run the list above against the diff's renames, moves, new members and removed

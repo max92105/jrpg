@@ -38,3 +38,8 @@ None.
 
 ## Verify by hand
 1. Run the editor, change any map tile and undo it, **Save all**: `git status` shows `encounters.json` unchanged.
+
+- **Done, with deviations:** about 160 lines with tests (code +31 -7, tests +127, the map's line). `OfEncounters`'s
+  two tests went to a new `CatalogProblemsEncounterTests` (26 lines), not `CatalogProblemsTests` (268), as BG3's did;
+  `ContentWriterEncounterTests` (100) adds its encounters to the test world's, since its maps' random battles name
+  them. `WriteMapCatalogs`'s summary names the encounter catalog. `CatalogProblems.cs` is 272 lines; 7298 tests.

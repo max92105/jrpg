@@ -70,6 +70,7 @@ public sealed class ContentWriterRepositoryTests : IDisposable
          .. File.ReadAllBytes(_content.PathOf("field-sprites.json")),
          .. File.ReadAllBytes(_content.PathOf("shops.json")),
          .. File.ReadAllBytes(_content.PathOf("enemies.json")),
+         .. File.ReadAllBytes(_content.PathOf("encounters.json")),
          .. File.ReadAllBytes(_content.PathOf("drop-tables.json")),
          .. File.ReadAllBytes(_content.PathOf("cinematics.json")),
          .. File.ReadAllBytes(_content.PathOf("effect-strips.json")),

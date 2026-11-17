@@ -41,6 +41,7 @@ public sealed partial class ContentWriter
         CatalogProblems.CheckStatuses(SortedStatuses(catalog));
         CatalogProblems.CheckSkills(SortedSkills(catalog), catalog);
         CatalogProblems.CheckEnemies(SortedEnemies(catalog), catalog);
+        CatalogProblems.CheckEncounters(SortedEncounters(catalog), catalog);
         CatalogProblems.CheckCinematics(SortedCinematics(catalog));
         CatalogProblems.CheckEffectStrips(SortedEffectStrips(catalog));
         CatalogProblems.CheckAnimatedBackgrounds(SortedAnimatedBackgrounds(catalog));
@@ -57,6 +58,7 @@ public sealed partial class ContentWriter
         new(ContentCatalogLoader.FieldSpritesFile, ContentFileWriter.Serialize(SortedFieldSprites(catalog))),
         new(ContentCatalogLoader.ShopsFile, ContentFileWriter.Serialize(SortedShops(catalog))),
         new(ContentCatalogLoader.EnemiesFile, ContentFileWriter.Serialize(SortedEnemies(catalog))),
+        new(ContentCatalogLoader.EncountersFile, ContentFileWriter.Serialize(SortedEncounters(catalog))),
         new(ContentCatalogLoader.DropTablesFile, ContentFileWriter.Serialize(SortedDropTables(catalog))),
         new(ContentCatalogLoader.CinematicsFile, ContentFileWriter.Serialize(SortedCinematics(catalog))),
         new(ContentCatalogLoader.EffectStripsFile, ContentFileWriter.Serialize(SortedEffectStrips(catalog))),
@@ -100,6 +102,9 @@ public sealed partial class ContentWriter
 
     private static List<EnemyDefinition> SortedEnemies(ContentCatalog catalog) =>
         [.. catalog.Enemies.Values.OrderBy(enemy => enemy.Id, StringComparer.Ordinal)];
+
+    private static List<EncounterDefinition> SortedEncounters(ContentCatalog catalog) =>
+        [.. catalog.Encounters.Values.OrderBy(encounter => encounter.Id, StringComparer.Ordinal)];
 
     private static List<DropTable> SortedDropTables(ContentCatalog catalog) =>
         [.. catalog.DropTables.Values.OrderBy(table => table.Id, StringComparer.Ordinal)];

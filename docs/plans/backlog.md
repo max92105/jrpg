@@ -333,3 +333,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   every art import, so `Catalogs/` is its home (encounters and backgrounds plan, BG9 review).
 - `Editor/Battle/GifImportWindow.AskFor` tests a path for `.gif` with its own `Path.GetExtension` check, a copy of
   `Catalogs/ArtImageImport.IsGif`: share one (encounters and backgrounds plan, BG9b review).
+- `Data/Content/CatalogProblems.OfEnemies` doesn't run the `encounters.json` check: removing an enemy an encounter names
+  shows no problem on the Enemies page and Save then refuses naming encounters.json; run every check that reads
+  `enemies.json`, as `CheckItems` does for items (encounters and backgrounds plan, EC1 review).

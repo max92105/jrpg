@@ -65,6 +65,15 @@ public static partial class CatalogProblems
         FirstProblem(() => CheckShops(shops, content));
 
     /// <summary>
+    /// The first problem in the encounters (decision 908): an encounter's own rule, or an enemy the content lacks; null
+    /// when the loader would take them.
+    /// </summary>
+    /// <param name="encounters">The encounters as edited, each one's enemies in their screen order.</param>
+    /// <param name="content">The enemies the encounters name.</param>
+    public static string? OfEncounters(IReadOnlyList<EncounterDefinition> encounters, ContentCatalog content) =>
+        FirstProblem(() => CheckEncounters(encounters, content));
+
+    /// <summary>
     /// The first problem in the enemies (ADR 0034, ADR 0045): an enemy's own numbers, its drop table, or a tactic
     /// naming a skill the content lacks or enemies can't use; null when the loader would take them.
     /// </summary>
@@ -182,6 +191,13 @@ public static partial class CatalogProblems
     /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
     internal static void CheckShops(IReadOnlyList<ShopDefinition> shops, ContentCatalog content) =>
         ShopCatalogValidator.Validate(ContentCatalogLoader.ShopsFile, shops, content.Items);
+
+    /// <summary>
+    /// The checks the loader makes on <c>encounters.json</c>, for the writer and the problem line alike.
+    /// </summary>
+    /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
+    internal static void CheckEncounters(IReadOnlyList<EncounterDefinition> encounters, ContentCatalog content) =>
+        EncounterCatalogValidator.Validate(ContentCatalogLoader.EncountersFile, encounters, content.Enemies.Keys.ToHashSet());
 
     /// <summary>
     /// The checks the loader makes on <c>enemies.json</c>, for the writer and the problem line alike.

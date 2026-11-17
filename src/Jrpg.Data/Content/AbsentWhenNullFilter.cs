@@ -108,6 +108,11 @@ internal static class AbsentWhenNullFilter
         // ADR 0047: only an animated sprite has a loop.
         (typeof(EnemyDefinition), "idleAnimation"),
 
+        // Decision 908: an encounter without its own background fights on the map's, one without its own track plays
+        // the battle theme.
+        (typeof(EncounterDefinition), "backgroundFile"),
+        (typeof(EncounterDefinition), "musicFile"),
+
         // ADR 0048: only a strip an Attack sweeps before names a swing.
         (typeof(EffectStripDefinition), "swingFile"),
 

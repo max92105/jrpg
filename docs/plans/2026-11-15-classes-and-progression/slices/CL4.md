@@ -61,3 +61,6 @@ None new: the page binds CL2's and CL3's tested view models. Guard: the smoke sc
   32-35.
 - **Note from CL3:** split on 2026-11-17; the page also needs CL3b, whose `Party/ClassEditingViewModel` its
   registration takes.
+- **Note from CL3b review:** `CatalogDraftClassTests` and `ClassEditingViewModelTests` each build the test world with
+  `Classes` set to Archer and Scholar; if this slice's tests need that draft too, move it into `ClassFixtures` (e.g.
+  `DraftWithClasses()`) rather than a third copy.

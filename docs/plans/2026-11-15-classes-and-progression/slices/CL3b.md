@@ -34,3 +34,9 @@ None: the page comes in CL4.
 - **Note from CL1:** `CatalogDraft.Database.cs` is at 214 lines (118 when planned), so `SetClasses` goes in the new
   `Catalogs/CatalogDraft.Party.cs` partial. CL1 already rewrote `CatalogDraft.SetSkills`' summary ("no page edits what
   they name"); reword it again here, now that the Classes page edits classes.
+- **Done, with deviations:** `Catalogs/CatalogDraft.Party.cs` (31 lines, `SetClasses` with `IsSameClass`) and
+  `Party/ClassEditingViewModel` (17); `SetSkills`' summary now says a class or enemy naming a removed skill came in a
+  later step, already undone. Tests: `CatalogDraftClassTests` (70, 5 tests) and `ClassEditingViewModelTests` (53, 3
+  tests), both over `ClassFixtures.Archer` and `Scholar`. Beyond the list: `SetClasses_OnlySkillsChanged_RecordsOneStep`
+  and `SetClasses_OnlyResourcesChanged_RecordsOneStep` (one per list the comparison reads by content), and
+  `Apply_NothingChanged_RecordsNoStep` (an untouched page records no step). About 175 lines with tests.

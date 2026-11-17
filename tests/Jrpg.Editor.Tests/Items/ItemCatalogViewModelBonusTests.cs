@@ -48,7 +48,7 @@ public sealed class ItemCatalogViewModelBonusTests
 
     private static ItemCatalogViewModel WithVestChosen()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
         catalog.SelectedItem = catalog.Items.Single(item => item.Id == "copper_vest");
         return catalog;
     }

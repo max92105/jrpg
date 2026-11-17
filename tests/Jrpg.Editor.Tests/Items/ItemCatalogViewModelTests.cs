@@ -15,7 +15,7 @@ public sealed class ItemCatalogViewModelTests
             [ItemFixtures.Ore, ItemFixtures.WarlordAxe, ItemFixtures.CopperVest, ItemFixtures.CopperAxe, ItemFixtures.Tonic];
         var content = ItemFixtures.Catalog with { Items = reversed.ToDictionary(item => item.Id, StringComparer.Ordinal) };
 
-        var catalog = new ItemCatalogViewModel(content, []);
+        var catalog = new ItemCatalogViewModel(content, [], []);
 
         Assert.Equal(["tonic", "copper_axe", "copper_vest", "warlord_axe", "ore"], catalog.Items.Select(item => item.Id));
     }
@@ -23,7 +23,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void Problem_Constructed_IsNull()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
 
         Assert.Null(catalog.Problem);
     }
@@ -31,7 +31,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void AddItem_Equipment_AddsANewArmorLastAndChoosesIt()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
 
         catalog.AddItemCommand.Execute(ItemCategory.Equipment);
 
@@ -44,7 +44,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void AddItem_Unique_AddsANewUniqueWithNoFixedAffix()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
 
         catalog.AddItemCommand.Execute(ItemCategory.Unique);
 
@@ -57,7 +57,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void Duplicate_ChosenUnique_AddsANewUniqueCopyLast()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
         catalog.SelectedItem = ItemOf(catalog, "warlord_axe");
 
         catalog.DuplicateCommand.Execute(null);
@@ -72,7 +72,7 @@ public sealed class ItemCatalogViewModelTests
     public void Duplicate_NothingChosen_CannotExecute()
     {
         var noItems = ItemFixtures.Catalog with { Items = new Dictionary<string, ItemDefinition>() };
-        var catalog = new ItemCatalogViewModel(noItems, []);
+        var catalog = new ItemCatalogViewModel(noItems, [], []);
 
         Assert.False(catalog.DuplicateCommand.CanExecute(null));
     }
@@ -80,7 +80,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void RemoveItem_SavedItemChosen_CannotExecute()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
         catalog.SelectedItem = ItemOf(catalog, "tonic");
 
         Assert.False(catalog.RemoveItemCommand.CanExecute(null));
@@ -89,7 +89,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void RemoveItem_NewItem_RemovesItAndChoosesItsNeighbor()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
         catalog.AddItemCommand.Execute(ItemCategory.Consumable);
         var removed = catalog.SelectedItem!;
         catalog.AddItemCommand.Execute(ItemCategory.Material);
@@ -105,7 +105,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void Problem_TwoNewItemsWithTheSameId_NamesIt()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
         AddMaterial(catalog, "pebble");
 
         AddMaterial(catalog, "pebble");
@@ -117,7 +117,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void Problem_ChosenItemHasAProblem_IsItsOwnFirst()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
         AddMaterial(catalog, "pebble").PriceText = "abc";
 
         AddMaterial(catalog, "flint").PriceText = "xyz";
@@ -128,7 +128,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void Problem_PriceClearedOnAnItemAShopSells_IsDatasShopsMessage()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
         catalog.SelectedItem = ItemOf(catalog, "potion");
 
         catalog.SelectedItem.PriceText = "";
@@ -140,7 +140,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void Problem_WeaponDamageTypedZero_IsDatasMessage()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
         catalog.SelectedItem = ItemOf(catalog, "copper_axe");
 
         catalog.SelectedItem.Equipment!.DamageText = "0";
@@ -153,7 +153,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void Problem_ArmorTurnedWeaponWithoutAType_IsDatasMessage()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
         catalog.SelectedItem = ItemOf(catalog, "copper_vest");
 
         catalog.SelectedItem.Equipment!.Kind = EquipmentKind.Weapon;
@@ -165,7 +165,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void Problem_WeaponDamageTypedOne_IsNull()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
         catalog.SelectedItem = ItemOf(catalog, "copper_axe");
 
         catalog.SelectedItem.Equipment!.DamageText = "1";
@@ -176,7 +176,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void Problem_EquipmentDamageTyped_IsRaised()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
         catalog.SelectedItem = ItemOf(catalog, "copper_axe");
         var raised = new List<string?>();
         catalog.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
@@ -189,7 +189,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void Problem_TypedIdChanged_IsRaised()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
         catalog.AddItemCommand.Execute(ItemCategory.Material);
         var raised = new List<string?>();
         catalog.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
@@ -202,7 +202,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void Problem_OtherItemChosen_IsRaised()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
         var raised = new List<string?>();
         catalog.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
 
@@ -214,7 +214,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void ToItems_WithAProblem_Throws()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
         catalog.AddItemCommand.Execute(ItemCategory.Consumable);
 
         Assert.Throws<InvalidOperationException>(catalog.ToItems);
@@ -223,7 +223,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void Choose_KnownId_ChoosesIt()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
 
         catalog.Choose("ore");
 
@@ -233,7 +233,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void Choose_UnknownId_KeepsTheChoice()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
         catalog.Choose("ore");
 
         catalog.Choose("missing");
@@ -245,7 +245,7 @@ public sealed class ItemCatalogViewModelTests
     [Fact]
     public void ChosenKey_NewItemWithoutId_IsNull()
     {
-        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, [], []);
 
         catalog.AddItemCommand.Execute(ItemCategory.Material);
 

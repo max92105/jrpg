@@ -6,7 +6,7 @@ namespace Jrpg.Editor.Tests.Items;
 // when another item is chosen or its icon box changes.
 public sealed class ItemCatalogViewModelIconTests
 {
-    private readonly ItemCatalogViewModel _catalog = new(ItemFixtures.Catalog, ["Ore.png", "Vest.png"]);
+    private readonly ItemCatalogViewModel _catalog = new(ItemFixtures.Catalog, ["Ore.png", "Vest.png"], []);
 
     [Fact]
     public void MissingIconNote_IconNotInTheFolder_NamesIt()

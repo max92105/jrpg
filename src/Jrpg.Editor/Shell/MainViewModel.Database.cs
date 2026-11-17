@@ -142,12 +142,18 @@ internal sealed partial class MainViewModel
             current.Statuses);
     }
 
-    // An image the folder holds but can't be read is left out, as the Character sprites page's: its size is unknown.
     private EffectStripEditingViewModel CreateEffectStripEditing() =>
         new(
             Content!,
-            () => [.. ArtFolders.ImagesIn(ArtRoot, ArtFolders.Effects).Where(file => PngSize.IsReadable(EffectPath(file)))],
+            ReadableEffectImages,
             file => PngSize.IsReadable(EffectPath(file)) ? PngSize.Read(EffectPath(file)) : null);
+
+    private ItemEditingViewModel CreateItemEditing() =>
+        new(Content!, () => ArtFolders.ImagesIn(ArtRoot, ArtFolders.Icons), ReadableEffectImages);
+
+    // An image the folder holds but can't be read is left out, as the Character sprites page's: its size is unknown.
+    private IReadOnlyList<string> ReadableEffectImages() =>
+        [.. ArtFolders.ImagesIn(ArtRoot, ArtFolders.Effects).Where(file => PngSize.IsReadable(EffectPath(file)))];
 
     private string EffectPath(string file) => Path.Combine(ArtRoot, ArtFolders.Effects, file);
 }

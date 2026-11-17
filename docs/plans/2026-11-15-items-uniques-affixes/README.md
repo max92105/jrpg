@@ -127,7 +127,7 @@ slices run; IU5 is optional and IU16 merged into IU15.
 - [x] **IU10. The equipment form: kind, damage and damage type** (Editor, about 170 lines) →
   [slices/IU10.md](slices/IU10.md)
 - [x] **IU11. The equipment form's bonus rows** (Editor, about 180 lines) → [slices/IU11.md](slices/IU11.md)
-- [ ] **IU12. The consumable form: effect kind, targeting, power, damage type, own strip** (Editor, about 210 lines) →
+- [x] **IU12. The consumable form: effect kind, targeting, power, damage type, own strip** (Editor, about 210 lines) →
   [slices/IU12.md](slices/IU12.md)
 - [ ] **IU13. The unique form: the fixed affix rows and the piece's price** (Editor, about 210 lines) →
   [slices/IU13.md](slices/IU13.md)

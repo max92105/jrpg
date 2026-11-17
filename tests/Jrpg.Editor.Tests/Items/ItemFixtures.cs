@@ -28,6 +28,23 @@ internal static class ItemFixtures
         Price = 30,
     };
 
+    /// <summary>
+    /// A damage thrown in battle with its own strip: its effect's targeting, hits and type away from a new effect's, so
+    /// a form that drops one shows in the record.
+    /// </summary>
+    public static ItemDefinition Firebomb { get; } = new()
+    {
+        Id = "firebomb",
+        Name = "Firebomb",
+        Description = "Burns every enemy twice.",
+        IconFile = "Bomb.png",
+        MaxStack = 9,
+        IsUsableFromMenu = false,
+        Effect = new Effect(EffectKind.Damage, 15, Targeting.AllEnemies, Hits: 2, DamageType: DamageType.Fire),
+        EffectFile = "Blast.png",
+        Price = 60,
+    };
+
     public static ItemDefinition CopperVest { get; } = new()
     {
         Id = "copper_vest",
@@ -84,8 +101,8 @@ internal static class ItemFixtures
     };
 
     /// <summary>
-    /// The test world with the five records above beside its own items, kept since its shops, drop tables, Forge and
-    /// new game name them. The five ids must stay out of the test world: a clash makes every Items test fail to start.
+    /// The test world with the six records above beside its own items, kept since its shops, drop tables, Forge and new
+    /// game name them. The six ids must stay out of the test world: a clash makes every Items test fail to start.
     /// </summary>
     public static ContentCatalog Catalog { get; } =
         CatalogOf(ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")));
@@ -94,7 +111,7 @@ internal static class ItemFixtures
         world with
         {
             Items = world.Items.Values
-                .Concat([Tonic, CopperVest, CopperAxe, Ore, WarlordAxe])
+                .Concat([Tonic, Firebomb, CopperVest, CopperAxe, Ore, WarlordAxe])
                 .ToDictionary(item => item.Id, StringComparer.Ordinal),
         };
 }

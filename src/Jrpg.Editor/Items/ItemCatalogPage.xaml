@@ -161,6 +161,62 @@
             </StackPanel>
           </StackPanel>
         </StackPanel>
+        <!-- A consumable's effect (decision 881): a rest's power and the type off a damage are hidden, which writes
+             power 0 and no type, as Data requires; its statuses, hits and range are carried, never edited. -->
+        <StackPanel Margin="0,12,0,0">
+          <StackPanel.Style>
+            <Style TargetType="StackPanel">
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding Effect}" Value="{x:Null}">
+                  <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </StackPanel.Style>
+          <TextBlock Text="Effect" FontWeight="Bold" />
+          <StackPanel DataContext="{Binding Effect}">
+            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+              <TextBlock Text="Effect" Style="{StaticResource FieldLabel}" />
+              <ComboBox Width="160"
+                        ItemsSource="{Binding KindChoices}"
+                        SelectedItem="{Binding Kind}"
+                        ToolTip="Hurt, heal, revive, or rest the whole party from the menu" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+              <TextBlock Text="Target" Style="{StaticResource FieldLabel}" />
+              <ComboBox Width="160"
+                        ItemsSource="{Binding TargetingChoices}"
+                        SelectedItem="{Binding Targeting}"
+                        ToolTip="Whom it may be aimed at; a rest takes all allies" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,4,0,0" Visibility="{Binding TakesPower, Converter={StaticResource VisibleWhenTrue}}">
+              <TextBlock Text="Power" Style="{StaticResource FieldLabel}" />
+              <TextBox Width="60"
+                       Text="{Binding PowerText, UpdateSourceTrigger=PropertyChanged}"
+                       ToolTip="The HP it deals, heals or revives with, whoever uses it" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,4,0,0" Visibility="{Binding TakesDamageType, Converter={StaticResource VisibleWhenTrue}}">
+              <TextBlock Text="Damage type" Style="{StaticResource FieldLabel}" />
+              <ComboBox Width="160"
+                        ItemsSource="{Binding DamageTypeChoices}"
+                        SelectedItem="{Binding DamageType}"
+                        ToolTip="The type its hits meet resistances as" />
+            </StackPanel>
+          </StackPanel>
+          <!-- Editable, so a name the folder lacks can still be typed and saved (decision 442); the note says so. -->
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Own strip" Style="{StaticResource FieldLabel}" />
+            <ComboBox Width="240"
+                      IsEditable="True"
+                      ItemsSource="{Binding DataContext.EffectImages, RelativeSource={RelativeSource AncestorType=items:ItemCatalogPage}}"
+                      Text="{Binding EffectFile, UpdateSourceTrigger=PropertyChanged}"
+                      ToolTip="The strip it plays in battle instead of its user's attack strip; empty plays the user's; a damage's only" />
+          </StackPanel>
+          <TextBlock Margin="90,2,0,0"
+                     TextWrapping="Wrap"
+                     Foreground="{StaticResource ProblemTextBrush}"
+                     Text="{Binding DataContext.MissingStripNote, RelativeSource={RelativeSource AncestorType=items:ItemCatalogPage}}" />
+        </StackPanel>
       </StackPanel>
     </ScrollViewer>
   </DockPanel>

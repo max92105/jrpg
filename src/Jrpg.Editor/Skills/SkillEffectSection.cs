@@ -110,9 +110,9 @@ internal sealed partial class SkillEffectSection : ObservableObject
     /// <summary>Only without a tier, whose record sets the kind, the type and the amount.</summary>
     public bool CanTypeKind => TierId.Length == 0;
 
-    public bool CanTypePower => CanTypeKind && FieldsFor(Kind).ReadsPower;
+    public bool CanTypePower => CanTypeKind && EffectKindFields.ReadsPower(Kind);
 
-    public bool CanTypeDamageType => CanTypeKind && FieldsFor(Kind).ReadsDamageType;
+    public bool CanTypeDamageType => CanTypeKind && EffectKindFields.ReadsDamageType(Kind);
 
     public bool CanTypeRange => Targeting == Targeting.AlliesInRange;
 
@@ -139,19 +139,8 @@ internal sealed partial class SkillEffectSection : ObservableObject
                 Targeting,
                 CanTypeRange ? TypedNumber.Parse(RangeText)!.Value : 0,
                 TypedNumber.Parse(HitsText)!.Value,
-                FieldsFor(Kind).ReadsDamageType ? DamageType : null)
+                EffectKindFields.ReadsDamageType(Kind) ? DamageType : null)
             { Tier = _tier };
-
-    // Which boxes beside the targeting and the hits a kind reads; a rest is never offered, and Data refuses it on a
-    // skill at load.
-    private static (bool ReadsPower, bool ReadsDamageType) FieldsFor(EffectKind kind) =>
-        kind switch
-        {
-            EffectKind.Damage => (true, true),
-            EffectKind.RestoreHp or EffectKind.Revive => (true, false),
-            EffectKind.GrantStatus or EffectKind.ReadyExtraTurn => (false, false),
-            _ => throw new ArgumentOutOfRangeException(nameof(kind), kind, "A skill's effect can't be this kind."),
-        };
 
     // Starting on the effect's own record changes nothing; picking another takes its kind, its type and its amount, and
     // picking none keeps them to type over.

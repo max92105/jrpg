@@ -9,7 +9,7 @@ public sealed class ItemEditingViewModelTests
     private readonly CatalogDraft _draft = new(ItemFixtures.Catalog);
     private readonly ItemEditingViewModel _itemEditing;
 
-    public ItemEditingViewModelTests() => _itemEditing = new ItemEditingViewModel(_draft, () => []);
+    public ItemEditingViewModelTests() => _itemEditing = new ItemEditingViewModel(_draft, () => [], () => []);
 
     [Fact]
     public void Apply_NameChanged_IsOneUndoStep()
@@ -50,12 +50,24 @@ public sealed class ItemEditingViewModelTests
     public void Start_ReadsTheIconFilesEachTime()
     {
         var folder = new Queue<IReadOnlyList<string>>([["Ore.png"], ["Ore.png", "Vest.png"]]);
-        var itemEditing = new ItemEditingViewModel(_draft, folder.Dequeue);
+        var itemEditing = new ItemEditingViewModel(_draft, folder.Dequeue, () => []);
         itemEditing.Start();
 
         var second = itemEditing.Start();
 
         Assert.Equal(["Ore.png", "Vest.png"], second.IconFiles);
+    }
+
+    [Fact]
+    public void Start_ReadsTheEffectImagesEachTime()
+    {
+        var folder = new Queue<IReadOnlyList<string>>([["Blast.png"], ["Blast.png", "Spark.png"]]);
+        var itemEditing = new ItemEditingViewModel(_draft, () => [], folder.Dequeue);
+        itemEditing.Start();
+
+        var second = itemEditing.Start();
+
+        Assert.Equal(["Blast.png", "Spark.png"], second.EffectImages);
     }
 
     private ItemCatalogViewModel TonicRenamed()

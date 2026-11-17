@@ -16,8 +16,8 @@ namespace Jrpg.Editor.Items;
 /// session after them; Add starts an item of the category its button names, Duplicate copies the chosen one with its
 /// category (decision 878); only an added one can be removed, since shops, tables and maps name a saved one (decision
 /// 581). <see cref="Problem"/> is the chosen item's own first, then any item's, then Data's message for the items and
-/// everything that reads them (decision 863). The icon box offers the icons folder's images, a note naming the chosen
-/// item's icon when the folder lacks it (decisions 879, 442).
+/// everything that reads them (decision 863). The icon box offers the icons folder's images and the strip box the
+/// effects folder's, a note naming the chosen item's icon or strip when its folder lacks it (decisions 879, 881, 442).
 /// </summary>
 internal sealed partial class ItemCatalogViewModel : ObservableObject, IEditedCatalog
 {
@@ -31,10 +31,12 @@ internal sealed partial class ItemCatalogViewModel : ObservableObject, IEditedCa
     /// game that name the items.
     /// </param>
     /// <param name="iconFiles">The PNGs in the icons folder as the session starts, sorted.</param>
-    public ItemCatalogViewModel(ContentCatalog content, IReadOnlyList<string> iconFiles)
+    /// <param name="effectImages">The readable PNGs in the effects folder as the session starts, sorted.</param>
+    public ItemCatalogViewModel(ContentCatalog content, IReadOnlyList<string> iconFiles, IReadOnlyList<string> effectImages)
     {
         _content = content;
         IconFiles = iconFiles;
+        EffectImages = effectImages;
         _sellPercent = content.Rules.Trade.SellPercent;
         Items =
         [
@@ -55,8 +57,10 @@ internal sealed partial class ItemCatalogViewModel : ObservableObject, IEditedCa
 
     public IReadOnlyList<string> IconFiles { get; }
 
+    public IReadOnlyList<string> EffectImages { get; }
+
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Problem), nameof(MissingIconNote))]
+    [NotifyPropertyChangedFor(nameof(Problem), nameof(MissingIconNote), nameof(MissingStripNote))]
     [NotifyCanExecuteChangedFor(nameof(DuplicateCommand), nameof(RemoveItemCommand))]
     public partial ItemViewModel? SelectedItem { get; set; }
 
@@ -78,6 +82,17 @@ internal sealed partial class ItemCatalogViewModel : ObservableObject, IEditedCa
         SelectedItem is not { IconFile: var icon } || IconFiles.Contains(icon, StringComparer.OrdinalIgnoreCase) ? ""
         : icon.Length == 0 ? $"No icon: the game will refuse to start until one of art/{ArtFolders.Icons} is named."
         : $"{icon} isn't in art/{ArtFolders.Icons}: the game will refuse to start until it is.";
+
+    /// <summary>
+    /// "Blast.png isn't in art/effects: ...", the chosen item's own strip, trimmed as it is saved, when the folder
+    /// lacks it: kept and saved (decision 442), refused by the game's start; empty for no strip, as its user's plays,
+    /// when the folder has it, ignoring case as the icon's note does, or with no item chosen.
+    /// </summary>
+    public string MissingStripNote =>
+        SelectedItem?.EffectFile.Trim() is not { Length: > 0 } strip
+        || EffectImages.Contains(strip, StringComparer.OrdinalIgnoreCase)
+            ? ""
+            : $"{strip} isn't in art/{ArtFolders.Effects}: the game will refuse to start until it is.";
 
     /// <summary>The chosen item's id; null with none chosen or while a new one has no id yet.</summary>
     public string? ChosenKey => SelectedItem is { Id.Length: > 0 } item ? item.Id : null;
@@ -119,10 +134,11 @@ internal sealed partial class ItemCatalogViewModel : ObservableObject, IEditedCa
     }
 
     // Only the typed boxes reach here, never an item's label or problem notices, so Data's check runs once per change.
-    // The chosen item's icon is among them, so its note is read again.
+    // The chosen item's icon and strip are among them, so their notes are read again.
     private void OnItemChanged(object? sender, EventArgs e)
     {
         OnPropertyChanged(nameof(Problem));
         OnPropertyChanged(nameof(MissingIconNote));
+        OnPropertyChanged(nameof(MissingStripNote));
     }
 }

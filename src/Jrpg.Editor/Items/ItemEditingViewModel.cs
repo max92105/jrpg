@@ -10,10 +10,16 @@ namespace Jrpg.Editor.Items;
 /// <param name="iconFiles">
 /// The icons folder's PNGs, read as each session starts so one dropped in while the editor runs is offered.
 /// </param>
-internal sealed class ItemEditingViewModel(CatalogDraft catalog, Func<IReadOnlyList<string>> iconFiles)
+/// <param name="effectImages">
+/// The effects folder's readable PNGs, read as each session starts, as the icons are.
+/// </param>
+internal sealed class ItemEditingViewModel(
+    CatalogDraft catalog,
+    Func<IReadOnlyList<string>> iconFiles,
+    Func<IReadOnlyList<string>> effectImages)
 {
     /// <summary>The page's state from the draft as it is now, so an item undone since shows on the page.</summary>
-    public ItemCatalogViewModel Start() => new(catalog.Current, iconFiles());
+    public ItemCatalogViewModel Start() => new(catalog.Current, iconFiles(), effectImages());
 
     /// <summary>Gives the draft the page's items; nothing when they didn't change.</summary>
     public void Apply(ItemCatalogViewModel edited) => catalog.SetItems(edited.ToItems());

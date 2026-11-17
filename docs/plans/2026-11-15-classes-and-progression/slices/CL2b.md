@@ -43,3 +43,13 @@ gives back a record equal to its source.
 
 ## Verify by hand
 None: no page yet (CL4).
+- **Done, with deviations:** `Party/ClassViewModel` (108 lines) with `Party/ClassViewModelTests` (237, 23 tests);
+  `ClassFixtures` (32) gains `TextsOf`, the eight boxes' texts in the page's order, which `ClassStatsBoxesTests` (106)
+  now uses too: a third copy of that list would have come with the sixteen-box test. Tests beyond the list: an
+  untouched class's problem, a new class's legal id, the growth's box alone, and `Changed` for the id and the
+  description (one test per raising branch), and the review's two: the id's notices `[Id, Label, Problem]` and the
+  name's `[Name, Label]`, which CL3's list label and CL4's problem line read.
+  `ToClass_UntouchedClass_KeepsItsSkillsAndResources` became `ToClass_NameTyped_KeepsItsSkillsAndResources`, since
+  `ToClass_Untouched_EqualsTheSource` already covers an untouched class; `New_Constructed_IsTheBlank` became
+  `New_IdTyped_IsTheBlankClass` (a blank id refuses `ToClass`). About 345 lines with tests in all, the review's two
+  tests included.

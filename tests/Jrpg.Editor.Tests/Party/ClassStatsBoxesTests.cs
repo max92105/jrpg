@@ -12,12 +12,7 @@ public sealed class ClassStatsBoxesTests
     {
         var boxes = new ClassStatsBoxes(Scholar.Base, "Base");
 
-        string[] texts =
-        [
-            boxes.MaxHpText, boxes.SpeedText, boxes.AccuracyText, boxes.PowerText, boxes.AgilityText,
-            boxes.IntelligenceText, boxes.ConstitutionText, boxes.WillText,
-        ];
-        Assert.Equal(["140", "9", "3", "11", "7", "17", "5", "13"], texts);
+        Assert.Equal(["140", "9", "3", "11", "7", "17", "5", "13"], TextsOf(boxes));
     }
 
     [Fact]
@@ -92,12 +87,7 @@ public sealed class ClassStatsBoxesTests
 
         boxes.CopyFrom(copied);
 
-        string[] texts =
-        [
-            boxes.MaxHpText, boxes.SpeedText, boxes.AccuracyText, boxes.PowerText, boxes.AgilityText,
-            boxes.IntelligenceText, boxes.ConstitutionText, boxes.WillText,
-        ];
-        Assert.Equal(["12", "2", "4x", "6", "8", "10", "14", "16"], texts);
+        Assert.Equal(["12", "2", "4x", "6", "8", "10", "14", "16"], TextsOf(boxes));
     }
 
     [Fact]

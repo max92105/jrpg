@@ -101,7 +101,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   relaid file) → [slices/CL1.md](slices/CL1.md)
 - [x] **CL2. A class's base or growth as eight typed boxes** (Editor, about 250 lines; split, the class itself is CL2b)
   → [slices/CL2.md](slices/CL2.md)
-- [ ] **CL2b. One class as typed: its id, name, description and the two sets of boxes** (Editor, about 230 lines; split
+- [x] **CL2b. One class as typed: its id, name, description and the two sets of boxes** (Editor, about 230 lines; split
   from CL2) → [slices/CL2b.md](slices/CL2b.md)
 - [ ] **CL3. The classes as a catalog: Add, Duplicate, Remove while new, one undo step** (Editor, about 230 lines) →
   [slices/CL3.md](slices/CL3.md)

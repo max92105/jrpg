@@ -3,11 +3,11 @@
 Editor, about 210 lines (about 100 of them tests). Needs CL1. Design: section 3; decisions 945-947.
 
 ## Goal
-The view model of one class as the Classes page will type it: its id (typed while new), name, description, and its
-base stats and growth as the same eight boxes each (max HP, speed, accuracy, power, agility, intelligence,
-constitution, will). Its problem names the first box that isn't a whole number, in the form's order ("Growth will must
-be a whole number (was 'x')."). Its record is the original `with` the edited fields, so the skills and resources no tab
-edits yet are carried silently (decision 945).
+A class's base stats or its growth as the Classes page will type them: eight boxes (max HP, speed, accuracy, power,
+agility, intelligence, constitution, will), each keeping its text as typed, used twice by one class (decision 947). Its
+problem names the first box that isn't a whole number, in the form's order, after its label ("Growth will must be a
+whole number (was 'x')."); its stats as typed are null while a box doesn't read. The class itself, its id, name,
+description and the record written over its source (decision 945), is CL2b's goal.
 
 ## New types
 - `Party/ClassStatsBoxes` (`ObservableObject`): one `ClassStats` as eight typed boxes, with the first box that isn't a

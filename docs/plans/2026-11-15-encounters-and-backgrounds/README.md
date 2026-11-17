@@ -95,7 +95,7 @@ slices and Editor slices aim at about 200 lines, not because the scope grew.
 - [ ] **BG2. Map settings' Battle background box** (Editor, about 150 lines) → [slices/BG2.md](slices/BG2.md)
 
 ### Phase 2: animated backgrounds
-- [ ] **ADR 0059, animated battle backgrounds as grid sheets.** Write it from the entry under "ADRs needed" below
+- [x] **ADR 0059, animated battle backgrounds as grid sheets.** Write it from the entry under "ADRs needed" below
   (decisions 896-900, 904; a default taken while the developer was away, so it is marked as such in its Status line).
 - [ ] **BG3. The animated background record, loaded, validated and written** (Core, Data, about 230 lines) →
   [slices/BG3.md](slices/BG3.md)

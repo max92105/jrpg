@@ -30,4 +30,5 @@ sheets (`tilesheets/bonus ...`, `tilesheets/collision & alpha.png`), used unmodi
 ## Placeholders (replace before release)
 
 - **AI-generated placeholders** by the developer, with an image generator: the backgrounds, battlers, cutscene stills,
-  attack effects, field sprites, icons and portraits.
+  attack effects, field sprites, icons and portraits. `backgrounds/ForestPulse.png` is `backgrounds/Forest.png` made
+  into four frames by the repository's script `art-src/backgrounds/New-PlaceholderAnimatedBackground.ps1`.

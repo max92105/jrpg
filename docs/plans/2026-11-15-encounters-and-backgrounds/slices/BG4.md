@@ -60,3 +60,11 @@ None (`ArtReferenceCheck.Backgrounds.cs` exists since BG1).
 2. Open `content/art/backgrounds/ForestPulse.png` (agents may: it is made from the `generated` forest, not Mana Seed):
    four 960 x 540 frames in two rows of two, darkening then brightening.
 3. Change the record's `frameHeight` to 600 locally: the start names `ForestPulse.png` and the grid it needs. Revert.
+
+- **Done, with deviations:** about 320 lines of code and tests (code +104 -16, tests +215), past the ~200 planned: the
+  new art check tests went to a new `ArtReferenceCheckBackgroundSizeTests` (193 lines) with an art root of its own,
+  since `ArtReferenceCheckBackgroundTests` reads the shared test world's art; four tests beyond the list (a record's
+  sheet over 4096 says too large before the grid, a last row partly filled on a width that doesn't divide, a one-frame
+  wide image, an encounter's background over 4096 wide for the width side). The grid message follows the column rule,
+  so the example "need 2 x 2; the image holds 1 x 2" can't arise: a one-column image needs 1 x 4. `CREDITS.md`'s
+  generated line names the script. The script is 74 lines; `ForestPulse.png` is 1920 x 1080, 5,420,797 bytes.

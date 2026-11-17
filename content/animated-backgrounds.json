@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "file": "ForestPulse.png",
+    "frameWidth": 960,
+    "frameHeight": 540,
+    "animation": {
+      "frameCount": 4,
+      "frameMilliseconds": 200
+    }
+  }
+]

@@ -19,10 +19,12 @@ public static partial class ArtReferenceCheck
     /// still, every party member's portrait, every item's icon, every skill icon named (a skill may have none), every
     /// battle sprite, every enemy's portrait, every attack effect, every strip a skill or item names for itself
     /// (decision 709), every strip and swing <c>effect-strips.json</c> lists (ADR 0048), every encounter's own
-    /// background and every map's battle background exist as PNGs, every tile's cell and its animation's last frame lie
-    /// inside its sheet, every effect strip is whole square frames and its listed hit frame one of them, every animated
-    /// enemy's battle strip splits into its loop's frames (ADR 0047), and every field sprite holds the frames its
-    /// record needs (ADR 0043). The names of skill icons, NPC sprites, stills, battle art and backgrounds must match
+    /// background, every map's battle background and every animated background's sheet exist as PNGs, every tile's cell
+    /// and its animation's last frame lie inside its sheet, every effect strip is whole square frames and its listed
+    /// hit frame one of them, every animated enemy's battle strip splits into its loop's frames (ADR 0047), every field
+    /// sprite holds the frames its record needs (ADR 0043), every background is at most
+    /// <see cref="TextureLimit.MaxSide"/> a side (decision 895) and every animated background's sheet holds its
+    /// record's grid (ADR 0059). The names of skill icons, NPC sprites, stills, battle art and backgrounds must match
     /// their files exactly, case included.
     /// </summary>
     /// <returns>One line per problem, naming the file; empty when the art is complete.</returns>

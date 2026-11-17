@@ -86,3 +86,6 @@ list): no `ERROR` line. Read the script's lines only: the Character sprites page
 is the developer's to look at (he checks its list is in the same order as before).
 - **Note from BG3 review:** the Data validator and problems tests each build the same `_pulse` record (960 x 540, 4
   frames, 200 ms); if this slice's tests need it a third time, move it to one shared test fixture.
+- **Note from BG4 review:** `ArtReferenceCheck.GridProblemOf` divides by the frame size and reads `Animation`: the
+  page's problem line calls it only on a record `AnimatedBackgroundCatalogValidator` accepts (a 0 frame width throws
+  `DivideByZeroException`; the page may hold a record with no animation, BG3).

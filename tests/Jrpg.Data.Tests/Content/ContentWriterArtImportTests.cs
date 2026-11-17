@@ -115,6 +115,28 @@ public sealed class ContentWriterArtImportTests : IDisposable
     }
 
     [Fact]
+    public void ImportArtImage_BackgroundTallerThan4096_IsRefusedAndNotCopied()
+    {
+        var source = PngHeaderFile.Write(ImportSource("Tower.png"), width: 2000, height: 4097);
+
+        var exception = Assert.Throws<ContentValidationException>(() => Import(ArtFolders.Backgrounds, source));
+
+        Assert.Equal(
+            "Tower.png: a 2000 x 4097 px image is larger than the game loads (4096 px a side).", exception.Message);
+        Assert.False(_writer.HasArtImage(ArtFolders.Backgrounds, "Tower.png"));
+    }
+
+    [Fact]
+    public void ImportArtImage_Background4096Square_IsCopied()
+    {
+        var source = PngHeaderFile.Write(ImportSource("Square.png"), width: 4096, height: 4096);
+
+        Import(ArtFolders.Backgrounds, source);
+
+        Assert.True(_writer.HasArtImage(ArtFolders.Backgrounds, "Square.png"));
+    }
+
+    [Fact]
     public void ImportArtImage_NotAPng_Refuses()
     {
         var source = ImportSource("Notes.png");

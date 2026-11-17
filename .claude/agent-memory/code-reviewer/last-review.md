@@ -5,15 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-classes-and-progression, slice CL5b (CL5's split: the Levels tab; ClassViewModel LevelRows and
-LevelsProblem, ClassCatalogPage Levels tab, ClassFixtures.World, ClassViewModelLevelTests).
+Plan 2026-11-15-classes-and-progression, slice LV1 (ClassSkill entries in classes.json, ClassSkillLevelCheck,
+validator null/level-0 checks, messages say `skills`, decision 1012; ADR 0062).
 2026-11-17. Round 1. Verdict: Ready to commit. No Critical, no Warning.
 
-- Probe (scratch net10 WPF, the tab's XAML verbatim): no binding error once selected; header and rows share widths;
-  18 of 99 rows realized; LevelRows read once per notice, also while the Stats tab is shown.
-- Suggestion: ItemsControl's ScrollViewer.CanContentScroll and VirtualizingPanel.IsVirtualizing attributes are no-ops
-  (template ScrollViewer sets its own; IsVirtualizing defaults true) — open
-- Follow-up: Game/NewGame/LeaderProfile.cs:27 still inlines ClassSheet.At(class, 1, rules) — open (carried from CL5)
+- Checked: classes.json's nine classes keep the same ids in the same order, no `level`, no stale `skillIds`
+  (PowerShell ConvertFrom-Json compare against HEAD); a stale `skillIds` is refused (ComputedPropertyFilter removes
+  the getter-only property, UnmappedMemberHandling.Disallow); ClassViewModel.ToClass keeps Skills through `with`.
+- Suggestion: CatalogProblems.OfClasses's new CheckClassSkillLevels call (the editor's Classes problem line) has no
+  test; CatalogProblemsPartyTests could add a level-past-max row — open
+- Not a finding (drop): LeaderProfile.cs:27 calling `ClassSheet.At(class, 1, rules)` IS the CL5 fix (the shared rule), not an inline copy.
 - Follow-up: eight stat labels in page order in ClassStatsBoxes.Problem and ClassLevelPreview.StatsOf — open (from CL5)
-- From CL5: ClassLevelPreview.ProblemAt guard order — fixed (range check is first)
-- From CL5: StatFormula.MaxHp / AccuracyPermille wrap — dropped, backlog.md lists it
+- From CL5b: ItemsControl ScrollViewer/IsVirtualizing no-op attributes Suggestion — not carried (other slice's taste)

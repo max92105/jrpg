@@ -87,3 +87,6 @@ None.
 4. Delete `content/art/backgrounds/FireExplosion.png` (never committed); `git status` clean.
 5. The developer, with a GIF of his own background: the same steps, **Apply**, then name it in a map's **Map >
    Settings...** **Battle background** and fight there (the game's side is BG5's).
+
+- **Note from BG6 review:** `GifImportOptions.BattleHeight` now also means a background sheet's frame height; consider
+  a neutral name (`FrameHeight`) once the dialog's background kind settles.

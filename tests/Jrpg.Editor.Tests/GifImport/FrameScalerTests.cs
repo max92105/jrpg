@@ -31,6 +31,17 @@ public sealed class FrameScalerTests
         Assert.Equal([Black, Black, White, White], scaled);
     }
 
+    // A whole factor down, which Scale takes nearest neighbor: a battle background is averaged (decision 904).
+    [Fact]
+    public void ScaleAveraged_HalfHeight_IsTheGreyBetween()
+    {
+        uint[] checker = [Black, White, White, Black];
+
+        var scaled = Assert.Single(FrameScaler.ScaleAveraged([checker], 2, 2, 1));
+
+        Assert.Equal([0xFF808080], scaled);
+    }
+
     // Black and white columns scaled to three quarters: the middle pixel covers two thirds of a white column and two
     // thirds of a black one, so it is the grey between.
     [Fact]

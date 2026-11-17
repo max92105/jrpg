@@ -1,7 +1,3 @@
-using System.IO;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-
 namespace Jrpg.Editor.GifImport;
 
 /// <summary>
@@ -10,9 +6,6 @@ namespace Jrpg.Editor.GifImport;
 /// </summary>
 internal static class FrameStrip
 {
-    private const int BytesPerPixel = 4;
-    private const double Dpi = 96;
-
     /// <summary>
     /// Each frame centered in a square of its larger side, transparent around, then side by side: an effect strip.
     /// </summary>
@@ -53,11 +46,6 @@ internal static class FrameStrip
             }
         }
 
-        var stride = stripWidth * BytesPerPixel;
-        var image = BitmapSource.Create(stripWidth, frameHeight, Dpi, Dpi, PixelFormats.Bgra32, null, strip, stride);
-        var encoder = new PngBitmapEncoder();
-        encoder.Frames.Add(BitmapFrame.Create(image));
-        using var file = File.Create(path);
-        encoder.Save(file);
+        PngWriter.Write(strip, stripWidth, frameHeight, path);
     }
 }

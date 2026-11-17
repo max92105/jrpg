@@ -3,7 +3,9 @@ namespace Jrpg.Editor.GifImport;
 /// <summary>
 /// Scales whole frames to a height in pixels, aspect kept, resampled once (decision 637): nearest neighbor when the
 /// factor or its inverse is a whole number, so pixel art stays crisp; otherwise each pixel is the average of the source
-/// pixels it covers, weighted by their alpha so a transparent edge doesn't darken the color beside it.
+/// pixels it covers, weighted by their alpha so a transparent edge doesn't darken the color beside it. A battle
+/// background is always averaged when shrunk, whatever the factor (decision 904): a halved painting keeps its detail as
+/// color, not dropped pixels.
 /// </summary>
 internal static class FrameScaler
 {
@@ -35,6 +37,18 @@ internal static class FrameScaler
         return IsWholeFactor(height, targetHeight)
             ? [.. frames.Select(frame => Nearest(frame, source, target))]
             : [.. frames.Select(frame => Averaged(frame, source, target))];
+    }
+
+    /// <summary>The alpha-weighted average whatever the factor: a battle background's shrink (decision 904).</summary>
+    /// <param name="frames">Whole frames, row by row, BGRA packed as <see cref="GifFrame.Pixels"/>.</param>
+    /// <param name="width">Each frame's width.</param>
+    /// <param name="height">Each frame's height.</param>
+    /// <param name="targetHeight">The height wanted, at least 1.</param>
+    /// <returns>The frames at <see cref="WidthAt"/> by the target height.</returns>
+    public static IReadOnlyList<uint[]> ScaleAveraged(IReadOnlyList<uint[]> frames, int width, int height, int targetHeight)
+    {
+        var target = (Width: WidthAt(width, height, targetHeight), Height: targetHeight);
+        return [.. frames.Select(frame => Averaged(frame, (width, height), target))];
     }
 
     private static uint[] Nearest(uint[] frame, (int Width, int Height) source, (int Width, int Height) target)

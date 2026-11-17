@@ -52,3 +52,15 @@ All through `StaThread`, GIFs written with `GifFixtures`, PNGs read back with `P
 
 ## Verify by hand
 None: no dialog calls it yet (BG9 does). The suite runs green.
+
+- **Done, with deviations:** about 420 lines with tests, not about 190 (code +180 -35, much of it doc comments; tests
+  +241, 20 tests not 11): no split point named. Beyond the list, the bound and branch tests the rules ask for:
+  `SheetSize` at exactly the most frames, one past and `int.MaxValue`, `FrameScaler.ScaleAveraged` on its own, a
+  one-frame GIF refused, a height above the GIF's thrown, and the import note with and without a typed pace ("24 frames
+  of 480 x 270 px, 100 ms" or "..., the typed 150 ms", the battle strip's shape; the slice named no note). The
+  one-frame refusal is one private `RefuseOneFrame` shared with `Prepared`. The averaging and frame time tests build
+  their `ComposedGif` as read, since the fixture palette has no white; the grid and the cleared-color tests read a
+  fixture GIF. `FrameGrid.WritePng` lays cells by the column rule `FrameOrigin` reads back, refusing a count past
+  `MostFrames` through `SheetSize` before a frame is read; the review added
+  `WritePng_EveryFrame_IsAtItsRecordsFrameOrigin`, which ties the writer to Core's rule. `GifConversion.cs` is 160
+  lines, `FrameGrid.cs` 61, `PngWriter.cs` 28, `FrameGridTests.cs` 131, `GifConversionTests.cs` 180.

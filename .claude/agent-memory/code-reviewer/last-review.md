@@ -5,11 +5,11 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-classes-and-progression, slice CL7b (one resource as typed: `Party/ClassResourceViewModel`; decision
-1015; `DuplicateOf` moved to CL7c by the slice note). 2026-11-17. Round 1. Verdict: Ready to commit.
-No Critical, no Warning.
+Plan 2026-11-15-classes-and-progression, slice CL7c (first part; split, the list's selection, Add, Remove, Up, Down
+and list relay are CL7d per the slice's Done note). 2026-11-17. Round 1. Verdict: Ready to commit.
+No Critical, no Warning, no Suggestion.
 
-- Suggestion: third private `NumberIn` (`TypedNumber.Parse(text)!.Value`) in Party/ — open (suggestion; fold into the
-  backlog's TypedNumber line rather than carry)
-- Suggestion: no test that From speed ignores a bad Starts at box (only Max tested on that side) — open (suggestion)
-- Follow-up: CL8's Gains column headers must use the same names as ResourceGainsBoxes.Problem ("Heavy hit share" etc.) — open
+Carried from CL7b and closed:
+- Suggestion: third private `NumberIn` — dropped (backlog.md line about `TypedNumber.ValueOf` records it)
+- Suggestion: From speed ignoring a bad Starts at box untested — dropped (CL7b suggestion, not carried)
+- Follow-up: CL8's Gains headers use ResourceGainsBoxes.Problem's names — dropped (CL8.md "Note from CL7 review")

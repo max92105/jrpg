@@ -15,6 +15,15 @@ public sealed class StatBonusesConverterTests
         Assert.Equal(expected, bonuses);
     }
 
+    // The name content writes the stat with (the content enum name, as affixes.json's stat), pinned against a rename.
+    [Fact]
+    public void Read_DamageBonus_IsNamedDamageBonus()
+    {
+        var bonuses = JsonSerializer.Deserialize<StatBonuses>("""{ "damageBonus": 20 }""", ContentJsonOptions.Strict);
+
+        Assert.Equal(20, bonuses!.Of(StatKind.DamageBonus));
+    }
+
     [Fact]
     public void Read_UnknownStat_ThrowsNamingIt()
     {

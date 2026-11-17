@@ -76,6 +76,14 @@ public sealed class MemberSheetTests
     }
 
     [Fact]
+    public void Of_DamageBonusWorn_InPermille()
+    {
+        var sheet = MemberSheet.Of(ClassWith(PrimaryStats.None), Bonus(StatKind.DamageBonus, 20), weaponDamage: null, _rules);
+
+        Assert.Equal(200, sheet.DamageBonusPermille);
+    }
+
+    [Fact]
     public void Of_FlatFireResistance_AddsAfterWill()
     {
         var atLevel = ClassWith(new PrimaryStats(Power: 0, Agility: 0, Intelligence: 0, Constitution: 0, Will: 20));

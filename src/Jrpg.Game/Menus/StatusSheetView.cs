@@ -16,11 +16,11 @@ namespace Jrpg.Game.Menus;
 /// </summary>
 internal sealed class StatusSheetView
 {
-    // Placeholder layout (decisions 82, 334): a 28 x 20 margin; a 160 px portrait 32 px left of the profile's text: a
-    // 36 px name with the level 24 px after it, a 20 px class 48 px under the name's top, the experience row 92 px
-    // under the name's top; 18 px labels 2 px apart, 26 px values.
+    // Placeholder layout (decisions 82, 334, 1003): a 28 x 10 margin; a 160 px portrait 32 px left of the profile's
+    // text: a 36 px name with the level 24 px after it, a 20 px class 48 px under the name's top, the experience
+    // row 92 px under the name's top; 18 px labels 2 px apart, 26 px values.
     private const int Margin = 28;
-    private const int TopMargin = 20;
+    private const int TopMargin = 10;
     private const int NamePixels = 36;
     private const int ClassPixels = 20;
     private const int PortraitSize = 160;
@@ -35,11 +35,11 @@ internal sealed class StatusSheetView
     private const int BarHeight = 6;
     private const int XpBarTop = 40;
 
-    // Under the profile band (as tall as Attributes) and 16 px, the middle band, 16 px, then Skills: room for three
+    // Under the profile band (as tall as Attributes) and 8 px, the middle band, 8 px, then Skills: room for three
     // skills with two-line descriptions (decision 373; the skills view draws as many whole ones as fit, and the layout
     // test measures every class's). Resources sit 48 px right of Skills, 300 px wide (decision 368).
     private const int ProfileHeight = AttributesHeight + SectionGap;
-    private const int SectionGap = 16;
+    private const int SectionGap = 8;
     private const int ResourcesWidth = 300;
     private const int ResourcesGap = 48;
 

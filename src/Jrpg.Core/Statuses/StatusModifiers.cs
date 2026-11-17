@@ -26,7 +26,7 @@ public static class StatusModifiers
         {
             Resistances = stats.Resistances.Raised(SumOf(statuses, StatusPartKind.ResistanceChange)),
 
-            // Added to the base, so a gear modifier (row 9) keeps its share beside the statuses'.
+            // Added to the base, so gear's damage bonus (decision 886) keeps its share beside the statuses'.
             DamageModifierPermille =
                 stats.DamageModifierPermille + StatFormula.PermilleOf(SumOf(statuses, StatusPartKind.DamageDealtChange)),
         },

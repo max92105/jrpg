@@ -142,15 +142,33 @@ public sealed class StatusPageSheetTests
         Assert.NotEqual(before, page.ShownSheet.Affixes[0]);
     }
 
+    // A ring rolled with +20 % damage: the fifth affix value, the last in StatKinds.AffixOnly (decision 886).
+    [Fact]
+    public void Open_LeaderWearingDamageBonus_ShowsItInAffixes()
+    {
+        var page = NewPage();
+        page.Open();
+        var before = page.ShownSheet.Affixes[4];
+        var ring = StartMapScenarios.BelowClosedDoor.Items["power_ring"];
+        var piece = GearPiece.Rolled(ring, Rarity.Magic, [new RolledAffix("fury", StatKind.DamageBonus, 20)]);
+        _session.Inventory.AddGear(piece);
+        Assert.True(_session.Equipment.TryEquip(_session.Party.Leader, piece));
+
+        page.Open();
+
+        Assert.Equal(StatText.ValueOf(StatKind.DamageBonus, 200, _messages), page.ShownSheet.Affixes[4]);
+        Assert.NotEqual(before, page.ShownSheet.Affixes[4]);
+    }
+
     // The page shows everything (decision 350): a stat no affix gives reads 0 %.
     [Fact]
-    public void Open_NoAffixWorn_ShowsFourAffixStatsAtZero()
+    public void Open_NoAffixWorn_ShowsFiveAffixStatsAtZero()
     {
         var page = NewPage();
 
         page.Open();
 
-        Assert.Equal(Enumerable.Repeat(StatText.ValueOf(StatKind.LifeSteal, 0, _messages), 4), page.ShownSheet.Affixes);
+        Assert.Equal(Enumerable.Repeat(StatText.ValueOf(StatKind.LifeSteal, 0, _messages), 5), page.ShownSheet.Affixes);
     }
 
     [Fact]
@@ -160,7 +178,7 @@ public sealed class StatusPageSheetTests
 
         page.Open();
 
-        Assert.Equal(["LIFESTEAL", "PENETRATION", "BLOCK", "DROP LUCK"], page.ShownLabels.Affixes);
+        Assert.Equal(["LIFESTEAL", "PENETRATION", "BLOCK", "DROP LUCK", "DAMAGE BONUS"], page.ShownLabels.Affixes);
     }
 
     [Fact]

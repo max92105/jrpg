@@ -64,7 +64,7 @@ public sealed class StatusModifiersTests
         Assert.Equal(-150, current.DamageModifierPermille);
     }
 
-    // A later source, such as gear's (row 9), keeps its share: 100 - 250 = -150.
+    // A later source, such as gear's (decision 886), keeps its share: 100 - 250 = -150.
     [Fact]
     public void Apply_WeakenedOverANonZeroBase_AddsToIt()
     {

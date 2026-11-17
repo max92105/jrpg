@@ -52,6 +52,11 @@ public sealed record StatSheet(
     public int DropLuckPermille { get; init; }
 
     /// <summary>
+    /// What the member's gear adds to the modifiers' sum of the damage they deal (decision 886), never to healing.
+    /// </summary>
+    public int DamageBonusPermille { get; init; }
+
+    /// <summary>
     /// The number a screen shows for <paramref name="kind"/>: whole points for a primary, max HP and speed, permille
     /// for the percent kinds. The one place that reads a sheet by kind, so screens list stats without a switch.
     /// </summary>
@@ -77,6 +82,7 @@ public sealed record StatSheet(
         StatKind.ArmorPenetration => ArmorPenetrationPermille,
         StatKind.BlockChance => BlockChancePermille,
         StatKind.DropLuck => DropLuckPermille,
+        StatKind.DamageBonus => DamageBonusPermille,
         _ => Primaries.ValueOf(kind),
     };
 }

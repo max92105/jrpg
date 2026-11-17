@@ -286,9 +286,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Game/Menus` Status page: its skills section (268 px) holds three two-line skills, so no class can have a fourth;
   Enfeeble and Cone of Cold wait in `skills.json` off their classes' `skillIds` until the section scrolls or pages
   (skills and statuses plan, WK; needed before row 12's classes and progression).
-- `Core/Effects/DamageFormula.ModifiedFlat` has no cap, where `TieredAmount` stops at `MaxPower` so `Calculate`'s
-  product fits a `long` (decision 818); harmless while flat damage is small and the only modifier negative: cap it
-  when row 9 adds a positive gear modifier (skills and statuses plan, WK review).
 - `Editor/Quests/QuestCatalogViewModel.OnQuestChanged` raises `Problem` on every quest notice, its own `Label`,
   `Problem` and `SelectedStage` included, where the editor rules ask for the typed fields only; cheap today (no Data
   check) (mode bar plan, WD3).

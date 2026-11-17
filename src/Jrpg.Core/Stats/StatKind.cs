@@ -31,4 +31,10 @@ public enum StatKind
     ArmorPenetration,
     BlockChance,
     DropLuck,
+
+    /// <summary>
+    /// A percent added to the modifiers' sum of the damage its wearer deals: the gear modifier of decision 704's damage
+    /// sheet, given by affixes only (decision 886).
+    /// </summary>
+    DamageBonus,
 }

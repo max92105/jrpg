@@ -7,9 +7,9 @@ namespace Jrpg.Game.Menus;
 
 /// <summary>
 /// Draws the Status page's middle band (decision 334, the plan's S1a): Combat in the left half, the eight resistances
-/// in two columns of four in the right half, the four stats only affixes give in two columns of two under them
-/// (decision 368; Resources sit beside the skills). Each row is a small spaced-caps label with its value right-aligned
-/// close to it, so the two read together (<see cref="SheetRowLook"/>, which the Equipment page shares).
+/// in two columns of four in the right half, the five stats only affixes give in two columns of three under them
+/// (decisions 368, 886; Resources sit beside the skills). Each row is a small spaced-caps label with its value
+/// right-aligned close to it, so the two read together (<see cref="SheetRowLook"/>, which the Equipment page shares).
 /// </summary>
 internal sealed class StatusParametersView
 {
@@ -25,16 +25,17 @@ internal sealed class StatusParametersView
     internal const int BelowBand = SectionTitle.Height + 10;
 
     // Placeholder layout (S1a's arithmetic): 34 px rows from 10 px under each band; cells 12 px in and at most 380 px
-    // wide, the halves 48 px apart; the resistances in two columns of four, the affix stats 16 px under them in two of
-    // two, both sections' columns 24 px apart; HP's 4 px bar under its label, 12 px short of its value.
+    // wide, the halves 48 px apart; the resistances in two columns of four, the affix stats 8 px under them in two of
+    // three (decision 1003), both sections' columns 24 px apart; HP's 4 px bar under its label, 12 px short of the
+    // value beside it.
     private const int CombatRows = 7;
     private const int ResistanceRowsPerColumn = 4;
-    private const int AffixRowsPerColumn = 2;
+    private const int AffixRowsPerColumn = 3;
     private const int CellInset = 12;
     private const int CellWidth = 380;
     private const int HalfGap = 48;
     private const int ColumnGap = 24;
-    private const int SectionGap = 16;
+    private const int SectionGap = 8;
     private const int HpBarHeight = 4;
     private const int HpBarValueGap = 12;
     private const int CombatHeight = BelowBand + (CombatRows * RowHeight);

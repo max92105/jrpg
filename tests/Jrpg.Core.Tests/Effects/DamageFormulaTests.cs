@@ -209,4 +209,12 @@ public sealed class DamageFormulaTests
     [Fact]
     public void ModifiedFlat_ModifiersAtMinusOneHundredPercent_IsZero() =>
         Assert.Equal(0, DamageFormula.ModifiedFlat(24, 1150, -1000));
+
+    // The ceiling a positive gear bonus could pass (decision 1004): at it, one past it, and a product past an int.
+    [Theory]
+    [InlineData(1_000_000, 0, 1_000_000)]
+    [InlineData(1_000_001, 0, 1_000_000)]
+    [InlineData(int.MaxValue, 1000, 1_000_000)]
+    public void ModifiedFlat_AroundMaxPower_HeldAtIt(int raw, int modifierPermille, int expected) =>
+        Assert.Equal(expected, DamageFormula.ModifiedFlat(raw, 1000, modifierPermille));
 }

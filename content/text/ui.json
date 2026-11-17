@@ -88,6 +88,7 @@
   "stat_armor_penetration": "Armor penetration",
   "stat_block_chance": "Block",
   "stat_drop_luck": "Drop luck",
+  "stat_damage_bonus": "Damage bonus",
   "stat_percent": "{value} %",
   "affix_line": "{value} {stat}",
   "affix_separator": " · ",

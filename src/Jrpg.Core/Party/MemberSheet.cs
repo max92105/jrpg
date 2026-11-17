@@ -43,6 +43,7 @@ public static class MemberSheet
             ArmorPenetrationPermille = PermilleOf(worn, StatKind.ArmorPenetration),
             BlockChancePermille = PermilleOf(worn, StatKind.BlockChance),
             DropLuckPermille = PermilleOf(worn, StatKind.DropLuck),
+            DamageBonusPermille = PermilleOf(worn, StatKind.DamageBonus),
         };
     }
 

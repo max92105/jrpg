@@ -83,6 +83,26 @@ public sealed class CombatantTests
         Assert.Equal(70, combatant.Stats.BlockChancePermille);
     }
 
+    // A sword with +12 % damage and a ring with +8 %: the sheet sums the pieces, the battle starts its modifiers there.
+    [Fact]
+    public void FromPartyMember_DamageBonusOnTwoPieces_SumsIntoTheModifier()
+    {
+        var member = new PartyMemberBuilder().WithClass("fighter").Build();
+        var sword = new ItemDefinitionBuilder().WithId("sword").AsWeapon(15).Build();
+        var ring = new ItemDefinitionBuilder().WithId("ring").AsWorn(EquipmentKind.Ring).Build();
+        var inventory = new Inventory();
+        var equipment = new PartyEquipment(inventory);
+        foreach (var piece in new[] { DamageBonusPiece(sword, 12), DamageBonusPiece(ring, 8) })
+        {
+            inventory.AddGear(piece);
+            Assert.True(equipment.TryEquip(member, piece));
+        }
+
+        var combatant = Combatant.FromPartyMember(member);
+
+        Assert.Equal(200, combatant.Stats.DamageModifierPermille);
+    }
+
     [Fact]
     public void FromPartyMember_MemberWithSkills_CarriesThem()
     {
@@ -241,4 +261,7 @@ public sealed class CombatantTests
         mage.KeepLastingAmount("clarity", clarityLeft);
         return mage;
     }
+
+    private static GearPiece DamageBonusPiece(ItemDefinition item, int percent) =>
+        GearPiece.Rolled(item, Rarity.Magic, [new RolledAffix("fury", StatKind.DamageBonus, percent)]);
 }

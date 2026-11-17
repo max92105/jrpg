@@ -13,8 +13,8 @@ internal static class DamageFormula
     public const int MinimumDamage = 1;
 
     /// <summary>
-    /// The most a tiered amount reaches, so <see cref="Calculate"/>'s product (up to about 1.8 x 10^12 times the power)
-    /// stays within a <see cref="long"/> (decision 818).
+    /// The most a tiered or a modified flat amount reaches, so <see cref="Calculate"/>'s product (up to about 1.8 x
+    /// 10^12 times the power) stays within a <see cref="long"/> (decision 818), whatever gear's damage bonus adds.
     /// </summary>
     public const int MaxPower = 1_000_000;
 
@@ -78,8 +78,9 @@ internal static class DamageFormula
 
     /// <summary>
     /// Any flat damage's amount, such as the basic attack's: its raw damage times Power's percent times 1 plus the sum
-    /// of the damage modifiers (decisions 784, 786), in one <c>long</c> product rounded down once and never below 0. A
-    /// weapon of 26 at 115 % while Weakened (-25 %) deals 22.425, kept as 22; rounding after either factor gives 21.
+    /// of the damage modifiers (decisions 784, 786), in one <c>long</c> product rounded down once and held within 0 and
+    /// <see cref="MaxPower"/>. A weapon of 26 at 115 % while Weakened (-25 %) deals 22.425, kept as 22; rounding after
+    /// either factor gives 21.
     /// </summary>
     /// <param name="raw">The raw damage: an untiered skill's power, a weapon's, the unarmed one, or an enemy's.</param>
     /// <param name="damagePermille">The user's damage percent from Power, in permille.</param>
@@ -87,7 +88,7 @@ internal static class DamageFormula
     public static int ModifiedFlat(int raw, int damagePermille, int modifierPermille)
     {
         var amount = (long)raw * damagePermille * (Whole + modifierPermille) / (Whole * Whole);
-        return (int)Math.Max(0, amount);
+        return (int)Math.Clamp(amount, 0, MaxPower);
     }
 
     /// <returns>

@@ -1,5 +1,5 @@
 # Items, uniques and affixes (editor push, roadmap row 9)
-Status: approved, in progress
+Status: retro pending
 
 Drafted on 2026-11-15 from roadmap row 9 of [the editor push](../2026-11-15-editor-push/README.md), its design.md
 section 3.9, and the developer's words: "for item I want to be able to create base item. Item will have base stats then
@@ -140,7 +140,7 @@ slices run; IU5 is optional and IU16 merged into IU15.
   [slices/IU15b.md](slices/IU15b.md)
 
 ### Phase 5: the gear damage modifier
-- [ ] **IU17. A "+% damage" affix stat raises its wearer's damage through the modifiers' sum** (Core + Data + Game,
+- [x] **IU17. A "+% damage" affix stat raises its wearer's damage through the modifiers' sum** (Core + Data + Game,
   about 230 lines) → [slices/IU17.md](slices/IU17.md)
 
 ## Decisions
@@ -260,6 +260,15 @@ The gear damage modifier:
 - **888.** No weapon gives Power today (decision 696's "weapon gives power" is content: a weapon's Power bonus, the
   pool's `power` affix, which already rolls on weapons, or a unique's fixed affix; the placeholder unique has one). No
   repository weapon changes (default taken while the developer was away; his to overturn).
+- **1003.** (IU17; default taken by the slice, the developer's to overturn.) The affixes' third row grows the Status
+  page's middle band 34 px, where the page had 1 px to spare (847 of 848), so the page halves its placeholder gaps: the
+  top margin 20 to 10 px, the gaps between the profile, the band and the skills 16 to 8, and the gap over Affixes 16 to
+  8; the content stays at 847 px. Rejected: smaller rows (the band's rows would no longer match the Attributes'),
+  Resources moved under Resistances with Affixes beside the skills (against decision 368), three affix columns (146 px
+  cells, too narrow for "PENETRATION" and its value), and room for fewer skills (against decision 373).
+- **1004.** (IU17, the WK review's backlog line.) `DamageFormula.ModifiedFlat` is held at `MaxPower`, as
+  `TieredAmount` is: gear's bonus is the first positive modifier, so a flat amount can now grow past what
+  `Calculate`'s `long` product allows (decision 818).
 
 Structure:
 - **889.** The Items page lives in Editor `Items/` (a new folder), the Affixes page in `Loot/` beside the Drop tables
@@ -280,6 +289,7 @@ Taken while the developer was away, each his to overturn; the loud ones first:
 5. **878. An item's category, unique included, is fixed once added.**
 6. **870. Uniques may be owned several times.**
 7. **872, 888.** The placeholder unique (placed nowhere); no repository weapon gains Power.
+8. **1003. The Status page's gaps halved** (20 and 16 px to 10 and 8) to fit the affixes' third row.
 
 ## Open design questions (developer decides)
 - **Flat or tiered items (IU5, decision 874).** Today, and in this plan, an item keeps its own flat power: a Potion

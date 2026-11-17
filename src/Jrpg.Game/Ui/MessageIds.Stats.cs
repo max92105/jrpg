@@ -71,6 +71,8 @@ internal static partial class MessageIds
 
     public const string StatDropLuck = "stat_drop_luck";
 
+    public const string StatDamageBonus = "stat_damage_bonus";
+
     /// <summary>A percent stat's value: "{value} %".</summary>
     public const string StatPercent = "stat_percent";
 

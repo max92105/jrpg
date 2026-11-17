@@ -20,8 +20,9 @@ public sealed record CombatStats(int AttackDamage)
     public int Power { get; init; }
 
     /// <summary>
-    /// The sum of the modifiers on the damage the combatant deals, in permille (decision 704's "1 + the sum"): its
-    /// statuses' damage dealt changes, and gear's once row 9 adds one; 0 by default. Never on healing (decision 786).
+    /// The sum of the modifiers on the damage the combatant deals, in permille (decision 704's "1 + the sum"): a
+    /// member's gear damage bonus (decision 886) and its statuses' damage dealt changes; 0 by default. Never on
+    /// healing, which no modifier changes (decision 786).
     /// </summary>
     public int DamageModifierPermille { get; init; }
 

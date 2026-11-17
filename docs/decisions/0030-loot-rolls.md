@@ -43,6 +43,8 @@ A.
 - Only dropped gear rolls (decision 344): starting items and map gifts stay plain.
 - Lifesteal, armor penetration, block and drop luck are stat kinds that only affixes give (decision 294, the affix
   stats plan); drop luck raises drop chances and the weights above Common (decision 349).
+- **Amended by the items, uniques and affixes plan (2026-11-16, decision 887):** the damage bonus joins the stats only
+  affixes give; its sum over the worn gear adds to the damage modifiers' sum (decision 886).
 
 ## Consequences
 - No battle's draws change; a seeded run that fights and then walks into the next encounter sees its later draws

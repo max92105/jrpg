@@ -3,6 +3,9 @@
 Status: accepted
 Date: 2026-10-24
 
+Amended by ADR 0062: a class's skill entry may name the level it is learned at (`skills` replaces `skillIds`), and a
+member knows the class skills at or below its level.
+
 ## Context
 Question 181 left skills on the member (`party-members.json` `skillIds`) "until a class-skills plan". This plan gives each class its own battle resource (ADR 0019), and skills spend, gain or require those resources. Today only Sarxian has skills, and they are the cleric's and the mage's spells.
 

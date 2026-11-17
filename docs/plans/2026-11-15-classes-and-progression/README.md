@@ -115,7 +115,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/CL5b.md](slices/CL5b.md)
 
 ### Phase 2: skills learned at a level
-- [ ] ADR 0062, skills learned at a level (amends ADR 0020). Write it from decisions 959, 963-966 and 970 and design.md,
+- [x] ADR 0062, skills learned at a level (amends ADR 0020). Write it from decisions 959, 963-966 and 970 and design.md,
   section 5 (the options: an optional level on each skill entry, chosen; a `skillLevels` map beside `skillIds`; a
   separate level-up table). The developer delegated approval; the rule is the first of "Defaults to confirm".
 - [ ] **LV1. A class's skill entry may name a level: the file shape, its checks, every level 1** (Core + Data + content,

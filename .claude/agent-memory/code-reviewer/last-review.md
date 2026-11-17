@@ -5,15 +5,13 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-encounters-and-backgrounds, slice BG2 (Map settings' Battle background box).
-2026-11-16. Round 1. Verdict: Ready to commit (no Critical).
+Plan 2026-11-15-encounters-and-backgrounds, slice BG3 (animated background record: Core definition, loader,
+validator, writer, empty content file).
+2026-11-17. Round 1. Verdict: Ready to commit (no Critical, no Warning).
 
-- Warning (open): src/Jrpg.Editor/Shell/MainViewModel.MapSettings.cs:27 — the edited summary line still says "Each is
-  one undo step"; ToSettings goes out as one SetMapSettingsEdit (resize apart), so one Ctrl+Z reverts name and
-  background together. Fix: "then the other fields together as one undo step"; same for the partial's class summary
-  (line 10-11, "each one undo step").
-- Dropped (in backlog.md:207): ArtFolders.ImagesIn throws when art/backgrounds is missing.
-- Dropped from BG1: Suggestion on ArtReferenceCheck.Backgrounds.cs `!` after Where (a Suggestion, not carried).
-- Checked, no finding: the box sits outside the random-battles panel (a town may name one, decision 909); the
-  MapSettingsViewModelTests fixture (random battles, no background) now has CanApply false, and no test there asserts
-  Problem null or CanApply; test-world maps with random battles name a background (BG1), so shell apply tests hold.
+- Fixed (from BG2): MainViewModel.MapSettings.cs summaries now say "together as one undo step".
+- Suggestion (open): FrameOrigin's row term `frame / columns * FrameHeight` can overflow for a huge FrameHeight the
+  validator lets through; harmless once BG4's art check bounds rows by the image height. Not carried as a finding.
+- Checked, no finding: OfAnimatedBackgrounds has no src caller yet but BG7 uses it (slice planned); the validator's
+  null-animation branch is reachable from an editor record (comment states why); no `new ContentCatalog {}` site drops
+  the new property (only `with`); content file bytes `[]\r\n` match the writer; repository bytes test includes it.

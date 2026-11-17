@@ -8,10 +8,10 @@ namespace Jrpg.Editor.Items;
 
 /// <summary>
 /// One item as the Items page edits it (decision 879): its id (typed while the item is new, fixed once the draft holds
-/// it, decision 582), name, description, icon, max stack, price and menu use as typed, written over the record it came
-/// from, so what no box edits (the effect, the equipment, the fixed affixes) is carried; its category is the record's
-/// and never typed (decision 878). <see cref="Problem"/> is only the typed id's and the number boxes': the rest is
-/// Data's rules, which the list shows for every item at once.
+/// it, decision 582), name, description, icon, max stack, price and menu use as typed, and an equipment's form
+/// (decision 880), written over the record it came from, so what no box edits (the effect, the fixed affixes) is
+/// carried; its category is the record's and never typed (decision 878). <see cref="Problem"/> is only the typed id's
+/// and the number boxes': the rest is Data's rules, which the list shows for every item at once.
 /// </summary>
 internal sealed partial class ItemViewModel : ObservableObject
 {
@@ -20,11 +20,18 @@ internal sealed partial class ItemViewModel : ObservableObject
     // rules.json's one sale share (decision 864), which the sale line reads: the page doesn't edit it.
     private readonly int _sellPercent;
 
-    // The boxes start on the source's fields: a new item's id is empty.
-    private ItemViewModel(ItemDefinition source, int sellPercent)
+    // The boxes start on the source's fields: a new item's id is empty. The equipment's form is given apart, since a
+    // duplicate's copies its boxes as typed.
+    private ItemViewModel(ItemDefinition source, int sellPercent, ItemEquipmentViewModel? equipment)
     {
         _source = source;
         _sellPercent = sellPercent;
+        Equipment = equipment;
+        if (equipment is not null)
+        {
+            equipment.Changed += (_, _) => Changed?.Invoke(this, EventArgs.Empty);
+        }
+
         Category = ItemCategories.Of(source);
         Id = source.Id;
         Name = source.Name;
@@ -36,14 +43,14 @@ internal sealed partial class ItemViewModel : ObservableObject
     }
 
     /// <summary>
-    /// A typed box changed: what the list's problem line listens to, never the label's, the sale line's or the
-    /// problem's own notices, so the list runs Data's check once per change.
+    /// A typed box changed, the equipment form's included: what the list's problem line listens to, never the label's,
+    /// the sale line's or the problem's own notices, so the list runs Data's check once per change.
     /// </summary>
     public event EventHandler? Changed;
 
     /// <param name="item">The record as the draft holds it.</param>
     /// <param name="sellPercent">The share of a price a sale pays (<c>rules.json</c>, decision 864).</param>
-    public static ItemViewModel From(ItemDefinition item, int sellPercent) => new(item, sellPercent);
+    public static ItemViewModel From(ItemDefinition item, int sellPercent) => new(item, sellPercent, EquipmentOf(item));
 
     /// <summary>
     /// An item added this session: its id left to type, the rest as its category's starting record has it.
@@ -51,7 +58,7 @@ internal sealed partial class ItemViewModel : ObservableObject
     /// <param name="startingRecord">The record whose fields the new item starts with; its id is not used.</param>
     /// <param name="sellPercent">The share of a price a sale pays (<c>rules.json</c>, decision 864).</param>
     public static ItemViewModel New(ItemDefinition startingRecord, int sellPercent) =>
-        new(startingRecord with { Id = "" }, sellPercent) { IsNew = true };
+        new(startingRecord with { Id = "" }, sellPercent, EquipmentOf(startingRecord)) { IsNew = true };
 
     /// <summary>
     /// True while the item was added this session: the only time its id can be typed (decision 582).
@@ -60,6 +67,11 @@ internal sealed partial class ItemViewModel : ObservableObject
 
     /// <summary>The page shows it but never changes it: another category is another item (decision 878).</summary>
     public ItemCategory Category { get; }
+
+    /// <summary>
+    /// The equipment's form (decision 880): an equipment item's or a unique's, null for anything else.
+    /// </summary>
+    public ItemEquipmentViewModel? Equipment { get; }
 
     /// <summary>The id as typed; the page lets it be typed only while <see cref="IsNew"/>.</summary>
     [ObservableProperty]
@@ -112,11 +124,14 @@ internal sealed partial class ItemViewModel : ObservableObject
     public bool ShowsUsableFromMenu => Category == ItemCategory.Consumable;
 
     /// <summary>
-    /// Why the item can't be built: the typed id while new, then the max stack box, then the price box; null when it
-    /// can. Data's rules (a name, the ranges) are the list's.
+    /// Why the item can't be built: the typed id while new, then the max stack box, then the price box, then the
+    /// equipment's form; null when it can. Data's rules (a name, the ranges) are the list's.
     /// </summary>
     public string? Problem =>
-        (IsNew ? ObjectIds.ProblemOf(Id, []) : null) ?? TypedNumber.ProblemOf("Max stack", MaxStackText) ?? PriceProblem;
+        (IsNew ? ObjectIds.ProblemOf(Id, []) : null)
+        ?? TypedNumber.ProblemOf("Max stack", MaxStackText)
+        ?? PriceProblem
+        ?? Equipment?.Problem;
 
     private bool IsPriceEmpty => PriceText.Trim().Length == 0;
 
@@ -132,7 +147,7 @@ internal sealed partial class ItemViewModel : ObservableObject
     /// type (decision 585).
     /// </summary>
     public ItemViewModel Duplicate() =>
-        new(TypedRecord() with { Id = "" }, _sellPercent)
+        new(TypedRecord() with { Id = "" }, _sellPercent, Equipment is null ? null : ItemEquipmentViewModel.CopyOf(Equipment))
         {
             IsNew = true,
             MaxStackText = MaxStackText,
@@ -140,7 +155,8 @@ internal sealed partial class ItemViewModel : ObservableObject
         };
 
     /// <summary>
-    /// The record it came from with the typed fields over it: the name trimmed, no price for an empty box.
+    /// The record it came from with the typed fields over it: the name trimmed, no price for an empty box, the
+    /// equipment as its form makes it.
     /// </summary>
     /// <exception cref="InvalidOperationException">There is a <see cref="Problem"/>.</exception>
     public ItemDefinition ToItem() =>
@@ -150,9 +166,14 @@ internal sealed partial class ItemViewModel : ObservableObject
             {
                 MaxStack = TypedNumber.Parse(MaxStackText)!.Value,
                 Price = IsPriceEmpty ? null : TypedNumber.Parse(PriceText),
+                Equipment = Equipment?.ToEquipment(),
             };
 
-    // The number boxes are left out: a duplicate copies them as typed, and ToItem alone reads what they hold.
+    private static ItemEquipmentViewModel? EquipmentOf(ItemDefinition item) =>
+        item.Equipment is { } equipment ? ItemEquipmentViewModel.From(equipment) : null;
+
+    // The number boxes and the equipment's form are left out: a duplicate copies them as typed, and ToItem alone reads
+    // what they hold.
     private ItemDefinition TypedRecord() =>
         _source with
         {

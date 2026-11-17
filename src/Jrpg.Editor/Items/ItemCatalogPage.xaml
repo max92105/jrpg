@@ -95,6 +95,42 @@
                   IsChecked="{Binding IsUsableFromMenu}"
                   Visibility="{Binding ShowsUsableFromMenu, Converter={StaticResource VisibleWhenTrue}}"
                   ToolTip="The menu's Items screen offers it; unticked for a battle-only item" />
+        <!-- An equipment's or a unique's form (decision 880); a weapon's damage boxes are hidden off a weapon, which
+             writes no damage and no type, as Data requires. -->
+        <StackPanel DataContext="{Binding Equipment}" Margin="0,12,0,0">
+          <StackPanel.Style>
+            <Style TargetType="StackPanel">
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding}" Value="{x:Null}">
+                  <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </StackPanel.Style>
+          <TextBlock Text="Equipment" FontWeight="Bold" />
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Kind" Style="{StaticResource FieldLabel}" />
+            <ComboBox Width="160"
+                      ItemsSource="{Binding KindChoices}"
+                      SelectedItem="{Binding Kind}"
+                      ToolTip="What it is worn as, which says the slots it fits" />
+          </StackPanel>
+          <StackPanel Visibility="{Binding IsWeapon, Converter={StaticResource VisibleWhenTrue}}">
+            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+              <TextBlock Text="Damage" Style="{StaticResource FieldLabel}" />
+              <TextBox Width="60"
+                       Text="{Binding DamageText, UpdateSourceTrigger=PropertyChanged}"
+                       ToolTip="The wearer's basic attack before Power; at least 1" />
+            </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+              <TextBlock Text="Damage type" Style="{StaticResource FieldLabel}" />
+              <ComboBox Width="160"
+                        ItemsSource="{Binding DamageTypeChoices}"
+                        SelectedItem="{Binding DamageType}"
+                        ToolTip="The type its hits meet resistances as" />
+            </StackPanel>
+          </StackPanel>
+        </StackPanel>
       </StackPanel>
     </ScrollViewer>
   </DockPanel>

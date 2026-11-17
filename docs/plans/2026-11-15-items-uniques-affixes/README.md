@@ -124,7 +124,7 @@ slices run; IU5 is optional and IU16 merged into IU15.
 - [x] **IU8. Database > Items opens the Items page** (Editor, about 190 lines) → [slices/IU8.md](slices/IU8.md)
 - [x] **IU9. An undo removing an item a map gives is refused** (Editor, about 120 lines) →
   [slices/IU9.md](slices/IU9.md)
-- [ ] **IU10. The equipment form: kind, damage and damage type** (Editor, about 170 lines) →
+- [x] **IU10. The equipment form: kind, damage and damage type** (Editor, about 170 lines) →
   [slices/IU10.md](slices/IU10.md)
 - [ ] **IU11. The equipment form's bonus rows** (Editor, about 180 lines) → [slices/IU11.md](slices/IU11.md)
 - [ ] **IU12. The consumable form: effect kind, targeting, power, damage type, own strip** (Editor, about 210 lines) →

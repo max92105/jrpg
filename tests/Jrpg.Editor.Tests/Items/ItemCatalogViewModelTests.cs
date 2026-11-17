@@ -138,6 +138,55 @@ public sealed class ItemCatalogViewModelTests
     }
 
     [Fact]
+    public void Problem_WeaponDamageTypedZero_IsDatasMessage()
+    {
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        catalog.SelectedItem = ItemOf(catalog, "copper_axe");
+
+        catalog.SelectedItem.Equipment!.DamageText = "0";
+
+        Assert.Equal(
+            "items.json: item 'copper_axe': equipment.damage must be at least 1 for a weapon (was 0).", catalog.Problem);
+    }
+
+    // Data requires a weapon's type, which is why the Damage type box offers no "none".
+    [Fact]
+    public void Problem_ArmorTurnedWeaponWithoutAType_IsDatasMessage()
+    {
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        catalog.SelectedItem = ItemOf(catalog, "copper_vest");
+
+        catalog.SelectedItem.Equipment!.Kind = EquipmentKind.Weapon;
+        catalog.SelectedItem.Equipment.DamageText = "5";
+
+        Assert.Equal("items.json: item 'copper_vest': equipment.damageType is required for a weapon.", catalog.Problem);
+    }
+
+    [Fact]
+    public void Problem_WeaponDamageTypedOne_IsNull()
+    {
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        catalog.SelectedItem = ItemOf(catalog, "copper_axe");
+
+        catalog.SelectedItem.Equipment!.DamageText = "1";
+
+        Assert.Null(catalog.Problem);
+    }
+
+    [Fact]
+    public void Problem_EquipmentDamageTyped_IsRaised()
+    {
+        var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);
+        catalog.SelectedItem = ItemOf(catalog, "copper_axe");
+        var raised = new List<string?>();
+        catalog.PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        catalog.SelectedItem.Equipment!.DamageText = "12";
+
+        Assert.Contains(nameof(ItemCatalogViewModel.Problem), raised);
+    }
+
+    [Fact]
     public void Problem_TypedIdChanged_IsRaised()
     {
         var catalog = new ItemCatalogViewModel(ItemFixtures.Catalog, []);

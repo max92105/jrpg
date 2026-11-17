@@ -340,3 +340,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - The page-local `FieldLabel` and `NumberBox` styles are copied in about ten Database pages (Enemy, Cinematic,
   TieredEffect, Encounter, Item, Affix, DropTable, Class...): one keyed style each in `Shell/EditorTheme.xaml` would
   replace them (classes and progression plan, CL4 review).
+- `Core/Stats/StatFormula.MaxHp` casts a long to int and `AccuracyPermille` multiplies an int by 10: on absurd typed
+  growth (e.g. max HP growth 100,000,000 over 21 levels) Constitution's share wraps negative and `MemberSheet` shows
+  max HP 1 instead of the Levels tab's "too large" problem; cap both at int's bounds in one place, with a test (classes
+  and progression plan, CL5 review).

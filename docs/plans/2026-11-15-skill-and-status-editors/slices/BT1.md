@@ -63,3 +63,6 @@ level. Two Core readings make the battle's internal rule readable; nothing in th
 None: the page comes in BT3.
 - **Note from FX2:** Core's `TieredEffect.AmountAt(power)` (decision 1001) already reads a tier's one hit at a
   Power, before modifiers; the tier sheet (BT2) builds on it.
+- **Note from CL5:** BT1 hadn't landed when CL5 built Core's `Party/ClassSheet.At(characterClass, level, rules)`, the
+  sheet of a member of the class at the level wearing nothing (decision 948). `ClassBattleStats.At` maps
+  `ClassSheet.At(...)` by `MemberBattleStats.Of` from birth, never its own `MemberSheet.Of(ClassGrowth.StatsAt(...))`.

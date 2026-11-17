@@ -66,3 +66,14 @@ number would pass the largest whole number (a huge growth), it shows that proble
 3. Stats tab, type `5` in Per level power, back to Levels: power rises by 5 per level. Type `2147483647`: the tab shows
    "Growth power is too large". Revert.
 4. Run the game, start with Ragnir (fighter): the Status page's max HP at level 1 is the Levels tab's level 1 number.
+- **Done, with deviations:** split on 2026-11-17, the whole slice estimated at about 400 lines with tests: CL5 built
+  Core's `Party/ClassSheet` (14 lines) with `ClassSheetTests` (54, 4 tests), and `Party/ClassLevelPreview` (75) and
+  `Party/LevelPreviewRow` (16) with `ClassLevelPreviewTests` (96, 12 tests); `ClassViewModel`'s `LevelRows` and
+  `LevelsProblem`, the tab's XAML, their tests and the `ClassFixtures` draft moved to CL5b. Row 7's BT1 hasn't landed,
+  so there is no `ClassBattleStats` to change: BT1's file gains a note to map `ClassSheet.At` from birth, and the
+  game's `NewGame/LeaderProfile` (the review's ask) reads `ClassSheet.At` instead of its own copy of the rule. `RowsOf`
+  takes the draft's `GameRules` (the table and the stat rules), not the whole catalog; the row holds a `PrimaryStats`
+  rather than five numbers. `ProblemOf` refuses both bounds ("too large" past `int.MaxValue`, "too small" past
+  `int.MinValue`: a typed negative growth wraps too), each side tested at the bound and one past it, plus the first
+  stat in the page's order and a max level of 1. Core's formulas are unchanged, so no simulation was run. The sheet's
+  own wrap past the check (Constitution's share of max HP, accuracy in permille) is a backlog line.

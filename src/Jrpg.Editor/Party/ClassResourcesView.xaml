@@ -1,0 +1,131 @@
+<UserControl x:Class="Jrpg.Editor.Party.ClassResourcesView"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:party="clr-namespace:Jrpg.Editor.Party">
+  <UserControl.Resources>
+    <party:HexColorBrushConverter x:Key="SwatchBrush" />
+    <!-- Wider than the page's FieldLabel, for "Speed per charge" and "Per battle fought". -->
+    <Style x:Key="ResourceLabel" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+      <Setter Property="Width" Value="120" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="SectionHeader" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Margin" Value="0,12,0,4" />
+    </Style>
+  </UserControl.Resources>
+  <!-- The NumberBox style is the Classes page's, found up the tree once the tab is shown. -->
+  <Grid Margin="8">
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="220" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <!-- In the order the game draws them; any can be removed: the line names a class skill still using it (decision 950). -->
+    <DockPanel Grid.Column="0">
+      <TextBlock DockPanel.Dock="Top" Text="Resources" FontWeight="Bold" />
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,6,0,0">
+        <Button Content="Add" Width="44" Command="{Binding AddResourceCommand}" ToolTip="A new resource after the chosen one, its id to type" />
+        <Button Content="Up" Width="40" Margin="4,0,0,0" Command="{Binding MoveResourceUpCommand}" />
+        <Button Content="Down" Width="48" Margin="4,0,0,0" Command="{Binding MoveResourceDownCommand}" />
+        <Button Content="Remove" Width="60" Margin="4,0,0,0" Command="{Binding RemoveResourceCommand}"
+                ToolTip="Any resource; the line names a class skill still using it" />
+      </StackPanel>
+      <ListBox Margin="0,4,0,0" ItemsSource="{Binding Resources}" SelectedItem="{Binding SelectedResource}" DisplayMemberPath="Label" />
+    </DockPanel>
+
+    <ScrollViewer Grid.Column="1" Margin="12,0,0,0" VerticalScrollBarVisibility="Auto" DataContext="{Binding SelectedResource}">
+      <StackPanel Style="{StaticResource EnabledWhenChosen}">
+        <TextBlock Text="General" FontWeight="Bold" />
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="Id" Style="{StaticResource ResourceLabel}" />
+          <TextBox Width="200"
+                   Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}"
+                   IsEnabled="{Binding IsNew, FallbackValue=False}"
+                   ToolTip="Lowercase letters, digits and _; fixed once saved, since skills name it" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Name" Style="{StaticResource ResourceLabel}" />
+          <TextBox Width="200" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Color" Style="{StaticResource ResourceLabel}" />
+          <TextBox Width="80" Text="{Binding ColorText, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="# and six hex digits: the color of its pips or bar" />
+          <Border Width="20" Height="20" Margin="6,0,0,0" BorderThickness="1" BorderBrush="{StaticResource BorderBrush}"
+                  Background="{Binding ColorText, Converter={StaticResource SwatchBrush}}" />
+        </StackPanel>
+        <CheckBox Content="Lasting" Margin="0,6,0,0" IsChecked="{Binding IsLasting}"
+                  ToolTip="Kept on the member from battle to battle until a rest; otherwise each battle starts at Starts at" />
+
+        <TextBlock Text="Amount" Style="{StaticResource SectionHeader}" />
+        <CheckBox Content="From speed" IsChecked="{Binding TakesMaxFromSpeed}"
+                  ToolTip="The max and start are the holder's speed charges, one per Speed per charge" />
+        <!-- Unused while from speed: the resource writes 0 and 0 then, as Data asks. -->
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <StackPanel.Style>
+            <Style TargetType="StackPanel">
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding TakesMaxFromSpeed}" Value="True">
+                  <Setter Property="IsEnabled" Value="False" />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </StackPanel.Style>
+          <TextBlock Text="Max" Style="{StaticResource ResourceLabel}" />
+          <TextBox Style="{DynamicResource NumberBox}" Text="{Binding MaxText, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Text="Starts at" Width="60" VerticalAlignment="Center" />
+          <TextBox Style="{DynamicResource NumberBox}" Text="{Binding StartsAtText, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0" IsEnabled="{Binding TakesMaxFromSpeed, FallbackValue=False}">
+          <TextBlock Text="Speed per charge" Style="{StaticResource ResourceLabel}" />
+          <TextBox Style="{DynamicResource NumberBox}" Text="{Binding SpeedPerChargeText, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="The speed one charge takes" />
+        </StackPanel>
+
+        <!-- Labelled as the problem line names them; a negative gain drains (ADR 0019). -->
+        <TextBlock Text="Gains" Style="{StaticResource SectionHeader}" />
+        <Grid DataContext="{Binding Gains}">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <TextBlock Grid.Row="0" Text="Per turn" Style="{StaticResource ResourceLabel}"
+                     ToolTip="At the end of each of the holder's own turns" />
+          <TextBox Grid.Row="0" Grid.Column="1" Style="{DynamicResource NumberBox}" Text="{Binding PerTurnText, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Grid.Row="1" Text="Per hit taken" Style="{StaticResource ResourceLabel}"
+                     ToolTip="For each hit that costs the holder HP, whatever the damage" />
+          <TextBox Grid.Row="1" Grid.Column="1" Style="{DynamicResource NumberBox}" Text="{Binding PerHitTakenText, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Grid.Row="2" Text="Per heavy hit" Style="{StaticResource ResourceLabel}"
+                     ToolTip="For a hit that takes at least the heavy hit share of the holder's max HP, on top of per hit taken" />
+          <TextBox Grid.Row="2" Grid.Column="1" Style="{DynamicResource NumberBox}" Text="{Binding PerHeavyHitText, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Grid.Row="3" Text="Heavy hit share" Style="{StaticResource ResourceLabel}"
+                     ToolTip="The share of max HP, 1 to 100, that makes a hit heavy" />
+          <TextBox Grid.Row="3" Grid.Column="1" Style="{DynamicResource NumberBox}" Text="{Binding HeavyHitPercentText, UpdateSourceTrigger=PropertyChanged}" />
+
+          <TextBlock Grid.Row="0" Grid.Column="2" Text="Per hit landed" Style="{StaticResource ResourceLabel}"
+                     ToolTip="For each of the holder's own hits that costs its target HP, attacks included" />
+          <TextBox Grid.Row="0" Grid.Column="3" Style="{DynamicResource NumberBox}" Text="{Binding PerHitLandedText, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Grid.Row="1" Grid.Column="2" Text="Per ally fallen" Style="{StaticResource ResourceLabel}"
+                     ToolTip="Whenever another combatant on the holder's side falls, while the holder still stands" />
+          <TextBox Grid.Row="1" Grid.Column="3" Style="{DynamicResource NumberBox}" Text="{Binding PerAllyFallenText, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Grid.Row="2" Grid.Column="2" Text="Per enemy fallen" Style="{StaticResource ResourceLabel}"
+                     ToolTip="Whenever a combatant on the other side falls, while the holder still stands" />
+          <TextBox Grid.Row="2" Grid.Column="3" Style="{DynamicResource NumberBox}" Text="{Binding PerEnemyFallenText, UpdateSourceTrigger=PropertyChanged}" />
+          <TextBlock Grid.Row="3" Grid.Column="2" Text="Per battle fought" Style="{StaticResource ResourceLabel}"
+                     ToolTip="Once each battle ends, whatever the outcome, for a lasting resource" />
+          <TextBox Grid.Row="3" Grid.Column="3" Style="{DynamicResource NumberBox}" Text="{Binding PerBattleFoughtText, UpdateSourceTrigger=PropertyChanged}" />
+        </Grid>
+      </StackPanel>
+    </ScrollViewer>
+  </Grid>
+</UserControl>

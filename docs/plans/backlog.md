@@ -359,3 +359,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Editor/Party/ClassViewModel.Skills` and `.Resources` each hold the chosen-row move greying and the list-change
   handler (re-watch, re-grey, raise `Problem` and `Changed`): a third chosen-row list extracts them (classes and
   progression plan, CL7d review).
+- `Editor/Party/HexColorBrushConverter` repeats Data's private resource color rule (`#` and six hex digits,
+  `ResourceDefinitionValidator.FindColorProblem`): one public check in Data used by both keeps the swatch and the problem
+  line in step if the rule changes (classes and progression plan, CL8 review).

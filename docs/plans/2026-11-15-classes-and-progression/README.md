@@ -138,7 +138,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   split, the commands are CL7d) → [slices/CL7c.md](slices/CL7c.md)
 - [x] **CL7d. A class's resources: Add, Remove, Up and Down** (Editor, about 220 lines; split from CL7c) →
   [slices/CL7d.md](slices/CL7d.md)
-- [ ] **CL8. The Resources tab** (Editor, about 60 lines plus about 120 of XAML) → [slices/CL8.md](slices/CL8.md)
+- [x] **CL8. The Resources tab** (Editor, about 60 lines plus about 120 of XAML) → [slices/CL8.md](slices/CL8.md)
 - [ ] **CL9. A resource's rules: Will scaling, backfire, strain and dominance** (Editor, about 210 lines) →
   [slices/CL9.md](slices/CL9.md)
 

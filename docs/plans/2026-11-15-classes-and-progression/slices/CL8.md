@@ -41,3 +41,9 @@ columns, each with the tooltip from `ResourceGains`' own summaries: "At the end 
   "Per battle fought", "Heavy hit share"), so the problem line names a box the form shows.
 - **Note from CL7c:** CL7c was split; the list's selection and its Add, Remove, Up and Down are CL7d, which this slice
   now needs.
+- **Done, with deviations:** the tab is its own `Party/ClassResourcesView` (131 lines of XAML, 12 of code-behind, as
+  the Enemies page's Tactics tab), since the page (254) would have passed 300 lines; the converter is that view's
+  resource, not the page's. Its list rows show the label only, so they take no `TypedRow` style (no box in a row).
+  `Party/HexColorBrushConverter` (36) trims the text as the resource writes it. `HexColorBrushConverterTests` (45, 9
+  tests: the planned four, plus lowercase digits, spaces trimmed, seven digits, a sign, and `ConvertBack`'s throw).
+  `open-editor-windows.ps1`: no `ERROR` line; it can't choose a tab, so the tab's bindings are the hand check's.

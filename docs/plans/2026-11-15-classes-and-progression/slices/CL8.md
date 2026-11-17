@@ -39,3 +39,5 @@ columns, each with the tooltip from `ResourceGains`' own summaries: "At the end 
   gain boxes read their gains through `Typed` (null while a box doesn't read), not a throwing `ToGains`.
 - **Note from CL7 review:** the Gains labels on the tab use the names `ResourceGainsBoxes.Problem` uses ("Per turn" ...
   "Per battle fought", "Heavy hit share"), so the problem line names a box the form shows.
+- **Note from CL7c:** CL7c was split; the list's selection and its Add, Remove, Up and Down are CL7d, which this slice
+  now needs.

@@ -5,7 +5,8 @@ using static Jrpg.Editor.Tests.Party.ClassFixtures;
 namespace Jrpg.Editor.Tests.Party;
 
 // One resource as the Resources tab types it, written over the record it came from: its boxes, its amounts fixed or
-// from speed, its problem, its label and the Changed event the class's list listens to.
+// from speed, its problem, its label, the Changed event the class's list listens to, and the copy a duplicated class
+// makes of it.
 public sealed class ClassResourceViewModelTests
 {
     [Fact]
@@ -245,5 +246,48 @@ public sealed class ClassResourceViewModelTests
         fury.Gains.PerTurnText = "3";
 
         Assert.Equal(1, raised);
+    }
+
+    [Fact]
+    public void DuplicateOf_HalfTypedBox_CopiesTheTextsAndId()
+    {
+        var fury = ClassResourceViewModel.From(Fury);
+        fury.MaxText = "9x";
+        fury.Gains.PerTurnText = "2y";
+
+        var copy = ClassResourceViewModel.DuplicateOf(fury);
+
+        Assert.True(copy.IsNew);
+        Assert.Equal(["fury", "9x", "2y"], [copy.Id, copy.MaxText, copy.Gains.PerTurnText]);
+    }
+
+    // Every field typed away from the record, so a field the copy reads from the record instead shows; the fixed
+    // amounts in the next test, as From speed sets them aside.
+    [Fact]
+    public void DuplicateOf_TypedSpeedResource_WritesTheSameRecord()
+    {
+        var fury = ClassResourceViewModel.From(Fury);
+        fury.Name = "Rage";
+        fury.ColorText = "#010203";
+        fury.TakesMaxFromSpeed = true;
+        fury.SpeedPerChargeText = "7";
+        fury.Gains.PerHitLandedText = "11";
+
+        var copy = ClassResourceViewModel.DuplicateOf(fury);
+
+        Assert.Equal(fury.ToResource(), copy.ToResource());
+    }
+
+    [Fact]
+    public void DuplicateOf_TypedFixedAmounts_WritesTheSameRecord()
+    {
+        var fury = ClassResourceViewModel.From(Fury);
+        fury.IsLasting = true;
+        fury.MaxText = "12";
+        fury.StartsAtText = "3";
+
+        var copy = ClassResourceViewModel.DuplicateOf(fury);
+
+        Assert.Equal(fury.ToResource(), copy.ToResource());
     }
 }

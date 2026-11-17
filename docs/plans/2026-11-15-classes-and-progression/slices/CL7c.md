@@ -46,3 +46,13 @@ None: the tab comes in CL8. CL4's hand check 3 still passes (the resources go th
   `DuplicateOf_TypedSpeedResource_WritesTheSameRecord` and `DuplicateOf_TypedFixedAmounts_WritesTheSameRecord`. A
   resource's problem is `ProblemAmong(classmateIds)`: the class passes the other resources' ids (by position for a
   new one without an id), and `ToResource` checks only the boxes.
+- **Done, with deviations:** split on 2026-11-17, the whole slice estimated at about 400 lines with tests: the
+  selection, Add, Remove, Up, Down and the list's change relay moved to CL7d (note in CL8). CL7c built
+  `ClassViewModel.Resources.cs` (48 lines): `Resources` from the record, each resource's `Changed` raising `Problem`
+  and the class's `Changed` once, the first resource's problem through `Catalogs/RecordListProblem` ("Resource fury:
+  ..."), `ResourcesAsTyped` keeping the record's own list while equal in order. `ClassViewModel` (181) takes the
+  resources in its constructor, writes them in `ToClass`, and its `DuplicateOf` copies them as typed through
+  `ClassResourceViewModel.DuplicateOf` (178, with the three tests, `ClassResourceViewModelTests` 293).
+  `ClassCatalogViewModel`'s relay comment names the resource fields. `Party/ClassResourceListTests` (135, 14 tests:
+  record order, untouched equal, typed name, the resource's problem and its place after the growth's, Data's start
+  rule at both bounds and one past each, the notices, the copy as typed and new, a copied id taken, the copy watched).

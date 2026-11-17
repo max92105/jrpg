@@ -53,6 +53,28 @@ internal sealed partial class ClassResourceViewModel : ObservableObject
     /// </summary>
     public static ClassResourceViewModel New() => new(_blank) { IsNew = true };
 
+    /// <summary>
+    /// A copy of the resource as typed, for a duplicated class (decision 585): the texts, a half-typed number included,
+    /// and the id too, since the class's skills name it; new, as the draft holds no resource of the new class.
+    /// </summary>
+    public static ClassResourceViewModel DuplicateOf(ClassResourceViewModel chosen)
+    {
+        var copy = new ClassResourceViewModel(chosen._original)
+        {
+            IsNew = true,
+            Id = chosen.Id,
+            Name = chosen.Name,
+            ColorText = chosen.ColorText,
+            IsLasting = chosen.IsLasting,
+            TakesMaxFromSpeed = chosen.TakesMaxFromSpeed,
+            MaxText = chosen.MaxText,
+            StartsAtText = chosen.StartsAtText,
+            SpeedPerChargeText = chosen.SpeedPerChargeText,
+        };
+        copy.Gains.CopyFrom(chosen.Gains);
+        return copy;
+    }
+
     /// <summary>True while the resource was added this session: the only time its id can be typed.</summary>
     public bool IsNew { get; private init; }
 

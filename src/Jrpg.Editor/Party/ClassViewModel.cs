@@ -9,10 +9,10 @@ namespace Jrpg.Editor.Party;
 /// <summary>
 /// One class as the Classes page types it (decisions 945-948): its id (typed while the class is new, fixed once the
 /// draft holds it, decision 582), name, description, and its base and growth as the same eight boxes each, written over
-/// the record it came from, so the resources no tab edits yet are carried as they are; its skills as typed, added,
-/// removed and moved (the <c>.Skills</c> partial); and the Levels tab's rows, read from the boxes as typed against the
-/// draft's experience table and stat rules. <see cref="Problem"/> is only the typed id's, the boxes' and the skill
-/// levels'; the rest is Data's rules, which the list shows.
+/// the record it came from; its skills as typed, added, removed and moved (the <c>.Skills</c> partial); its resources
+/// as typed (the <c>.Resources</c> partial); and the Levels tab's rows, read from the boxes as typed against the
+/// draft's experience table and stat rules. <see cref="Problem"/> is only the typed id's, the boxes', the skill levels'
+/// and the resources' own; the rest is Data's rules, which the list shows.
 /// </summary>
 internal sealed partial class ClassViewModel : ObservableObject
 {
@@ -22,7 +22,11 @@ internal sealed partial class ClassViewModel : ObservableObject
     private readonly ClassDefinition _source;
     private readonly ContentCatalog _content;
 
-    private ClassViewModel(ClassDefinition source, ContentCatalog content, IEnumerable<ClassSkillRow> skillRows)
+    private ClassViewModel(
+        ClassDefinition source,
+        ContentCatalog content,
+        IEnumerable<ClassSkillRow> skillRows,
+        IEnumerable<ClassResourceViewModel> resources)
     {
         _source = source;
         _content = content;
@@ -36,12 +40,14 @@ internal sealed partial class ClassViewModel : ObservableObject
         Skills = [.. skillRows];
         WatchSkillRows();
         SelectedSkill = Skills.FirstOrDefault();
+        Resources = [.. resources];
+        WatchResources();
     }
 
     /// <summary>
-    /// The id, the name, the description, a box or a skill's level typed, or a skill added, removed or moved: what the
-    /// list's problem line listens to, never the label's or the problem's own notices, so the list runs Data's check
-    /// once per change.
+    /// The id, the name, the description, a box or a skill's level typed, a skill added, removed or moved, or a
+    /// resource's typed field: what the list's problem line listens to, never the label's or the problem's own notices,
+    /// so the list runs Data's check once per change.
     /// </summary>
     public event EventHandler? Changed;
 
@@ -51,26 +57,32 @@ internal sealed partial class ClassViewModel : ObservableObject
     /// through and its add box offers.
     /// </param>
     public static ClassViewModel From(ClassDefinition classDefinition, ContentCatalog content) =>
-        new(classDefinition, content, SkillRowsOf(classDefinition, content));
+        new(
+            classDefinition,
+            content,
+            SkillRowsOf(classDefinition, content),
+            classDefinition.Resources.Select(ClassResourceViewModel.From));
 
     /// <summary>
-    /// A class added this session: its id, name and description left to type, the lowest legal numbers, no skill.
+    /// A class added this session: its id, name and description left to type, the lowest legal numbers, and neither
+    /// skills nor resources.
     /// </summary>
     /// <param name="content">
     /// The draft as it is: the experience table and the stat rules the Levels tab reads, the skills its add box offers.
     /// </param>
-    public static ClassViewModel New(ContentCatalog content) => new(_blank, content, []) { IsNew = true };
+    public static ClassViewModel New(ContentCatalog content) => new(_blank, content, [], []) { IsNew = true };
 
     /// <summary>
     /// A new class copying the chosen one as typed, its id left to type (decision 585): the boxes' texts, not the
-    /// record, so a half-typed class duplicates too, its skills' levels included; its resources come from its record.
+    /// record, so a half-typed class duplicates too, its skills' levels and its resources' boxes included.
     /// </summary>
     public static ClassViewModel DuplicateOf(ClassViewModel chosen)
     {
         var copy = new ClassViewModel(
             chosen._source with { Id = "" },
             chosen._content,
-            chosen.Skills.Select(row => new ClassSkillRow(row.Skill, row.LevelText)))
+            chosen.Skills.Select(row => new ClassSkillRow(row.Skill, row.LevelText)),
+            chosen.Resources.Select(ClassResourceViewModel.DuplicateOf))
         {
             IsNew = true,
             Name = chosen.Name,
@@ -109,10 +121,11 @@ internal sealed partial class ClassViewModel : ObservableObject
 
     /// <summary>
     /// Why the class can't be built: the typed id while new, then the first box that isn't a whole number, the base's
-    /// before the growth's, then the first skill's level that isn't; null when it can.
+    /// before the growth's, then the first skill's level that isn't, then the first resource's own problem; null when
+    /// it can be built.
     /// </summary>
     public string? Problem =>
-        (IsNew ? ObjectIds.ProblemOf(Id, []) : null) ?? Base.Problem ?? Growth.Problem ?? SkillsProblem;
+        (IsNew ? ObjectIds.ProblemOf(Id, []) : null) ?? Base.Problem ?? Growth.Problem ?? SkillsProblem ?? ResourcesProblem;
 
     /// <summary>
     /// Why the Levels tab shows no rows, null while it shows them: the first box that isn't a whole number, the base's
@@ -145,6 +158,7 @@ internal sealed partial class ClassViewModel : ObservableObject
                 Base = Base.Typed!,
                 Growth = Growth.Typed!,
                 Skills = SkillsAsTyped(),
+                Resources = ResourcesAsTyped(),
             };
 
     // Every typed box notifies its boxes' Problem, so that notice alone stands for one typed change.

@@ -10,6 +10,7 @@
   <MenuItem Header="Shops..." Tag="Shops" ToolTip="Each shop's name and the priced items it sells, in order; the shopkeeper preset's shop box offers them." />
   <MenuItem Header="Items..." Tag="Items" ToolTip="Base items, equipment, uniques and materials: icons, stacks, prices, effects, bonuses and fixed affixes." />
   <MenuItem Header="Drop tables..." Tag="Drop tables" ToolTip="Each table's items, chances and quantities; the Enemies page's Drop table box offers them." />
+  <MenuItem Header="Affixes..." Tag="Affixes" ToolTip="The affixes dropped gear may roll: stat, range, gear kinds, weight and gold value." />
   <MenuItem Header="Effect strips..." Tag="Effect strips" ToolTip="Each effects image's frame time, the frame its hit lands on and the swing an Attack plays first." />
   <MenuItem Header="Skills..." Tag="Skills" ToolTip="Each skill's name, texts, icon, sound, own strip, costs, effect and statuses; classes and enemies still list theirs in their files." />
   <MenuItem Header="Effects..." Tag="Effects" ToolTip="effects.json: fire_1, heal_2...; an image's pace is Effect strips" />

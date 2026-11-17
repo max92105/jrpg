@@ -1,0 +1,74 @@
+<UserControl x:Class="Jrpg.Editor.Loot.AffixCatalogPage"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <UserControl.Resources>
+    <Style x:Key="FieldLabel" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+      <Setter Property="Width" Value="90" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="NumberBox" TargetType="TextBox" BasedOn="{StaticResource {x:Type TextBox}}">
+      <Setter Property="Width" Value="60" />
+    </Style>
+  </UserControl.Resources>
+  <DockPanel>
+    <!-- The pool in id order, the affixes added this session after them; only those can be removed (decision 884). -->
+    <DockPanel DockPanel.Dock="Left" Width="260">
+      <TextBlock DockPanel.Dock="Top" Text="Affixes" FontWeight="Bold" />
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
+        <Button Content="Add affix" Width="80" Command="{Binding AddAffixCommand}" ToolTip="A new affix last in the list, its id to type" />
+        <Button Content="Duplicate" Width="80" Margin="4,0,0,0" Command="{Binding DuplicateCommand}"
+                ToolTip="A copy of the chosen affix last in the list, its id to type" />
+        <Button Content="Remove" Width="60" Margin="4,0,0,0" Command="{Binding RemoveAffixCommand}"
+                ToolTip="Only an affix added this session; a unique may name a saved one" />
+      </StackPanel>
+      <ListBox ItemsSource="{Binding Affixes}" SelectedItem="{Binding SelectedAffix}" DisplayMemberPath="Label" Margin="0,4,0,0" />
+    </DockPanel>
+
+    <!-- The chosen affix's fields, then the gear kinds it may roll on: two columns of four boxes. -->
+    <StackPanel Margin="12,0,0,0" DataContext="{Binding SelectedAffix}" Style="{StaticResource EnabledWhenChosen}">
+      <StackPanel Orientation="Horizontal">
+        <TextBlock Text="Id" Style="{StaticResource FieldLabel}" />
+        <TextBox Width="240"
+                 Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}"
+                 IsEnabled="{Binding IsNew}"
+                 ToolTip="Lowercase letters, digits and _; fixed once saved, since uniques name it" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+        <TextBlock Text="Stat" Style="{StaticResource FieldLabel}" />
+        <ComboBox Width="170" ItemsSource="{Binding StatChoices}" SelectedItem="{Binding Stat}" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+        <TextBlock Text="Min" Style="{StaticResource FieldLabel}" />
+        <TextBox Style="{StaticResource NumberBox}" Text="{Binding MinText, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="The lowest value a roll gives; both ends on one side of zero" />
+        <TextBlock Text="Max" Width="40" Margin="12,0,0,0" VerticalAlignment="Center" />
+        <TextBox Style="{StaticResource NumberBox}" Text="{Binding MaxText, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="The highest value a roll gives" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+        <TextBlock Text="Weight" Style="{StaticResource FieldLabel}" />
+        <TextBox Style="{StaticResource NumberBox}" Text="{Binding WeightText, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="Its chance against the other affixes a piece may roll" />
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+        <TextBlock Text="Gold value" Style="{StaticResource FieldLabel}" />
+        <TextBox Style="{StaticResource NumberBox}" Text="{Binding GoldValueText, UpdateSourceTrigger=PropertyChanged}"
+                 ToolTip="What it adds to a piece's price in a shop" />
+      </StackPanel>
+      <TextBlock Text="Rolls on" FontWeight="Bold" Margin="0,12,0,0" />
+      <ItemsControl ItemsSource="{Binding Kinds}" Width="240" HorizontalAlignment="Left" Margin="0,4,0,0">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <UniformGrid Columns="2" />
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate>
+            <CheckBox Content="{Binding Label}" IsChecked="{Binding IsChosen}" Margin="0,2,0,2" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+  </DockPanel>
+</UserControl>

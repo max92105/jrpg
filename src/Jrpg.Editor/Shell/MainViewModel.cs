@@ -106,6 +106,7 @@ internal sealed partial class MainViewModel : ObservableObject
             TieredEffectEditing = new TieredEffectEditingViewModel(Content);
             StatusEditing = new StatusEditingViewModel(Content);
             ItemEditing = CreateItemEditing();
+            AffixEditing = new AffixEditingViewModel(Content);
             NpcSpriteChange = new NpcSpriteChange(Content, Placing.Browser);
             if (MapIds.Count > 0)
             {

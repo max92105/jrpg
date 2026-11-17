@@ -30,6 +30,7 @@ internal sealed partial class MainWindow
         ["Shops"] = OpenShops,
         ["Items"] = OpenItems,
         ["Drop tables"] = () => _ = EditDropTables(this, ""),
+        ["Affixes"] = OpenAffixes,
         ["Effect strips"] = OpenEffectStrips,
         ["Skills"] = OpenSkills,
         ["Effects"] = OpenTieredEffects,
@@ -84,6 +85,16 @@ internal sealed partial class MainWindow
 
         BitmapSource? LoadIcon(string file) =>
             SpriteImageFile.LoadAtWidth(artRoot, ArtFolders.Icons, file, (int)ItemCatalogPage.IconPictureSize);
+    }
+
+    private void OpenAffixes()
+    {
+        if (_viewModel.AffixEditing is not { } affixEditing)
+        {
+            return;
+        }
+
+        OpenInDialog("Affixes", affixEditing.Start, affixEditing.Apply, edited => new AffixCatalogPage(edited));
     }
 
     // Starts the page's session, shows it in the dialog over the main window, applies it on OK.

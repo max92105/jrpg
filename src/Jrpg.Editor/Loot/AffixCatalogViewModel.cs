@@ -6,6 +6,7 @@ using Jrpg.Core.Loot;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Events;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Loot;
 
@@ -14,9 +15,9 @@ namespace Jrpg.Editor.Loot;
 /// this session after them; only an added one can be removed, since a unique names a saved one and the Items page reads
 /// each it names from the pool. <see cref="Problem"/> is the chosen affix's own first, then any affix's, then Data's
 /// message for the pool and the uniques naming it: a unique's value may leave its affix's range but not its side of
-/// zero (decision 866).
+/// zero (decision 866). Its host chooses an affix by its id and reads the chosen one's (<see cref="IEditedCatalog"/>).
 /// </summary>
-internal sealed partial class AffixCatalogViewModel : ObservableObject
+internal sealed partial class AffixCatalogViewModel : ObservableObject, IEditedCatalog
 {
     private readonly ContentCatalog _content;
 
@@ -51,6 +52,11 @@ internal sealed partial class AffixCatalogViewModel : ObservableObject
         SelectedAffix?.Problem
         ?? RecordListProblem.FirstOf(Affixes, affix => affix.Id, affix => affix.Problem, "Affix")
         ?? CatalogProblems.OfAffixes([.. Affixes.Select(affix => affix.ToAffix())], _content);
+
+    /// <summary>The chosen affix's id; null with none chosen or while a new one has no id yet.</summary>
+    public string? ChosenKey => SelectedAffix is { Id.Length: > 0 } affix ? affix.Id : null;
+
+    public void Choose(string key) => SelectedAffix = Affixes.FirstOrDefault(affix => affix.Id == key) ?? SelectedAffix;
 
     /// <exception cref="InvalidOperationException">
     /// There is a <see cref="Problem"/>; the page's host applies only without one.

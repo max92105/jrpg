@@ -37,3 +37,8 @@ IU15's "Verify by hand" list, all of it: the smoke script's line (no `ERROR`, th
 the boxes), `power`'s Max typed 4 with no problem and saved, Ctrl+Z, the `test_ward` affix offered by the Items page's
 Add affix, no binding-error line. Also: `power` moved to -5..-1 shows the items.json line for `chiefs_cleaver` and greys
 OK.
+- **Done, with deviations:** the page is 74 lines of XAML (16 of code); its sizes are typed in the XAML as the Drop
+  tables page's, since no code reads one (no `x:Static`), and it needs no `AncestorType` binding: the right side reads
+  only the chosen affix. The `Choose` tests went to the sibling `AffixCatalogViewModelChoiceTests` (61 lines; the list's
+  file would have passed 250), with two more: `ChosenKey_AffixChosen_IsItsId`, `ChosenKey_NothingChosen_IsNull`.
+  `AffixCatalogViewModel.cs` 97, `MainViewModel.cs` 291. Tests: 7072 (5 new). The smoke script's run had no `ERROR`.

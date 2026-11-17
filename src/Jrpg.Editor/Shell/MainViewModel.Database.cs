@@ -9,6 +9,7 @@ using Jrpg.Editor.Battle;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Cinematics;
 using Jrpg.Editor.Effects;
+using Jrpg.Editor.Encounters;
 using Jrpg.Editor.GifImport;
 using Jrpg.Editor.Items;
 using Jrpg.Editor.Loot;
@@ -22,9 +23,10 @@ namespace Jrpg.Editor.Shell;
 /// <summary>
 /// The Database menu's pages over the draft (ADR 0045, decision 583): the shops, the drop tables, the enemies, the
 /// cinematics (ADR 0046), the effect strips (decision 659), the skills, the tiered effects, the statuses (decision
-/// 976), the items (decision 877), the affixes (decision 884) and the battle backgrounds (decision 901), beside the
-/// quests; and the image import the Enemies, Effect strips, Character sprites and Battle backgrounds pages share, and
-/// the strip Strip from sheet cells writes, through Data, asking before either replaces an image of the art folder.
+/// 976), the items (decision 877), the affixes (decision 884), the battle backgrounds (decision 901) and the encounters
+/// (decision 905), beside the quests; and the image import the Enemies, Effect strips, Character sprites and Battle
+/// backgrounds pages share, and the strip Strip from sheet cells writes, through Data, asking before either replaces an
+/// image of the art folder.
 /// </summary>
 internal sealed partial class MainViewModel
 {
@@ -49,6 +51,8 @@ internal sealed partial class MainViewModel
     public AffixEditingViewModel? AffixEditing { get; }
 
     public BattleBackgroundEditingViewModel? BattleBackgroundEditing { get; }
+
+    public EncounterEditingViewModel? EncounterEditing { get; }
 
     /// <summary>
     /// Copies images into an art folder (asking before replacing one, decisions 125 and 590); a file copy, not an undo
@@ -156,12 +160,24 @@ internal sealed partial class MainViewModel
             () => ReadableImagesIn(ArtFolders.Backgrounds),
             file => ReadableSizeOf(ArtFolders.Backgrounds, file));
 
+    private EncounterEditingViewModel CreateEncounterEditing() => new(Content!, ReadEncounterChoices);
+
+    // Read when the page opens, so an enemy, image or track added since the editor started is offered.
+    private EncounterChoices ReadEncounterChoices() =>
+        new(
+            [.. Content!.Current.Enemies.Values
+                .OrderBy(enemy => enemy.Name, StringComparer.Ordinal)
+                .ThenBy(enemy => enemy.Id, StringComparer.Ordinal)
+                .Select(enemy => new EnemyChoice(enemy.Id, enemy.Name))],
+            ReadableImagesIn(ArtFolders.Backgrounds),
+            AudioFolders.TracksIn(_audioRoot));
+
     private ItemEditingViewModel CreateItemEditing() =>
         new(Content!, () => ArtFolders.ImagesIn(ArtRoot, ArtFolders.Icons), () => ReadableImagesIn(ArtFolders.Effects));
 
     // An image the folder holds but can't be read is left out of an art page's list, as its size is unknown; both are
     // read when the page opens, never cached, since an import changes them (the Character sprites, Effect strips and
-    // Battle backgrounds pages, and the Items page's effect strips).
+    // Battle backgrounds pages, the Items page's effect strips and the Encounters page's Background box).
     private IReadOnlyList<string> ReadableImagesIn(string artFolder) =>
         [.. ArtFolders.ImagesIn(ArtRoot, artFolder).Where(file => PngSize.IsReadable(ArtPath(artFolder, file)))];
 

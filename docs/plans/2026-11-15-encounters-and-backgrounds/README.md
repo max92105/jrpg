@@ -1,5 +1,5 @@
 # Encounters and battle backgrounds (editor push, roadmap row 10)
-Status: approved, in progress
+Status: retro pending
 
 Approved on 2026-11-15 by delegation (the developer delegated approval of the editor push's sub-plans), with the devil's
 advocate's review applied: the plan builds on row 7's shared preview (`Animation/FramePreview`, AN1) and GIF dialog
@@ -17,7 +17,7 @@ always want a preview and be able to tweak them: frame rate etc."; he confirmed 
 background a map's battles use (decision 700). The developer was away while this was planned: the decisions marked
 "(default taken while the developer was away; his to overturn)" are listed under [Defaults to confirm](#defaults-to-confirm).
 
-- Numbers: decisions 891-910 (911-915 unused), and 1005 from the shared line (BG9). ADR 0059.
+- Numbers: decisions 891-910 (911-915 unused), and 1005 (BG9) and 1006 (EC5) from the shared line. ADR 0059.
 - Projects: Core (a map setting, an optional encounter field, the background rule, the animated background record), Data
   (validators, the startup art check, the writer taking over `encounters.json` and the new `animated-backgrounds.json`),
   Game (the battle plays an animated background; backgrounds decoded and released on map entry), Editor (Map settings'
@@ -129,7 +129,7 @@ slices and Editor slices aim at about 200 lines, not because the scope grew.
   [slices/EC3b.md](slices/EC3b.md)
 - [x] **EC4. An undo can't remove an encounter a map's battles list** (Editor, about 130 lines) →
   [slices/EC4.md](slices/EC4.md)
-- [ ] **EC5. The Encounters page** (Editor, about 170 lines) → [slices/EC5.md](slices/EC5.md)
+- [x] **EC5. The Encounters page** (Editor, about 170 lines) → [slices/EC5.md](slices/EC5.md)
 
 ## Decisions
 - **891.** The plan is three phases and 14 slices in the order above: a map's background, animated backgrounds, the
@@ -210,6 +210,10 @@ slices and Editor slices aim at about 200 lines, not because the scope grew.
   tallest chosen, with no sheet line and no preview; OK imports it, and the import reads the file again and names the
   decoder's refusal, as the battlers' and effects' kinds do with a GIF they can't read. (taken during the slice; the
   developer's to overturn)
+- **1006.** (EC5) The Encounters page's Background box offers only the backgrounds folder's images whose size can be
+  read (`MainViewModel.Database`'s `ReadableImagesIn`, as the Battle backgrounds page lists them), not every image as
+  Map settings' box does: a file the game couldn't fit to the screen isn't offered; one an encounter already names
+  stays listed (decision 906). (taken during the slice; the developer's to overturn)
 
 ## Defaults to confirm
 - **892**: backgrounds both per map (required with random battles) and per encounter, the encounter's own winning. The

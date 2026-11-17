@@ -27,6 +27,7 @@ internal sealed partial class EncounterViewModel : ObservableObject
     {
         Id = source.Id;
         Enemies = [.. source.EnemyIds.Select(enemyId => SlotOf(enemyId, choices))];
+        NumberSlots();
         Enemies.CollectionChanged += OnEnemiesChanged;
         SelectedSlot = Enemies.FirstOrDefault();
         BackgroundChoices = FileBoxChoices.Of(source.BackgroundFile, MapsBackground, choices.Backgrounds);
@@ -140,8 +141,11 @@ internal sealed partial class EncounterViewModel : ObservableObject
 
     private bool HasSelectedSlot() => SelectedSlot is not null;
 
+    private void NumberSlots() => ListOrder.Renumber(Enemies, (slot, index) => slot.Number = index + 1);
+
     private void OnEnemiesChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
+        NumberSlots();
         OnPropertyChanged(nameof(Label));
         OnPropertyChanged(nameof(Problem));
         Changed?.Invoke(this, EventArgs.Empty);

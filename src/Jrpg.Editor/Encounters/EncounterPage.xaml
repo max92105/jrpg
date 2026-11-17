@@ -1,0 +1,78 @@
+<UserControl x:Class="Jrpg.Editor.Encounters.EncounterPage"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:encounters="clr-namespace:Jrpg.Editor.Encounters">
+  <UserControl.Resources>
+    <Style x:Key="FieldLabel" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+      <Setter Property="Width" Value="90" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+  </UserControl.Resources>
+  <DockPanel>
+    <!-- The draft's encounters in id order, the ones added this session after them; only those can be removed (decision 905). -->
+    <DockPanel DockPanel.Dock="Left" Width="280">
+      <TextBlock DockPanel.Dock="Top" Text="Encounters" FontWeight="Bold" />
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
+        <Button Content="Add" Width="60" Command="{Binding AddEncounterCommand}" ToolTip="A new encounter last in the list, its id to type" />
+        <Button Content="Remove" Width="60" Margin="4,0,0,0" Command="{Binding RemoveEncounterCommand}"
+                ToolTip="Only an encounter added this session; a map's random battles may roll a saved one" />
+      </StackPanel>
+      <ListBox ItemsSource="{Binding Encounters}" SelectedItem="{Binding SelectedEncounter}" DisplayMemberPath="Label" Margin="0,4,0,0" />
+    </DockPanel>
+
+    <!-- The chosen encounter: its id, its enemies in slot order with the add box, then its Background and Music boxes. -->
+    <DockPanel Margin="12,0,0,0" DataContext="{Binding SelectedEncounter}" Style="{StaticResource EnabledWhenChosen}">
+      <StackPanel DockPanel.Dock="Top">
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="Id" Style="{StaticResource FieldLabel}" />
+          <TextBox Width="240"
+                   Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}"
+                   IsEnabled="{Binding IsNew}"
+                   ToolTip="Lowercase letters, digits and _; fixed once saved, since maps roll it" />
+        </StackPanel>
+        <TextBlock Text="Enemies, in slot order" FontWeight="Bold" Margin="0,8,0,0" />
+      </StackPanel>
+
+      <StackPanel DockPanel.Dock="Bottom">
+        <TextBlock Text="Slot 1 stands front left; each next slot a row up and to the right."
+                   Foreground="{StaticResource MutedTextBrush}" Margin="0,4,0,0" />
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <ComboBox Width="260"
+                    DisplayMemberPath="Label"
+                    ItemsSource="{Binding DataContext.OfferedEnemies, RelativeSource={RelativeSource AncestorType=encounters:EncounterPage}}"
+                    SelectedItem="{Binding EnemyToAdd}" />
+          <Button Content="Add" Width="60" Margin="4,0,0,0" Command="{Binding AddEnemyCommand}"
+                  ToolTip="After the chosen slot; the same enemy may stand in several" />
+          <Button Content="Remove" Width="60" Margin="12,0,0,0" Command="{Binding RemoveEnemyCommand}" />
+          <Button Content="Up" Width="50" Margin="4,0,0,0" Command="{Binding MoveEnemyUpCommand}" />
+          <Button Content="Down" Width="50" Margin="4,0,0,0" Command="{Binding MoveEnemyDownCommand}" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+          <TextBlock Text="Background" Style="{StaticResource FieldLabel}" />
+          <ComboBox Width="260" ItemsSource="{Binding BackgroundChoices}" SelectedItem="{Binding SelectedBackground}"
+                    ToolTip="(the map's) fights on the background the map names in Map &gt; Settings...; a file here wins on every map (a boss's arena). The folder also holds the title's and the menu's pictures." />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Music" Style="{StaticResource FieldLabel}" />
+          <ComboBox Width="260" ItemsSource="{Binding MusicChoices}" SelectedItem="{Binding SelectedMusic}" />
+        </StackPanel>
+      </StackPanel>
+
+      <ListBox ItemsSource="{Binding Enemies}" SelectedItem="{Binding SelectedSlot}">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <TextBlock>
+              <TextBlock.Text>
+                <MultiBinding StringFormat="{}{0}. {1}">
+                  <Binding Path="Number" />
+                  <Binding Path="Name" />
+                </MultiBinding>
+              </TextBlock.Text>
+            </TextBlock>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+  </DockPanel>
+</UserControl>

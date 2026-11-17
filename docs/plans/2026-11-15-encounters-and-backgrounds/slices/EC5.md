@@ -57,3 +57,16 @@ undo step; Save all writes `encounters.json`.
   `MainWindow.Database.OpenInDialog`, as WD2-WD8 and IU15b did, and declare no `ICatalogEditing<T>`.
 - **Note from BG1:** `goblin_chief` (row 8's boss) now uses the map's background like the others; decision 892's boss arena
   has no content yet, so a hand check giving an encounter its own background picks one from the folder.
+- **Done, with deviations:** about 240 lines with tests (code: `EncounterPage` 78 lines of XAML and 16 of code, +51 -7
+  elsewhere; tests 95). Hosted in `Workspaces/CatalogDialog` through `MainWindow.Database.OpenInDialog` (BG1's note):
+  no `CatalogPage.Of`, `ShowDatabasePageCommand` or `Register<...>` line, the menu entry tagged "Encounters" as its
+  neighbours; `MainViewModel.Database` holds `EncounterEditing` (built by `CreateEncounterEditing`, so
+  `MainViewModel.cs` takes one line, 293) and `ReadEncounterChoices` (188 lines). Its Background box lists only the
+  folder's readable images (`ReadableImagesIn`, decision 1006), not `ArtFolders.ImagesIn`. Added for the page:
+  `EncounterCatalogViewModel.OfferedEnemies` (the add box's entries) and `EnemySlotRow.Number` (its place from 1, set
+  by its encounter on every change, as the drop entries' `Index`), for "1. Goblin". Tests: the planned registration
+  test became `EncounterEditing_TestWorld_StartsOnItsEncountersInIdOrder` (no page list before WS5; it asserts the
+  ordinal order, not the four ids), `ReadEncounterChoices_ImageAddedToTheFolderAfterStart_IsOffered` became
+  `..._ImageAddedAfterTheEditorOpened_IsOffered`; added `ReadEncounterChoices_ImageThatCantBeRead_IsLeftOut`,
+  `ReadEncounterChoices_TestWorld_OffersTheMusicFoldersTracks` and two numbering tests in `EncounterViewModelTests`
+  (208); `MainViewModelEncounterTests` 75; 7371 tests.

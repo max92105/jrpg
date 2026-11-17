@@ -43,6 +43,9 @@ internal sealed partial class EncounterCatalogViewModel : ObservableObject, IEdi
 
     public ObservableCollection<EncounterViewModel> Encounters { get; }
 
+    /// <summary>What the chosen encounter's add box offers: every enemy, in the order the page read them.</summary>
+    public IReadOnlyList<EnemyChoice> OfferedEnemies => _choices.Enemies;
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Problem))]
     [NotifyCanExecuteChangedFor(nameof(RemoveEncounterCommand))]

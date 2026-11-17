@@ -90,6 +90,26 @@ public sealed class EncounterViewModelTests
     }
 
     [Fact]
+    public void From_TwoGoblins_NumbersTheSlotsFromOne()
+    {
+        var encounter = EncounterViewModel.From(GoblinPair, Choices);
+
+        Assert.Equal([1, 2], encounter.Enemies.Select(slot => slot.Number));
+    }
+
+    [Fact]
+    public void MoveEnemyDown_FirstOfTwoGoblins_NumbersBothRowsAnew()
+    {
+        var encounter = EncounterViewModel.From(GoblinPair, Choices);
+        var first = encounter.Enemies[0];
+
+        encounter.MoveEnemyDownCommand.Execute(null);
+
+        Assert.Equal(2, first.Number);
+        Assert.Equal([1, 2], encounter.Enemies.Select(slot => slot.Number));
+    }
+
+    [Fact]
     public void RemoveEnemy_SecondGoblin_RemovesThatRow()
     {
         var encounter = EncounterViewModel.From(GoblinPair, Choices);

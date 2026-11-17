@@ -7,6 +7,7 @@ using Jrpg.Editor.Backgrounds;
 using Jrpg.Editor.Battle;
 using Jrpg.Editor.Cinematics;
 using Jrpg.Editor.Effects;
+using Jrpg.Editor.Encounters;
 using Jrpg.Editor.Items;
 using Jrpg.Editor.Loot;
 using Jrpg.Editor.Quests;
@@ -39,6 +40,7 @@ internal sealed partial class MainWindow
         ["Statuses"] = OpenStatuses,
         ["Cinematics"] = OpenCinematics,
         ["Enemies"] = OpenEnemies,
+        ["Encounters"] = OpenEncounters,
     };
 
     // Only an entry raises Click, never the Database header. An entry without a known title is a typo in
@@ -156,6 +158,16 @@ internal sealed partial class MainWindow
                     enemyEditing.RefreshDropTables(edited);
                 }
             }));
+    }
+
+    private void OpenEncounters()
+    {
+        if (_viewModel.EncounterEditing is not { } encounterEditing)
+        {
+            return;
+        }
+
+        OpenInDialog("Encounters", encounterEditing.Start, encounterEditing.Apply, edited => new EncounterPage(edited));
     }
 
     // The preview decodes each still at the preview's width, a sixteenth of the pixels of a 1920 px picture.

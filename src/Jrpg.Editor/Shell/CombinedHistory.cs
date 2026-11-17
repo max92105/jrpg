@@ -112,14 +112,20 @@ internal sealed partial class CombinedHistory : ObservableObject
 
     // In the order checked: the first map whose event names a quest or a stage the undo would remove (decision 394), or
     // opens a shop it would remove (decision 581), or plays a cinematic it would remove (decision 630), or gives an
-    // item it would remove (decision 883); the first map placing or swapping to an object it would remove; the first
-    // tile cut from a sheet it would remove; the first tile it would remove that something still uses, named with its
-    // first user (decision 117).
+    // item it would remove (decision 883); the first map whose random battles roll an encounter it would remove
+    // (decision 907); the first map placing or swapping to an object it would remove; the first tile cut from a sheet
+    // it would remove; the first tile it would remove that something still uses (decision 117), each named with the
+    // first user the check found.
     private string? RefusalOfCatalogUndo()
     {
         if (RefusalOfEventNamedUndo() is { } named)
         {
             return named;
+        }
+
+        if (RefusalOfEncounterUndo() is { } rolled)
+        {
+            return rolled;
         }
 
         foreach (var objectId in _catalog.ObjectsRemovedByUndo())
@@ -199,6 +205,18 @@ internal sealed partial class CombinedHistory : ObservableObject
             "given",
             _catalog.ItemsRemovedByUndo(),
             itemId => CatalogUsage.UsersOfItem(_catalog.Current, itemId, _openMaps.Layouts));
+
+    // A saved encounter is never removed by its page (decision 905), so only an added one can be undone away. Random
+    // battles are a map setting, so the open maps are read whole, their unsaved settings included (decision 502).
+    private string? RefusalOfEncounterUndo()
+    {
+        var content = _openMaps.ContentWith(_catalog.Current);
+        return RefusalNamingFirstUser(
+            "encounter",
+            "rolled",
+            _catalog.EncountersRemovedByUndo(),
+            encounterId => CatalogUsage.UsersOfEncounter(content, encounterId));
+    }
 
     // The first removed record a map still names, said as "Can't undo: shop armory is opened on map start." for the
     // kind "shop" used as "opened".

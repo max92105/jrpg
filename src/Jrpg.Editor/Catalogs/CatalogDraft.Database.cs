@@ -206,4 +206,9 @@ internal sealed partial class CatalogDraft
 
     /// <summary>The items the next undo would remove, so it can be refused while a map's event gives one.</summary>
     public IReadOnlyList<string> ItemsRemovedByUndo() => KeysRemovedByUndo(catalog => catalog.Items);
+
+    /// <summary>
+    /// The encounters the next undo would remove, so it can be refused while a map's random battles roll one.
+    /// </summary>
+    public IReadOnlyList<string> EncountersRemovedByUndo() => KeysRemovedByUndo(catalog => catalog.Encounters);
 }

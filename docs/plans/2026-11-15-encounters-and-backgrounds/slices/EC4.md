@@ -38,3 +38,10 @@ None here: no page adds an encounter yet. EC5's hand check (step 5) covers the r
   IU9 added the item one): restate the shared-helper step against those before writing the encounter refusal.
 - **Note from EC3:** EC3 was split: `CatalogDraft.SetEncounters` and `EncounterEditingViewModel` land in EC3b, which
   EC4 needs as well.
+- **Done, with deviations:** no extraction: `CombinedHistory.RefusalNamingFirstUser` (kind, use, removed ids, users
+  of), which the shop, cinematic and item refusals already share, is decision 907's one helper, and
+  `RefusalOfEncounterUndo` is its fourth call, checked after the event-named refusals; `RefusalOfShopUndo`,
+  `RefusalOfCinematicUndo` and their tests unchanged. The unopened-map test takes goblin_chief (rolled on the test
+  world's to_aslas_1) out and back as two `SetEncounters` steps, since no page adds an encounter a saved map rolls;
+  `CatalogUsageEncounterTests` adds `UsersOfEncounter_BattlesRollAnother_NotListed`. `CombinedHistory` 260 lines,
+  `CatalogUsage` 180, `CatalogDraft.Database` 214; tests 70 and 52.

@@ -7,8 +7,9 @@ namespace Jrpg.Editor.Catalogs;
 /// <summary>
 /// What uses a catalog record, so an undo that would remove it can be refused (decision 117) and a re-cut can say what
 /// it touches (decision 116): maps, saved or open, and objects; a map's events for a quest or a stage (decision 394), a
-/// shop (decision 581), a cinematic (ADR 0046) or a given item (decision 883). Each open map is read as it is now,
-/// unsaved changes included, in place of its saved version (decision 502).
+/// shop (decision 581), a cinematic (ADR 0046) or a given item (decision 883); a map's random battles for an encounter
+/// (decision 907). Each open map is read as it is now, unsaved changes included, in place of the saved one (decision
+/// 502), its random battles too.
 /// </summary>
 internal static class CatalogUsage
 {
@@ -110,6 +111,22 @@ internal static class CatalogUsage
         string itemId,
         IReadOnlyCollection<MapLayout> openLayouts) =>
         MapsWithStep(catalog, openLayouts, step => step is GiveItemStep give && give.ItemId == itemId);
+
+    /// <summary>
+    /// The maps whose random battles roll an encounter, so an undo that would remove it can be refused (decision 907).
+    /// </summary>
+    /// <param name="content">
+    /// Every map with its settings, each open map's as it is now in place of its saved one
+    /// (<c>OpenMaps.ContentWith</c>, decision 502): random battles are a setting, not a layout.
+    /// </param>
+    /// <param name="encounterId">The encounter looked for.</param>
+    /// <returns>"map forest" style names, sorted by id; empty when no map rolls it.</returns>
+    public static IReadOnlyList<string> UsersOfEncounter(ContentCatalog content, string encounterId) =>
+        [.. content.Maps.Values
+            .Where(map => map.Settings.RandomEncounters?.EncounterIds.Contains(encounterId) == true)
+            .Select(map => map.Id)
+            .Order(StringComparer.Ordinal)
+            .Select(id => $"map {id}")];
 
     // "map forest" style names of the maps with an event holding a matching step, the open maps as they are now.
     private static IReadOnlyList<string> MapsWithStep(

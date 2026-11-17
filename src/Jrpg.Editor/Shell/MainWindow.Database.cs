@@ -106,6 +106,11 @@ internal sealed partial class MainWindow
         string title, Func<TEdited> start, Action<TEdited> apply, Func<TEdited, FrameworkElement> buildPage)
         where TEdited : IEditedCatalog
     {
+        if (!TryApplyShownPage())
+        {
+            return;
+        }
+
         var edited = start();
         var dialog = new CatalogDialog(title, buildPage(edited), edited) { Owner = this };
         DialogBounds.FitTo(dialog, this);
@@ -115,11 +120,15 @@ internal sealed partial class MainWindow
         }
     }
 
+    // A dialog's OK changes the draft, which would start the shown Database page again under what was typed: applied
+    // first, or the dialog doesn't open and the Database mode shows why (decision 919).
+    private bool TryApplyShownPage() => _viewModel.DatabaseWorkspace?.TryApplyShown() ?? true;
+
     // The Drop tables page in the catalog dialog over the owner, on the chosen table; its OK applies its own undo step
     // at once, so a page under it can take the new tables (decision 602). Returns whether it applied.
     private bool EditDropTables(Window owner, string chosenTableId)
     {
-        if (_viewModel.DropTableEditing is not { } dropTableEditing)
+        if (_viewModel.DropTableEditing is not { } dropTableEditing || !TryApplyShownPage())
         {
             return false;
         }

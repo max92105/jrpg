@@ -15,7 +15,7 @@ replacement mapping and the risks.
 | Groups | `Workspaces/CatalogGroup` | Story, Battle, Items, Trade, Characters | The list's headings, in this order (decision 917). |
 | Bar note | `Workspaces/DatabaseWorkspaceView.xaml` | "Applied when you leave this page, save, undo or close." | Says the leave rule where Apply is (decision 919). |
 | Refusal texts | `Workspaces/DatabaseWorkspaceViewModel` | "The {title} page has a problem: {problem} Fix it or press Revert."; "The {title} page can't apply: {message}" | Why a move was refused (decisions 919, 939); Undo and Save show the same text in their lines. |
-| Unsaved line | `Workspaces/DatabaseWorkspaceViewModel.UnappliedPage` | "the {title} page, not applied: {problem or message}" | Listed by the close question and the error box (decision 924). |
+| Unsaved line | `Workspaces/DatabaseWorkspaceViewModel.UnappliedPageLine` | "the {title} page, not applied: {problem or message}" | Listed by the close question and the error box (decision 924). |
 | Page name for the script | the hosted page's `AutomationProperties.Name`, set by `DatabaseWorkspaceView` | "{title} page" | What `open-editor-windows.ps1` finds from WS5 (decision 933). |
 
 ## 2. What exists (2026-11-15)
@@ -134,7 +134,7 @@ internal sealed partial class DatabaseWorkspaceViewModel : ObservableObject
     public CatalogPage? ShownPage { get; }                    // observable
     public PageSession? Session { get; }                      // observable
     public string? Refusal { get; }                           // observable, WS3
-    public string? UnappliedPage { get; }                     // WS4
+    public string? UnappliedPageLine { get; }                 // WS4
     public void Open();
     public bool TryClose();                                   // WS3 (WS2: Close)
     public bool TryApplyShown();                              // WS3; a throwing Apply becomes a Refusal (decision 939)

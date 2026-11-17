@@ -115,7 +115,7 @@ page recipe: [page-recipe.md](page-recipe.md).
 - [x] **WS3b. The mode switch goes through the workspace: the main window builds it with every page, Database opens it,
   World and Back to previous map only when the page applies** (Editor, split from WS3, about 150 lines) →
   [slices/WS3b.md](slices/WS3b.md)
-- [ ] **WS4. Undo, Redo, Save, Save all, the close question and the dialogs still opened in Database mode apply the
+- [x] **WS4. Undo, Redo, Save, Save all, the close question and the dialogs still opened in Database mode apply the
   page first** (Editor, about 250 lines) → [slices/WS4.md](slices/WS4.md)
 - [ ] **WS5. The Database view hosts every page: the grouped list, the bar, focus kept; the Database menu shows pages;
   the smoke script reaches them** (Editor + script, about 260 lines) → [slices/WS5.md](slices/WS5.md)
@@ -227,6 +227,12 @@ may overturn; the others follow from them, from the code or from the review.
   move that passes, a change of the page's problem (typing a fix) and a new session (Revert, a restart, another page)
   clear it (`.claude/rules/editor.md`'s note cleared when an input it reads changes). WS3 split in two: WS3, the
   workspace's leave rule headless; WS3b, the shell building the workspace and the mode switch going through it.
+- **1009.** (WS4.) The workspace's `UnappliedPageLine` is its last refusal, kept and cleared with `Refusal`
+  (decision 1008), its quoted problem's last period dropped so the unsaved line ends on one. So the close question,
+  which applies the page first, always lists a page that can't apply; the unexpected-error box, which applies nothing,
+  lists it only after a refused move, and never lists a page whose valid typed changes were not yet applied. The
+  page's refusal copied into `History.Refusal` or `SaveError` clears when the workspace's `Refusal` changes. *(default
+  taken while the developer was away; his to overturn)*
 
 ## Defaults to confirm
 Taken while the developer was away; each is his to overturn, and the slices that change if he does are named.

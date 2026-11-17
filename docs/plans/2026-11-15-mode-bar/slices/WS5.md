@@ -87,3 +87,6 @@ Agents may run steps 1-5 (Shops, Quests, Enemies, Drop tables, Effect strips and
   may look at becomes a list of pages (Quests, Shops, Drop tables, Effect strips, Battle backgrounds, Cinematics,
   Enemies, Encounters). `Shell/MainWindow.xaml` is at 296 lines after WS1: the view's content goes in
   `DatabaseWorkspaceView`, never there.
+- **Note from WS4:** once a page is typable, the unexpected-error box (ADR 0050) lists a Database page only after a
+  refused move (decision 1009): valid typed changes not yet applied are not named there. Say so in the hand check, or
+  have the line run `TryApplyShown` first if the developer wants it (his call).

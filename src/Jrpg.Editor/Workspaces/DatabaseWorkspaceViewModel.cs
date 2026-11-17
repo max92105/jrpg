@@ -10,12 +10,16 @@ namespace Jrpg.Editor.Workspaces;
 /// The Database mode's state (ADR 0060): its pages and the one shown, whose session alone holds unapplied edits
 /// (decision 922). Apply records the session as one undo step (decision 918); any new catalog in the draft while a page
 /// is shown, its own Apply included, starts the session again from the draft on the same record (decision 921), so an
-/// added record's id is fixed once applied. Leaving the page applies it first, or is refused naming why (decision 919).
+/// added record's id is fixed once applied. Leaving the page applies it first, or is refused naming why (decision 919),
+/// a refused page also named for the close question's list of unsaved work (decision 924).
 /// </summary>
 internal sealed partial class DatabaseWorkspaceViewModel : ObservableObject
 {
     // Each page's chosen record when it was last left, so the mode reopens on it (decision 922).
     private readonly Dictionary<CatalogPage, string?> _chosenKeys = [];
+
+    // The problem or the failure message the last refusal quotes; null whenever Refusal is.
+    private string? _unappliedReason;
 
     /// <param name="draft">The catalogs the pages edit, listened to for the restart.</param>
     /// <param name="pages">The list's pages in order; the first is shown on the first visit.</param>
@@ -42,6 +46,14 @@ internal sealed partial class DatabaseWorkspaceViewModel : ObservableObject
     /// </summary>
     [ObservableProperty]
     public partial string? Refusal { get; private set; }
+
+    /// <summary>
+    /// "the Shops page, not applied: {its problem or its apply's failure}", the last refusal as the close question and
+    /// the unexpected-error box list it (decision 924), its last period left to the list's sentence; null when nothing
+    /// was refused, cleared with <see cref="Refusal"/>.
+    /// </summary>
+    public string? UnappliedPageLine =>
+        _unappliedReason is { } reason ? $"the {ShownPage!.Title} page, not applied: {reason.TrimEnd('.')}" : null;
 
     /// <summary>Shows the last page shown on its last chosen record, the first page on the first visit.</summary>
     public void Open() => Show(ShownPage ?? Pages[0]);
@@ -102,6 +114,7 @@ internal sealed partial class DatabaseWorkspaceViewModel : ObservableObject
         var title = ShownPage!.Title;
         if (session.Edited.Problem is { } problem)
         {
+            _unappliedReason = problem;
             return $"The {title} page has a problem: {problem} Fix it or press Revert.";
         }
 
@@ -112,7 +125,16 @@ internal sealed partial class DatabaseWorkspaceViewModel : ObservableObject
         }
         catch (Exception refused) when (refused is InvalidOperationException or ContentValidationException)
         {
+            _unappliedReason = refused.Message;
             return $"The {title} page can't apply: {refused.Message}";
+        }
+    }
+
+    partial void OnRefusalChanged(string? value)
+    {
+        if (value is null)
+        {
+            _unappliedReason = null;
         }
     }
 

@@ -63,25 +63,31 @@ internal sealed partial class MainViewModel
     }
 
     // The list's order is decision 917's groups: Story, Battle, Items, Trade, Characters. Called by the constructor
-    // once the content loaded, so every editing view model is built.
-    private DatabaseWorkspaceViewModel CreateDatabaseWorkspace(CatalogDraft content) =>
-        new(content,
-        [
-            CatalogPage.Of("Quests", QuestEditing!),
-            CatalogPage.Of("Cinematics", CinematicEditing!),
-            CatalogPage.Of("Enemies", EnemyEditing!),
-            CatalogPage.Of("Encounters", EncounterEditing!),
-            CatalogPage.Of("Skills", SkillEditing!),
-            CatalogPage.Of("Effects", TieredEffectEditing!),
-            CatalogPage.Of("Statuses", StatusEditing!),
-            CatalogPage.Of("Drop tables", DropTableEditing!),
-            CatalogPage.Of("Effect strips", EffectStripEditing!),
-            CatalogPage.Of("Battle backgrounds", BattleBackgroundEditing!),
-            CatalogPage.Of("Items", ItemEditing!),
-            CatalogPage.Of("Affixes", AffixEditing!),
-            CatalogPage.Of("Shops", ShopEditing!),
-            CatalogPage.Of("Character sprites", FieldSpriteEditing!),
-        ]);
+    // once the content loaded, so every editing view model is built. A save line quoting the shown page's refusal
+    // clears with it.
+    private DatabaseWorkspaceViewModel CreateDatabaseWorkspace(CatalogDraft content)
+    {
+        var workspace = new DatabaseWorkspaceViewModel(
+            content,
+            [
+                CatalogPage.Of("Quests", QuestEditing!),
+                CatalogPage.Of("Cinematics", CinematicEditing!),
+                CatalogPage.Of("Enemies", EnemyEditing!),
+                CatalogPage.Of("Encounters", EncounterEditing!),
+                CatalogPage.Of("Skills", SkillEditing!),
+                CatalogPage.Of("Effects", TieredEffectEditing!),
+                CatalogPage.Of("Statuses", StatusEditing!),
+                CatalogPage.Of("Drop tables", DropTableEditing!),
+                CatalogPage.Of("Effect strips", EffectStripEditing!),
+                CatalogPage.Of("Battle backgrounds", BattleBackgroundEditing!),
+                CatalogPage.Of("Items", ItemEditing!),
+                CatalogPage.Of("Affixes", AffixEditing!),
+                CatalogPage.Of("Shops", ShopEditing!),
+                CatalogPage.Of("Character sprites", FieldSpriteEditing!),
+            ]);
+        workspace.PropertyChanged += OnDatabaseWorkspaceChanged;
+        return workspace;
+    }
 
     private RelayCommand CreateGoBackToMapCommand()
     {

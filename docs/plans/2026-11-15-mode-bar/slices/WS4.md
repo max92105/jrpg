@@ -22,8 +22,8 @@ None.
 - `Shell/MainViewModel.Saving.cs` (197 → about 222): `Save` and `SaveAll` start with a shared `TryApplyShownPage()`
   that sets `SaveError` to the refusal plus " Nothing was written." and stops; `ConfirmClose` runs `TryApplyShown` once
   before the question (its result ignored: a page that can't apply is then listed), and Don't save closes without
-  running it again; `UnsavedChanges` adds `DatabaseWorkspace.UnappliedPage` when set.
-- `Workspaces/DatabaseWorkspaceViewModel`: `string? UnappliedPage` ("the Shops page, not applied: {problem or
+  running it again; `UnsavedChanges` adds `DatabaseWorkspace.UnappliedPageLine` when set.
+- `Workspaces/DatabaseWorkspaceViewModel`: `string? UnappliedPageLine` ("the Shops page, not applied: {problem or
   message}"; null with no session or when the last apply passed), kept from the last `TryApplyShown`.
 - `Shell/MainWindow.Database.cs`: `OpenInDialog` returns at once when the Database workspace exists and its
   `TryApplyShown` is false (a dialog's OK changes the draft, which would start the shown page again); what it needs
@@ -69,3 +69,18 @@ in the workspace has nothing typed); undo, redo and save work as before in World
   record land in the page's own session. `OpenInDialog` serves all thirteen Database entries and Character sprites
   until WS5, and `EditDropTables` the Enemies page's Edit...; the encounter undo refusal (EC4, decision 907) is one
   more catalog refusal an Undo meets after the apply.
+- **Done, with deviations:** `EditDropTables` (Database > Drop tables..., which skips `OpenInDialog`) applies the page
+  first too, through the same `MainWindow.Database.TryApplyShownPage`. `UnappliedPageLine` (renamed at review) is the
+  last refusal, kept and cleared with `Refusal`, its quoted problem's last period dropped (decision 1009): the close
+  question always lists a page that can't apply, the unexpected-error box only after a refused move. The page's
+  refusal copied into `History.Refusal` and `SaveError` clears when the workspace's `Refusal` changes (review, decision
+  1008's rule), only that copy: the page part of `CombinedHistory` moved to its partial `.DatabasePage` (37 lines), the
+  save line's listener in `MainViewModel.Saving`, subscribed in `CreateDatabaseWorkspace`. The Shops-page steps shared
+  with `MainViewModelDatabaseWorkspaceTests` moved to `Shell/ShopsPageSteps` (45 lines; `OpenOnArmory`, `ShowArmory`,
+  `ShownShops`, `ShowPage`); the throwing page is WS3's `NotesEditing` with `Thrown` set (`ThrowingEditing` was never
+  written). 22 tests instead of 15: `DatabaseWorkspaceLeavingTests` gains three `UnappliedPageLine_...` tests (260
+  lines); `Undo_PageWithProblemFixed_ClearsTheRefusal`, `Undo_PageRevertedAfterARefusal_ClearsTheRefusal`,
+  `Save_PageWithProblemFixed_ClearsTheSaveError` and `SaveError_MapRefusedThenPageRefusalCleared_Stays` (review);
+  `ConfirmClose_PageWithProblemAndDiscard_Closes` also asserts the page is listed. `CombinedHistory.cs` 282,
+  `MainViewModel.Saving.cs` 237, `MainViewModel.Workspaces.cs` 108, `MainViewModel.cs` 295, `MainWindow.Database.cs`
+  278, `DatabaseWorkspaceViewModel.cs` 188, `MainViewModelPageUndoTests` 116, `MainViewModelPageSavingTests` 158.

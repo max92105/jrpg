@@ -86,7 +86,6 @@ internal sealed partial class MainViewModel : ObservableObject
             Content.PropertyChanged += OnContentChanged;
             _openMaps.DirtyChanged += OnOpenMapsDirtyChanged;
             Content.Rewriting += (_, written) => ShowRewritten(written);
-            History = new CombinedHistory(Content, _openMaps);
             Placing = new ObjectPlacingViewModel(Content, Layer, _openMaps);
             Composing = new ObjectComposing(Content, Placing.Browser, Painting.Browser);
             AnimationImport = new AnimationImport(Content);
@@ -110,6 +109,7 @@ internal sealed partial class MainViewModel : ObservableObject
             BattleBackgroundEditing = CreateBattleBackgroundEditing();
             EncounterEditing = CreateEncounterEditing();
             DatabaseWorkspace = CreateDatabaseWorkspace(Content);
+            History = new CombinedHistory(Content, _openMaps, DatabaseWorkspace);
             NpcSpriteChange = new NpcSpriteChange(Content, Placing.Browser);
             if (MapIds.Count > 0)
             {

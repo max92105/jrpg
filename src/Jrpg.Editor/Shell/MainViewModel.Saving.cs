@@ -1,18 +1,25 @@
+using System.ComponentModel;
 using System.IO;
 using CommunityToolkit.Mvvm.Input;
 using Jrpg.Core.Content;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Maps;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
-/// Save, Save all and the close question (decisions 499-501, 518); a refused Save points to Save all when the open
-/// maps pass together (decision 519).
+/// Save, Save all and the close question (decisions 499-501, 518); a refused Save points to Save all when the open maps
+/// pass together (decision 519). Each first applies the shown Database page: one that can't apply stops a save with
+/// nothing written, its refusal on the save line until the page's clears, and is listed by the close question
+/// (decisions 923, 924, 1008).
 /// </summary>
 internal sealed partial class MainViewModel
 {
+    // The shown page's refusal as last quoted in SaveError, so only that line clears with the page's.
+    private string? _pageSaveError;
+
     /// <summary>
     /// Whether the editor may close: nothing unsaved, or the developer's answer to the close question: Save all closes
     /// only when everything was written, Don't save closes, Cancel stays.
@@ -21,6 +28,10 @@ internal sealed partial class MainViewModel
     {
         // A stroke still being dragged counts as a change, so it ends before the question.
         CurrentMap?.EndStroke();
+
+        // A page whose typed changes apply counts as the catalogs' change; one that can't is listed, and Don't save
+        // then closes without applying it again (decision 924).
+        _ = DatabaseWorkspace?.TryApplyShown();
         if (UnsavedChanges is not { } question)
         {
             return true;
@@ -46,7 +57,7 @@ internal sealed partial class MainViewModel
     [RelayCommand]
     private void Save()
     {
-        if (Content is not { } content)
+        if (Content is not { } content || !TryApplyShownPage())
         {
             return;
         }
@@ -76,7 +87,7 @@ internal sealed partial class MainViewModel
     [RelayCommand]
     private void SaveAll()
     {
-        if (Content is not { } content)
+        if (Content is not { } content || !TryApplyShownPage())
         {
             return;
         }
@@ -85,6 +96,29 @@ internal sealed partial class MainViewModel
         SaveTogether(content, _openMaps.ContentWith(content.Current), _openMaps.Dirty);
         ShowMapList(content.Current);
         Art!.Refresh();
+    }
+
+    // The shown Database page's typed changes are written with the rest, or nothing is (decision 923).
+    private bool TryApplyShownPage()
+    {
+        if (DatabaseWorkspace is not { } workspace || workspace.TryApplyShown())
+        {
+            return true;
+        }
+
+        SaveError = _pageSaveError = $"{workspace.Refusal} Nothing was written.";
+        return false;
+    }
+
+    // Any change of the page's refusal (a fix typed, Revert, a move that passes) leaves the save line quoting what is
+    // gone; a map's or a file's refusal stays.
+    private void OnDatabaseWorkspaceChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(DatabaseWorkspaceViewModel.Refusal) && SaveError is not null
+            && SaveError == _pageSaveError)
+        {
+            SaveError = null;
+        }
     }
 
     // All or none; refused, the changed tiles and objects are still written alone when they pass by themselves, as
@@ -174,8 +208,9 @@ internal sealed partial class MainViewModel
     }
 
     /// <summary>
-    /// "Unsaved changes in map 'forest', map 'start' and the tiles and objects."; null when nothing is unsaved. Read by
-    /// the close question and by the unexpected-error box (ADR 0050).
+    /// The line the close question and the unexpected-error box (ADR 0050) show: "Unsaved changes in map 'forest', map
+    /// 'start' and the tiles and objects.", a Database page that can't apply named last (decision 924); null when
+    /// nothing is unsaved.
     /// </summary>
     public string? UnsavedChanges
     {
@@ -185,6 +220,11 @@ internal sealed partial class MainViewModel
             if (Content is { IsDirty: true })
             {
                 unsaved.Add("the tiles and objects");
+            }
+
+            if (DatabaseWorkspace?.UnappliedPageLine is { } unappliedPageLine)
+            {
+                unsaved.Add(unappliedPageLine);
             }
 
             return unsaved.Count == 0 ? null : $"Unsaved changes in {Named(unsaved)}.";

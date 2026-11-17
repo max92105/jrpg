@@ -2,13 +2,15 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Maps;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Shell;
 
 /// <summary>
 /// One Undo and Redo over the open maps' and the catalogs' histories, in the order the steps were recorded (ADR 0014,
 /// decision 117); each open map keeps its steps while another is shown (decision 503). A catalog undo that would remove
-/// a record still in use is refused, with the reason in <see cref="Refusal"/>.
+/// a record still in use is refused, with the reason in <see cref="Refusal"/>. Both first apply the shown Database
+/// page's typed changes, or are refused with the page's own refusal (decision 920; the `.DatabasePage` partial).
 /// </summary>
 internal sealed partial class CombinedHistory : ObservableObject
 {
@@ -19,10 +21,16 @@ internal sealed partial class CombinedHistory : ObservableObject
 
     /// <param name="catalog">The catalogs whose steps share the order with the open maps'.</param>
     /// <param name="openMaps">Every open map, read by the refusals as it is now (decision 502).</param>
-    public CombinedHistory(CatalogDraft catalog, OpenMaps openMaps)
+    /// <param name="database">
+    /// The Database mode, whose shown page an undo or redo applies first, listened to so its refusal shown here clears
+    /// with the page's.
+    /// </param>
+    public CombinedHistory(CatalogDraft catalog, OpenMaps openMaps, DatabaseWorkspaceViewModel database)
     {
         _catalog = catalog;
         _openMaps = openMaps;
+        _database = database;
+        database.PropertyChanged += OnDatabaseChanged;
         catalog.StepRecorded += (_, _) => RecordStep(UndoStep.Catalogs);
         catalog.RedoDropped += (_, _) =>
         {
@@ -52,16 +60,24 @@ internal sealed partial class CombinedHistory : ObservableObject
     }
 
     /// <summary>
-    /// Why the last undo was refused: a record it would remove is still in use; null after any other undo, redo or
-    /// edit.
+    /// Why the last undo or redo was refused: a record the undo would remove is still in use, or the shown Database
+    /// page can't apply; null after any other undo, redo or edit.
     /// </summary>
     [ObservableProperty]
     public partial string? Refusal { get; private set; }
 
-    /// <summary>Undoes the newest step, whether it went to the shown map or to the catalogs (decision 117).</summary>
+    /// <summary>
+    /// Undoes the newest step, whether it went to the shown map or to the catalogs (decision 117); the shown page's
+    /// typed changes are that step when it has any.
+    /// </summary>
     [RelayCommand(CanExecute = nameof(CanUndo))]
     private void Undo()
     {
+        if (!TryApplyShownPage())
+        {
+            return;
+        }
+
         // A stroke still being dragged is the newest step.
         _openMap?.EndStroke();
         if (!_journal.CanUndo(ShownMapId))
@@ -87,9 +103,15 @@ internal sealed partial class CombinedHistory : ObservableObject
         NotifyUndoRedoChanged();
     }
 
+    // The shown page's typed changes, applied, are a new step, which drops the redo as any edit does (decision 920).
     [RelayCommand(CanExecute = nameof(CanRedo))]
     private void Redo()
     {
+        if (!TryApplyShownPage())
+        {
+            return;
+        }
+
         _openMap?.EndStroke();
         if (!_journal.CanRedo(ShownMapId))
         {

@@ -220,6 +220,38 @@ public sealed class DatabaseWorkspaceLeavingTests
         Assert.Null(_workspace.Refusal);
     }
 
+    [Fact]
+    public void UnappliedPageLine_Problem_NamesThePageAndItsProblem()
+    {
+        ShowNotesWithProblem();
+
+        _workspace.TryApplyShown();
+
+        Assert.Equal("the Notes page, not applied: No title", _workspace.UnappliedPageLine);
+    }
+
+    [Fact]
+    public void UnappliedPageLine_ApplyThrows_NamesItsMessage()
+    {
+        _workspace.ShowPageCommand.Execute(_notesPage);
+        _notesEditing.Thrown = new InvalidOperationException("broken");
+
+        _workspace.TryApplyShown();
+
+        Assert.Equal("the Notes page, not applied: broken", _workspace.UnappliedPageLine);
+    }
+
+    [Fact]
+    public void UnappliedPageLine_ProblemFixedAfterARefusal_IsNull()
+    {
+        ShowNotesWithProblem();
+        _workspace.TryApplyShown();
+
+        ShownNotes.Problem = null;
+
+        Assert.Null(_workspace.UnappliedPageLine);
+    }
+
     private void ShowNotesWithProblem()
     {
         _workspace.ShowPageCommand.Execute(_notesPage);

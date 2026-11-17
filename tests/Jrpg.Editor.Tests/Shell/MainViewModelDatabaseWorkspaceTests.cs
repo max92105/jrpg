@@ -1,7 +1,5 @@
-using Jrpg.Core.Trade;
-using Jrpg.Editor.Shell;
-using Jrpg.Editor.Trade;
 using Jrpg.Editor.Workspaces;
+using static Jrpg.Editor.Tests.Shell.ShopsPageSteps;
 
 namespace Jrpg.Editor.Tests.Shell;
 
@@ -11,8 +9,6 @@ namespace Jrpg.Editor.Tests.Shell;
 /// </summary>
 public sealed class MainViewModelDatabaseWorkspaceTests : IDisposable
 {
-    private static readonly ShopDefinition _armory = new("armory", "Armory", ["bronze_sword"]);
-
     private readonly EditorTestContent _content = new();
 
     public void Dispose() => _content.Dispose();
@@ -41,7 +37,7 @@ public sealed class MainViewModelDatabaseWorkspaceTests : IDisposable
     [Fact]
     public void ShowDatabase_DatabaseShown_KeepsWhatWasTyped()
     {
-        var viewModel = OpenOnArmory();
+        var viewModel = OpenOnArmory(_content, _content.TestWorld);
         ShownShops(viewModel).SelectedShop!.Name = "Old Armory";
 
         viewModel.ShowDatabaseCommand.Execute(null);
@@ -52,7 +48,7 @@ public sealed class MainViewModelDatabaseWorkspaceTests : IDisposable
     [Fact]
     public void ShowWorld_TypedName_AppliesIt()
     {
-        var viewModel = OpenOnArmory();
+        var viewModel = OpenOnArmory(_content, _content.TestWorld);
         ShownShops(viewModel).SelectedShop!.Name = "Old Armory";
 
         viewModel.ShowWorldCommand.Execute(null);
@@ -63,7 +59,7 @@ public sealed class MainViewModelDatabaseWorkspaceTests : IDisposable
     [Fact]
     public void ShowWorld_FromDatabase_EndsThePageSession()
     {
-        var viewModel = OpenOnArmory();
+        var viewModel = OpenOnArmory(_content, _content.TestWorld);
 
         viewModel.ShowWorldCommand.Execute(null);
 
@@ -73,7 +69,7 @@ public sealed class MainViewModelDatabaseWorkspaceTests : IDisposable
     [Fact]
     public void ShowWorld_PageWithProblem_StaysInDatabase()
     {
-        var viewModel = OpenOnArmory();
+        var viewModel = OpenOnArmory(_content, _content.TestWorld);
         ShownShops(viewModel).AddShopCommand.Execute(null);
 
         viewModel.ShowWorldCommand.Execute(null);
@@ -95,25 +91,5 @@ public sealed class MainViewModelDatabaseWorkspaceTests : IDisposable
         viewModel.GoBackToMapCommand.Execute(null);
 
         Assert.Equal((EditorWorkspace.Database, secondMapId), (viewModel.Workspace, viewModel.CurrentMap!.Map.Id));
-    }
-
-    private static ShopCatalogViewModel ShownShops(MainViewModel viewModel) =>
-        (ShopCatalogViewModel)viewModel.DatabaseWorkspace!.Session!.Edited;
-
-    // The Shops page shown on the shop armory, set on the draft first.
-    private static void ShowArmory(MainViewModel viewModel)
-    {
-        viewModel.Content!.SetShops([.. viewModel.Catalog!.Shops.Values, _armory]);
-        viewModel.ShowDatabaseCommand.Execute(null);
-        var workspace = viewModel.DatabaseWorkspace!;
-        workspace.ShowPageCommand.Execute(workspace.Pages.Single(page => page.Title == "Shops"));
-        ShownShops(viewModel).Choose("armory");
-    }
-
-    private MainViewModel OpenOnArmory()
-    {
-        var viewModel = _content.Open(_content.TestWorld);
-        ShowArmory(viewModel);
-        return viewModel;
     }
 }

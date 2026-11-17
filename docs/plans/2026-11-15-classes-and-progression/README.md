@@ -36,7 +36,7 @@ roadmap names:
 2. **Skills learned at a level (ADR 0062, LV1-LV3)** before the Skills tab, so CL6 builds the Level column from the
    start: the file shape first with every level 1 (LV1, nothing changes in play), then the member's rule (LV2), then
    the victory line (LV3).
-3. **The rest of the Classes page (CL6-CL9):** skills with their levels, then the resources (rules, tab, the four
+3. **The rest of the Classes page (CL6-CL9d):** skills with their levels, then the resources (rules, tab, the four
    optional rules).
 4. **Party members (PM1-PM4)** then **the new game (NG1-NG3)**, which names members.
 5. **Experience (ADR 0061, XP1-XP4)** last: `rules.json` is the one takeover with a real alternative (the ADR); the
@@ -139,8 +139,14 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 - [x] **CL7d. A class's resources: Add, Remove, Up and Down** (Editor, about 220 lines; split from CL7c) →
   [slices/CL7d.md](slices/CL7d.md)
 - [x] **CL8. The Resources tab** (Editor, about 60 lines plus about 120 of XAML) → [slices/CL8.md](slices/CL8.md)
-- [ ] **CL9. A resource's rules: Will scaling, backfire, strain and dominance** (Editor, about 210 lines) →
-  [slices/CL9.md](slices/CL9.md)
+- [x] **CL9. A resource's rules: Will scaling and backfire as typed boxes** (Editor, about 210 lines; split, strain and
+  dominance are CL9b, the resource's writing CL9c, the tab CL9d) → [slices/CL9.md](slices/CL9.md)
+- [ ] **CL9b. A resource's strain and dominance as typed boxes** (Editor, about 230 lines; split from CL9) →
+  [slices/CL9b.md](slices/CL9b.md)
+- [ ] **CL9c. A resource writes its four rules from the boxes** (Editor, about 200 lines; split from CL9) →
+  [slices/CL9c.md](slices/CL9c.md)
+- [ ] **CL9d. The Rules group on the Resources tab** (Editor, about 40 lines plus about 60 of XAML; split from CL9) →
+  [slices/CL9d.md](slices/CL9d.md)
 
 ### Phase 4: party members
 - [ ] **PM1. `party-members.json` is written by the editor** (Data + content, about 130 lines plus the relaid file) →
@@ -284,6 +290,10 @@ Skills learned at a level (ADR 0062):
 - **1015.** (CL7b) A resource with fixed amounts shows 1 in its Speed per charge box, the validator's lowest, so ticking
   From speed starts on a number Data takes; a speed resource unticked shows its record's max and start, 0 and 0, and
   Data's "max must be at least 1" asks for a max.
+- **1016.** (CL9) An optional resource rule ticked on a resource without it starts on numbers Data takes on any
+  resource: Will per point 1 raising the max (a lasting resource refuses a raised start), backfire 1 % and 1 %, strain 1
+  per missing point and dominance a bonus of 0, the last two naming no resource until one is chosen. The four boxes
+  share one base, `Party/ResourceRuleBoxes<TRule>`: the on box, the problem only while on, the rule or null, `Changed`.
 
 Shared and new game:
 - **960.** A member's starting gear is not built: members join with nothing worn, and no rule says otherwise.

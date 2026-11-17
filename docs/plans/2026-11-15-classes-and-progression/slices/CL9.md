@@ -57,3 +57,15 @@ on a problem), `From(X?)` and `CopyFrom`:
 
 - **Note from CL7:** CL7 was split in three; `Party/ClassResourceViewModel` comes from CL7b and
   `Party/ClassResourceListTests` from CL7c (the "after CL7" and "CL7's file" above mean those).
+- **Done, with deviations:** split on 2026-11-17, the whole slice estimated at about 450 lines with tests: CL9 built
+  the shared base and the first two rules' boxes; strain and dominance moved to CL9b, the resource writing the four
+  rules (`ClassResourceViewModel`, the list's Data-message and round-trip tests) to CL9c, `ResourceIds` and the Rules
+  group to CL9d, which says the group goes in CL8's `Party/ClassResourcesView.xaml`, not the page. Decision 1016: the
+  four boxes share `Party/ResourceRuleBoxes<TRule>` (46 lines: `IsOn`, `Problem` only while on, `ToRule` null while
+  off and throwing on a problem, `Changed` raised through `OnTyped` from each typed field's change hook, after review,
+  so a later computed property never raises it), and an off rule's boxes show numbers Data takes on any resource (Will
+  per point 1 raising the max, backfire 1 and 1). `Party/WillScalingBoxes` (52) and `Party/BackfireBoxes` (56), each
+  with `From` and `CopyFrom`, the record or the blank read once in the constructor. `Party/ResourceRuleTests` (270, 26
+  tests: shown on and off, untouched equal, ticked on writing the blank, typed rules written, off writing nothing, the
+  throw, each box's problem name, the problem only while on, each `Problem` notice, `Changed` once for every typed
+  field and the tick, `CopyFrom` on and off). About 420 lines, above the 210 planned. No hand check: no page change.

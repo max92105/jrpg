@@ -11,6 +11,7 @@ behind ADR 0062 (section 5), the file layouts and what is left for later (sectio
 | New class | `Party/ClassViewModel` (`_blank`) | name and description empty, base max HP 1, every other base and growth number 0, no skills, no resources | Add's starting record: the validator's lowest legal numbers, as the Enemies page's blank (decision 585's pattern). |
 | New skill entry's level | `Party/ClassViewModel.Skills` (CL6) | 1 | What Add writes in the Level box: known from the start, as every entry today. |
 | New resource | `Party/ClassResourceViewModel` (`_blank`) | id and name empty, color `#FFFFFF`, max 1, starts at 0, no gains, no rules; speed per charge 1 if From speed is ticked (decision 1015) | Add's starting resource. |
+| An off resource rule's boxes | `Party/WillScalingBoxes`, `BackfireBoxes`, `StrainBoxes`, `DominanceBoxes` (`_blank`) | Will per point 1, raising the max; backfire 1 % and 1 %; strain 1 per missing point, no resource named; dominance bonus 0, no rival named | What a rule's boxes show while it is off, so ticking it starts on numbers Data takes (decision 1016). |
 | New member | `Party/PartyMemberViewModel` (`_blank`) | every text empty, no class | Add's starting member. |
 | New starting item row | `NewGame/StartingItemRow` | no item, quantity 1 | Add's row on the New game page. |
 | Added level | `Progression/ExperienceTableViewModel` | the last row's amount | What Add level puts in the new last row. |
@@ -77,7 +78,8 @@ Editor, `Editor/Party/` (no type is named `Party`, CA1724):
 | `ClassResourceViewModel` | CL7 | One resource as the Resources tab types it. |
 | `ResourceGainsBoxes` | CL7 | A resource's eight gains and heavy-hit share as typed boxes. |
 | `HexColorBrushConverter` | CL8 | A `#RRGGBB` text to a brush for the swatch, transparent while unreadable. |
-| `WillScalingBoxes`, `BackfireBoxes`, `StrainBoxes`, `DominanceBoxes` | CL9 | One optional resource rule each: whether it is on, and its boxes. |
+| `ResourceRuleBoxes<TRule>` | CL9 | One optional resource rule as typed: whether it is on, its boxes' problem, the rule or null. |
+| `WillScalingBoxes`, `BackfireBoxes`, `StrainBoxes`, `DominanceBoxes` | CL9, CL9b | One optional resource rule each: whether it is on, and its boxes. |
 | `PartyMemberViewModel` | PM2 | One member as the Party members page types it. |
 | `PartyMemberCatalogViewModel` | PM2 | Every member on the page, Add, Remove while new, the class choices and the problem line. |
 | `PartyMemberEditingViewModel` | PM3 | Starts the Party members page from the draft and applies its session as one step. |

@@ -65,3 +65,11 @@ from the menu. The run is the tests and `verify.ps1`.
   (in `MainWindow.MapSwitching.cs`, not `MainWindow.xaml.cs`) and `GoBackToMapCommand`, a hand-built command in
   `MainViewModel.Workspaces.cs` (built lazily, since the constructor can't read `Navigation` without a nullable
   warning) whose action runs `ShowWorld()` then the navigation's Back with no check yet; it gets one, with a test.
+- **Note from WS2:** the restart on a `Current` change is in (WS2's `OnDraftChanged`), with WS2's tests
+  `DraftChanged_Closed_StartsNothing` (taken from this list) and `MarkSaved_TypedName_KeepsTheSession`; WS3 adds the
+  undo tests. Closing keeps `ShownPage` and remembers each page's chosen key in `_chosenKeys` (decision 1007), so
+  `ShowPage` reads it. `Close`, `Apply` and `Revert` assume a shown session (`Session!`): `TryClose` and
+  `TryApplyShown` take "nothing shown" from there.
+- **Note from WS2 review:** `MainViewModel.ShowDatabase` has no guard for Database already shown: once it calls
+  `DatabaseWorkspace.Open()`, pressing Database again would restart the session and drop what was typed but not
+  applied. Return early (or grey the lit button) when Database is shown, with a test.

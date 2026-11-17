@@ -1,4 +1,5 @@
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Sprites;
 
@@ -13,6 +14,7 @@ namespace Jrpg.Editor.Sprites;
 /// <param name="sizeOf">An image's size by file name; null when the folder lacks it.</param>
 internal sealed class FieldSpriteEditingViewModel(
     CatalogDraft catalog, Func<IReadOnlyList<string>> listFiles, Func<string, (int Width, int Height)?> sizeOf)
+    : ICatalogEditing<FieldSpriteCatalogViewModel>
 {
     /// <summary>
     /// The page's state from the draft as it is now, so a record undone or saved since is read right.

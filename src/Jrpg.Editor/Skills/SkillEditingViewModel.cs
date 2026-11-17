@@ -1,4 +1,5 @@
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Skills;
 
@@ -11,6 +12,7 @@ namespace Jrpg.Editor.Skills;
 /// Reads what the page's boxes offer, built by the shell over the art and audio roots.
 /// </param>
 internal sealed class SkillEditingViewModel(CatalogDraft catalog, Func<SkillChoices> readChoices)
+    : ICatalogEditing<SkillCatalogViewModel>
 {
     /// <summary>
     /// The page's state from the draft and the folders as they are now, so a skill undone or an image added since shows

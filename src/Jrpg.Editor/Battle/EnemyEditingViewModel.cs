@@ -1,4 +1,5 @@
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Battle;
 
@@ -10,6 +11,7 @@ namespace Jrpg.Editor.Battle;
 /// <param name="catalog">The draft the page edits.</param>
 /// <param name="artImagesIn">The PNG names of an art folder by name, built by the shell over the art root.</param>
 internal sealed class EnemyEditingViewModel(CatalogDraft catalog, Func<string, IReadOnlyList<string>> artImagesIn)
+    : ICatalogEditing<EnemyCatalogViewModel>
 {
     /// <summary>
     /// The page's state from the draft as it is now, so an enemy undone or saved since is read right.

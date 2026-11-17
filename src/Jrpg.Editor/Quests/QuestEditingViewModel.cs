@@ -1,4 +1,5 @@
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Quests;
 
@@ -6,7 +7,7 @@ namespace Jrpg.Editor.Quests;
 /// Editing the draft's quests through the Quests page (decision 394): the page starts from the draft as it is and the
 /// whole session is applied as one undo step, as <see cref="Events.EventEditingViewModel"/> applies a dialog.
 /// </summary>
-internal sealed class QuestEditingViewModel(CatalogDraft catalog)
+internal sealed class QuestEditingViewModel(CatalogDraft catalog) : ICatalogEditing<QuestCatalogViewModel>
 {
     /// <summary>
     /// The page's state from the draft as it is now, so a quest undone or saved since is read right.

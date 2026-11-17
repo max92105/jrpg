@@ -1,4 +1,5 @@
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Encounters;
 
@@ -10,6 +11,7 @@ namespace Jrpg.Editor.Encounters;
 /// <param name="readChoices">The enemies, backgrounds and tracks as the draft and the folders hold them when the page
 /// opens.</param>
 internal sealed class EncounterEditingViewModel(CatalogDraft catalog, Func<EncounterChoices> readChoices)
+    : ICatalogEditing<EncounterCatalogViewModel>
 {
     /// <summary>
     /// The page's state from the draft as it is now, its boxes read now, so an image or track dropped into a folder

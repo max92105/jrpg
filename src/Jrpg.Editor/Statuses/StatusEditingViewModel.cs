@@ -1,4 +1,5 @@
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Statuses;
 
@@ -8,7 +9,7 @@ namespace Jrpg.Editor.Statuses;
 /// <see cref="Effects.TieredEffectEditingViewModel"/> does for the tiered effects.
 /// </summary>
 /// <param name="catalog">The draft the page edits.</param>
-internal sealed class StatusEditingViewModel(CatalogDraft catalog)
+internal sealed class StatusEditingViewModel(CatalogDraft catalog) : ICatalogEditing<StatusCatalogViewModel>
 {
     /// <summary>The page's state from the draft as it is now, so a status undone since shows on the page.</summary>
     public StatusCatalogViewModel Start() => new(catalog.Current);

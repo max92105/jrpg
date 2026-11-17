@@ -108,7 +108,7 @@ page recipe: [page-recipe.md](page-recipe.md).
 - [x] ADR 0060, the Database mode's pages and the undo rule of a live page. Write it from decisions 918-924, 928, 931
   and 939; status "accepted as a default; the developer's to overturn". Amends ADR 0045 (its amendment B, the nested
   window, retired by WS6).
-- [ ] **WS2. A page's session: the catalog pages, the shown one started from the draft, Apply as one undo step
+- [x] **WS2. A page's session: the catalog pages, the shown one started from the draft, Apply as one undo step
   starting it again on the same record, Revert** (Editor, about 230 lines) → [slices/WS2.md](slices/WS2.md)
 - [ ] **WS3. Leaving a page applies it first: another page and World mode, refused with the page's problem or its
   apply's failure; a draft change starts the shown page again** (Editor, about 240 lines) → [slices/WS3.md](slices/WS3.md)
@@ -216,6 +216,10 @@ may overturn; the others follow from them, from the code or from the review.
   again): a page command reads the values it needs first, and any dialog it opens is owned by the main window. When the
   shown page is rebuilt and the old one held the keyboard focus, the new one takes it (`MoveFocus` to its first
   element).
+- **1007.** (WS2.) Closing the Database mode ends the session only: `ShownPage` stays set while World is shown, so
+  `Open` reopens it, and each page's chosen key when left is kept in the workspace's own dictionary (design section 3),
+  so WS3's `ShowPage` reopens any page on its record. Only a `Current` change starts the shown session again; the
+  draft's `IsDirty` notice (a save's mark) doesn't.
 
 ## Defaults to confirm
 Taken while the developer was away; each is his to overturn, and the slices that change if he does are named.

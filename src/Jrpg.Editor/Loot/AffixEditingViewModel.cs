@@ -1,4 +1,5 @@
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Loot;
 
@@ -7,7 +8,7 @@ namespace Jrpg.Editor.Loot;
 /// session is applied as one undo step that the uniques follow (decision 884), as
 /// <see cref="DropTableEditingViewModel"/> does for the tables.
 /// </summary>
-internal sealed class AffixEditingViewModel(CatalogDraft catalog)
+internal sealed class AffixEditingViewModel(CatalogDraft catalog) : ICatalogEditing<AffixCatalogViewModel>
 {
     /// <summary>The page's state from the draft as it is now, so an affix undone since shows on the page.</summary>
     public AffixCatalogViewModel Start() => new(catalog.Current);

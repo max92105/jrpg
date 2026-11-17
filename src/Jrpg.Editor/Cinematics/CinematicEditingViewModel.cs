@@ -1,4 +1,5 @@
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Cinematics;
 
@@ -9,6 +10,7 @@ namespace Jrpg.Editor.Cinematics;
 /// <param name="catalog">The draft the cinematics are read from and applied to.</param>
 /// <param name="readChoices">The pictures, voices and tracks as the folders hold them when the page opens.</param>
 internal sealed class CinematicEditingViewModel(CatalogDraft catalog, Func<CinematicMediaChoices> readChoices)
+    : ICatalogEditing<CinematicCatalogViewModel>
 {
     /// <summary>
     /// The page's state from the draft as it is now, so a cinematic undone or saved since is read right.

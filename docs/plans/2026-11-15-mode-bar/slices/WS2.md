@@ -50,3 +50,11 @@ None: nothing shows yet. The run is the tests and `verify.ps1`.
   "Effects" page, `effects.json`), `StatusEditingViewModel`, `ItemEditingViewModel`, `AffixEditingViewModel`,
   `BattleBackgroundEditingViewModel` and `EncounterEditingViewModel`. Each already has `Start()` and `Apply(edited)`,
   and each `CatalogDraft.SetX` records nothing when the records are the same, so it stays one line per type.
+- **Done, with deviations:** fourteen editing view models declare `ICatalogEditing<TEdited>` (two lines each, the
+  using included); the restart on a `Current` change is in, not split (decision 1007: `ShownPage` stays set after
+  `Close`, each page's key kept in the workspace's dictionary, the `IsDirty` notice ignored). 14 tests instead of 11:
+  the fixture has a second page (Quests) so "the first page" is told apart; `ApplyCommand_ProblemTyped_...` became
+  `ApplyCommand_ProblemFixed_...` (a new shop is a problem until it sells an item); added
+  `Revert_ProblemShown_RaisesApplyCanExecuteChanged`, `DraftChanged_Closed_StartsNothing` (taken from WS3) and
+  `MarkSaved_TypedName_KeepsTheSession`. `DatabaseWorkspaceViewModel` 95 lines, `CatalogPage` 41, `PageSession` 13,
+  `ICatalogEditing` 17, `DatabaseWorkspaceViewModelTests` 213: about 400 with the 28 declaration lines.

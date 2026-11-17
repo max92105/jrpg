@@ -1,4 +1,5 @@
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Effects;
 
@@ -8,7 +9,7 @@ namespace Jrpg.Editor.Effects;
 /// <see cref="Skills.SkillEditingViewModel"/> does.
 /// </summary>
 /// <param name="catalog">The draft the page edits.</param>
-internal sealed class TieredEffectEditingViewModel(CatalogDraft catalog)
+internal sealed class TieredEffectEditingViewModel(CatalogDraft catalog) : ICatalogEditing<TieredEffectCatalogViewModel>
 {
     /// <summary>The page's state from the draft as it is now, so an effect undone since shows on the page.</summary>
     public TieredEffectCatalogViewModel Start() => new(catalog.Current);

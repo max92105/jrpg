@@ -1,4 +1,5 @@
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Items;
 
@@ -16,7 +17,7 @@ namespace Jrpg.Editor.Items;
 internal sealed class ItemEditingViewModel(
     CatalogDraft catalog,
     Func<IReadOnlyList<string>> iconFiles,
-    Func<IReadOnlyList<string>> effectImages)
+    Func<IReadOnlyList<string>> effectImages) : ICatalogEditing<ItemCatalogViewModel>
 {
     /// <summary>The page's state from the draft as it is now, so an item undone since shows on the page.</summary>
     public ItemCatalogViewModel Start() => new(catalog.Current, iconFiles(), effectImages());

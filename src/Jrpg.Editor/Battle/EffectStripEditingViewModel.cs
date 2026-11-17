@@ -1,4 +1,5 @@
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Battle;
 
@@ -11,6 +12,7 @@ namespace Jrpg.Editor.Battle;
 /// <param name="sizeOf">An effects image's size by file name; null when the folder lacks it.</param>
 internal sealed class EffectStripEditingViewModel(
     CatalogDraft catalog, Func<IReadOnlyList<string>> listImages, Func<string, (int Width, int Height)?> sizeOf)
+    : ICatalogEditing<EffectStripCatalogViewModel>
 {
     /// <summary>The page's state from the draft and the folder as they are now.</summary>
     public EffectStripCatalogViewModel Start() => new(catalog.Current, listImages(), sizeOf);

@@ -76,6 +76,7 @@ public sealed class ContentWriterRepositoryTests : IDisposable
          .. File.ReadAllBytes(_content.PathOf("effect-strips.json")),
          .. File.ReadAllBytes(_content.PathOf("animated-backgrounds.json")),
          .. File.ReadAllBytes(_content.PathOf("skills.json")),
+         .. File.ReadAllBytes(_content.PathOf("classes.json")),
          .. File.ReadAllBytes(_content.PathOf("effects.json")),
          .. File.ReadAllBytes(_content.PathOf("statuses.json")),
          .. File.ReadAllBytes(_content.PathOf("items.json")),

@@ -58,3 +58,6 @@ records one `CatalogDraft.SetClasses` step; an Apply with no change records none
 
 ## Verify by hand
 None: the page comes in CL4.
+- **Note from CL1:** `CatalogDraft.Database.cs` is at 214 lines (118 when planned), so `SetClasses` goes in the new
+  `Catalogs/CatalogDraft.Party.cs` partial. CL1 already rewrote `CatalogDraft.SetSkills`' summary ("no page edits what
+  they name"); CL3 rewords it again once the Classes page edits a class's skills (CL6 at the latest).

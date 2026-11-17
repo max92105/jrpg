@@ -1,5 +1,5 @@
 # Classes and progression (editor push, roadmap row 12)
-Status: approved
+Status: approved, in progress
 
 Drafted on 2026-11-15 from roadmap row 12 of [the editor push](../2026-11-15-editor-push/README.md) ("Class windows or
 pages (stats, growth, skills, resources), skills learned by level, the experience table", its design.md section 3.11)
@@ -97,7 +97,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 `slices/CL0.md` is superseded (decision 962): delete it.
 
 ### Phase 1: classes
-- [ ] **CL1. `classes.json` is written by the editor, in the writer's layout** (Data + content, about 200 lines plus the
+- [x] **CL1. `classes.json` is written by the editor, in the writer's layout** (Data + content, about 200 lines plus the
   relaid file) → [slices/CL1.md](slices/CL1.md)
 - [ ] **CL2. One class as typed: name, description, base stats and growth** (Editor, about 210 lines) →
   [slices/CL2.md](slices/CL2.md)
@@ -208,6 +208,8 @@ Classes:
 - **951.** Each resource rule (Will scaling, backfire, strain, dominance) is a box that turns it on with its numbers;
   off writes nothing. Strain's and dominance's other resource is chosen from the class's resources as typed; Data's
   rules stay Data's messages.
+- **1011.** (CL1) A resource whose eight gains are all 0 leaves `gains` out of `classes.json` too, as the hand-written
+  druid's Growth and Decay did, so the writer never writes `"gains": {}`.
 
 Party members:
 - **952.** `party-members.json` is editor-written: sorted by id, relaid once, checked against the draft's classes.

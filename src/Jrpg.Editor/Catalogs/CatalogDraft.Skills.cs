@@ -13,8 +13,8 @@ internal sealed partial class CatalogDraft
 {
     /// <summary>
     /// Replaces the skills as one undo step (decision 974); nothing when they are the same by content, costs and the
-    /// effect's grants in order included. No undo refusal: classes and enemies name skills, but the editor writes
-    /// neither, so none of them can name a skill the undo removes.
+    /// effect's grants in order included. No undo refusal: classes and enemies name skills, but no page edits what they
+    /// name, so none of them can name a skill the undo removes.
     /// </summary>
     public void SetSkills(IReadOnlyList<SkillDefinition> skills)
     {

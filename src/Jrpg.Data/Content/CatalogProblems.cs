@@ -11,7 +11,6 @@ using Jrpg.Data.Battle;
 using Jrpg.Data.Cinematics;
 using Jrpg.Data.Effects;
 using Jrpg.Data.Loot;
-using Jrpg.Data.Party;
 using Jrpg.Data.Skills;
 using Jrpg.Data.Sprites;
 using Jrpg.Data.Statuses;
@@ -109,7 +108,7 @@ public static partial class CatalogProblems
     /// <summary>
     /// The first problem in the skills (decision 974): a skill's own rule, then the classes' check (a class's skills
     /// use only its resources) and the enemies' check (an enemy's skills use none), both run with these skills, since
-    /// the editor writes neither file; null when the loader would take them.
+    /// the Skills page changes what the classes and enemies name; null when the loader would take them.
     /// </summary>
     /// <param name="skills">The skills as edited.</param>
     /// <param name="content">The classes and the enemies that name the skills.</param>
@@ -216,8 +215,9 @@ public static partial class CatalogProblems
 
     /// <summary>
     /// The checks the loader makes on <c>skills.json</c>, then on <c>classes.json</c> against these skills, since a
-    /// class's skills may use only its resources (decision 974); the enemies that name these skills are checked by
-    /// <see cref="CheckEnemies"/>, which the writer and <see cref="OfSkills"/> run after this.
+    /// class's skills may use only its resources (decision 974): the one place the writer checks the classes (decision
+    /// 944), sorted by id as it writes them so the first problem named is the loader's. The enemies that name these
+    /// skills are checked by <see cref="CheckEnemies"/>, which the writer and <see cref="OfSkills"/> run after this.
     /// </summary>
     /// <param name="skills">The skills as they will be written.</param>
     /// <param name="content">The classes that name the skills.</param>
@@ -225,8 +225,9 @@ public static partial class CatalogProblems
     internal static void CheckSkills(IReadOnlyList<SkillDefinition> skills, ContentCatalog content)
     {
         SkillCatalogValidator.Validate(ContentCatalogLoader.SkillsFile, skills);
-        var references = new ClassReferences(skills.ToDictionary(skill => skill.Id, StringComparer.Ordinal));
-        ClassCatalogValidator.Validate(ContentCatalogLoader.ClassesFile, [.. content.Classes.Values], references);
+        CheckClasses(
+            [.. content.Classes.Values.OrderBy(classDefinition => classDefinition.Id, StringComparer.Ordinal)],
+            skills.ToDictionary(skill => skill.Id, StringComparer.Ordinal));
     }
 
     /// <summary>

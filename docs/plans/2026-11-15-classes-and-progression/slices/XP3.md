@@ -39,3 +39,16 @@ None new: the page binds XP2's tested view model. Guard: the smoke script shows 
    Run the game, win the first battle: the bar fills against 50. Ctrl+Z, Save all to restore.
 5. Database > Classes, Levels tab: 21 rows; after Remove last level and Apply on the Experience page, back on Classes:
    20.
+- **Note from CL1:** rows 6-11 landed as this plan expected, so this is a page in the Database mode, never a dialog:
+  `Workspaces/CatalogDialog` is gone and the Fallback paragraph is void. The recipe is
+  `docs/plans/2026-11-15-mode-bar/page-recipe.md` (what this file calls "the WS12 recipe"). Its lines on 2026-11-17:
+  one `CatalogPage.Of(title, CatalogGroup.Characters, editing)` in `Shell/MainViewModel.Workspaces.cs`'s
+  `CreateDatabaseWorkspace` (143 lines), the editing view model built there from its `content` parameter rather than
+  as a new `XEditing` property (`MainViewModel.cs` is at 295 and each property costs a constructor line there); one
+  `pageViews.Register<TEdited>(...)` in `Shell/MainWindow.Database.cs`'s `CreatePageViews` (96 lines; a page with
+  pictures in `RegisterPicturePages`), and the map's Workspaces row count ("registers the fourteen") moves; the
+  `Shell/DatabaseMenu.xaml` entry passes the title as `CommandParameter` (the recipe's "`Tag`" is stale);
+  `CatalogGroup.Characters`' summary ("Character sprites.") gains the title; and
+  `MainViewModelDatabaseWorkspaceTests.DatabaseWorkspace_ContentLoaded_ListsEveryPageInGroupOrder` gains it after the
+  page before it, so "Tests: none new" still changes that one assertion. The smoke script's default list is its lines
+  32-35.

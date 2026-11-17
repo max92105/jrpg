@@ -1,13 +1,15 @@
 using System.Text.Json.Serialization.Metadata;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Items;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
 
 namespace Jrpg.Data.Content;
 
 /// <summary>
-/// Leaves a flag off by default out of a file while it is false, so an enemy, a skill or an item the editor writes
-/// reads like a hand-written one (decisions 586, 973, 862) and only the records the developer turned it on in carry it.
+/// Leaves a flag off by default out of a file while it is false, so an enemy, a skill, an item or a class the editor
+/// writes reads like a hand-written one (decisions 586, 973, 862, 944) and only the records the developer turned it on
+/// in carry it.
 /// </summary>
 internal static class AbsentWhenFalseFilter
 {
@@ -30,6 +32,9 @@ internal static class AbsentWhenFalseFilter
 
         // ADR 0058: only a hand-made piece is unique.
         (typeof(ItemDefinition), "isUnique"),
+
+        // ADR 0024: most resources start every battle afresh.
+        (typeof(ResourceDefinition), "isLasting"),
     ];
 
     public static void SkipFalseOptionalFields(JsonTypeInfo typeInfo) =>

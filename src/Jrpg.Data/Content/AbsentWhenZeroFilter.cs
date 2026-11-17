@@ -3,6 +3,7 @@ using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Sprites;
 using Jrpg.Core.Statuses;
 
@@ -10,8 +11,8 @@ namespace Jrpg.Data.Content;
 
 /// <summary>
 /// Leaves a whole-number field out of a file while it is 0: one added after the content was written, so every file that
-/// predates it writes back byte for byte, or one that 0 means "unused" for, so an enemy the editor writes reads like a
-/// hand-written one (decision 586).
+/// predates it writes back byte for byte, or one that 0 means "unused" for, so an enemy or a class the editor writes
+/// reads like a hand-written one (decisions 586, 944).
 /// </summary>
 internal static class AbsentWhenZeroFilter
 {
@@ -35,6 +36,18 @@ internal static class AbsentWhenZeroFilter
         (typeof(Effect), "range"),
         // Decision 330: only a weapon swings.
         (typeof(EquipmentStats), "damage"),
+        // Decision 944: a speed resource has neither number, and most start empty.
+        (typeof(ResourceDefinition), "max"),
+        (typeof(ResourceDefinition), "startsAt"),
+        // Decision 944: a resource gains on a few triggers only.
+        (typeof(ResourceGains), "perTurn"),
+        (typeof(ResourceGains), "perAllyFallen"),
+        (typeof(ResourceGains), "perHitTaken"),
+        (typeof(ResourceGains), "perHeavyHit"),
+        (typeof(ResourceGains), "heavyHitPercent"),
+        (typeof(ResourceGains), "perEnemyFallen"),
+        (typeof(ResourceGains), "perHitLanded"),
+        (typeof(ResourceGains), "perBattleFought"),
     ];
 
     public static void SkipZeroOptionalFields(JsonTypeInfo typeInfo) =>

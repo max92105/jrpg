@@ -6,6 +6,7 @@ using Jrpg.Core.Events;
 using Jrpg.Core.Items;
 using Jrpg.Core.Maps;
 using Jrpg.Core.Quests;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Sprites;
 using Jrpg.Core.Statuses;
@@ -15,8 +16,8 @@ namespace Jrpg.Data.Content;
 /// <summary>
 /// Leaves an optional field out of a file while it is null, for two reasons: a field added after the content was
 /// written, so every file that predates it writes back byte for byte; and a field with a meaning for null (an enemy's,
-/// decision 586; a cinematic's, ADR 0046), so a record the editor writes reads like a hand-written one. Every other
-/// null is written out, as the hand-written files spell it.
+/// decision 586; a cinematic's, ADR 0046; a class resource's, decision 944), so a record the editor writes reads like a
+/// hand-written one. Every other null is written out, as the hand-written files spell it.
 /// </summary>
 internal static class AbsentWhenNullFilter
 {
@@ -129,6 +130,13 @@ internal static class AbsentWhenNullFilter
 
         // Decision 848: most rules aim as their skill does.
         (typeof(EnemyAction), "on"),
+
+        // ADR 0019, decision 944: each of a resource's rules is for some resources only.
+        (typeof(ResourceDefinition), "maxFromSpeed"),
+        (typeof(ResourceDefinition), "backfire"),
+        (typeof(ResourceDefinition), "strain"),
+        (typeof(ResourceDefinition), "dominance"),
+        (typeof(ResourceDefinition), "willScaling"),
     ];
 
     public static void SkipNullOptionalFields(JsonTypeInfo typeInfo) =>

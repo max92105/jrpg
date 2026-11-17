@@ -3,6 +3,7 @@ using System.Text.Json.Serialization.Metadata;
 using Jrpg.Core.Battle;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
+using Jrpg.Core.Resources;
 using Jrpg.Core.Skills;
 using Jrpg.Core.Sprites;
 using Jrpg.Core.Stats;
@@ -14,7 +15,8 @@ namespace Jrpg.Data.Content;
 /// hand-written one (decision 586): most enemies only attack and have no phases (ADR 0034); a field sprite facing that
 /// mirrors another has no cells (ADR 0054); a skill or its effect leaves out a list it has no use for (decision 973);
 /// gear adding no stat leaves out its bonuses, a <see cref="StatBonuses"/> naming no kind (decision 862); an item that
-/// isn't unique leaves out its fixed affixes (ADR 0058).
+/// isn't unique leaves out its fixed affixes (ADR 0058); a class resource gaining on no trigger leaves out its gains, a
+/// <see cref="ResourceGains"/> of zeros (decision 1011).
 /// </summary>
 internal static class AbsentWhenEmptyFilter
 {
@@ -38,10 +40,17 @@ internal static class AbsentWhenEmptyFilter
 
         // ADR 0058: only a unique has fixed affixes.
         (typeof(ItemDefinition), "fixedAffixes"),
+
+        // Decision 1011: a resource only its skills change gains on no trigger.
+        (typeof(ResourceDefinition), "gains"),
     ];
 
-    // StatBonuses isn't a collection, so it is tested apart.
+    private static readonly ResourceGains _noGains = new();
+
+    // StatBonuses and ResourceGains aren't collections, so they are tested apart.
     public static void SkipEmptyOptionalFields(JsonTypeInfo typeInfo) =>
         OptionalFieldFilter.SkipWhen(
-            typeInfo, _emptyByDefault, value => value is ICollection { Count: 0 } or StatBonuses { Values.Count: 0 });
+            typeInfo,
+            _emptyByDefault,
+            value => value is ICollection { Count: 0 } or StatBonuses { Values.Count: 0 } || _noGains.Equals(value));
 }

@@ -4,7 +4,7 @@ Feature plans from `/plan-feature`, worked through one slice at a time with `/sl
 
 Code-health work found along the way (big files, copies, open follow-ups) waits in [backlog.md](backlog.md) for the next cleanup plan.
 
-**Next free numbers:** decision 1011, ADR 0063 (706-1000 and ADRs 0051-0062 are reserved for the editor push's sub-plans of 2026-11-15). A new decision or ADR takes its number from this line and bumps it in the same change, so two plans never share a number.
+**Next free numbers:** decision 1012, ADR 0063 (706-1000 and ADRs 0051-0062 are reserved for the editor push's sub-plans of 2026-11-15). A new decision or ADR takes its number from this line and bumps it in the same change, so two plans never share a number.
 
 **Layout of a plan** (from the battle plan on): a folder `YYYY-MM-DD-name/` with
 - `README.md`: status, goal, order, guiding rules, out of scope, the slice index (one line and a checkbox per slice), the developer's decisions, open questions, ADRs needed. Read for every slice.
@@ -18,7 +18,7 @@ Older plans are single files with the same sections.
 | [2026-11-15-editor-push](2026-11-15-editor-push/README.md) | approved (the roadmap of twelve sub-plans, and sub-plan 1: the editor's safety net, NET1; NET2 optional) |
 | [2026-11-15-skill-and-status-editors](2026-11-15-skill-and-status-editors/README.md) | approved, in progress (the editor push's row 7; its balance table runs after row 12) |
 | [2026-11-15-items-uniques-affixes](2026-11-15-items-uniques-affixes/README.md) | retro pending (the editor push's row 9) |
-| [2026-11-15-classes-and-progression](2026-11-15-classes-and-progression/README.md) | approved (the editor push's row 12) |
+| [2026-11-15-classes-and-progression](2026-11-15-classes-and-progression/README.md) | approved, in progress (the editor push's row 12) |
 | [2026-11-15-enemy-behavior](2026-11-15-enemy-behavior/README.md) | retro pending (the editor push's row 8) |
 | [2026-11-15-encounters-and-backgrounds](2026-11-15-encounters-and-backgrounds/README.md) | retro pending (the editor push's row 10) |
 | [2026-11-15-mode-bar](2026-11-15-mode-bar/README.md) | retro pending (the editor push's row 11) |

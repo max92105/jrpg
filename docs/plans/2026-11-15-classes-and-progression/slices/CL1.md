@@ -57,3 +57,14 @@ file is relaid once; nothing edits classes yet (CL3).
 2. Run the game, choose Omer (mage): the Status page shows Mana and Clarity with their colors and the mage's skills, as
    before the relay.
 3. Run the editor, change any map, Save all: `git status` shows no change to `classes.json`.
+- **Done, with deviations:** `classes.json` joins the writer's catalogs and stamps, relaid once (85 lines to 480, id
+  order, one field per line; the simulations' lines identical, only the per-class theories' order follows the file).
+  Decision 1011: a resource gaining on no trigger also leaves `gains` out (`AbsentWhenEmptyFilter`, as the druid's
+  Growth and Decay were hand-written), with its own test. `CheckSkills` sorts the classes itself, as `CheckItems` sorts
+  the shops, instead of sharing the writer's private `SortedClasses`. Three tests beyond the list, for the two sorts
+  and the skills passed: `WriteMapCatalogs_ClassesAddedOutOfOrder_WritesThemSortedById`,
+  `WriteMapCatalogs_TwoClassesRefused_NamesTheFirstById` and `OfClasses_UnknownSkill_NamesIt`. The foreign-resource test builds its own skill (`power_strike` with a focus
+  cost) rather than pinning what a repository skill uses. `CatalogDraft.SetSkills`' summary reworded here ("no page
+  edits what they name"), since the writer now writes `classes.json`. Sizes: about 96 lines of Data
+  (`CatalogProblems.Party.cs` 33, `CatalogProblems.cs` 273) and 233 of tests (`ContentWriterClassTests` 197,
+  `CatalogProblemsPartyTests` 35), above the 110 planned for tests.

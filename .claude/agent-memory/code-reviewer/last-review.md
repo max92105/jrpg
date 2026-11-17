@@ -5,11 +5,12 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-mode-bar, slice WS3b (shell wiring: MainViewModel.DatabaseWorkspace, ShowDatabase guard + Open,
-ShowWorld through TryClose, GoBackToMap stopping; Refusal line in DatabaseWorkspaceView.xaml).
-2026-11-17. Round 1. Verdict: Ready to commit (no Critical, no Warning).
+Plan 2026-11-15-mode-bar, slice WS4 (Undo, Redo, Save, Save all, close and the catalog dialogs apply the shown
+Database page first; UnappliedPage, decision 1009). 2026-11-17. Round 1. Verdict: Ready to commit (no Critical).
 
-- Suggestion: GoBackToMapCommand summary "World, then the previous map" doesn't say it stops when the page refuses — open
-- Suggestion: Refusal TextBlock without TextWrapping in a centered StackPanel clips a long problem — open
-- WS3 Suggestion NotesEditing.AppliesCount -> ApplyCount — fixed
-- Known gap (not a finding): CatalogDialog changing the draft while Database shown restarts the session; WS4's scope
+- Warning: CombinedHistory.TryApplyShownPage copies the page refusal into History.Refusal (status bar,
+  MainWindow.xaml:166), cleared only by RecordStep/Undo/Redo: fixing the problem or Revert leaves "has a problem... Fix
+  it or press Revert" in the status bar; same for SaveError's "Not saved: ..." — open
+- Suggestion: UnappliedPage is a string? line, reads as a CatalogPage; UnappliedPageEntry/Line — open
+- WS3b Suggestion GoBackToMapCommand summary names the refusal — fixed
+- WS3b Suggestion Refusal TextBlock wraps (TextWrapping, MaxWidth 640) — fixed

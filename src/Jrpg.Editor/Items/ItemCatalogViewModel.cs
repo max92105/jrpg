@@ -43,7 +43,7 @@ internal sealed partial class ItemCatalogViewModel : ObservableObject, IEditedCa
             .. content.Items.Values
                 .OrderBy(ItemCategories.Of)
                 .ThenBy(item => item.Id, StringComparer.Ordinal)
-                .Select(item => ItemViewModel.From(item, _sellPercent)),
+                .Select(item => ItemViewModel.From(item, _sellPercent, content.Affixes)),
         ];
         foreach (var item in Items)
         {
@@ -108,7 +108,7 @@ internal sealed partial class ItemCatalogViewModel : ObservableObject, IEditedCa
     /// <summary>Adds an item of the button's category last and chooses it, so its id is the next thing typed.</summary>
     [RelayCommand]
     private void AddItem(ItemCategory category) =>
-        Insert(ItemViewModel.New(ItemCategories.StartingRecord(category), _sellPercent));
+        Insert(ItemViewModel.New(ItemCategories.StartingRecord(category), _sellPercent, _content.Affixes));
 
     /// <summary>Adds a copy of the chosen item last, as typed, its id left to type (decision 585).</summary>
     [RelayCommand(CanExecute = nameof(HasSelectedItem))]

@@ -16,7 +16,7 @@ public sealed class ItemViewModelEffectTests
     [InlineData("warlord_axe", false)]
     public void Effect_EachCategory_SetForConsumablesOnly(string id, bool hasEffect)
     {
-        var item = ItemViewModel.From(ItemFixtures.Catalog.Items[id], SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Catalog.Items[id], SellPercent, ItemFixtures.Catalog.Affixes);
 
         Assert.Equal(hasEffect, item.Effect is not null);
     }
@@ -24,7 +24,7 @@ public sealed class ItemViewModelEffectTests
     [Fact]
     public void ToItem_UntouchedBomb_EqualsTheSource()
     {
-        var item = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent, ItemFixtures.Catalog.Affixes);
 
         Assert.Equal(ItemFixtures.Firebomb, item.ToItem());
     }
@@ -34,7 +34,7 @@ public sealed class ItemViewModelEffectTests
     public void ToItem_UntouchedRestWithAHiddenPower_EqualsTheSource()
     {
         var tent = ItemFixtures.Tonic with { Id = "tent", Effect = new Effect(EffectKind.Rest, 5, Targeting.AllAllies) };
-        var item = ItemViewModel.From(tent, SellPercent);
+        var item = ItemViewModel.From(tent, SellPercent, ItemFixtures.Catalog.Affixes);
 
         Assert.Equal(tent, item.ToItem());
     }
@@ -42,7 +42,7 @@ public sealed class ItemViewModelEffectTests
     [Fact]
     public void ToItem_EffectEdited_TakesTheForm()
     {
-        var item = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent, ItemFixtures.Catalog.Affixes);
 
         item.Effect!.PowerText = "18";
         item.Effect.Targeting = Targeting.SingleEnemy;
@@ -54,7 +54,7 @@ public sealed class ItemViewModelEffectTests
     [Fact]
     public void ToItem_StripCleared_HasNoEffectFile()
     {
-        var item = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent, ItemFixtures.Catalog.Affixes);
 
         item.EffectFile = " ";
 
@@ -64,7 +64,7 @@ public sealed class ItemViewModelEffectTests
     [Fact]
     public void ToItem_StripTyped_TakesItTrimmed()
     {
-        var item = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent, ItemFixtures.Catalog.Affixes);
 
         item.EffectFile = " Flame.png ";
 
@@ -74,7 +74,7 @@ public sealed class ItemViewModelEffectTests
     [Fact]
     public void Problem_PowerNotANumber_IsTheItems()
     {
-        var item = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent, ItemFixtures.Catalog.Affixes);
 
         item.Effect!.PowerText = "big";
 
@@ -84,7 +84,7 @@ public sealed class ItemViewModelEffectTests
     [Fact]
     public void Problem_PriceAndPowerNotNumbers_NamesThePriceFirst()
     {
-        var item = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent, ItemFixtures.Catalog.Affixes);
         item.Effect!.PowerText = "big";
 
         item.PriceText = "cheap";
@@ -95,7 +95,7 @@ public sealed class ItemViewModelEffectTests
     [Fact]
     public void Changed_EffectTargetingPicked_IsRaised()
     {
-        var item = ItemViewModel.From(ItemFixtures.Tonic, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Tonic, SellPercent, ItemFixtures.Catalog.Affixes);
         var raised = 0;
         item.Changed += (_, _) => raised++;
 
@@ -107,7 +107,7 @@ public sealed class ItemViewModelEffectTests
     [Fact]
     public void Changed_StripTyped_IsRaised()
     {
-        var item = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent, ItemFixtures.Catalog.Affixes);
         var raised = 0;
         item.Changed += (_, _) => raised++;
 
@@ -119,7 +119,7 @@ public sealed class ItemViewModelEffectTests
     [Fact]
     public void Duplicate_HalfTypedPower_CopiesTheFormAsTyped()
     {
-        var item = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent, ItemFixtures.Catalog.Affixes);
         item.Effect!.PowerText = "2x";
 
         var copy = item.Duplicate();
@@ -131,7 +131,7 @@ public sealed class ItemViewModelEffectTests
     [Fact]
     public void Duplicate_StripTyped_CopiesIt()
     {
-        var item = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent, ItemFixtures.Catalog.Affixes);
         item.EffectFile = "Flame.png";
 
         var copy = item.Duplicate();
@@ -142,7 +142,7 @@ public sealed class ItemViewModelEffectTests
     [Fact]
     public void Duplicate_CopyTyped_RaisesTheCopysChanged()
     {
-        var copy = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent).Duplicate();
+        var copy = ItemViewModel.From(ItemFixtures.Firebomb, SellPercent, ItemFixtures.Catalog.Affixes).Duplicate();
         var raised = 0;
         copy.Changed += (_, _) => raised++;
 

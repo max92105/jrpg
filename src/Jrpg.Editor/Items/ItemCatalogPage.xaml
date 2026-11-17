@@ -14,7 +14,8 @@
       <Setter Property="Width" Value="144" />
       <Setter Property="Margin" Value="0,4,4,0" />
     </Style>
-    <!-- A click into a bonus row's box chooses that row, so Add bonus and Remove bonus act on the row being typed in. -->
+    <!-- A click into a box of a bonus or fixed affix row chooses that row, so the buttons beside the list act on
+         the row being typed in. -->
     <Style x:Key="TypedRow" TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
       <Setter Property="catalogs:RowFocus.ChoosesRow" Value="True" />
     </Style>
@@ -160,6 +161,49 @@
               <Button Content="Remove bonus" Width="100" Margin="0,4,0,0" Command="{Binding RemoveBonusCommand}" />
             </StackPanel>
           </StackPanel>
+        </StackPanel>
+        <!-- A unique's fixed affixes (decision 882): any pool affix, whatever kinds it rolls on, its value free of the
+             roll range shown beside it (decision 866); the price line adds each affix's gold (decision 871). -->
+        <StackPanel Margin="0,12,0,0">
+          <StackPanel.Style>
+            <Style TargetType="StackPanel">
+              <Style.Triggers>
+                <DataTrigger Binding="{Binding Unique}" Value="{x:Null}">
+                  <Setter Property="Visibility" Value="Collapsed" />
+                </DataTrigger>
+              </Style.Triggers>
+            </Style>
+          </StackPanel.Style>
+          <TextBlock Text="Fixed affixes" FontWeight="Bold" />
+          <StackPanel DataContext="{Binding Unique}" Orientation="Horizontal" Margin="0,4,0,0">
+            <TextBlock Text="Affixes" Style="{StaticResource FieldLabel}" VerticalAlignment="Top" />
+            <ListBox Width="340" MinHeight="24" ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}"
+                     ItemContainerStyle="{StaticResource TypedRow}">
+              <ListBox.ItemTemplate>
+                <DataTemplate>
+                  <StackPanel Orientation="Horizontal">
+                    <ComboBox Width="170"
+                              ItemsSource="{Binding DataContext.AffixChoices, RelativeSource={RelativeSource AncestorType=ListBox}}"
+                              SelectedItem="{Binding Affix}"
+                              DisplayMemberPath="Label" />
+                    <TextBox Width="50"
+                             Margin="4,0,0,0"
+                             Text="{Binding ValueText, UpdateSourceTrigger=PropertyChanged}"
+                             ToolTip="Free of the roll range; Data checks the bound and the affix's side of zero" />
+                    <TextBlock Text="{Binding RollLine}" Foreground="{StaticResource MutedTextBrush}" Margin="8,0,0,0" VerticalAlignment="Center" />
+                  </StackPanel>
+                </DataTemplate>
+              </ListBox.ItemTemplate>
+            </ListBox>
+            <StackPanel Margin="4,0,0,0">
+              <Button Content="Add affix" Width="100" Command="{Binding AddRowCommand}"
+                      ToolTip="The first pool affix no row names, at its roll range's min, after the chosen row" />
+              <Button Content="Remove affix" Width="100" Margin="0,4,0,0" Command="{Binding RemoveRowCommand}" />
+              <Button Content="Move up" Width="100" Margin="0,4,0,0" Command="{Binding MoveRowUpCommand}" />
+              <Button Content="Move down" Width="100" Margin="0,4,0,0" Command="{Binding MoveRowDownCommand}" />
+            </StackPanel>
+          </StackPanel>
+          <TextBlock Margin="90,4,0,0" Text="{Binding PieceValueLine}" Foreground="{StaticResource MutedTextBrush}" />
         </StackPanel>
         <!-- A consumable's effect (decision 881): a rest's power and the type off a damage are hidden, which writes
              power 0 and no type, as Data requires; its statuses, hits and range are carried, never edited. -->

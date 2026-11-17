@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Items;
+using Jrpg.Core.Loot;
 using Jrpg.Core.Trade;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Objects;
@@ -9,10 +10,10 @@ namespace Jrpg.Editor.Items;
 /// <summary>
 /// One item as the Items page edits it (decision 879): its id (typed while the item is new, fixed once the draft holds
 /// it, decision 582), name, description, icon, max stack, price, menu use and own strip as typed, and its category's
-/// form, an equipment's (decision 880) or a consumable's effect (decision 881), written over the record it came from,
-/// so what no box edits (the fixed affixes) is carried; its category is the record's and never typed (decision 878).
-/// <see cref="Problem"/> is only the typed id's, the number boxes' and the form's (a box that can't be read, a stat
-/// named twice): the rest is Data's rules, which the list shows for every item at once.
+/// forms, an equipment's (decision 880), a unique's fixed affixes (decision 882) or a consumable's effect (decision
+/// 881), written over the record it came from, so what no box edits is carried; its category is the record's and never
+/// typed (decision 878). <see cref="Problem"/> is only the typed id's, the number boxes' and the forms' (a box that
+/// can't be read, a stat named twice): the rest is Data's rules, which the list shows for every item at once.
 /// </summary>
 internal sealed partial class ItemViewModel : ObservableObject
 {
@@ -39,6 +40,11 @@ internal sealed partial class ItemViewModel : ObservableObject
             effect.Changed += OnFormChanged;
         }
 
+        if (forms.Unique is { } unique)
+        {
+            unique.Changed += OnUniqueChanged;
+        }
+
         Category = ItemCategories.Of(source);
         Id = source.Id;
         Name = source.Name;
@@ -58,15 +64,19 @@ internal sealed partial class ItemViewModel : ObservableObject
 
     /// <param name="item">The record as the draft holds it.</param>
     /// <param name="sellPercent">The share of a price a sale pays (<c>rules.json</c>, decision 864).</param>
-    public static ItemViewModel From(ItemDefinition item, int sellPercent) => new(item, sellPercent, ItemForms.Of(item));
+    /// <param name="pool">The draft's affixes by id, which a unique's rows offer and price.</param>
+    public static ItemViewModel From(ItemDefinition item, int sellPercent, IReadOnlyDictionary<string, AffixDefinition> pool) =>
+        new(item, sellPercent, ItemForms.Of(item, pool));
 
     /// <summary>
     /// An item added this session: its id left to type, the rest as its category's starting record has it.
     /// </summary>
     /// <param name="startingRecord">The record whose fields the new item starts with; its id is not used.</param>
     /// <param name="sellPercent">The share of a price a sale pays (<c>rules.json</c>, decision 864).</param>
-    public static ItemViewModel New(ItemDefinition startingRecord, int sellPercent) =>
-        new(startingRecord with { Id = "" }, sellPercent, ItemForms.Of(startingRecord)) { IsNew = true };
+    /// <param name="pool">The draft's affixes by id, which a new unique's rows offer and price.</param>
+    public static ItemViewModel New(
+        ItemDefinition startingRecord, int sellPercent, IReadOnlyDictionary<string, AffixDefinition> pool) =>
+        new(startingRecord with { Id = "" }, sellPercent, ItemForms.Of(startingRecord, pool)) { IsNew = true };
 
     /// <summary>
     /// True while the item was added this session: the only time its id can be typed (decision 582).
@@ -83,6 +93,9 @@ internal sealed partial class ItemViewModel : ObservableObject
 
     /// <summary>The effect's form (decision 881): a consumable's, null for anything else.</summary>
     public ItemEffectViewModel? Effect => _forms.Effect;
+
+    /// <summary>The fixed affixes' form (decision 882): a unique's, null for anything else.</summary>
+    public UniqueAffixesViewModel? Unique => _forms.Unique;
 
     /// <summary>The id as typed; the page lets it be typed only while <see cref="IsNew"/>.</summary>
     [ObservableProperty]
@@ -108,7 +121,7 @@ internal sealed partial class ItemViewModel : ObservableObject
 
     /// <summary>The buying price as typed; empty when the item is never bought nor sold (ADR 0031).</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(SaleLine), nameof(Problem))]
+    [NotifyPropertyChangedFor(nameof(SaleLine), nameof(PieceValueLine), nameof(Problem))]
     public partial string PriceText { get; set; }
 
     /// <summary>Whether the menu's Items screen offers it; only a consumable's box is shown.</summary>
@@ -136,6 +149,12 @@ internal sealed partial class ItemViewModel : ObservableObject
         : TypedNumber.Parse(PriceText) is { } price ? SellsFor(price)
         : "";
 
+    /// <summary>
+    /// A unique's whole price and its sale, its affixes' gold values added (decision 871): "Price as a piece: 440,
+    /// sells for 220"; empty for any other item.
+    /// </summary>
+    public string PieceValueLine => Unique?.PieceValueLine(PriceText, _sellPercent) ?? "";
+
     /// <summary>Equipment and uniques stack to their record's max (99, decision 879), so the box is hidden.</summary>
     public bool ShowsMaxStack => Category is ItemCategory.Consumable or ItemCategory.Material;
 
@@ -143,13 +162,15 @@ internal sealed partial class ItemViewModel : ObservableObject
 
     /// <summary>
     /// Why the item can't be built: the typed id while new, then the max stack box, then the price box, then the
-    /// category's form; null when it can. Data's rules (a name, the ranges) are the list's.
+    /// category's forms, the equipment's before the fixed affixes'; null when it can. Data's rules (a name, the ranges)
+    /// are the list's.
     /// </summary>
     public string? Problem =>
         (IsNew ? ObjectIds.ProblemOf(Id, []) : null)
         ?? TypedNumber.ProblemOf("Max stack", MaxStackText)
         ?? PriceProblem
         ?? Equipment?.Problem
+        ?? Unique?.Problem
         ?? Effect?.Problem;
 
     private bool IsPriceEmpty => PriceText.Trim().Length == 0;
@@ -187,6 +208,7 @@ internal sealed partial class ItemViewModel : ObservableObject
                 Price = IsPriceEmpty ? null : TypedNumber.Parse(PriceText),
                 Equipment = Equipment?.ToEquipment(),
                 Effect = Effect?.ToEffect(),
+                FixedAffixes = Unique?.ToFixedAffixes() ?? _source.FixedAffixes,
             };
 
     // The number boxes and the forms are left out: a duplicate copies them as typed, and only ToItem reads the number
@@ -203,6 +225,13 @@ internal sealed partial class ItemViewModel : ObservableObject
         };
 
     private void OnFormChanged(object? sender, EventArgs e) => Changed?.Invoke(this, EventArgs.Empty);
+
+    // A row added, removed or given another affix changes the gold the piece's price adds.
+    private void OnUniqueChanged(object? sender, EventArgs e)
+    {
+        OnPropertyChanged(nameof(PieceValueLine));
+        Changed?.Invoke(this, EventArgs.Empty);
+    }
 
     partial void OnIdChanged(string value) => Changed?.Invoke(this, EventArgs.Empty);
 

@@ -17,7 +17,7 @@ public sealed class ItemViewModelEquipmentTests
     [InlineData("warlord_axe", true)]
     public void Equipment_EachCategory_SetForEquipmentAndUniques(string id, bool hasEquipment)
     {
-        var item = ItemViewModel.From(ItemFixtures.Catalog.Items[id], SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Catalog.Items[id], SellPercent, ItemFixtures.Catalog.Affixes);
 
         Assert.Equal(hasEquipment, item.Equipment is not null);
     }
@@ -25,7 +25,7 @@ public sealed class ItemViewModelEquipmentTests
     [Fact]
     public void ToItem_UntouchedUnique_EqualsTheSource()
     {
-        var item = ItemViewModel.From(ItemFixtures.WarlordAxe, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.WarlordAxe, SellPercent, ItemFixtures.Catalog.Affixes);
 
         Assert.Equal(ItemFixtures.WarlordAxe, item.ToItem());
     }
@@ -33,7 +33,7 @@ public sealed class ItemViewModelEquipmentTests
     [Fact]
     public void ToItem_EquipmentEdited_TakesTheForm()
     {
-        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent, ItemFixtures.Catalog.Affixes);
 
         item.Equipment!.DamageText = "24";
         item.Equipment.DamageType = DamageType.Blunt;
@@ -45,7 +45,7 @@ public sealed class ItemViewModelEquipmentTests
     [Fact]
     public void Problem_WeaponDamageNotANumber_IsTheItems()
     {
-        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent, ItemFixtures.Catalog.Affixes);
 
         item.Equipment!.DamageText = "big";
 
@@ -55,7 +55,7 @@ public sealed class ItemViewModelEquipmentTests
     [Fact]
     public void Problem_PriceAndDamageNotNumbers_NamesThePriceFirst()
     {
-        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent, ItemFixtures.Catalog.Affixes);
         item.Equipment!.DamageText = "big";
 
         item.PriceText = "cheap";
@@ -66,7 +66,7 @@ public sealed class ItemViewModelEquipmentTests
     [Fact]
     public void Changed_EquipmentKindPicked_IsRaised()
     {
-        var item = ItemViewModel.From(ItemFixtures.CopperVest, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.CopperVest, SellPercent, ItemFixtures.Catalog.Affixes);
         var raised = 0;
         item.Changed += (_, _) => raised++;
 
@@ -78,7 +78,7 @@ public sealed class ItemViewModelEquipmentTests
     [Fact]
     public void Duplicate_HalfTypedDamage_CopiesTheFormAsTyped()
     {
-        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent, ItemFixtures.Catalog.Affixes);
         item.Equipment!.DamageText = "2x";
 
         var copy = item.Duplicate();
@@ -90,7 +90,7 @@ public sealed class ItemViewModelEquipmentTests
     [Fact]
     public void Duplicate_CopyTyped_RaisesTheCopysChanged()
     {
-        var copy = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent).Duplicate();
+        var copy = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent, ItemFixtures.Catalog.Affixes).Duplicate();
         var raised = 0;
         copy.Changed += (_, _) => raised++;
 

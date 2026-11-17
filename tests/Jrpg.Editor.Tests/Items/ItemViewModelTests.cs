@@ -23,7 +23,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void From_Weapon_ShowsItsFieldsAndHidesMaxStack()
     {
-        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent, ItemFixtures.Catalog.Affixes);
 
         Assert.Equal(("copper_axe", "Copper Axe", "A heavy axe."), (item.Id, item.Name, item.Description));
         Assert.Equal(("Axe.png", "99", "100"), (item.IconFile, item.MaxStackText, item.PriceText));
@@ -40,7 +40,7 @@ public sealed class ItemViewModelTests
     [InlineData("warlord_axe", false, false)]
     public void ShowsBoxes_EachCategory_MatchesItsFields(string id, bool showsMaxStack, bool showsUsableFromMenu)
     {
-        var item = ItemViewModel.From(ItemFixtures.Catalog.Items[id], SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Catalog.Items[id], SellPercent, ItemFixtures.Catalog.Affixes);
 
         Assert.Equal((showsMaxStack, showsUsableFromMenu), (item.ShowsMaxStack, item.ShowsUsableFromMenu));
     }
@@ -48,7 +48,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void ToItem_Untouched_EqualsTheSource()
     {
-        var item = ItemViewModel.From(ItemFixtures.Tonic, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Tonic, SellPercent, ItemFixtures.Catalog.Affixes);
 
         Assert.Equal(ItemFixtures.Tonic, item.ToItem());
     }
@@ -56,7 +56,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void ToItem_GeneralFieldsTyped_WritesEachOverTheSource()
     {
-        var item = ItemViewModel.From(ItemFixtures.Tonic, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Tonic, SellPercent, ItemFixtures.Catalog.Affixes);
 
         item.Name = " Draught ";
         item.Description = "Restores some HP.";
@@ -78,7 +78,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void ToItem_NameAndPriceTyped_CarriesTheEquipmentUntouched()
     {
-        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent, ItemFixtures.Catalog.Affixes);
 
         item.Name = "Bronze Axe";
         item.PriceText = "120";
@@ -91,7 +91,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void ToItem_UniqueTyped_CarriesItsFixedAffixes()
     {
-        var item = ItemViewModel.From(ItemFixtures.WarlordAxe, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.WarlordAxe, SellPercent, ItemFixtures.Catalog.Affixes);
 
         item.Name = "Tyrant's Axe";
 
@@ -103,7 +103,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void ToItem_PriceEmpty_HasNoPrice()
     {
-        var item = ItemViewModel.From(ItemFixtures.CopperVest, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.CopperVest, SellPercent, ItemFixtures.Catalog.Affixes);
 
         item.PriceText = " ";
 
@@ -113,7 +113,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void ToItem_PriceZero_IsPricedZero()
     {
-        var item = ItemViewModel.From(ItemFixtures.CopperVest, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.CopperVest, SellPercent, ItemFixtures.Catalog.Affixes);
 
         item.PriceText = "0";
 
@@ -123,7 +123,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void ToItem_WithAProblem_Throws()
     {
-        var item = ItemViewModel.From(ItemFixtures.Ore, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Ore, SellPercent, ItemFixtures.Catalog.Affixes);
 
         item.MaxStackText = "many";
 
@@ -133,7 +133,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void SaleLine_Price100AtFiftyPercent_SaysFifty()
     {
-        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent, ItemFixtures.Catalog.Affixes);
 
         Assert.Equal("Sells for 50 (50 % share)", item.SaleLine);
     }
@@ -141,7 +141,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void SaleLine_PriceCleared_SaysNeverTraded()
     {
-        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent, ItemFixtures.Catalog.Affixes);
 
         item.PriceText = "";
 
@@ -151,7 +151,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void SaleLine_PriceNotANumber_IsEmpty()
     {
-        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent, ItemFixtures.Catalog.Affixes);
 
         item.PriceText = "cheap";
 
@@ -161,7 +161,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void SaleLine_PriceTyped_RaisesItsChange()
     {
-        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.CopperAxe, SellPercent, ItemFixtures.Catalog.Affixes);
         var raised = new List<string?>();
         item.PropertyChanged += (_, args) => raised.Add(args.PropertyName);
 
@@ -174,7 +174,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void Problem_MaxStackNotANumber_NamesTheBox()
     {
-        var item = ItemViewModel.From(ItemFixtures.Ore, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Ore, SellPercent, ItemFixtures.Catalog.Affixes);
 
         item.MaxStackText = "many";
 
@@ -184,7 +184,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void Problem_PriceNotANumber_NamesTheBox()
     {
-        var item = ItemViewModel.From(ItemFixtures.Ore, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Ore, SellPercent, ItemFixtures.Catalog.Affixes);
 
         item.PriceText = "cheap";
 
@@ -194,7 +194,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void Problem_NewWithoutId_NamesTheId()
     {
-        var item = ItemViewModel.New(ItemFixtures.Ore, SellPercent);
+        var item = ItemViewModel.New(ItemFixtures.Ore, SellPercent, ItemFixtures.Catalog.Affixes);
 
         Assert.Equal("The id must not be empty.", item.Problem);
     }
@@ -202,7 +202,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void Problem_SavedItem_IgnoresTheIdRule()
     {
-        var item = ItemViewModel.From(ItemFixtures.Ore with { Id = "Old_Ore" }, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.Ore with { Id = "Old_Ore" }, SellPercent, ItemFixtures.Catalog.Affixes);
 
         Assert.Null(item.Problem);
     }
@@ -210,7 +210,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void Label_SavedUnique_NamesItsCategoryNameAndId()
     {
-        var item = ItemViewModel.From(ItemFixtures.WarlordAxe, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.WarlordAxe, SellPercent, ItemFixtures.Catalog.Affixes);
 
         Assert.Equal("Unique · Warlord's Axe (warlord_axe)", item.Label);
     }
@@ -218,7 +218,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void Label_NewWithoutId_NamesItsCategory()
     {
-        var item = ItemViewModel.New(ItemFixtures.WarlordAxe, SellPercent);
+        var item = ItemViewModel.New(ItemFixtures.WarlordAxe, SellPercent, ItemFixtures.Catalog.Affixes);
 
         Assert.Equal("(new unique)", item.Label);
     }
@@ -226,7 +226,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void Duplicate_Unique_IsANewUniqueWithEveryFieldButTheId()
     {
-        var item = ItemViewModel.From(ItemFixtures.WarlordAxe, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.WarlordAxe, SellPercent, ItemFixtures.Catalog.Affixes);
 
         var copy = item.Duplicate();
         copy.Id = "warlord_axe_2";
@@ -239,7 +239,7 @@ public sealed class ItemViewModelTests
     [Fact]
     public void Duplicate_HalfTypedPrice_CopiesItAsTyped()
     {
-        var item = ItemViewModel.From(ItemFixtures.CopperVest, SellPercent);
+        var item = ItemViewModel.From(ItemFixtures.CopperVest, SellPercent, ItemFixtures.Catalog.Affixes);
         item.PriceText = "8x";
 
         var copy = item.Duplicate();
@@ -257,7 +257,7 @@ public sealed class ItemViewModelTests
     [InlineData(nameof(ItemViewModel.IsUsableFromMenu))]
     public void Changed_TypedBoxEdited_IsRaised(string box)
     {
-        var item = ItemViewModel.New(ItemFixtures.Tonic, SellPercent);
+        var item = ItemViewModel.New(ItemFixtures.Tonic, SellPercent, ItemFixtures.Catalog.Affixes);
         var raised = 0;
         item.Changed += (_, _) => raised++;
 

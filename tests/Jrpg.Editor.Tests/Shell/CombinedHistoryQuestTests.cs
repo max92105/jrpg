@@ -1,8 +1,5 @@
 using Jrpg.Core.Events;
-using Jrpg.Core.Geometry;
 using Jrpg.Core.Quests;
-using Jrpg.Editor.Maps.Editing;
-using Jrpg.Editor.Shell;
 
 namespace Jrpg.Editor.Tests.Shell;
 
@@ -20,7 +17,7 @@ public sealed class CombinedHistoryQuestTests : IDisposable
         var viewModel = _content.Open(_content.CopyOfTestWorld());
         var errand = viewModel.Catalog!.Quests["placeholder_errand"];
         viewModel.Content!.SetQuests([errand with { Stages = [.. errand.Stages, new QuestStage("extra", "One more.")] }]);
-        var mapId = SaveWithCellEvent(viewModel, new AdvanceQuestStep("placeholder_errand", "extra"));
+        var mapId = EditorTestContent.SaveWithCellEvent(viewModel, new AdvanceQuestStep("placeholder_errand", "extra"));
 
         viewModel.History!.UndoCommand.Execute(null);
 
@@ -34,23 +31,11 @@ public sealed class CombinedHistoryQuestTests : IDisposable
         var viewModel = _content.Open(_content.CopyOfTestWorld());
         var heist = new QuestDefinition("heist", "The heist", "Case the vault.", QuestKind.Main, [new QuestStage("case", "Case the vault.")]);
         viewModel.Content!.SetQuests([.. viewModel.Catalog!.Quests.Values, heist]);
-        var mapId = SaveWithCellEvent(viewModel, new StartQuestStep("heist"));
+        var mapId = EditorTestContent.SaveWithCellEvent(viewModel, new StartQuestStep("heist"));
 
         viewModel.History!.UndoCommand.Execute(null);
 
         Assert.Equal($"Can't undo: quest heist is used on map {mapId}.", viewModel.History.Refusal);
         Assert.True(viewModel.Catalog.Quests.ContainsKey("heist"));
-    }
-
-    // Puts an event with the step on the open map's top-left cell, saves, and opens another map so only the catalog
-    // step is left to undo.
-    private static string SaveWithCellEvent(MainViewModel viewModel, EventStep step)
-    {
-        var map = viewModel.CurrentMap!;
-        var mapEvent = new MapEvent { Id = "quest_check", Activation = EventActivation.Touch, Steps = [step] };
-        map.Do(SetCellEventEdit.For(map.Map.Layout.CellEvents, new GridCell(0, 0), mapEvent));
-        viewModel.SaveCommand.Execute(null);
-        viewModel.TryOpenMap(viewModel.MapIds.First(id => id != map.Map.Id));
-        return map.Map.Id;
     }
 }

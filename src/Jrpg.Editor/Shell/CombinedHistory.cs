@@ -111,12 +111,13 @@ internal sealed partial class CombinedHistory : ObservableObject
     }
 
     // In the order checked: the first map whose event names a quest or a stage the undo would remove (decision 394), or
-    // opens a shop it would remove (decision 581), or plays a cinematic it would remove (decision 630); the first map
-    // placing or swapping to an object it would remove; the first tile cut from a sheet it would remove; the first tile
-    // it would remove that something still uses, named with its first user (decision 117).
+    // opens a shop it would remove (decision 581), or plays a cinematic it would remove (decision 630), or gives an
+    // item it would remove (decision 883); the first map placing or swapping to an object it would remove; the first
+    // tile cut from a sheet it would remove; the first tile it would remove that something still uses, named with its
+    // first user (decision 117).
     private string? RefusalOfCatalogUndo()
     {
-        if ((RefusalOfQuestUndo() ?? RefusalOfShopUndo() ?? RefusalOfCinematicUndo()) is { } named)
+        if (RefusalOfEventNamedUndo() is { } named)
         {
             return named;
         }
@@ -148,6 +149,11 @@ internal sealed partial class CombinedHistory : ObservableObject
         return null;
     }
 
+    // The quests, shops, cinematics and items a map's event names, checked apart from the objects, sheets and tiles so
+    // the catalog undo's check stays under the build's complexity bound (CA1502).
+    private string? RefusalOfEventNamedUndo() =>
+        RefusalOfQuestUndo() ?? RefusalOfShopUndo() ?? RefusalOfCinematicUndo() ?? RefusalOfItemUndo();
+
     private string? RefusalOfQuestUndo()
     {
         var openLayouts = _openMaps.Layouts;
@@ -171,27 +177,42 @@ internal sealed partial class CombinedHistory : ObservableObject
     }
 
     // A saved shop is never removed by its window (decision 581), so only an added one can be undone away.
-    private string? RefusalOfShopUndo()
-    {
-        foreach (var shopId in _catalog.ShopsRemovedByUndo())
-        {
-            if (CatalogUsage.UsersOfShop(_catalog.Current, shopId, _openMaps.Layouts) is [var map, ..])
-            {
-                return $"Can't undo: shop {shopId} is opened on {map}.";
-            }
-        }
-
-        return null;
-    }
+    private string? RefusalOfShopUndo() =>
+        RefusalNamingFirstUser(
+            "shop",
+            "opened",
+            _catalog.ShopsRemovedByUndo(),
+            shopId => CatalogUsage.UsersOfShop(_catalog.Current, shopId, _openMaps.Layouts));
 
     // A saved cinematic is never removed by its window (decision 630), so only an added one can be undone away.
-    private string? RefusalOfCinematicUndo()
+    private string? RefusalOfCinematicUndo() =>
+        RefusalNamingFirstUser(
+            "cinematic",
+            "played",
+            _catalog.CinematicsRemovedByUndo(),
+            cinematicId => CatalogUsage.UsersOfCinematic(_catalog.Current, cinematicId, _openMaps.Layouts));
+
+    // A saved item is never removed by its page (decision 877), so only an added one can be undone away.
+    private string? RefusalOfItemUndo() =>
+        RefusalNamingFirstUser(
+            "item",
+            "given",
+            _catalog.ItemsRemovedByUndo(),
+            itemId => CatalogUsage.UsersOfItem(_catalog.Current, itemId, _openMaps.Layouts));
+
+    // The first removed record a map still names, said as "Can't undo: shop armory is opened on map start." for the
+    // kind "shop" used as "opened".
+    private static string? RefusalNamingFirstUser(
+        string kind,
+        string usedAs,
+        IReadOnlyList<string> removedIds,
+        Func<string, IReadOnlyList<string>> usersOf)
     {
-        foreach (var cinematicId in _catalog.CinematicsRemovedByUndo())
+        foreach (var id in removedIds)
         {
-            if (CatalogUsage.UsersOfCinematic(_catalog.Current, cinematicId, _openMaps.Layouts) is [var map, ..])
+            if (usersOf(id) is [var map, ..])
             {
-                return $"Can't undo: cinematic {cinematicId} is played on {map}.";
+                return $"Can't undo: {kind} {id} is {usedAs} on {map}.";
             }
         }
 

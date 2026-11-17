@@ -1,3 +1,4 @@
+using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Data.Art;
 using Jrpg.Editor.Catalogs;
@@ -114,6 +115,18 @@ internal sealed class EditorTestContent : IDisposable
         var tileId = viewModel.Catalog!.Tiles.Values.First(tile => tile.IsWalkable).Id;
         viewModel.Content!.SetWalkable(tileId, isWalkable: false);
         return tileId;
+    }
+
+    // Puts an event with the step on the open map's top-left cell, saves, and opens another map so only the catalog
+    // step is left to undo.
+    public static string SaveWithCellEvent(MainViewModel viewModel, EventStep step)
+    {
+        var map = viewModel.CurrentMap!;
+        var mapEvent = new MapEvent { Id = "step_check", Activation = EventActivation.Touch, Steps = [step] };
+        map.Do(SetCellEventEdit.For(map.Map.Layout.CellEvents, new GridCell(0, 0), mapEvent));
+        viewModel.SaveCommand.Execute(null);
+        viewModel.TryOpenMap(viewModel.MapIds.First(id => id != map.Map.Id));
+        return map.Map.Id;
     }
 
     public string ObjectsPath => Path.Combine(ContentCopy, "objects.json");

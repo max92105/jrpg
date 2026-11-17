@@ -7,8 +7,8 @@ namespace Jrpg.Editor.Catalogs;
 /// <summary>
 /// What uses a catalog record, so an undo that would remove it can be refused (decision 117) and a re-cut can say what
 /// it touches (decision 116): maps, saved or open, and objects; a map's events for a quest or a stage (decision 394), a
-/// shop (decision 581) or a cinematic (ADR 0046). Each open map is read as it is now, unsaved changes included, in
-/// place of its saved version (decision 502).
+/// shop (decision 581), a cinematic (ADR 0046) or a given item (decision 883). Each open map is read as it is now,
+/// unsaved changes included, in place of its saved version (decision 502).
 /// </summary>
 internal static class CatalogUsage
 {
@@ -83,10 +83,7 @@ internal static class CatalogUsage
         ContentCatalog catalog,
         string shopId,
         IReadOnlyCollection<MapLayout> openLayouts) =>
-        MapNamesWhere(catalog, openLayouts, layout => layout.AllEvents.Any(mapEvent => OpensShop(mapEvent, shopId)));
-
-    private static bool OpensShop(MapEvent mapEvent, string shopId) =>
-        mapEvent.Steps.Any(step => step is OpenShopStep shop && shop.ShopId == shopId);
+        MapsWithStep(catalog, openLayouts, step => step is OpenShopStep shop && shop.ShopId == shopId);
 
     /// <summary>
     /// The maps whose events play a cinematic, so an undo that would remove it can be refused (ADR 0046).
@@ -99,10 +96,27 @@ internal static class CatalogUsage
         ContentCatalog catalog,
         string cinematicId,
         IReadOnlyCollection<MapLayout> openLayouts) =>
-        MapNamesWhere(catalog, openLayouts, layout => layout.AllEvents.Any(mapEvent => PlaysCinematic(mapEvent, cinematicId)));
+        MapsWithStep(catalog, openLayouts, step => step is CinematicStep cinematic && cinematic.CinematicId == cinematicId);
 
-    private static bool PlaysCinematic(MapEvent mapEvent, string cinematicId) =>
-        mapEvent.Steps.Any(step => step is CinematicStep cinematic && cinematic.CinematicId == cinematicId);
+    /// <summary>
+    /// The maps whose events give an item, so an undo that would remove it can be refused (decision 883).
+    /// </summary>
+    /// <param name="catalog">The saved maps.</param>
+    /// <param name="itemId">The item looked for.</param>
+    /// <param name="openLayouts">The open maps' layouts, unsaved changes included; empty when none is open.</param>
+    /// <returns>"map forest" style names, sorted by id; empty when no event gives it.</returns>
+    public static IReadOnlyList<string> UsersOfItem(
+        ContentCatalog catalog,
+        string itemId,
+        IReadOnlyCollection<MapLayout> openLayouts) =>
+        MapsWithStep(catalog, openLayouts, step => step is GiveItemStep give && give.ItemId == itemId);
+
+    // "map forest" style names of the maps with an event holding a matching step, the open maps as they are now.
+    private static IReadOnlyList<string> MapsWithStep(
+        ContentCatalog catalog,
+        IReadOnlyCollection<MapLayout> openLayouts,
+        Func<EventStep, bool> isMatch) =>
+        MapNamesWhere(catalog, openLayouts, layout => layout.AllEvents.Any(mapEvent => mapEvent.Steps.Any(isMatch)));
 
     // "map forest" style names of the maps that use a record, sorted by id, the open maps as they are now.
     private static IReadOnlyList<string> MapNamesWhere(

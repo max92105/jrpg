@@ -34,3 +34,7 @@ refusal.
   another map, press Ctrl+Z: the status line says "Can't undo: item test_tonic is given on map start." and Test Tonic
   is still in Database > Items. Go back to the start map, Ctrl+Z (the event goes), then Ctrl+Z again (Test Tonic
   goes). Revert the content (`git checkout content`).
+- **Done, with deviations:** the four event-named refusals moved into `CombinedHistory.RefusalOfEventNamedUndo`, as
+  one more `??` put `RefusalOfCatalogUndo` at complexity 11 (CA1502); the shop, cinematic and item copies extracted
+  (third copy): `CatalogUsage.MapsWithStep` and `CombinedHistory.RefusalNamingFirstUser`, and the four tests'
+  `SaveWithCellEvent` to `EditorTestContent`; `docs/map.md` names the item refusal. The hand check is the developer's.

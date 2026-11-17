@@ -2,7 +2,6 @@ using Jrpg.Core.Events;
 using Jrpg.Core.Geometry;
 using Jrpg.Core.Trade;
 using Jrpg.Editor.Maps.Editing;
-using Jrpg.Editor.Shell;
 
 namespace Jrpg.Editor.Tests.Shell;
 
@@ -21,7 +20,7 @@ public sealed class CombinedHistoryShopTests : IDisposable
     {
         var viewModel = _content.Open(_content.CopyOfTestWorld());
         viewModel.Content!.SetShops([.. viewModel.Catalog!.Shops.Values, _armory]);
-        var mapId = SaveWithCellEvent(viewModel, new OpenShopStep("armory"));
+        var mapId = EditorTestContent.SaveWithCellEvent(viewModel, new OpenShopStep("armory"));
 
         viewModel.History!.UndoCommand.Execute(null);
 
@@ -34,7 +33,7 @@ public sealed class CombinedHistoryShopTests : IDisposable
     {
         var viewModel = _content.Open(_content.CopyOfTestWorld());
         viewModel.Content!.SetShops([.. viewModel.Catalog!.Shops.Values, _armory]);
-        SaveWithCellEvent(viewModel, new OpenShopStep("general_store"));
+        EditorTestContent.SaveWithCellEvent(viewModel, new OpenShopStep("general_store"));
 
         viewModel.History!.UndoCommand.Execute(null);
 
@@ -60,17 +59,5 @@ public sealed class CombinedHistoryShopTests : IDisposable
         viewModel.History!.UndoCommand.Execute(null);
 
         Assert.Equal($"Can't undo: shop armory is opened on map {map.Map.Id}.", viewModel.History.Refusal);
-    }
-
-    // Puts an event with the step on the open map's top-left cell, saves, and opens another map so only the catalog
-    // step is left to undo.
-    private static string SaveWithCellEvent(MainViewModel viewModel, EventStep step)
-    {
-        var map = viewModel.CurrentMap!;
-        var mapEvent = new MapEvent { Id = "shop_check", Activation = EventActivation.Touch, Steps = [step] };
-        map.Do(SetCellEventEdit.For(map.Map.Layout.CellEvents, new GridCell(0, 0), mapEvent));
-        viewModel.SaveCommand.Execute(null);
-        viewModel.TryOpenMap(viewModel.MapIds.First(id => id != map.Map.Id));
-        return map.Map.Id;
     }
 }

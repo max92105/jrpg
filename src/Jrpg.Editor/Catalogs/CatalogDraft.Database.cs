@@ -94,8 +94,8 @@ internal sealed partial class CatalogDraft
 
     /// <summary>
     /// Replaces the items as one undo step (decision 877); nothing when they are the same by content, a unique's fixed
-    /// affixes in order included. No undo refusal yet: shops and drop tables naming an added item came in later steps,
-    /// undone first, and the refusal for one a map's event gives is decision 883's, still to come.
+    /// affixes in order included. An undo removing one a map's event gives is refused (decision 883); shops and drop
+    /// tables naming an added item came in later steps, undone first, so they need no refusal.
     /// </summary>
     public void SetItems(IReadOnlyList<ItemDefinition> items)
     {
@@ -133,4 +133,7 @@ internal sealed partial class CatalogDraft
     /// The cinematics the next undo would remove, so it can be refused while a map's event plays one.
     /// </summary>
     public IReadOnlyList<string> CinematicsRemovedByUndo() => KeysRemovedByUndo(catalog => catalog.Cinematics);
+
+    /// <summary>The items the next undo would remove, so it can be refused while a map's event gives one.</summary>
+    public IReadOnlyList<string> ItemsRemovedByUndo() => KeysRemovedByUndo(catalog => catalog.Items);
 }

@@ -1,10 +1,11 @@
+using Jrpg.Core.Content;
 using Jrpg.Core.Party;
 
 namespace Jrpg.Editor.Catalogs;
 
 /// <summary>
-/// The classes and the party members, edited by the Classes and Party members pages (decisions 945, 954), each session
-/// recorded as one undo step.
+/// The classes, the party members and the new game, edited by the Classes, Party members and New game pages (decisions
+/// 945, 954, 968), each session recorded as one undo step.
 /// </summary>
 internal sealed partial class CatalogDraft
 {
@@ -54,4 +55,27 @@ internal sealed partial class CatalogDraft
     /// on one leading.
     /// </summary>
     public IReadOnlyList<string> PartyMembersRemovedByUndo() => KeysRemovedByUndo(catalog => catalog.PartyMembers);
+
+    /// <summary>
+    /// Replaces the new game as one undo step (decision 968); nothing when it is the same by content, its leader
+    /// choices and starting items in order included. No undo refusal (decision 954): the members, items and maps it
+    /// names were in the draft before its step, and catalog steps undo in order.
+    /// </summary>
+    public void SetNewGame(NewGameDefinition newGame)
+    {
+        var before = Current.NewGame;
+        if (IsSameNewGame(before, newGame))
+        {
+            return;
+        }
+
+        Do(new CatalogEdit(catalog => catalog with { NewGame = newGame }, catalog => catalog with { NewGame = before }));
+    }
+
+    // As a class's: the with-copy compares every field but the two lists, the lists by content and order: a leader
+    // moved changes the leader screen's order.
+    private static bool IsSameNewGame(NewGameDefinition before, NewGameDefinition after) =>
+        before with { LeaderChoices = after.LeaderChoices, StartingItems = after.StartingItems } == after
+        && before.LeaderChoices.SequenceEqual(after.LeaderChoices)
+        && before.StartingItems.SequenceEqual(after.StartingItems);
 }

@@ -55,3 +55,15 @@ The problem line is its typed boxes first, then Data's message (`CatalogProblems
 
 ## Verify by hand
 None: the page comes in NG3.
+- **Done, with deviations:** split at its start (the estimate passed 320 lines with tests): the leader choices and
+  starting items as typed lists, `StartingItemRow` and their tests are NG2b; `ToNewGame` keeps the record's two lists
+  until then. No `CanApply`: no page catalog has one, the workspace greys Apply on `Problem` (as PM2). The start's x
+  and y read through the new `Catalogs/TypedDecimal` (finite, a dot, a sign, and an exponent so what `Text` writes as
+  1E-05 reads back: review), beside `TypedNumber`; the placed object panel's and the cinematic still's copies are
+  backlog lines. `MapIds` lists the start's map when the draft lacks it, `Facings` Core's values, `FieldSpriteFiles`
+  the field sprites' records. Beyond the list: the gold, y and sprite problems, the start at the map's last column
+  accepted, the reversed maps and sprites sorted, a reordered leader list and a changed quantity each a step,
+  `Apply_Untouched_RecordsNothing`, `TypedDecimalTests` (review: a tiny and a huge value read back from `Text`, a parse
+  and a write under fr-CA). Sizes: `NewGameViewModel` 115, `NewGameEditingViewModel` 17, `TypedDecimal` 30,
+  `CatalogDraft.Party` 81; tests `NewGameViewModelTests` 203, `CatalogDraftNewGameTests` 67, `TypedDecimalTests` 88,
+  `NewGameEditingViewModelTests` 34, `NewGameFixtures` 28 (about 190 lines of code, 420 of tests; 44 tests).

@@ -163,8 +163,10 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 ### Phase 5: the new game
 - [x] **NG1. `new-game.json` joins the catalogs' write and stamps** (Data, about 150 lines) →
   [slices/NG1.md](slices/NG1.md)
-- [ ] **NG2. The new game as typed: leader choices, starting items, gold, start, sprite; its undo step** (Editor, about
-  230 lines) → [slices/NG2.md](slices/NG2.md)
+- [x] **NG2. The new game as typed: gold, start, sprite; its undo step** (Editor, about 230 lines; its lists are
+  NG2b) → [slices/NG2.md](slices/NG2.md)
+- [ ] **NG2b. The new game's lists: leader choices and starting items** (Editor, about 320 lines; split from NG2) →
+  [slices/NG2b.md](slices/NG2b.md)
 - [ ] **NG3. Database > New game: the page** (Editor, about 40 lines plus about 110 of XAML) →
   [slices/NG3.md](slices/NG3.md)
 

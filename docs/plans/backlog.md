@@ -379,3 +379,9 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   first (classes and progression plan, NG1 review).
 - `NewGameReferences` plus `NewGameValidator.Validate` are written in three places (`ContentCatalogLoader`,
   `CatalogProblems.CheckItems`, `CheckNewGame`): one shared call, keeping `CheckItems`' edited-items input (NG1 review).
+- `Editor/Objects/PlacedObjectEditing.cs` (~224): its private `Coordinate` and `Text` are `Catalogs/TypedDecimal`'s
+  `Parse` and `Text` (NG2 made the shared piece for the new game's start): call it, keeping the panel's message
+  (classes and progression plan, NG2).
+- `Editor/Cinematics/CinematicStillRow.cs` (~192) is a third copy of invariant-culture double parsing (exponent allowed,
+  no sign): read through `Catalogs/TypedDecimal` with a styles argument when next touched (classes and progression
+  plan, NG2 review).

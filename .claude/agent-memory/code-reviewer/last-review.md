@@ -5,15 +5,12 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-classes-and-progression, slice NG2c (the new game's starting items; split from NG2b). 2026-11-17.
-Round 1. Verdict: Ready to commit. No Critical.
+Plan 2026-11-15-classes-and-progression, slice NG3 (Database > New game: the page). 2026-11-17.
+Round 1. Verdict: Ready to commit. No Critical, no Warning, no Suggestion.
 
-- Warning, open: third copies with ClassViewModel.Skills and NewGameViewModel.Leaders: the "record or missing" lookup
-  (StartingItemRowsOf / LeadersOf / ClassViewModel.ChoiceOf) and the add-box query (ItemsToAdd / LeadersToAdd /
-  SkillsToAdd); proposed RecordChoice.Of(id, name-or-null) and a shared by-name-then-id ordering of unlisted records.
-- Suggestion, open: no test that with two bad quantities the first row's is named (StartingItemsProblem's order).
-- Suggestion, open: the "record's list kept while equal" check is now three two-liners (Skills, Leaders, Items).
-- Follow-up, open: StartingItemRow and Party/ClassSkillRow share a shape (choice + typed number + New + ToEntry);
-  share at a third copy.
-- NG2b items: both suggestions fixed in this slice (notice counted once; Leaders comment); WatchRowsOf follow-up
-  dropped (backlog.md lists it).
+- Runtime probe (scratchpad ng3probe, real page + theme + repository content): 0 binding/resource trace lines;
+  a Quantity box's focus chooses its row; Up/Remove/Add act on the chosen row; the sprite box keeps a missing value
+  and its ItemsSource never changes (same DataContext), so the CL9d trap doesn't apply; nothing written back on close.
+- NG2c items: Warning (record-or-missing lookup, add-box query) fixed (RecordChoice.Of / RecordChoice.ByName in all
+  three); Suggestion two bad quantities fixed (Problem_TwoQuantitiesNotNumbers_NamesTheFirstRowsItem); Suggestion
+  kept-list check fixed (ListOrder.KeptIfEqual); Follow-up StartingItemRow/ClassSkillRow dropped (backlog.md lists it).

@@ -54,3 +54,8 @@ None new: the page binds XP2's tested view model. Guard: the smoke script shows 
   32-35.
 - **Note from XP2:** XP2 was split; XP2b holds Add level, Remove last level and the max level note, which this page's
   buttons and note bind, so XP3 needs XP2b too.
+- **Done:** as planned, a page in the Database mode (the Fallback void, per the Note from CL1): `ExperienceTablePage`
+  (82 lines of XAML, 17 of code-behind; a "Step", "Experience", "Total to reach" header over a virtualized list, as
+  the Classes page's Levels tab), one `CatalogPage.Of` after New game (`MainViewModel.Workspaces` 154), one
+  `Register` (`MainWindow.Database` 107), the menu entry, `CatalogGroup.Characters`' summary, the page-order test and
+  the smoke script's list; the map's page counts say eighteen. No file passed 300 (decision 962's recount).

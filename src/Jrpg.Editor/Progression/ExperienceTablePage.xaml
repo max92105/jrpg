@@ -1,0 +1,83 @@
+<UserControl x:Class="Jrpg.Editor.Progression.ExperienceTablePage"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <UserControl.Resources>
+    <!-- The totals right-aligned so the digits line up, as on the Classes page's Levels tab. -->
+    <Style x:Key="NumberCell" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+      <Setter Property="Margin" Value="0,1,12,1" />
+      <Setter Property="HorizontalAlignment" Value="Right" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+  </UserControl.Resources>
+  <!-- The max level, the steps in order, then the two commands and the note on a lowered max level under them. -->
+  <DockPanel Width="440" HorizontalAlignment="Left">
+    <TextBlock DockPanel.Dock="Top" Text="{Binding MaxLevel, StringFormat='Max level {0}'}" FontWeight="Bold"
+               ToolTip="One past the last step: the table's length sets it" />
+
+    <TextBlock DockPanel.Dock="Bottom" Text="{Binding MaxLevelNote}" TextWrapping="Wrap" Margin="0,6,0,0">
+      <TextBlock.Style>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+          <Setter Property="Foreground" Value="{StaticResource WarningTextBrush}" />
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding MaxLevelNote}" Value="{x:Null}">
+              <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </TextBlock.Style>
+    </TextBlock>
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,6,0,0">
+      <Button Content="Add level" Width="100" Command="{Binding AddLevelCommand}"
+              ToolTip="A step after the last, its experience copied from the last row" />
+      <Button Content="Remove last level" Width="120" Margin="4,0,0,0" Command="{Binding RemoveLastLevelCommand}"
+              ToolTipService.ShowOnDisabled="True"
+              ToolTip="Drops the last step; greyed at one step, since the game needs one at least" />
+    </StackPanel>
+
+    <Grid DockPanel.Dock="Top" Margin="0,8,0,0" TextBlock.FontWeight="Bold">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="130" />
+        <ColumnDefinition Width="110" />
+        <ColumnDefinition Width="110" />
+      </Grid.ColumnDefinitions>
+      <TextBlock Grid.Column="0" Text="Step" />
+      <TextBlock Grid.Column="1" Text="Experience" ToolTip="The experience from this level to the next, at least 1" />
+      <TextBlock Grid.Column="2" Text="Total to reach" Style="{StaticResource NumberCell}"
+                 ToolTip="The experience from level 1 to the step's next level; blank while this box or one above can't be read" />
+    </Grid>
+    <!-- Virtualized: a long table builds only the rows in view. -->
+    <ItemsControl ItemsSource="{Binding Rows}"
+                  Margin="0,4,0,0"
+                  ScrollViewer.CanContentScroll="True"
+                  VirtualizingPanel.IsVirtualizing="True">
+      <ItemsControl.Template>
+        <ControlTemplate TargetType="ItemsControl">
+          <ScrollViewer VerticalScrollBarVisibility="Auto" CanContentScroll="True">
+            <ItemsPresenter />
+          </ScrollViewer>
+        </ControlTemplate>
+      </ItemsControl.Template>
+      <ItemsControl.ItemsPanel>
+        <ItemsPanelTemplate>
+          <VirtualizingStackPanel />
+        </ItemsPanelTemplate>
+      </ItemsControl.ItemsPanel>
+      <ItemsControl.ItemTemplate>
+        <DataTemplate>
+          <Grid Margin="0,1">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="130" />
+              <ColumnDefinition Width="110" />
+              <ColumnDefinition Width="110" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Text="{Binding Label}" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1" Width="90" HorizontalAlignment="Left"
+                     Text="{Binding AmountText, UpdateSourceTrigger=PropertyChanged}" />
+            <TextBlock Grid.Column="2" Text="{Binding TotalToReach}" Style="{StaticResource NumberCell}" />
+          </Grid>
+        </DataTemplate>
+      </ItemsControl.ItemTemplate>
+    </ItemsControl>
+  </DockPanel>
+</UserControl>

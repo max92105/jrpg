@@ -183,7 +183,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   and max level note are XP2b) → [slices/XP2.md](slices/XP2.md)
 - [x] **XP2b. Add level, Remove last level and the max level note** (Editor, about 130 lines; split from XP2) →
   [slices/XP2b.md](slices/XP2b.md)
-- [ ] **XP3. Database > Experience: the page** (Editor, about 30 lines plus about 80 of XAML) →
+- [x] **XP3. Database > Experience: the page** (Editor, about 30 lines plus about 80 of XAML) →
   [slices/XP3.md](slices/XP3.md)
 - [ ] **XP4. Fill from a curve: a first amount and a growth percent** (Editor, about 190 lines) →
   [slices/XP4.md](slices/XP4.md)

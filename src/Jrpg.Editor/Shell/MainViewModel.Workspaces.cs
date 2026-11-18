@@ -4,6 +4,7 @@ using Jrpg.Data.Art;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.NewGame;
 using Jrpg.Editor.Party;
+using Jrpg.Editor.Progression;
 using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Shell;
@@ -128,6 +129,7 @@ internal sealed partial class MainViewModel
                     CatalogGroup.Characters,
                     new PartyMemberEditingViewModel(content, folder => ArtFolders.ImagesIn(ArtRoot, folder))),
                 CatalogPage.Of("New game", CatalogGroup.Characters, new NewGameEditingViewModel(content)),
+                CatalogPage.Of("Experience", CatalogGroup.Characters, new ExperienceEditingViewModel(content)),
             ]);
         workspace.PropertyChanged += OnDatabaseWorkspaceChanged;
         return workspace;

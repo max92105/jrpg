@@ -23,4 +23,5 @@
   <MenuItem Header="Classes" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Classes" ToolTip="Each class's stats per level, its skills and their levels, and its battle resources; party members name a class." />
   <MenuItem Header="Party members" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Party members" ToolTip="Each character's name, class, summary and battle pictures; events recruit them and the new game offers them as leaders." />
   <MenuItem Header="New game" Command="{Binding ShowDatabasePageCommand}" CommandParameter="New game" ToolTip="The leaders a new game offers, its starting items and gold, where it starts and the player's sprite." />
+  <MenuItem Header="Experience" Command="{Binding ShowDatabasePageCommand}" CommandParameter="Experience" ToolTip="The experience each level needs; its length sets the max level." />
 </MenuItem>

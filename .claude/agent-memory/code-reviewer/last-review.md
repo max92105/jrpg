@@ -5,14 +5,17 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-classes-and-progression, slice XP3 (Database > Experience: the page).
+Plan 2026-11-15-classes-and-progression, slice XP4 (Experience page: Fill from a curve).
 2026-11-17. Round 1. Verdict: Ready to commit. No Critical, no Warning.
 
-Probe (scratchpad xp3probe, real page + theme + repository content): no binding or resource trace line; totals follow
-typing and blank on "x"; Remove twice shows the note, Add hides it, Remove greys at one row; 221 rows realize 14
-(Standard mode), no box shows another row's text after scrolling, a focused typed box keeps its value.
+Checked by hand: first 100, 20 %, max level 21 gives rules.json's 20 entries exactly (ending 3154); bounds at
+int.MaxValue (first, growth) fit the long product (at most 2^31 * (2^31 + 100) < 2^63).
 
-- Suggestion: "Total to reach" header ends 17 px right of the totals while the list's scrollbar shows (`*` column in
-  both grids, only the row's narrowed); give column 2 a fixed width in both: open.
-- Suggestion: Remove last level's tooltip ("needs one step at least") never shows when greyed; ShowOnDisabled: open.
-- Suggestion: the "Total to reach" header tooltip says "a box above", but the row's own box blanks it too: open.
+- Suggestion: `ExperienceCurve.Steps` comment says "a factor within int", but 100 + growth reaches int.MaxValue + 100:
+  open.
+- Suggestion: map.md Progression row's `ProblemOf` omits the "first below 1" refusal: open.
+- Suggestion: Fill raises the table's Problem (Data's check) once per replaced/removed row, ~100 checks on a 98-row
+  fill: open.
+
+XP3's three Suggestions (header column width, Remove last level ShowOnDisabled, "this box or one above" tooltip):
+fixed in the tree.

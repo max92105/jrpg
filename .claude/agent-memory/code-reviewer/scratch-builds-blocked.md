@@ -80,3 +80,6 @@ DataContext as Text, always holding the typed value (`ResourceIdChoices.Of`).
 WPF decode fact (probed 2026-11-17, PM4b review, PowerShell -STA BitmapImage OnLoad): a PNG cut to 60 or 200 bytes
 passes `PngSize.IsReadable` (24-byte header) and throws COMException 0x88982F07 in `EndInit`; the failed decode keeps
 the file locked. So a header check alone never guards a decode: look for the catch.
+Virtualized typed rows (probed 2026-11-17, XP3, .NET 10): an ItemsControl over a VirtualizingStackPanel in Standard
+mode with TextBoxes on PropertyChanged keeps every box on its own row's value across scrolling, a focused box included.
+A header Grid over a scrolling list with a `*` right-aligned column drifts by the scrollbar's 17 px: use fixed widths.

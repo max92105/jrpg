@@ -5,13 +5,14 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-classes-and-progression, slice XP2b (Add level, Remove last level, max level note; split from XP2).
-2026-11-17. Round 2. Verdict: Ready to commit. No Critical, no Warning.
+Plan 2026-11-15-classes-and-progression, slice XP3 (Database > Experience: the page).
+2026-11-17. Round 1. Verdict: Ready to commit. No Critical, no Warning.
 
-- Round 1 Warning (note measured against the session's start, cleared by an Apply): fixed. CatalogDraft.SavedMaxLevel
-  is set at load and in MarkSaved and passed by ExperienceEditingViewModel.Start; Start_LastLevelRemovedAndApplied
-  tells the old code from the new.
-- ReplaceAfterRewrite not setting SavedMaxLevel: declined, not reachable. All three callers refuse while unsaved
-  (SheetRemoval.AskPurge IsDirty, map rename and folder rename HasUnsavedChanges), and none changes the table.
-- XP2 Suggestion (ExperienceFixtures' Classes override): fixed.
-- ListItemWatch summary missing users: not raised, backlog.md line 385 holds it.
+Probe (scratchpad xp3probe, real page + theme + repository content): no binding or resource trace line; totals follow
+typing and blank on "x"; Remove twice shows the note, Add hides it, Remove greys at one row; 221 rows realize 14
+(Standard mode), no box shows another row's text after scrolling, a focused typed box keeps its value.
+
+- Suggestion: "Total to reach" header ends 17 px right of the totals while the list's scrollbar shows (`*` column in
+  both grids, only the row's narrowed); give column 2 a fixed width in both: open.
+- Suggestion: Remove last level's tooltip ("needs one step at least") never shows when greyed; ShowOnDisabled: open.
+- Suggestion: the "Total to reach" header tooltip says "a box above", but the row's own box blanks it too: open.

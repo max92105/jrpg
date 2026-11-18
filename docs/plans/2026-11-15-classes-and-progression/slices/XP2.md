@@ -61,8 +61,9 @@ None: the page comes in XP3.
   watched once (the list never changes) rather than through `ListItemWatch`. `SetExperienceTable` sits in
   `CatalogDraft.Party.cs` (the plan's pages' partial, 101 lines), not `.Database.cs` (214, not the 118 the slice
   read); it sets only `Rules.Experience`, both ways, so the step keeps whatever else the rules hold. No `CanApply`:
-  the workspace greys Apply on `Problem`, as for the new game. The fixture keeps only the archer as class, so no
-  repository class learning a skill late refuses the table. Beyond the list:
+  the workspace greys Apply on `Problem`, as for the new game. The fixture's classes were only the archer, which
+  changed nothing (`ClassFixtures.World` holds only the scholar and the archer); XP2b swaps in the skilled archer for
+  its past-max test. Beyond the list:
   `TotalToReach_TypedAmount_UpdatesTheRowsBelow`, `Problem_TwoRowsNotNumbers_NamesTheFirst`,
   `Problem_TypedAmount_RaisesProblemChanged`, `ToTable_TypedAmount_SetsIt`, `ToTable_WithAProblem_Throws`,
   `Apply_Untouched_RecordsNothing`. This part came to about 405 lines (169 code, 236 tests), past its estimate.

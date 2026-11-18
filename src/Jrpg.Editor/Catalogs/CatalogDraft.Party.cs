@@ -6,10 +6,17 @@ namespace Jrpg.Editor.Catalogs;
 
 /// <summary>
 /// The classes, the party members, the new game and the experience table, edited by the Classes, Party members, New
-/// game and Experience pages (decisions 945, 954, 968, 955), each session recorded as one undo step.
+/// game and Experience pages (decisions 945, 954, 968, 955), each session recorded as one undo step; and the table's
+/// max level as saved, which the Experience page warns against lowering (decision 956).
 /// </summary>
 internal sealed partial class CatalogDraft
 {
+    /// <summary>
+    /// The experience table's max level as last loaded or saved, the one <c>rules.json</c> holds: a save above a max
+    /// level applied lower is brought down only once the lower table is written and the save loads.
+    /// </summary>
+    public int SavedMaxLevel { get; private set; }
+
     /// <summary>
     /// Replaces the classes as one undo step (decision 945); nothing when they are the same by content, skills and
     /// resources in order included. No undo refusal: only party members name a class, and catalog steps undo in order,

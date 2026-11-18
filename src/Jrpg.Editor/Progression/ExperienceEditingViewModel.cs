@@ -10,7 +10,7 @@ namespace Jrpg.Editor.Progression;
 /// <param name="catalog">The draft the table is read from and applied to.</param>
 internal sealed class ExperienceEditingViewModel(CatalogDraft catalog) : ICatalogEditing<ExperienceTableViewModel>
 {
-    public ExperienceTableViewModel Start() => new(catalog.Current);
+    public ExperienceTableViewModel Start() => new(catalog.Current, catalog.SavedMaxLevel);
 
     /// <summary>Gives the draft the page's table; nothing when its amounts didn't change.</summary>
     public void Apply(ExperienceTableViewModel edited) => catalog.SetExperienceTable(edited.ToTable());

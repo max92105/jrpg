@@ -15,7 +15,9 @@ or more levels).
 - `Progression/ExperienceTableViewModel`: the rows watched through `ListItemWatch.WatchRowsOf` (XP2 subscribes each
   row once, since its list never changes), its list change re-greying Remove last level and raising `MaxLevel`,
   `MaxLevelNote` and `Problem`; `[RelayCommand]` `AddLevel` and `RemoveLastLevel` (`CanExecute`: more than one row);
-  `string? MaxLevelNote` against the max level the page started from.
+  `string? MaxLevelNote` against the saved max level, given by `ExperienceEditingViewModel.Start`.
+- `Catalogs/CatalogDraft`: `int SavedMaxLevel`, the table's max level as last loaded or saved (set at construction
+  and in `MarkSaved`), so an apply, which restarts the page, keeps the note until Save.
 - `docs/map.md`, Editor `Progression` row: the two commands and the note.
 
 ## Tests
@@ -34,3 +36,15 @@ None: the page comes in XP3.
 - **Note from XP2 review:** `ExperienceFixtures`' `Classes` override does nothing and its stated reason is wrong
   (`ClassFixtures.World` holds only the scholar and the archer): drop it, or say it swaps in `SkilledArcher` for this
   slice's past-max test, and fix the XP2 Done note's matching sentence.
+- **Done, with deviations:** the fixture's one class is now `ClassFixtures.SkilledArcher` (expose at level 4, the max
+  level), which the past-max test needs, and XP2's Done note says the old override changed nothing. From the review:
+  the note compares against `CatalogDraft.SavedMaxLevel` (set at load and in `MarkSaved`), passed by
+  `ExperienceEditingViewModel.Start`, since an apply restarts the page while `rules.json` keeps the old max; tests
+  `Start_LastLevelRemovedAndApplied_NoteNamesTheSavedMax`, `Start_LastLevelRemovedAppliedAndSaved_HasNoNote`,
+  `SavedMaxLevel_LowerTableNotSaved_KeepsTheLoadedOne`, `SavedMaxLevel_LowerTableSaved_TakesItsMax`; fixture
+  `TableOf`. Beyond the list: `AddLevel_FromOneRow_LightsRemoveLastLevel`, `RemoveLastLevel_TwoRows_IsLit` (the
+  bound's lit side), `RemoveLastLevel_RaisesChanged` (`MaxLevel`, `Problem`),
+  `RemoveLastLevel_RemovedRowTyped_RaisesNothing` (a removed row is no longer watched). About 270 lines (70 code, 200
+  tests), past the 130 estimate. Sizes: Editor `ExperienceTableViewModel` 130, `CatalogDraft` 274, its `.Party`
+  partial 108; tests `ExperienceTableViewModelTests` 264, `ExperienceEditingViewModelTests` 68,
+  `CatalogDraftExperienceTests` 71, `ExperienceFixtures` 34.

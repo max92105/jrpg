@@ -4,7 +4,8 @@ using static Jrpg.Editor.Tests.Progression.ExperienceFixtures;
 
 namespace Jrpg.Editor.Tests.Progression;
 
-// The Experience page starts from the draft as it is now, and its whole session is one undo step (decision 956).
+// The Experience page starts from the draft as it is now, its max level note measured against the saved table, and its
+// whole session is one undo step (decision 956).
 public sealed class ExperienceEditingViewModelTests
 {
     private readonly CatalogDraft _draft = new(World);
@@ -30,5 +31,38 @@ public sealed class ExperienceEditingViewModelTests
         _editing.Apply(_editing.Start());
 
         Assert.False(_draft.CanUndo);
+    }
+
+    // Applying restarts the page, but rules.json and the saves still hold the old max level until Save.
+    [Fact]
+    public void Start_LastLevelRemovedAndApplied_NoteNamesTheSavedMax()
+    {
+        var editing = new ExperienceEditingViewModel(DraftWithLastLevelRemovedAndApplied());
+
+        var again = editing.Start();
+
+        Assert.Equal("Max level 4, was 5: saved members above it drop to 4 when a save loads.", again.MaxLevelNote);
+    }
+
+    [Fact]
+    public void Start_LastLevelRemovedAppliedAndSaved_HasNoNote()
+    {
+        var draft = DraftWithLastLevelRemovedAndApplied();
+        draft.MarkSaved();
+
+        var again = new ExperienceEditingViewModel(draft).Start();
+
+        Assert.Null(again.MaxLevelNote);
+    }
+
+    // Four steps, so the skilled archer's expose at level 4 stays within the table once the last is removed.
+    private static CatalogDraft DraftWithLastLevelRemovedAndApplied()
+    {
+        var draft = new CatalogDraft(WithTable(new([10, 20, 40, 80])));
+        var editing = new ExperienceEditingViewModel(draft);
+        var edited = editing.Start();
+        edited.RemoveLastLevelCommand.Execute(null);
+        editing.Apply(edited);
+        return draft;
     }
 }

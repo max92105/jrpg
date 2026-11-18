@@ -22,6 +22,7 @@ internal sealed partial class CatalogDraft : ObservableObject
     public CatalogDraft(ContentCatalog loaded)
     {
         Current = loaded;
+        SavedMaxLevel = loaded.Rules.Experience.MaxLevel;
         _highestTileId = loaded.Tiles.Keys.Append(TileLayer.EmptyTileId).Max();
     }
 
@@ -232,6 +233,7 @@ internal sealed partial class CatalogDraft : ObservableObject
     public void MarkSaved()
     {
         _history.MarkSaved();
+        SavedMaxLevel = Current.Rules.Experience.MaxLevel;
         OnPropertyChanged(nameof(IsDirty));
     }
 

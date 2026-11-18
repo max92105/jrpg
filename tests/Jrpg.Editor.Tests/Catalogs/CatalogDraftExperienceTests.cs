@@ -5,7 +5,7 @@ using static Jrpg.Editor.Tests.Progression.ExperienceFixtures;
 namespace Jrpg.Editor.Tests.Catalogs;
 
 // The experience table is replaced whole as one undo step (decision 955), compared by its amounts in order, so a page
-// applied unchanged records nothing; the rest of the rules stays as it is.
+// applied unchanged records nothing; the rest of the rules stays as it is, and the saved max level waits for a save.
 public sealed class CatalogDraftExperienceTests
 {
     private readonly CatalogDraft _draft = new(World);
@@ -49,5 +49,23 @@ public sealed class CatalogDraftExperienceTests
         _draft.SetExperienceTable(table);
 
         Assert.Equal(World.Rules with { Experience = table }, _draft.Current.Rules);
+    }
+
+    [Fact]
+    public void SavedMaxLevel_LowerTableNotSaved_KeepsTheLoadedOne()
+    {
+        _draft.SetExperienceTable(new ExperienceTable([10, 20]));
+
+        Assert.Equal(4, _draft.SavedMaxLevel);
+    }
+
+    [Fact]
+    public void SavedMaxLevel_LowerTableSaved_TakesItsMax()
+    {
+        _draft.SetExperienceTable(new ExperienceTable([10, 20]));
+
+        _draft.MarkSaved();
+
+        Assert.Equal(3, _draft.SavedMaxLevel);
     }
 }

@@ -1,0 +1,109 @@
+<UserControl x:Class="Jrpg.Editor.NewGame.NewGamePage"
+             x:ClassModifier="internal"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:catalogs="clr-namespace:Jrpg.Editor.Catalogs">
+  <UserControl.Resources>
+    <Style x:Key="FieldLabel" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+      <Setter Property="Width" Value="90" />
+      <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+    <Style x:Key="GroupTitle" TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+      <Setter Property="FontWeight" Value="Bold" />
+      <Setter Property="Margin" Value="0,12,0,4" />
+    </Style>
+    <!-- A click into a starting item's Quantity box chooses that row, so Remove and the moves act on the row typed in. -->
+    <Style x:Key="TypedRow" TargetType="ListBoxItem" BasedOn="{StaticResource {x:Type ListBoxItem}}">
+      <Setter Property="catalogs:RowFocus.ChoosesRow" Value="True" />
+    </Style>
+  </UserControl.Resources>
+  <!-- The leaders left; right, what the party starts with, then where and as whom, in the problem line's order. -->
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="360" />
+      <ColumnDefinition Width="*" />
+    </Grid.ColumnDefinitions>
+
+    <DockPanel Grid.Column="0">
+      <TextBlock DockPanel.Dock="Top" Text="Leader choices" FontWeight="Bold" />
+      <TextBlock DockPanel.Dock="Top" Text="The leader screen offers them in this order." Foreground="{StaticResource MutedTextBrush}" />
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,6,0,0">
+        <ComboBox Width="232" ItemsSource="{Binding LeadersToAdd}" SelectedItem="{Binding LeaderToAdd}" DisplayMemberPath="Label"
+                  ToolTip="Every party member not listed yet; a new game lists each once" />
+        <Button Content="Add" Width="60" Margin="4,0,0,0" Command="{Binding AddLeaderCommand}" ToolTip="After the chosen leader" />
+      </StackPanel>
+      <StackPanel DockPanel.Dock="Right" Margin="4,0,0,0">
+        <Button Content="Up" Width="60" Command="{Binding MoveLeaderUpCommand}" />
+        <Button Content="Down" Width="60" Margin="0,4,0,0" Command="{Binding MoveLeaderDownCommand}" />
+        <Button Content="Remove" Width="60" Margin="0,4,0,0" Command="{Binding RemoveLeaderCommand}"
+                ToolTip="A new game needs one leader at least; the line says so" />
+      </StackPanel>
+      <ListBox Margin="0,4,0,0" ItemsSource="{Binding Leaders}" SelectedItem="{Binding SelectedLeader}" DisplayMemberPath="Label" />
+    </DockPanel>
+
+    <DockPanel Grid.Column="1" Margin="16,0,0,0">
+      <StackPanel DockPanel.Dock="Bottom">
+        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+          <TextBlock Text="Starting gold" Style="{StaticResource FieldLabel}" />
+          <TextBox Width="80" Text="{Binding GoldText, UpdateSourceTrigger=PropertyChanged}" />
+        </StackPanel>
+
+        <TextBlock Text="Start" Style="{StaticResource GroupTitle}" />
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="Map" Style="{StaticResource FieldLabel}" />
+          <ComboBox Width="200" ItemsSource="{Binding MapIds}" SelectedItem="{Binding MapId}"
+                    ToolTip="The map a new game starts on" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="X" Style="{StaticResource FieldLabel}" />
+          <TextBox Width="60" Text="{Binding XText, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="In cells from the map's left edge: 2.5 is the middle of the third column" />
+          <TextBlock Text="Y" Margin="12,0,6,0" VerticalAlignment="Center" />
+          <TextBox Width="60" Text="{Binding YText, UpdateSourceTrigger=PropertyChanged}"
+                   ToolTip="In cells from the map's top edge: 2.5 is the middle of the third row" />
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+          <TextBlock Text="Facing" Style="{StaticResource FieldLabel}" />
+          <ComboBox Width="100" ItemsSource="{Binding Facings}" SelectedItem="{Binding Facing}" />
+        </StackPanel>
+
+        <TextBlock Text="Player sprite" Style="{StaticResource GroupTitle}" />
+        <StackPanel Orientation="Horizontal">
+          <TextBlock Text="Field sprite" Style="{StaticResource FieldLabel}" />
+          <ComboBox Width="200"
+                    IsEditable="True"
+                    ItemsSource="{Binding FieldSpriteFiles}"
+                    Text="{Binding FieldSpriteFile, UpdateSourceTrigger=PropertyChanged}"
+                    ToolTip="The player's walk on the maps: a sheet of art/field-sprites that the Character sprites page sets up" />
+        </StackPanel>
+      </StackPanel>
+
+      <TextBlock DockPanel.Dock="Top" Text="Starting items" FontWeight="Bold" />
+      <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="0,4,0,0" TextBlock.FontWeight="Bold">
+        <TextBlock Text="Item" Width="260" />
+        <TextBlock Text="Quantity" ToolTip="From 1 to the item's max stack" />
+      </StackPanel>
+      <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,6,0,0">
+        <ComboBox Width="260" ItemsSource="{Binding ItemsToAdd}" SelectedItem="{Binding ItemToAdd}" DisplayMemberPath="Label"
+                  ToolTip="Every item not listed yet; a new game lists each once" />
+        <Button Content="Add" Width="60" Margin="4,0,0,0" Command="{Binding AddItemCommand}" ToolTip="After the chosen item, one copy" />
+      </StackPanel>
+      <StackPanel DockPanel.Dock="Right" Margin="4,0,0,0">
+        <Button Content="Up" Width="60" Command="{Binding MoveItemUpCommand}" />
+        <Button Content="Down" Width="60" Margin="0,4,0,0" Command="{Binding MoveItemDownCommand}" />
+        <Button Content="Remove" Width="60" Margin="0,4,0,0" Command="{Binding RemoveItemCommand}" />
+      </StackPanel>
+      <ListBox Margin="0,4,0,0" ItemsSource="{Binding StartingItems}" SelectedItem="{Binding SelectedItem}"
+               ItemContainerStyle="{StaticResource TypedRow}">
+        <ListBox.ItemTemplate>
+          <DataTemplate>
+            <StackPanel Orientation="Horizontal">
+              <TextBlock Width="256" Text="{Binding Item.Label}" VerticalAlignment="Center" />
+              <TextBox Width="50" Text="{Binding QuantityText, UpdateSourceTrigger=PropertyChanged}" />
+            </StackPanel>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+  </Grid>
+</UserControl>

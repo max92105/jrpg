@@ -33,7 +33,7 @@ param(
         'Database>Effect strips>Strip from sheet cells...', 'Database>Battle backgrounds',
         'Database>Skills', 'Database>Effects', 'Database>Statuses', 'Database>Cinematics',
         'Database>Enemies', 'Database>Items', 'Database>Affixes', 'Database>Encounters', 'Database>Classes',
-        'Database>Party members',
+        'Database>Party members', 'Database>New game',
         'Help>Raise a test error'),
     [switch]$EventWindows,
     [string]$Map

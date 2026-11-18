@@ -53,3 +53,8 @@ None new: the page binds NG2's tested view model. Guard: the smoke script shows 
   `MainViewModelDatabaseWorkspaceTests.DatabaseWorkspace_ContentLoaded_ListsEveryPageInGroupOrder` gains it after the
   page before it, so "Tests: none new" still changes that one assertion. The smoke script's default list is its lines
   32-35.
+- **Done, with deviations:** a page under Characters after Party members, as the CL1 note says (the Fallback void).
+  The groups in two columns: the leader choices left, the starting items right with the starting gold, the start and
+  the player sprite under them, in the problem line's order; "Field sprite" labels the player sprite's box. The
+  backlog's `RowFocus.ChoosesRow` style line counts New game's copy (six pages). Sizes: `NewGamePage.xaml` 109,
+  `.xaml.cs` 17, `MainViewModel.Workspaces` 152, `MainWindow.Database` 105, `DatabaseMenu.xaml` 26.

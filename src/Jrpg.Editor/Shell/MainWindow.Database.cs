@@ -7,6 +7,7 @@ using Jrpg.Editor.Effects;
 using Jrpg.Editor.Encounters;
 using Jrpg.Editor.Items;
 using Jrpg.Editor.Loot;
+using Jrpg.Editor.NewGame;
 using Jrpg.Editor.Party;
 using Jrpg.Editor.Quests;
 using Jrpg.Editor.Skills;
@@ -47,6 +48,7 @@ internal sealed partial class MainWindow
         pageViews.Register<StatusCatalogViewModel>(edited => new StatusCatalogPage(edited));
         pageViews.Register<EncounterCatalogViewModel>(edited => new EncounterPage(edited));
         pageViews.Register<ClassCatalogViewModel>(edited => new ClassCatalogPage(edited));
+        pageViews.Register<NewGameViewModel>(edited => new NewGamePage(edited));
         RegisterPicturePages(pageViews);
         RegisterPagesOnTheAnimationClock(pageViews, animationTime);
         return pageViews;

@@ -41,7 +41,8 @@ public static partial class CatalogProblems
 
     /// <summary>
     /// The loader's check that every class skill is learned within the experience table (decision 965), made once
-    /// <c>rules.json</c> is read: for the problem lines and the writer, which checks the classes' own rules first.
+    /// <c>rules.json</c> is read: for the classes' problem line and <see cref="CheckRules"/>, through which the writer
+    /// runs it once the classes' own rules are checked.
     /// </summary>
     /// <param name="classes">The classes as they will be written.</param>
     /// <param name="table">The experience table as it will be written.</param>
@@ -92,4 +93,8 @@ public static partial class CatalogProblems
         FieldSpriteReferenceCheck.Check(
             ContentCatalogLoader.FieldSpritesFile, content.FieldSprites, content.Objects.Values, newGame);
     }
+
+    // By id, as the writer writes them, so the first problem named is the one the loader would name.
+    private static List<ClassDefinition> ClassesById(ContentCatalog content) =>
+        [.. content.Classes.Values.OrderBy(classDefinition => classDefinition.Id, StringComparer.Ordinal)];
 }

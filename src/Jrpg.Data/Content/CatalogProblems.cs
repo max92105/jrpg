@@ -225,9 +225,7 @@ public static partial class CatalogProblems
     internal static void CheckSkills(IReadOnlyList<SkillDefinition> skills, ContentCatalog content)
     {
         SkillCatalogValidator.Validate(ContentCatalogLoader.SkillsFile, skills);
-        CheckClasses(
-            [.. content.Classes.Values.OrderBy(classDefinition => classDefinition.Id, StringComparer.Ordinal)],
-            skills.ToDictionary(skill => skill.Id, StringComparer.Ordinal));
+        CheckClasses(ClassesById(content), skills.ToDictionary(skill => skill.Id, StringComparer.Ordinal));
     }
 
     /// <summary>

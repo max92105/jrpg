@@ -19,8 +19,8 @@ using Jrpg.Data.Quests;
 namespace Jrpg.Data.Content;
 
 /// <summary>
-/// The catalog files the writer writes, the new game's among them (decision 961): each checked as the loader checks it,
-/// then serialized sorted by id; one place to add a catalog.
+/// The catalog files the writer writes, the new game's and the rules' among them (decisions 961, 955): each checked as
+/// the loader checks it, then serialized sorted by id; one place to add a catalog.
 /// </summary>
 public sealed partial class ContentWriter
 {
@@ -42,9 +42,10 @@ public sealed partial class ContentWriter
         // Before the enemies, so a skill's own problem is named before an enemy's tactic naming it.
         CatalogProblems.CheckTieredEffects(SortedTieredEffects(catalog));
         CatalogProblems.CheckStatuses(SortedStatuses(catalog));
-        // The classes' own rules too, against these skills, so they are checked once; their skills' levels right after.
+        // The classes' own rules too, against these skills, so they are checked once; then the rules, whose experience
+        // table the classes' skill levels must fit (the Forge's materials were checked with the items).
         CatalogProblems.CheckSkills(SortedSkills(catalog), catalog);
-        CatalogProblems.CheckClassSkillLevels(SortedClasses(catalog), catalog.Rules.Experience);
+        CatalogProblems.CheckRules(catalog.Rules, catalog);
         // After the classes, so a class's own problem is named before a member's naming it.
         CatalogProblems.CheckPartyMembers(SortedPartyMembers(catalog), catalog);
         CatalogProblems.CheckEnemies(SortedEnemies(catalog), catalog);
@@ -55,7 +56,7 @@ public sealed partial class ContentWriter
     }
 
     // Each catalog file's bytes as it would be written, sorted by id (the effect strips and animated backgrounds by
-    // file; the new game is one record): what the stamps compare and the writes carry.
+    // file; the new game and the rules are one record each): what the stamps compare and the writes carry.
     private static List<CatalogWrite> SerializedCatalogs(ContentCatalog catalog) =>
     [
         new(ContentCatalogLoader.TilesheetsFile, ContentFileWriter.Serialize(SortedSheets(catalog))),
@@ -77,6 +78,7 @@ public sealed partial class ContentWriter
         new(ContentCatalogLoader.PartyMembersFile, ContentFileWriter.Serialize(SortedPartyMembers(catalog))),
         new(ContentCatalogLoader.ItemsFile, ContentFileWriter.Serialize(SortedItems(catalog), ItemConverters(catalog))),
         new(ContentCatalogLoader.AffixesFile, ContentFileWriter.Serialize(SortedAffixes(catalog))),
+        new(ContentCatalogLoader.RulesFile, ContentFileWriter.Serialize(catalog.Rules)),
         NewGameWrite(catalog),
     ];
 

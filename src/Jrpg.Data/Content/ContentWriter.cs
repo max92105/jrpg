@@ -25,10 +25,11 @@ public sealed partial class ContentWriter(string contentRoot)
 
     /// <summary>
     /// Writes the tilesheet, tile, object, quest, field sprite, shop, enemy, encounter, drop table, cinematic, effect
-    /// strip, animated background, skill, class, party member, tiered effect, status, item and affix catalogs and the
-    /// new game that changed, each sorted by id, after checking them all as the loader would, with every map's layout
-    /// checked against them (the quests and stages its events name included, decision 394; the shops its steps open).
-    /// Missing art doesn't stop a save (decision 442): the editor warns, the game's startup refuses the missing file.
+    /// strip, animated background, skill, class, party member, tiered effect, status, item and affix catalogs, the new
+    /// game and the rules that changed, each catalog sorted by id, after checking them all as the loader would, with
+    /// every map's layout checked against them (the quests and stages its events name included, decision 394; the shops
+    /// its steps open). Missing art doesn't stop a save (decision 442): the editor warns, the game's startup refuses
+    /// the missing file.
     /// </summary>
     /// <param name="catalog">The content holding the catalogs to save; its maps are the ones checked.</param>
     /// <exception cref="ContentValidationException">

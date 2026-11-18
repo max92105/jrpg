@@ -45,3 +45,15 @@ the files' spelling (`ContentJsonOptions.EnumName`), registered in `ContentJsonO
 1. `git diff content/rules.json` in the relay commit: every number the same, one field per line, sections reordered.
 2. Run the game: walk (same speed), win a battle (the bar fills by the same table), open the Forge (same costs).
 3. Edit a map in the editor, Save all: `git status` shows no change to `rules.json`.
+- **Done, with deviations:** `rules.json` joins the writer's catalogs and stamps (one record, `GameRules`' order),
+  relaid once (39 lines to 127, the experience list one entry per line; every section the same by value, the
+  simulations' lines identical); no rarity converter needed (the keys come out `"common"`). Decision 1020: `CheckRules`
+  runs the sections' rules and the class skill levels (replacing the writer's own `CheckClassSkillLevels` call), not
+  the Forge's materials, which `CheckItems` already checks on every save; `OfRules` runs both, the loader's order.
+  `RulesFile` was already `internal`. The classes' sort is shared, `CatalogProblems.ClassesById` (third copy). Beyond
+  the list: `WriteMapCatalogs_UnchangedRules_LeavesTheFile`, `OfRules_TableShorterThanASkillLevel_NamesTheClass`,
+  `OfRules_CraftingNamingRemovedItem_NamesIt`; `ContentCatalogLoaderCraftingTests` edits the file through `JsonNode`
+  (its text replace no longer matched the new layout). Saves untouched. Sizes: Data `CatalogProblems.Rules.cs` 38,
+  `ContentWriter.Catalogs.cs` 160; tests `ContentWriterRulesTests` 135, `CatalogProblemsRulesTests` 55.
+  After review: with both a rules problem and an item problem, Save all names the item's first (`CheckItems` runs before
+  `CheckRules`) where the loader names the rules'; the problem line (`OfRules`) keeps the loader's order.

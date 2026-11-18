@@ -82,6 +82,7 @@ public sealed class ContentWriterRepositoryTests : IDisposable
          .. File.ReadAllBytes(_content.PathOf("statuses.json")),
          .. File.ReadAllBytes(_content.PathOf("items.json")),
          .. File.ReadAllBytes(_content.PathOf("affixes.json")),
+         .. File.ReadAllBytes(_content.PathOf("rules.json")),
          .. File.ReadAllBytes(_content.PathOf("new-game.json"))];
 
     // Both files one after the other, compared byte for byte: line endings and encoding count.

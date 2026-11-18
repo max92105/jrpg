@@ -177,7 +177,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   (the options: the whole file, chosen; the table in its own `experience.json`; a patch of the `experience` node
   keeping the hand layout), with the stamps as the reason the whole-file write is safe (decision 559). The developer
   delegated approval; the choice is in "Defaults to confirm".
-- [ ] **XP1. `rules.json` is written by the editor, every section in the writer's layout** (Data + content, about 140
+- [x] **XP1. `rules.json` is written by the editor, every section in the writer's layout** (Data + content, about 140
   lines plus the relaid file; about 40 more if the rarity keys need their converter) → [slices/XP1.md](slices/XP1.md)
 - [ ] **XP2. The experience table as typed, one undo step** (Editor, about 220 lines) → [slices/XP2.md](slices/XP2.md)
 - [ ] **XP3. Database > Experience: the page** (Editor, about 30 lines plus about 80 of XAML) →
@@ -264,6 +264,10 @@ Experience:
   An authoring tool: the game keeps reading the list (today's table is exactly first 100, 20 %, max level 21).
 - **958.** (default taken while the developer was away; his to overturn) The fill makes 2 to 99 levels, the genre's
   usual cap; the table typed by hand has no cap but Data's.
+- **1020.** (XP1) The writer's `CheckRules` runs the rules' own check and the classes' skill levels against the table,
+  not the Forge's materials: `CheckItems` already checks those against the items on every save (decision 863), so a
+  second call would check them twice with no test able to tell (as decision 1018). `OfRules`, the problem line, runs
+  `CheckRules` then the materials, the loader's order.
 
 Skills learned at a level (ADR 0062):
 - **959.** Built, as the approved roadmap names it: a class's skill entry is `{ "skillId", "level" }`, the level a

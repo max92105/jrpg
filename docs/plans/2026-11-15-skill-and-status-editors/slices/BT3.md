@@ -41,3 +41,16 @@ Tiers. Its `Problem` is the boxes' only and never stops a move; Apply records no
 4. Tiers: `fire_1` at Powers 1, 10, 50 reads 2, 20, 100; modifier 473 and Power 1: 11 (the sheet's example).
 5. Database > Effects..., `fire_1` Per Power 3, apply; back to the table: Fireball's numbers follow. Ctrl+Z.
 6. Run `.claude/scripts/open-editor-windows.ps1`: the table reported, no `ERROR` or binding-error line.
+- **Note from BT1:** the mode bar's stage 3 landed without `CatalogPage.IsReadOnly`: today a page is one
+  `CatalogPage.Of("Balance table", CatalogGroup.Battle, new BalanceTableEditingViewModel(content))` line in
+  `Shell/MainViewModel.Workspaces.cs`'s `CreateDatabaseWorkspace` (then "the nineteen pages" in `docs/map.md`'s
+  Shell and Workspaces rows), one `pageViews.Register<BalanceTableViewModel>(edited => new BalanceTablePage(edited))`
+  line in `Shell/MainWindow.Database.cs`, and one `Shell/DatabaseMenu.xaml` entry, `Command="{Binding
+  ShowDatabasePageCommand}" CommandParameter="Balance table"` (the title, not a `Tag`). A read-only page fits
+  `IEditedCatalog` as `Progression/ExperienceTableViewModel` does for one record (`ChosenKey` null, `Choose` keeps
+  all), with `Problem` always null (the recipe's step 8): `DatabaseWorkspaceViewModel` greys Apply and refuses every
+  move on it (`CanApply`, `ApplyOrRefuse`), so the boxes' line is BT1b's `BoxesProblem`, shown on the page itself.
+  `Apply` records nothing; Apply and Revert stay on the bar unless BT3 adds `CatalogPage.IsReadOnly` hiding them,
+  with its own tests. The session starts again on every `CatalogDraft.Current` change (decision 921), so an undo
+  while the table is shown puts its boxes back to 1, 10, 20; check that with the developer. Hand check 1's numbers
+  (Fireball 24, Flurry "28 x 4 = 112") are from 2026-11-15's content: read them again from today's.

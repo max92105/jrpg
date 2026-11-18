@@ -152,8 +152,9 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/AN7.md](slices/AN7.md)
 
 ### Phase 4: the balance table (after row 12)
-- [ ] **BT1. Core's readings and the table's class skill rows** (Core + Editor, about 240 lines) →
+- [x] **BT1. Core's readings for the balance table** (Core, about 150 lines; split at its start) →
   [slices/BT1.md](slices/BT1.md)
+- [ ] **BT1b. The table's class skill rows** (Editor, about 300 lines) → [slices/BT1b.md](slices/BT1b.md)
 - [ ] **BT2. Enemies' skills, classes and enemies, and the tier sheet rows** (Editor, about 180 lines) →
   [slices/BT2.md](slices/BT2.md)
 - [ ] **BT3. Database > Balance table...: the read-only page** (Editor + script, about 170 lines) →

@@ -39,3 +39,15 @@ HP and Power at the three levels; each enemy's HP, power, attack damage and type
 
 ## Verify by hand
 None: the page comes in BT3.
+- **Note from BT1:** BT1 was split; BT2 builds on BT1b's `Balance/BalanceTableViewModel` (its boxes' line is
+  `BoxesProblem`, never `Problem`: BT3's `IEditedCatalog.Problem` stays null). `ClassBalanceRow` reads
+  `Party/ClassSheet.At(class, level, content.Rules.Stats)`'s `MaxHp` and `Primaries.Power` (decision 948), never its
+  own `MemberSheet.Of(ClassGrowth.StatsAt(...), ...)`; classes and enemies in id order, as `Skills/SkillUsers` lists
+  them (the catalog keeps no file order). An enemy's skills are its `Tactics` then each phase's `Tactics` by
+  `SkillId`, the walk `EnemyDefinition.NamesSkill` makes (row 8), each skill once; its stats
+  `Combatant.FromEnemy(enemy).Stats` with the typed modifier added to `DamageModifierPermille` as BT1b adds it. A
+  tier row is `EffectAmounts.PerHit` of an effect naming the tier over `new CombatStats(0) { Power = p,
+  DamageModifierPermille = typed x 10 }`, a heal ignoring the modifier there. `DamageFormula.MaxPower` is internal to
+  Core (decision 1001's finding), so the Power boxes can't read it from the Editor: a whole number from 0 to a bound
+  of its own or one Core makes public with a test, BT2's choice to raise. Mind the 300-line cap:
+  `BalanceTableViewModel` with BT1b's and BT2's rows passes it; split its rows' building into a partial or a builder.

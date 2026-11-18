@@ -52,3 +52,5 @@ None new: the page binds XP2's tested view model. Guard: the smoke script shows 
   `MainViewModelDatabaseWorkspaceTests.DatabaseWorkspace_ContentLoaded_ListsEveryPageInGroupOrder` gains it after the
   page before it, so "Tests: none new" still changes that one assertion. The smoke script's default list is its lines
   32-35.
+- **Note from XP2:** XP2 was split; XP2b holds Add level, Remove last level and the max level note, which this page's
+  buttons and note bind, so XP3 needs XP2b too.

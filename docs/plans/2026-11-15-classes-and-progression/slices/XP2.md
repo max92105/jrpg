@@ -56,3 +56,16 @@ choose.
 
 ## Verify by hand
 None: the page comes in XP3.
+- **Done, with deviations:** split at its start (the estimate passed 320 lines with tests): Add level, Remove last
+  level, the max level note and `Problem_ClassSkillPastNewMax_ShowsDataMessage` are XP2b, so the rows here are each
+  watched once (the list never changes) rather than through `ListItemWatch`. `SetExperienceTable` sits in
+  `CatalogDraft.Party.cs` (the plan's pages' partial, 101 lines), not `.Database.cs` (214, not the 118 the slice
+  read); it sets only `Rules.Experience`, both ways, so the step keeps whatever else the rules hold. No `CanApply`:
+  the workspace greys Apply on `Problem`, as for the new game. The fixture keeps only the archer as class, so no
+  repository class learning a skill late refuses the table. Beyond the list:
+  `TotalToReach_TypedAmount_UpdatesTheRowsBelow`, `Problem_TwoRowsNotNumbers_NamesTheFirst`,
+  `Problem_TypedAmount_RaisesProblemChanged`, `ToTable_TypedAmount_SetsIt`, `ToTable_WithAProblem_Throws`,
+  `Apply_Untouched_RecordsNothing`. This part came to about 405 lines (169 code, 236 tests), past its estimate.
+  Sizes: Editor `ExperienceTableViewModel` 91, `ExperienceRowViewModel` 41, `ExperienceEditingViewModel` 17; tests
+  `ExperienceTableViewModelTests` 123, `CatalogDraftExperienceTests` 53, `ExperienceEditingViewModelTests` 34,
+  `ExperienceFixtures` 25.

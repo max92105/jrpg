@@ -1,11 +1,12 @@
 using Jrpg.Core.Content;
 using Jrpg.Core.Party;
+using Jrpg.Core.Progression;
 
 namespace Jrpg.Editor.Catalogs;
 
 /// <summary>
-/// The classes, the party members and the new game, edited by the Classes, Party members and New game pages (decisions
-/// 945, 954, 968), each session recorded as one undo step.
+/// The classes, the party members, the new game and the experience table, edited by the Classes, Party members, New
+/// game and Experience pages (decisions 945, 954, 968, 955), each session recorded as one undo step.
 /// </summary>
 internal sealed partial class CatalogDraft
 {
@@ -70,6 +71,25 @@ internal sealed partial class CatalogDraft
         }
 
         Do(new CatalogEdit(catalog => catalog with { NewGame = newGame }, catalog => catalog with { NewGame = before }));
+    }
+
+    /// <summary>
+    /// Replaces the rules' experience table as one undo step (decision 955: the only part of <c>rules.json</c> edited);
+    /// nothing when its amounts are the same in order. No undo refusal (decision 943): a save above a lowered max level
+    /// is repaired as it loads, and a class skill learned at a level the undo removes came in a later step, already
+    /// undone, since catalog steps undo in order.
+    /// </summary>
+    public void SetExperienceTable(ExperienceTable table)
+    {
+        var before = Current.Rules.Experience;
+        if (before.ExperienceToNextLevel.SequenceEqual(table.ExperienceToNextLevel))
+        {
+            return;
+        }
+
+        Do(new CatalogEdit(
+            catalog => catalog with { Rules = catalog.Rules with { Experience = table } },
+            catalog => catalog with { Rules = catalog.Rules with { Experience = before } }));
     }
 
     // As a class's: the with-copy compares every field but the two lists, the lists by content and order: a leader

@@ -6,7 +6,8 @@ namespace Jrpg.Data.Tests.Content;
 
 // The classes' problem line (decision 944): the loader's own message for the edited list, the skills a class names
 // checked against the content's skills and their levels against its experience table; the members' (decision 952), the
-// class a member names checked against the content's classes.
+// class a member names checked against the content's classes; the new game's (decision 969), its field sprite checked
+// against the content's records.
 public sealed class CatalogProblemsPartyTests
 {
     private static readonly ContentCatalog _catalog =
@@ -78,6 +79,27 @@ public sealed class CatalogProblemsPartyTests
         var problem = CatalogProblems.OfPartyMembers([_ilsa], _catalog);
 
         Assert.Equal("party-members.json: party member 'ilsa': classId 'ranger' is not a known class.", problem);
+    }
+
+    [Fact]
+    public void OfNewGame_ValidNewGame_IsNull() => Assert.Null(CatalogProblems.OfNewGame(_catalog.NewGame, _catalog));
+
+    [Fact]
+    public void OfNewGame_LeaderTheContentLacks_NamesIt()
+    {
+        var problem = CatalogProblems.OfNewGame(
+            _catalog.NewGame with { LeaderChoices = [new LeaderChoice { MemberId = "ilsa" }] }, _catalog);
+
+        Assert.Equal("new-game.json: leaderChoices has unknown party member id 'ilsa'.", problem);
+    }
+
+    // The content's own new game names a sprite with a record: the edited one, not the content's, is checked.
+    [Fact]
+    public void OfNewGame_SpriteWithoutRecord_NamesIt()
+    {
+        var problem = CatalogProblems.OfNewGame(_catalog.NewGame with { FieldSpriteFile = "ghost.png" }, _catalog);
+
+        Assert.Equal("field-sprites.json: the new game names field sprite 'ghost.png', which has no record.", problem);
     }
 
     private static ContentCatalog WithRanger() =>

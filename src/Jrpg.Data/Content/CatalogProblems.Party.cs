@@ -3,13 +3,14 @@ using Jrpg.Core.Party;
 using Jrpg.Core.Progression;
 using Jrpg.Core.Skills;
 using Jrpg.Data.Party;
+using Jrpg.Data.Sprites;
 
 namespace Jrpg.Data.Content;
 
 /// <summary>
 /// What the loader would refuse in the classes (decision 944), each checked with the skills it names and the experience
-/// table its skills' levels must fit (decision 965), and in the party members (decision 952), each checked with the
-/// class it names.
+/// table its skills' levels must fit (decision 965), in the party members (decision 952), each checked with the class
+/// it names, and in the new game (decision 969), checked with the members, items, maps and field sprites it names.
 /// </summary>
 public static partial class CatalogProblems
 {
@@ -67,4 +68,28 @@ public static partial class CatalogProblems
     internal static void CheckPartyMembers(IReadOnlyList<PartyMemberDefinition> members, ContentCatalog content) =>
         PartyMemberCatalogValidator.Validate(
             ContentCatalogLoader.PartyMembersFile, members, new PartyMemberReferences(content.Classes.Keys.ToHashSet()));
+
+    /// <summary>
+    /// The first problem in the new game (decision 969): its own rules, a member, item or map it names that the content
+    /// lacks, a start outside its map, or a field sprite without a record; null when the loader would take it.
+    /// </summary>
+    /// <param name="newGame">The new game as edited.</param>
+    /// <param name="content">The members, items, maps and field sprites the new game names.</param>
+    public static string? OfNewGame(NewGameDefinition newGame, ContentCatalog content) =>
+        FirstProblem(() => CheckNewGame(newGame, content));
+
+    /// <summary>
+    /// The checks the loader makes on <c>new-game.json</c>, then its field sprite's record as the loader checks it once
+    /// the new game is read (the objects' sprites included): for the problem line and the writer's map saves.
+    /// </summary>
+    /// <param name="newGame">The new game as it will be written.</param>
+    /// <param name="content">The members, items, maps, field sprites and objects, as they will be written.</param>
+    /// <exception cref="ContentValidationException">The first problem, naming the file.</exception>
+    internal static void CheckNewGame(NewGameDefinition newGame, ContentCatalog content)
+    {
+        var references = new NewGameReferences(content.PartyMembers.Keys.ToHashSet(), content.Items, content.Maps);
+        NewGameValidator.Validate(ContentCatalogLoader.NewGameFile, newGame, references);
+        FieldSpriteReferenceCheck.Check(
+            ContentCatalogLoader.FieldSpritesFile, content.FieldSprites, content.Objects.Values, newGame);
+    }
 }

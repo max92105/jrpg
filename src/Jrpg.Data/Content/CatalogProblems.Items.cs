@@ -27,8 +27,9 @@ public static partial class CatalogProblems
 
     /// <summary>
     /// Every check the loader makes that reads <c>items.json</c> (decision 863), in its order: the items' own rules,
-    /// then the Forge's materials in <c>rules.json</c>, the shops' prices, the drop tables' stacks and the new game's
-    /// starting items, each against these items.
+    /// then the Forge's materials in <c>rules.json</c>, the shops' prices, the drop tables' stacks and the whole new
+    /// game's own check (its leaders, starting items, start and gold), each against these items; Save all checks the
+    /// new game's rules only here (decision 1018).
     /// </summary>
     /// <param name="items">The items as they will be written.</param>
     /// <param name="content">

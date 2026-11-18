@@ -40,3 +40,17 @@ edits the new game yet (NG2).
 1. Run the editor, change a map, Save all: `git status` shows no change to `new-game.json`.
 2. Map > Rename map... on the start map, then rename it back: no refusal at the next Save all, and `new-game.json`
    names the map as at the start.
+- **Done, with deviations:** `new-game.json` joins the writer's catalogs and stamps (`NewGameWrite`, shared with the
+  map rename, which renews its stamp); no relay, the simulations' lines identical. Decision 1018: `CheckCatalogs`
+  gains no `CheckNewGame` call, since `CheckItems` already runs the new game's validator and `CheckFieldSprites` its
+  sprite's record (a third call checks it twice, no test can tell); `CheckNewGame` serves `OfNewGame` and
+  `CheckSettingsAndNewGame`, so a map save now refuses a new game sprite without a record, as the loader does
+  (`WriteMaps_NewGameSpriteWithoutRecord_WritesNothing`). Also beyond the list:
+  `OfNewGame_LeaderTheContentLacks_NamesIt` (the validator's half),
+  `WriteMapCatalogs_NewGameSpriteWithoutRecord_WritesNothing` (review: the sprite's half of decision 1018 on Save
+  all), and `ContentWriterRepositoryTests.CatalogFileBytes` gains `new-game.json`. Review: `CheckItems`' summary
+  names the whole new game check and decision 1018; the map checks' summaries say "the new game", not its start; two
+  backlog lines (the rename's unchecked hand edit, the new game check's three copies). Sizes: Data
+  `CatalogProblems.Party.cs` 95, `ContentWriter.Catalogs.cs` 158, `ContentWriter.cs` 237; tests
+  `ContentWriterNewGameTests` 115, `CatalogProblemsPartyTests` 107, `ContentWriterRenameTests` 159 (about 40 lines of
+  Data, 165 of tests).

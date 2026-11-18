@@ -161,7 +161,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/PM4b.md](slices/PM4b.md)
 
 ### Phase 5: the new game
-- [ ] **NG1. `new-game.json` joins the catalogs' write and stamps** (Data, about 150 lines) →
+- [x] **NG1. `new-game.json` joins the catalogs' write and stamps** (Data, about 150 lines) →
   [slices/NG1.md](slices/NG1.md)
 - [ ] **NG2. The new game as typed: leader choices, starting items, gold, start, sprite; its undo step** (Editor, about
   230 lines) → [slices/NG2.md](slices/NG2.md)
@@ -318,6 +318,10 @@ Shared and new game:
   from the draft's field sprites. One `CatalogDraft.SetNewGame` step.
 - **969.** The New game page's problem line is its typed boxes first, then Data's message (`CatalogProblems.OfNewGame`:
   the new game's own rules, its members, items, map and cell, and a field sprite with a record).
+- **1018.** (NG1) The writer's catalog check gains no new game call: `CheckItems` already runs the new game's validator
+  against the members, items and maps (decision 863) and `CheckFieldSprites` its sprite's record, so a third call
+  would check it twice per save with no test able to tell. `CatalogProblems.CheckNewGame` serves the problem line and
+  the map saves' check (`CheckSettingsAndNewGame`), which gains the sprite's record the loader checks.
 
 ## Defaults to confirm
 Taken while the developer was away, each his to overturn, the mechanic first:

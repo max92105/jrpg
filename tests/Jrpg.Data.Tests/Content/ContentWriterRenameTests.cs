@@ -85,6 +85,19 @@ public sealed class ContentWriterRenameTests : IDisposable
         Assert.Equal(before, File.ReadAllBytes(_content.PathOf("new-game.json")));
     }
 
+    // Without the renewed stamp, the rename's own write would read as a hand edit to the new game (decision 961).
+    [Fact]
+    public void RenameMap_StartMap_RenewsTheNewGameStamp()
+    {
+        _writer.StampCatalogs(_catalog);
+        var renamed = _writer.RenameMap(_catalog, "intro", "prologue");
+        var gold = renamed.NewGame.StartingGold + 1;
+
+        _writer.WriteMapCatalogs(renamed with { NewGame = renamed.NewGame with { StartingGold = gold } });
+
+        Assert.Equal(gold, ContentCatalogLoader.Load(_content.Path).NewGame.StartingGold);
+    }
+
     [Fact]
     public void RenameMap_UnrelatedMap_LeavesItsLayoutUntouched()
     {

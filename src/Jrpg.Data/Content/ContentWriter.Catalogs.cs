@@ -19,8 +19,8 @@ using Jrpg.Data.Quests;
 namespace Jrpg.Data.Content;
 
 /// <summary>
-/// The catalog files the writer writes: each checked as the loader checks it, then serialized sorted by id; one place
-/// to add a catalog.
+/// The catalog files the writer writes, the new game's among them (decision 961): each checked as the loader checks it,
+/// then serialized sorted by id; one place to add a catalog.
 /// </summary>
 public sealed partial class ContentWriter
 {
@@ -30,6 +30,8 @@ public sealed partial class ContentWriter
         TileCatalogValidator.Validate(ContentCatalogLoader.TilesFile, SortedTiles(catalog), catalog.Tilesheets.Keys.ToHashSet());
         ObjectCatalogValidator.Validate(ContentCatalogLoader.ObjectsFile, SortedObjects(catalog), catalog.Tiles.Keys.ToHashSet());
         QuestCatalogValidator.Validate(ContentCatalogLoader.QuestsFile, SortedQuests(catalog));
+        // The new game has no check of its own here, so it is checked once (decision 1018): its sprite's record by the
+        // field sprites' check, its rules against the members, items and maps by CheckItems.
         CatalogProblems.CheckFieldSprites(SortedFieldSprites(catalog), catalog);
         // As the loader reads them: a unique names the pool, so the pool's own problem comes first.
         CatalogProblems.CheckAffixes(SortedAffixes(catalog));
@@ -53,7 +55,7 @@ public sealed partial class ContentWriter
     }
 
     // Each catalog file's bytes as it would be written, sorted by id (the effect strips and animated backgrounds by
-    // file): what the stamps compare and the writes carry.
+    // file; the new game is one record): what the stamps compare and the writes carry.
     private static List<CatalogWrite> SerializedCatalogs(ContentCatalog catalog) =>
     [
         new(ContentCatalogLoader.TilesheetsFile, ContentFileWriter.Serialize(SortedSheets(catalog))),
@@ -75,7 +77,12 @@ public sealed partial class ContentWriter
         new(ContentCatalogLoader.PartyMembersFile, ContentFileWriter.Serialize(SortedPartyMembers(catalog))),
         new(ContentCatalogLoader.ItemsFile, ContentFileWriter.Serialize(SortedItems(catalog), ItemConverters(catalog))),
         new(ContentCatalogLoader.AffixesFile, ContentFileWriter.Serialize(SortedAffixes(catalog))),
+        NewGameWrite(catalog),
     ];
+
+    // Shared with the map rename, which rewrites the new game's start and renews its stamp with these bytes.
+    private static CatalogWrite NewGameWrite(ContentCatalog catalog) =>
+        new(ContentCatalogLoader.NewGameFile, ContentFileWriter.Serialize(catalog.NewGame));
 
     // A skill's or an item's effect names its tier and the statuses it grants by id (decision 972); effects.json and
     // statuses.json hold those records whole, so only skills.json and items.json are written with these.

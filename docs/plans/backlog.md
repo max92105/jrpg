@@ -374,3 +374,8 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Editor/Tiles/TileImages.cs` (~180): a tilesheet passing the header check but refused by the decoder gets a message
   calling it a bug; the art status's readable check needs a full decode, or `LoadImage` treats the null as missing art
   (classes and progression plan, PM4b review).
+- `Data/Content/ContentWriter.RenameMap` writes `new-game.json` without checking it was hand-edited since load; with its
+  stamp now renewed after the write (NG1), a lost hand edit can't be detected later: check `_stamps.IsEditedOnDisk`
+  first (classes and progression plan, NG1 review).
+- `NewGameReferences` plus `NewGameValidator.Validate` are written in three places (`ContentCatalogLoader`,
+  `CatalogProblems.CheckItems`, `CheckNewGame`): one shared call, keeping `CheckItems`' edited-items input (NG1 review).

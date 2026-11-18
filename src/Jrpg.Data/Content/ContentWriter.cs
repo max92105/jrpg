@@ -25,10 +25,10 @@ public sealed partial class ContentWriter(string contentRoot)
 
     /// <summary>
     /// Writes the tilesheet, tile, object, quest, field sprite, shop, enemy, encounter, drop table, cinematic, effect
-    /// strip, animated background, skill, class, party member, tiered effect, status, item and affix catalogs that
-    /// changed, each sorted by id, after checking them all as the loader would, with every map's layout checked against
-    /// them (the quests and stages its events name included, decision 394; the shops its steps open). Missing art
-    /// doesn't stop a save (decision 442): the editor warns, the game's startup refuses the missing file.
+    /// strip, animated background, skill, class, party member, tiered effect, status, item and affix catalogs and the
+    /// new game that changed, each sorted by id, after checking them all as the loader would, with every map's layout
+    /// checked against them (the quests and stages its events name included, decision 394; the shops its steps open).
+    /// Missing art doesn't stop a save (decision 442): the editor warns, the game's startup refuses the missing file.
     /// </summary>
     /// <param name="catalog">The content holding the catalogs to save; its maps are the ones checked.</param>
     /// <exception cref="ContentValidationException">
@@ -44,8 +44,8 @@ public sealed partial class ContentWriter(string contentRoot)
 
     /// <summary>
     /// Writes the catalogs and the named maps in one go, all or none, after the checks of
-    /// <see cref="WriteMapCatalogs"/> and each map's settings and the new game's start: for a change that spans both,
-    /// the editor's sheet purge (decision 442).
+    /// <see cref="WriteMapCatalogs"/> and each map's settings and the new game: for a change that spans both, the
+    /// editor's sheet purge (decision 442).
     /// </summary>
     /// <param name="catalog">
     /// The content holding the catalogs and the maps to save; every map is checked against it.
@@ -96,21 +96,21 @@ public sealed partial class ContentWriter(string contentRoot)
         var renamed = MapIdRename.Apply(content, oldId, newId);
         CheckLayouts(renamed.Content);
         var writes = CheckedMapWrites(renamed.Content, [newId, .. renamed.ChangedMapIds]);
-        if (renamed.IsNewGameChanged)
-        {
-            writes.Add(PlanWrite(ContentCatalogLoader.NewGameFile, renamed.Content.NewGame));
-        }
+        List<CatalogWrite> catalogs = renamed.IsNewGameChanged ? [NewGameWrite(renamed.Content)] : [];
+        writes.AddRange(catalogs.Select(PlanWrite));
 
         WriteAll(writes);
+        // Renewed, or a new game edited after the rename would read as a hand edit (decision 961).
+        RenewStamps(catalogs);
         File.Delete(Path.Combine(contentRoot, MapFolderReader.LayoutFile(oldId)));
         File.Delete(Path.Combine(contentRoot, MapFolderReader.SettingsFile(oldId)));
         return renamed.Content;
     }
 
     /// <summary>
-    /// Checks every map as <see cref="WriteMaps"/> would, every layout against the others, every map's settings and
-    /// the new game's start, and writes nothing: the editor's dry run on the open maps when Ctrl+S is refused, to
-    /// point to Save all (decision 519).
+    /// Checks every map as <see cref="WriteMaps"/> would, every layout against the others, every map's settings and the
+    /// new game, and writes nothing: the editor's dry run on the open maps when Ctrl+S is refused, which points to Save
+    /// all (decision 519).
     /// </summary>
     /// <exception cref="ContentValidationException">The game would reject a map; it names the file.</exception>
     public static void CheckMaps(ContentCatalog content)
@@ -119,7 +119,7 @@ public sealed partial class ContentWriter(string contentRoot)
         CheckSettingsAndNewGame(content, content.Maps.Keys);
     }
 
-    // The named maps' two files each, once their settings and the new game's start pass the loader's checks.
+    // The named maps' two files each, once their settings and the new game pass the loader's checks.
     private List<FileToWrite> CheckedMapWrites(ContentCatalog catalog, IReadOnlyCollection<string> mapIds)
     {
         CheckSettingsAndNewGame(catalog, mapIds);
@@ -141,8 +141,7 @@ public sealed partial class ContentWriter(string contentRoot)
             MapSettingsValidator.Validate(MapFolderReader.SettingsFile(map.Id), map.Settings, encounterIds);
         }
 
-        var newGameReferences = new NewGameReferences(catalog.PartyMembers.Keys.ToHashSet(), catalog.Items, catalog.Maps);
-        NewGameValidator.Validate(ContentCatalogLoader.NewGameFile, catalog.NewGame, newGameReferences);
+        CatalogProblems.CheckNewGame(catalog.NewGame, catalog);
     }
 
     // The catalog files whose content changed, once every catalog and every map's layout pass the loader's checks and

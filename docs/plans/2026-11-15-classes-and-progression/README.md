@@ -173,7 +173,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/NG3.md](slices/NG3.md)
 
 ### Phase 6: experience
-- [ ] ADR 0061, `rules.json` written whole by the editor. Write it from decisions 943 and 955 and design.md, section 4
+- [x] ADR 0061, `rules.json` written whole by the editor. Write it from decisions 943 and 955 and design.md, section 4
   (the options: the whole file, chosen; the table in its own `experience.json`; a patch of the `experience` node
   keeping the hand layout), with the stamps as the reason the whole-file write is safe (decision 559). The developer
   delegated approval; the choice is in "Defaults to confirm".

@@ -58,4 +58,16 @@ public sealed class EffectAmountsTests
     [InlineData(EffectKind.Rest)]
     public void PerHit_KindChangingNoHp_Throws(EffectKind kind) =>
         Assert.Throws<ArgumentException>(() => EffectAmounts.PerHit(new Effect(kind, 0, Targeting.Self), _caster));
+
+    [Theory]
+    [InlineData(EffectKind.Damage)]
+    [InlineData(EffectKind.RestoreHp)]
+    [InlineData(EffectKind.Revive)]
+    public void ChangesHp_KindWithAnAmount_IsTrue(EffectKind kind) => Assert.True(EffectAmounts.ChangesHp(kind));
+
+    [Theory]
+    [InlineData(EffectKind.GrantStatus)]
+    [InlineData(EffectKind.ReadyExtraTurn)]
+    [InlineData(EffectKind.Rest)]
+    public void ChangesHp_KindChangingNoHp_IsFalse(EffectKind kind) => Assert.False(EffectAmounts.ChangesHp(kind));
 }

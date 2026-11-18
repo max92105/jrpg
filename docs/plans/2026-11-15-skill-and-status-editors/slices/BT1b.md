@@ -1,49 +1,50 @@
 # BT1b. The table's class skill rows
 
-Editor, about 300 lines (about 140 of them tests). Decisions 992, 993, 786. Design: design.md, sections 1
-(`StartingLevels`, damage modifier) and 2.4. Split from BT1 at its start; builds on BT1's `Battle/ClassBattleStats`
-and `Battle/EffectAmounts` and row 12's class skill entries (`ClassDefinition.Skills`, each a
-`ClassSkill(SkillId) { Level }`, absent meaning 1, ADR 0062).
+Editor (+ one Core reading), about 300 lines (about 170 of them tests). Decisions 992, 993, 786. Design: design.md,
+sections 1 and 2.4. Split from BT1 at its start, then again at its own start (estimate past 320 lines): the boxes
+and their view model are [BT1c](BT1c.md). Builds on BT1's `Battle/ClassBattleStats` and `Battle/EffectAmounts` and
+row 12's class skill entries (`ClassDefinition.Skills`, each a `ClassSkill(SkillId) { Level }`, absent meaning 1,
+ADR 0062).
 
 ## Goal
-The balance table's first rows, headless: every class's damaging and healing skills with what one hit and all its hits
-come to at three typed levels, a typed damage modifier added to the modifiers' sum, worked out by the battle's own
+The balance table's class skill rows, headless: every class's damaging and healing skills with what one hit and all
+its hits come to at given levels, a given damage modifier added to the modifiers' sum, worked out by the battle's own
 rule (a member of the class at that level wearing nothing); a skill the class learns above a level reads "-" at that
 level.
 
 ## New types
 - `Editor/Balance/SkillBalanceRow` (internal sealed record): one skill of one class with its amounts at the table's
-  levels: `ClassName`, `SkillName`, `TierLine` ("fire_1 x2", "flat 15"), `Hits`, `IsHeal`, `AmountTexts` (three:
-  "24", or "28 x 4 = 112" with hits).
-- `Editor/Balance/BalanceTableViewModel` (internal sealed partial, `ObservableObject`): the table's boxes and rows.
-  - `BalanceTableViewModel(ContentCatalog content)`; `FirstLevelText`, `SecondLevelText`, `ThirdLevelText`
-    (`StartingLevels` 1, 10, 20; whole numbers from 1 to `content.Rules.Experience.MaxLevel`),
-    `ModifierPercentText` (0; a whole number above -100).
-  - `ClassSkillRows` (`IReadOnlyList<SkillBalanceRow>`): each class in id order (the Classes page's, which its Apply
-    writes back), its skills in `ClassDefinition.Skills`' order, only damage, restoreHp and revive, "-" at a level
-    below its `ClassSkill.Level`; each amount `EffectAmounts.PerHit(skill.Effect, stats)` over
-    `ClassBattleStats.At(class, level, content.Rules.Stats)`; rebuilt when a box changes; empty while `BoxesProblem`
-    shows.
-  - `BoxesProblem` ("Level 2 must be a whole number from 1 to 20."): the boxes' own, never named `Problem`, since BT3
-    makes the view model an `IEditedCatalog` whose `Problem` is always null (see BT3's note from BT1).
-  - The member's stats `with { DamageModifierPermille = stats.DamageModifierPermille + typed percent x 10 }`: added
-    to the sum, not put in its place (row 9's gear bonus starts that sum, 0 with nothing worn), so Core's rule decides
-    what the modifier raises (damage, not heals, decision 786).
+  levels: `ClassName`, `SkillName`, `TierLine` ("fire_1 x2", "flat 15"), `Hits`, `IsHeal`, `AmountTexts` (one per
+  level: "24", "28 x 4 = 112" with hits, or "-").
+- `Editor/Balance/SkillLines` (internal static): a skill's texts whoever uses it, so BT2's enemy rows share them:
+  `TierLine(effect)`; `AmountText(effect, user, modifierPermille)`, `EffectAmounts.PerHit` over the user `with {
+  DamageModifierPermille = user's + modifierPermille }` (added to the sum, not put in its place: row 9's gear bonus
+  starts it), so Core's rule decides what the modifier raises (damage, not heals, decision 786); the total in a long.
+- `Editor/Balance/ClassSkillBalanceRows` (internal static): `Of(ContentCatalog content, IReadOnlyList<int> levels, int
+  modifierPermille)`: each class in id order (the catalog keeps no file order, as `Skills/SkillUsers` says), its
+  skills in `ClassDefinition.Skills`' order, only those `EffectAmounts.ChangesHp` keeps, "-" at a level below its
+  `ClassSkill.Level`; each member `ClassBattleStats.At(class, level, content.Rules.Stats)`.
 
 ## Changes
-- `docs/map.md`: an Editor `Balance` line.
+- `Core/Battle/EffectAmounts`: public `ChangesHp(EffectKind kind)`, the kinds `PerHit` reads (damage, restoreHp,
+  revive), which `PerHit` now guards with, so the table's filter is Core's own.
+- `docs/map.md`: the Core Battle line's `EffectAmounts` names `ChangesHp`; an Editor `Balance` line.
 
 ## Tests
-- `Editor.Tests/Balance/BalanceTableViewModelTests` (new; classes and skills with `with` over the test world, the
-  classes' skill entries built in the test, never the repository's):
-  - `ClassSkillRows_TieredSkill_AmountsAtTheThreeLevels`.
-  - `ClassSkillRows_FourHits_ShowsPerHitAndTotal`.
-  - `ClassSkillRows_StatusOnlySkill_NotListed`.
-  - `ClassSkillRows_SkillLearnedAtFive_DashAtLevelOne` (and its value at level 5, the bound's other side).
-  - `ClassSkillRows_TwoClasses_InIdOrder` (set up opposite to id order).
-  - `ModifierPercentText_MinusTwentyFive_LowersDamageNotHeals`.
-  - `BoxesProblem_LevelPastTheMax_SaysSoAndEmptiesTheRows`; the accepted bounds, level 1 and the max, and the
-    modifier's, -99, beside the refused 0, max + 1 and -100.
+- `Core.Tests/Battle/EffectAmountsTests`: `ChangesHp_KindWithAnAmount_IsTrue` and `ChangesHp_KindChangingNoHp_IsFalse`
+  (theories over the six kinds).
+- `Editor.Tests/Balance/BalanceFixtures` (new): a mage and a cleric with six skills of every row shape, built in the
+  test over the test world, the mage first in the dictionary; rules with 1 % per Power point on a flat power.
+- `Editor.Tests/Balance/ClassSkillBalanceRowsTests` (new): `Of_TieredSkill_AmountsAtTheThreeLevels`,
+  `Of_FourHits_ShowsPerHitAndTotal`, `Of_FlatSkill_NamesItsPowerRaisedByDamagePercent`,
+  `Of_StatusOnlySkill_NotListed`, `Of_TwoClasses_InIdOrder`, `Of_SkillLearnedAtFive_DashBelowFiveOnly` (levels 4, 5
+  and 6), `Of_HealAndDamage_OnlyTheHealMarked`, `Of_MinusTwentyFivePercent_LowersDamageNotHeals`.
+- `Editor.Tests/Balance/SkillLinesTests` (new): `AmountText_UserWithAModifier_TableModifierAddedToTheSum`.
 
 ## Verify by hand
 None: the page comes in BT3.
+- **Done, with deviations:** split at its start (estimate past 320 lines): the boxes and their view model are BT1c.
+  Core's `EffectAmounts.ChangesHp` added so the table's filter is Core's (27 lines, +7). Editor:
+  `ClassSkillBalanceRows` (55; named at review apart from the Classes page's `Party/ClassSkillRow`), `SkillLines` (39,
+  shared with BT2's enemy rows), `SkillBalanceRow` (18). Tests 189 lines: `BalanceFixtures` 72,
+  `ClassSkillBalanceRowsTests` 86, `SkillLinesTests` 19, `EffectAmountsTests` +12.

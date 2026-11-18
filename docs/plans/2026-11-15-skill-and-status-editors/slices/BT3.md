@@ -49,7 +49,7 @@ Tiers. Its `Problem` is the boxes' only and never stops a move; Apply records no
   ShowDatabasePageCommand}" CommandParameter="Balance table"` (the title, not a `Tag`). A read-only page fits
   `IEditedCatalog` as `Progression/ExperienceTableViewModel` does for one record (`ChosenKey` null, `Choose` keeps
   all), with `Problem` always null (the recipe's step 8): `DatabaseWorkspaceViewModel` greys Apply and refuses every
-  move on it (`CanApply`, `ApplyOrRefuse`), so the boxes' line is BT1b's `BoxesProblem`, shown on the page itself.
+  move on it (`CanApply`, `ApplyOrRefuse`), so the boxes' line is BT1c's `BoxesProblem`, shown on the page itself.
   `Apply` records nothing; Apply and Revert stay on the bar unless BT3 adds `CatalogPage.IsReadOnly` hiding them,
   with its own tests. The session starts again on every `CatalogDraft.Current` change (decision 921), so an undo
   while the table is shown puts its boxes back to 1, 10, 20; check that with the developer. Hand check 1's numbers

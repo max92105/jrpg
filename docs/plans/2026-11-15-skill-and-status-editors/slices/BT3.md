@@ -2,8 +2,8 @@
 
 Editor + script, about 170 lines (XAML about 130, wiring and the read-only members about 40). Decisions 992, 994, 996.
 Design: design.md, section 1; the mode bar's [page recipe](../../2026-11-15-mode-bar/page-recipe.md), step 8 (a
-read-only page). Builds on BT2 (phase 4, after row 12, so after the mode bar's stage 3: re-read the recipe for the
-registration in force).
+read-only page). Builds on BT2 and BT2b (phase 4, after row 12, so after the mode bar's stage 3: re-read the recipe for
+the registration in force).
 
 ## Goal
 The balance table is a read-only Database page over the draft as it is (unsaved edits included): the level, modifier

@@ -1,3 +1,4 @@
+using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Party;
@@ -8,9 +9,10 @@ using Jrpg.Data.Content;
 namespace Jrpg.Editor.Tests.Balance;
 
 /// <summary>
-/// The balance table tests' own classes and skills, so no repository number is pinned: a mage of Power 12 (+3 a level)
-/// and a cleric of Power 10 (+2), the mage first so a list in id order is sorted, not read in the dictionary's order;
-/// skills of every row shape, one learned at level 5; rules where each Power point adds 1 % to a flat power.
+/// The balance table tests' own classes, skills and enemies, so no repository number is pinned: a mage of Power 12 (+3
+/// a level) and a cleric of Power 10 (+2), the mage first so a list in id order is sorted, not read in the dictionary's
+/// order, and the imp before the bat for the same reason; skills of every row shape, one learned at level 5; rules
+/// where each Power point adds 1 % to a flat power.
 /// </summary>
 internal static class BalanceFixtures
 {
@@ -45,7 +47,27 @@ internal static class BalanceFixtures
     public static ClassDefinition Cleric { get; } =
         Class("cleric", "Cleric", power: (10, 2)) with { Skills = [new(Mend.Id), new(Smite.Id)] };
 
-    /// <summary>The test world with the two classes and their six skills only.</summary>
+    /// <summary>
+    /// Power 20, 80 HP and a fire attack of 9; its tactics are the attack, Fireball, Curse and Mend, and below half its
+    /// HP its phase names Flurry, then Fireball once more.
+    /// </summary>
+    public static EnemyDefinition Imp { get; } = Enemy("imp", "Imp") with
+    {
+        MaxHp = 80,
+        Damage = 9,
+        DamageType = DamageType.Fire,
+        Power = 20,
+        Tactics = [Tactic(skillId: null), Tactic(Fireball.Id), Tactic(Curse.Id), Tactic(Mend.Id)],
+        Phases = [new EnemyPhase { BelowHpPercent = 50, Tactics = [Tactic(Flurry.Id), Tactic(Fireball.Id)] }],
+    };
+
+    /// <summary>40 HP, a blunt attack of 5, Power 0, and Smite, the flat skill.</summary>
+    public static EnemyDefinition Bat { get; } = Enemy("bat", "Bat") with { Tactics = [Tactic(Smite.Id)] };
+
+    /// <summary>
+    /// The test world with the two classes, their six skills and the two enemies only, the imp first; rules where each
+    /// Constitution point adds 1 % to a class's max HP.
+    /// </summary>
     public static ContentCatalog World { get; } = WorldOf(
         ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")));
 
@@ -53,7 +75,32 @@ internal static class BalanceFixtures
     {
         Classes = new Dictionary<string, ClassDefinition> { [Mage.Id] = Mage, [Cleric.Id] = Cleric },
         Skills = new[] { Fireball, Flurry, Nova, Curse, Mend, Smite }.ToDictionary(skill => skill.Id),
-        Rules = loaded.Rules with { Stats = loaded.Rules.Stats with { DamagePercentPer100Power = 100 } },
+        Enemies = new Dictionary<string, EnemyDefinition> { [Imp.Id] = Imp, [Bat.Id] = Bat },
+        Rules = loaded.Rules with
+        {
+            Stats = loaded.Rules.Stats with { DamagePercentPer100Power = 100, HpPercentPer100Constitution = 100 },
+        },
+    };
+
+    private static EnemyAction Tactic(string? skillId) => new() { SkillId = skillId, Weight = 1 };
+
+    // Only HP, power and the attack matter to the table; the rest is any number Data takes.
+    private static EnemyDefinition Enemy(string id, string name) => new()
+    {
+        Id = id,
+        Name = name,
+        PortraitFile = "",
+        BattleSpriteFile = "",
+        AttackEffectFile = "",
+        IsSpriteFlipped = false,
+        MaxHp = 40,
+        Damage = 5,
+        DamageType = DamageType.Blunt,
+        Accuracy = 90,
+        Dodge = 0,
+        CritChance = 0,
+        CrowdControlResistance = 0,
+        ExperienceReward = 1,
     };
 
     private static Effect Tiered(TieredEffect tier, int hits) =>
@@ -62,7 +109,8 @@ internal static class BalanceFixtures
     private static SkillDefinition Skill(string id, string name, Effect effect) =>
         new() { Id = id, Name = name, Description = "", IconFile = "", Effect = effect };
 
-    // Every other stat the same for both classes; only Power matters to the table's amounts.
+    // Every other stat the same for both classes: max HP 100 (+10 a level), raised by Constitution 5 (+1), beside the
+    // Power that the table's amounts read.
     private static ClassDefinition Class(string id, string name, (int Base, int Growth) power) => new(
         id,
         name,

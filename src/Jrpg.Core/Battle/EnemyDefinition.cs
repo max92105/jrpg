@@ -79,7 +79,19 @@ public sealed record EnemyDefinition
     /// </summary>
     public IReadOnlyList<EnemyPhase> Phases { get; init; } = [];
 
+    /// <summary>
+    /// The skills its tactics then its phases' name, each once in that order, the attack (no skill) left out: what the
+    /// enemy knows, the one walk its readers share, so a message or a list names them in the same order every load.
+    /// </summary>
+    public IReadOnlyList<string> NamedSkillIds =>
+    [
+        .. Tactics
+            .Concat(Phases.SelectMany(phase => phase.Tactics))
+            .Select(action => action.SkillId)
+            .OfType<string>()
+            .Distinct(StringComparer.Ordinal),
+    ];
+
     /// <summary>Whether its tactics or a phase's name the skill, which is how an enemy knows a skill.</summary>
-    public bool NamesSkill(string skillId) =>
-        Tactics.Concat(Phases.SelectMany(phase => phase.Tactics)).Any(action => action.SkillId == skillId);
+    public bool NamesSkill(string skillId) => NamedSkillIds.Contains(skillId, StringComparer.Ordinal);
 }

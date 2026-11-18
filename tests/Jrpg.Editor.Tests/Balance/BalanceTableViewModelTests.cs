@@ -5,7 +5,7 @@ using Jrpg.Editor.Balance;
 namespace Jrpg.Editor.Tests.Balance;
 
 // The balance table's boxes (decision 992): three typed levels and a typed damage modifier, read into the class skill
-// rows, which empty while a box can't be read.
+// rows, the enemy skill rows and the class rows, which empty while a box can't be read.
 public sealed class BalanceTableViewModelTests
 {
     private const int MaxLevel = 30;
@@ -56,6 +56,38 @@ public sealed class BalanceTableViewModelTests
         Assert.Equal(["36", "117", "207"], FireballOf(table).AmountTexts);
     }
 
+    // The imp's Fireball is 40 at its Power 20; 50 % more gives 60.
+    [Fact]
+    public void EnemySkillRows_ModifierTyped_PassedAsPermille()
+    {
+        var table = new BalanceTableViewModel(_world);
+
+        Type(table, ModifierPercent, "50");
+
+        Assert.Equal("60", table.EnemySkillRows.Single(row => row.EnemyName == "Imp" && row.SkillName == "Fireball").AmountText);
+    }
+
+    // The mage at level 2: class HP 110 raised 6 % by Constitution 6, 116.6 rounded down, and Power 15.
+    [Fact]
+    public void ClassRows_LevelTyped_ReadAtThatLevel()
+    {
+        var table = new BalanceTableViewModel(_world);
+
+        Type(table, FirstLevel, "2");
+
+        Assert.Equal("116 / 15", table.ClassRows.Single(row => row.ClassName == "Mage").HpAndPowerTexts[0]);
+    }
+
+    [Fact]
+    public void EnemyRows_LevelRefused_StillListed()
+    {
+        var table = new BalanceTableViewModel(_world);
+
+        Type(table, FirstLevel, "0");
+
+        Assert.Equal(["Bat", "Imp"], table.EnemyRows.Select(row => row.EnemyName));
+    }
+
     [Fact]
     public void BoxesProblem_LevelPastTheMax_SaysSoAndEmptiesTheRows()
     {
@@ -64,7 +96,7 @@ public sealed class BalanceTableViewModelTests
         Type(table, SecondLevel, "31");
 
         Assert.Equal("Level 2 must be a whole number from 1 to 30.", table.BoxesProblem);
-        Assert.Empty(table.ClassSkillRows);
+        AssertBoxRowsEmpty(table);
     }
 
     [Theory]
@@ -84,6 +116,8 @@ public sealed class BalanceTableViewModelTests
 
         Assert.Null(table.BoxesProblem);
         Assert.NotEmpty(table.ClassSkillRows);
+        Assert.NotEmpty(table.EnemySkillRows);
+        Assert.NotEmpty(table.ClassRows);
     }
 
     [Theory]
@@ -102,7 +136,7 @@ public sealed class BalanceTableViewModelTests
         Type(table, box, text);
 
         Assert.Equal($"{label} must be a whole number from 1 to 30.", table.BoxesProblem);
-        Assert.Empty(table.ClassSkillRows);
+        AssertBoxRowsEmpty(table);
     }
 
     [Theory]
@@ -117,7 +151,7 @@ public sealed class BalanceTableViewModelTests
         Type(table, ModifierPercent, text);
 
         Assert.Equal("Damage modifier must be a whole number from -99 to 10000.", table.BoxesProblem);
-        Assert.Empty(table.ClassSkillRows);
+        AssertBoxRowsEmpty(table);
     }
 
     [Theory]
@@ -134,7 +168,17 @@ public sealed class BalanceTableViewModelTests
         Type(table, box, "5");
 
         Assert.Contains(nameof(BalanceTableViewModel.ClassSkillRows), raised);
+        Assert.Contains(nameof(BalanceTableViewModel.EnemySkillRows), raised);
+        Assert.Contains(nameof(BalanceTableViewModel.ClassRows), raised);
         Assert.Contains(nameof(BalanceTableViewModel.BoxesProblem), raised);
+    }
+
+    // The rows read through the boxes; the enemy rows read none.
+    private static void AssertBoxRowsEmpty(BalanceTableViewModel table)
+    {
+        Assert.Empty(table.ClassSkillRows);
+        Assert.Empty(table.EnemySkillRows);
+        Assert.Empty(table.ClassRows);
     }
 
     private static SkillBalanceRow FireballOf(BalanceTableViewModel table) =>

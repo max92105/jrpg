@@ -1,7 +1,8 @@
 # BT2. Enemies' skills, classes and enemies, and the tier sheet rows
 
 Editor, about 180 lines (about 90 of them tests). Decisions 992, 993. Design: design.md, sections 1
-(`StartingPowers`) and 2.4. Builds on BT1 (phase 4, after row 12).
+(`StartingPowers`) and 2.4. Builds on BT1 (phase 4, after row 12). Split at its start (estimate past 320 lines): the tier
+sheet rows and the Power boxes (`TierBalanceRow`, the Power texts, `TierRows`, their tests) are [BT2b](BT2b.md).
 
 ## Goal
 The rest of the table's rows, headless: each enemy's damaging and healing skills at its own power; each class's max
@@ -59,3 +60,13 @@ None: the page comes in BT3.
   `SkillLines.AmountText(effect, Combatant.FromEnemy(enemy).Stats, modifierPermille)`, which already adds the
   modifier to the sum: no addition of BT2's own. Filter skills with Core's `EffectAmounts.ChangesHp`, as the class
   rows do. `Editor.Tests/Balance/BalanceFixtures` holds the tests' classes and skills; add the enemies there.
+- **Done, with deviations:** split at its start (estimate past 320 lines): the tier rows and the Power boxes are BT2b.
+  `EnemySkillBalanceRows` (41 lines) and its row, named `EnemySkillBalanceRow` (20) beside `SkillBalanceRow`, with
+  `IsHeal` for BT3's muted heals; `ClassBalanceRows` (28), `ClassBalanceRow` (6); `EnemyBalanceRows` (25) and
+  `EnemyBalanceRow` (11) read `Combatant.FromEnemy`. `BalanceTableViewModel` (127) reads the boxes once through
+  `ReadBoxes()`, each box-read list empty while `BoxesProblem` shows; `EnemyRows`, reading no box, built once. At
+  review, the third copy of the tactics walk became Core's `EnemyDefinition.NamedSkillIds` (97 lines; tactics then
+  phases, each id once, no attack), read by `NamesSkill`, Data's `EnemyCatalogValidator.FindPowerProblem` (87) and the
+  enemy skill rows; `EnemyDefinitionTests` (41, 3 cases); simulations identical.
+  Editor tests (15 cases): `EnemySkillBalanceRowsTests` 83, `ClassBalanceRowsTests` 29, `EnemyBalanceRowsTests` 25,
+  `BalanceTableViewModelTests` 207 (+3 cases, the refusals emptying every list), `BalanceFixtures` 120 (an imp, a bat).

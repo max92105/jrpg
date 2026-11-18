@@ -42,9 +42,7 @@ internal static class EnemyCatalogValidator
         // The first in its tactics, then its phases', so the message names the same skill every load.
         var tiered = enemy.Power > 0
             ? null
-            : enemy.Tactics.Concat(enemy.Phases.SelectMany(phase => phase.Tactics))
-                .Select(action => action.SkillId)
-                .FirstOrDefault(id => id is not null && skills.TryGetValue(id, out var skill) && skill.Effect.Tier is not null);
+            : enemy.NamedSkillIds.FirstOrDefault(id => skills.TryGetValue(id, out var skill) && skill.Effect.Tier is not null);
         return tiered is null ? null : $"power must be at least 1: its skill '{tiered}' names a tiered effect (was 0).";
     }
 

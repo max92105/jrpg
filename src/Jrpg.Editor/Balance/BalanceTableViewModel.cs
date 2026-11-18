@@ -6,8 +6,8 @@ namespace Jrpg.Editor.Balance;
 
 /// <summary>
 /// The balance table's boxes and rows (decisions 992, 993): three typed levels and a typed damage modifier in percent,
-/// the line naming a box that can't be read, and the rows read through the boxes, empty while that line shows. The
-/// rows' builders do the building; this only reads the boxes and hands them on.
+/// the line naming a box that can't be read, and the rows read through the boxes, empty while that line shows (the
+/// enemy rows read no box). The rows' builders do the building; this only reads the boxes and hands them on.
 /// </summary>
 internal sealed partial class BalanceTableViewModel : ObservableObject
 {
@@ -32,7 +32,7 @@ internal sealed partial class BalanceTableViewModel : ObservableObject
 
     private readonly ContentCatalog _content;
 
-    /// <param name="content">The catalog whose classes, skills and rules the rows read.</param>
+    /// <param name="content">The catalog whose classes, enemies, skills and rules the rows read.</param>
     public BalanceTableViewModel(ContentCatalog content)
     {
         _content = content;
@@ -40,25 +40,26 @@ internal sealed partial class BalanceTableViewModel : ObservableObject
         SecondLevelText = TypedNumber.Text(StartingSecondLevel);
         ThirdLevelText = TypedNumber.Text(StartingThirdLevel);
         ModifierPercentText = TypedNumber.Text(StartingModifierPercent);
+        EnemyRows = EnemyBalanceRows.Of(content);
     }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(BoxesProblem), nameof(ClassSkillRows))]
+    [NotifyPropertyChangedFor(nameof(BoxesProblem), nameof(ClassSkillRows), nameof(EnemySkillRows), nameof(ClassRows))]
     public partial string FirstLevelText { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(BoxesProblem), nameof(ClassSkillRows))]
+    [NotifyPropertyChangedFor(nameof(BoxesProblem), nameof(ClassSkillRows), nameof(EnemySkillRows), nameof(ClassRows))]
     public partial string SecondLevelText { get; set; }
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(BoxesProblem), nameof(ClassSkillRows))]
+    [NotifyPropertyChangedFor(nameof(BoxesProblem), nameof(ClassSkillRows), nameof(EnemySkillRows), nameof(ClassRows))]
     public partial string ThirdLevelText { get; set; }
 
     /// <summary>
     /// Added to each user's damage modifiers' sum, so it raises damage, never healing (decision 786).
     /// </summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(BoxesProblem), nameof(ClassSkillRows))]
+    [NotifyPropertyChangedFor(nameof(BoxesProblem), nameof(ClassSkillRows), nameof(EnemySkillRows), nameof(ClassRows))]
     public partial string ModifierPercentText { get; set; }
 
     /// <summary>
@@ -78,11 +79,28 @@ internal sealed partial class BalanceTableViewModel : ObservableObject
     /// Each class's damaging and healing skills at the typed levels; empty while a box can't be read.
     /// </summary>
     public IReadOnlyList<SkillBalanceRow> ClassSkillRows =>
-        TypedLevels() is { } levels && TypedModifierPercent() is { } percent
-            ? ClassSkillBalanceRows.Of(_content, levels, percent * PermillePerPercent)
-            : [];
+        ReadBoxes() is { } boxes ? ClassSkillBalanceRows.Of(_content, boxes.Levels, boxes.ModifierPermille) : [];
+
+    /// <summary>
+    /// Each enemy's damaging and healing skills at its power, with the typed modifier; empty while a box can't be read.
+    /// </summary>
+    public IReadOnlyList<EnemySkillBalanceRow> EnemySkillRows =>
+        ReadBoxes() is { } boxes ? EnemySkillBalanceRows.Of(_content, boxes.ModifierPermille) : [];
+
+    /// <summary>Each class's max HP and Power at the typed levels; empty while a box can't be read.</summary>
+    public IReadOnlyList<ClassBalanceRow> ClassRows =>
+        ReadBoxes() is { } boxes ? ClassBalanceRows.Of(_content, boxes.Levels) : [];
+
+    /// <summary>Each enemy's HP, power and attack, which no box changes, so listed whatever the boxes hold.</summary>
+    public IReadOnlyList<EnemyBalanceRow> EnemyRows { get; }
 
     private int MaxLevel => _content.Rules.Experience.MaxLevel;
+
+    /// <returns>The boxes as read; null while one can't be.</returns>
+    private TypedBoxes? ReadBoxes() =>
+        TypedLevels() is { } levels && TypedModifierPercent() is { } percent
+            ? new TypedBoxes(levels, percent * PermillePerPercent)
+            : null;
 
     private string? LevelProblem(int boxNumber, string text) =>
         TypedLevel(text) is null ? $"Level {boxNumber} must be a whole number from {LowestLevel} to {MaxLevel}." : null;
@@ -102,4 +120,8 @@ internal sealed partial class BalanceTableViewModel : ObservableObject
         TypedNumber.Parse(ModifierPercentText) is { } percent and >= LowestModifierPercent and <= MaxModifierPercent
             ? percent
             : null;
+
+    /// <param name="Levels">The three levels in the boxes' order.</param>
+    /// <param name="ModifierPermille">The typed modifier in permille, as Core sums the damage modifiers.</param>
+    private readonly record struct TypedBoxes(int[] Levels, int ModifierPermille);
 }

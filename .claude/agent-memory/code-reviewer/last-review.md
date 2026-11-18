@@ -5,11 +5,13 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-classes-and-progression, slice XP2 (first part; XP2b holds Add/Remove level and the max level note).
-2026-11-17. Round 1. Verdict: Ready to commit. No Critical, no Warning.
+Plan 2026-11-15-classes-and-progression, slice XP2b (Add level, Remove last level, max level note; split from XP2).
+2026-11-17. Round 2. Verdict: Ready to commit. No Critical, no Warning.
 
-- Checked: TotalToReach sums in long? (lifted, null propagates down); ExperienceTable record equality is by list
-  reference, but SetExperienceTable compares with SequenceEqual, tested by SameList and Apply_Untouched.
-- Suggestion (open): ExperienceFixtures' Classes override is redundant (ClassFixtures.World already holds only the
-  scholar, no skills, and the archer) and its stated reason (no repository class) doesn't hold; drop it or reword.
-- XP1 Suggestion (item-before-rules order in XP1's Done note): not carried, outside this slice.
+- Round 1 Warning (note measured against the session's start, cleared by an Apply): fixed. CatalogDraft.SavedMaxLevel
+  is set at load and in MarkSaved and passed by ExperienceEditingViewModel.Start; Start_LastLevelRemovedAndApplied
+  tells the old code from the new.
+- ReplaceAfterRewrite not setting SavedMaxLevel: declined, not reachable. All three callers refuse while unsaved
+  (SheetRemoval.AskPurge IsDirty, map rename and folder rename HasUnsavedChanges), and none changes the table.
+- XP2 Suggestion (ExperienceFixtures' Classes override): fixed.
+- ListItemWatch summary missing users: not raised, backlog.md line 385 holds it.

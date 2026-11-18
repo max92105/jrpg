@@ -7,6 +7,7 @@ using Jrpg.Data.Content;
 using Jrpg.Editor.Battle;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Events;
+using Jrpg.Editor.Tiles;
 using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Party;
@@ -16,7 +17,8 @@ namespace Jrpg.Editor.Party;
 /// added this session after them; Add starts from the blank; only an added member can be removed, since maps and the
 /// new game name a saved one (decision 581); no Duplicate, a member being one character. <see cref="Problem"/> is the
 /// chosen member's own first, then another's, then Data's message for the whole list; <see cref="MissingArtNote"/> the
-/// chosen member's pictures the art folders lack. Its host chooses a member by its id (<see cref="IEditedCatalog"/>).
+/// chosen member's pictures the art folders lack, read again once <see cref="TakeImport"/> picked an imported file. Its
+/// host chooses a member by its id (<see cref="IEditedCatalog"/>).
 /// </summary>
 internal sealed partial class PartyMemberCatalogViewModel : ObservableObject, IEditedCatalog
 {
@@ -74,14 +76,32 @@ internal sealed partial class PartyMemberCatalogViewModel : ObservableObject, IE
     /// </summary>
     public string MissingArtNote =>
         SelectedMember is { } chosen
-        && ArtChoices.MissingOf(chosen.BattleSpriteFile, chosen.PortraitFile, chosen.AttackEffectFile) is [_, ..] missing
-            ? $"Not in the art folders: {string.Join(", ", missing)}."
+            ? ArtChoices.MissingNoteOf(chosen.BattleSpriteFile, chosen.PortraitFile, chosen.AttackEffectFile)
             : "";
 
     /// <summary>The chosen member's id; null with none chosen or while a new one has no id yet.</summary>
     public string? ChosenKey => SelectedMember is { Id.Length: > 0 } chosen ? chosen.Id : null;
 
     public void Choose(string key) => SelectedMember = Members.FirstOrDefault(listed => listed.Id == key) ?? SelectedMember;
+
+    /// <summary>
+    /// Takes an Import... beside an art box (the page's Import... buttons sit in the chosen member's panel): the
+    /// folders read again and the last copied file picked in that folder's box; nothing when nothing was copied. The
+    /// note is read again even when the member already named the file, which changes no box.
+    /// </summary>
+    /// <param name="artFolder">The battlers, portraits or effects folder the file was copied into.</param>
+    /// <param name="result">What the shell's import copied and refused.</param>
+    public void TakeImport(string artFolder, SheetImportResult result)
+    {
+        if (result.LastImported is not { } file)
+        {
+            return;
+        }
+
+        ArtChoices.Refresh();
+        SelectedMember!.Pick(artFolder, file);
+        OnPropertyChanged(nameof(MissingArtNote));
+    }
 
     /// <exception cref="InvalidOperationException">
     /// There is a <see cref="Problem"/>; the page's host applies only without one.

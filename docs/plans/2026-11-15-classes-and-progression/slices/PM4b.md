@@ -40,3 +40,12 @@ None.
   naming the imported file gets no field change), with a test; and the "Not in the art folders: ..." sentence is built in
   `PartyMemberCatalogViewModel` and `EnemyCatalogPage.xaml.cs`: give `BattleArtChoices` one method returning it for the
   three names and call it from both.
+- **Done, with deviations:** the review's note as asked: `BattleArtChoices.MissingNoteOf` replaces `MissingOf` (its
+  three tests check the sentence), and `TakeImport` raises the note. The box is filled by a new
+  `PartyMemberViewModel.Pick`, as the enemy's; the file dialog is a new `ArtImageFileDialog.ChoosePng` (one PNG even
+  over the battlers and effects, whose shared dialog offers GIFs). The previews are 160 px squares, a name the folder
+  lacks never read (decision 895). 7 tests (a battlers/effects theory, the note raised, `Pick`'s throw). Sizes: page
+  `.xaml` 121, `.xaml.cs` 95, `PartyMemberCatalogViewModel` 153, `PartyMemberViewModel` 143; tests 250 and 124.
+  Review fix: `Sprites/SpriteImageFile`'s decode reads a PNG cut after its header (decoder refusal) as null, from a
+  stream it closes, so the Items, Cinematics, Enemies and members previews never throw on one (78 lines; 3 tests in
+  the new `SpriteImageFileTests`, 79); the import's header-only check is a backlog line.

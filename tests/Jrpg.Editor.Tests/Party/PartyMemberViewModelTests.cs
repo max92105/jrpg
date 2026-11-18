@@ -1,3 +1,4 @@
+using Jrpg.Data.Art;
 using Jrpg.Editor.Party;
 using static Jrpg.Editor.Tests.Party.PartyMemberFixtures;
 
@@ -116,4 +117,8 @@ public sealed class PartyMemberViewModelTests
 
         Assert.Equal(1, raised);
     }
+
+    [Fact]
+    public void Pick_FolderOfNoMemberPicture_Throws() =>
+        Assert.Throws<ArgumentException>(() => _scholar.Pick(ArtFolders.Tilesheets, "Grass.png"));
 }

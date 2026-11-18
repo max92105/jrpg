@@ -47,17 +47,21 @@ internal sealed partial class MainWindow
         pageViews.Register<StatusCatalogViewModel>(edited => new StatusCatalogPage(edited));
         pageViews.Register<EncounterCatalogViewModel>(edited => new EncounterPage(edited));
         pageViews.Register<ClassCatalogViewModel>(edited => new ClassCatalogPage(edited));
-        pageViews.Register<PartyMemberCatalogViewModel>(edited => new PartyMemberCatalogPage(edited));
         RegisterPicturePages(pageViews);
         RegisterPagesOnTheAnimationClock(pageViews, animationTime);
         return pageViews;
     }
 
-    // Items and Cinematics decode each picture at the size the page shows it: the icons and the 1920 px stills are far
-    // bigger. Effect strips and Battle backgrounds decode whole: their frames are cut from the image at its own size.
+    // Items, Cinematics and Party members decode each picture at the size the page shows it: the icons and the 1920 px
+    // stills are far bigger, a member's portrait and battle sprite at the 160 px of its preview. Effect strips and
+    // Battle backgrounds decode whole: their frames are cut from the image at its own size.
     private void RegisterPicturePages(DatabasePageViews pageViews)
     {
         var artRoot = _viewModel.ArtRoot;
+        pageViews.Register<PartyMemberCatalogViewModel>(edited => new PartyMemberCatalogPage(
+            edited,
+            _viewModel.ImportArtImages,
+            (folder, file) => SpriteImageFile.LoadAtWidth(artRoot, folder, file, (int)PartyMemberCatalogPage.PreviewWidth)));
         pageViews.Register<ItemCatalogViewModel>(edited => new ItemCatalogPage(
             edited,
             file => SpriteImageFile.LoadAtWidth(artRoot, ArtFolders.Icons, file, (int)ItemCatalogPage.IconPictureSize)));

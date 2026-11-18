@@ -1,14 +1,16 @@
 using System.ComponentModel;
 using Jrpg.Core.Party;
+using Jrpg.Data.Art;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.Party;
+using Jrpg.Editor.Tiles;
 using static Jrpg.Editor.Tests.Party.PartyMemberFixtures;
 
 namespace Jrpg.Editor.Tests.Party;
 
 // The Party members page's list (decision 953): the members in id order, the added ones after, only an added member
-// removable, the class box's choices, and the problem line: the chosen member's own, then another's, then Data's
-// message for the list.
+// removable, the class box's choices, the problem line: the chosen member's own, then another's, then Data's message
+// for the list; the missing art note, and an Import... taken into the chosen member's box.
 public sealed class PartyMemberCatalogViewModelTests
 {
     // Added after the scholar, its id first: a list in id order is sorted, not read in the dictionary's order.
@@ -152,6 +154,67 @@ public sealed class PartyMemberCatalogViewModelTests
         _catalog.SelectedMember = _catalog.Members[1];
 
         Assert.Contains(nameof(PartyMemberCatalogViewModel.MissingArtNote), raised);
+    }
+
+    // Bram is chosen at start; the import is the portrait's only.
+    [Fact]
+    public void TakeImport_CopiedPortrait_PicksItInThePortraitBox()
+    {
+        _catalog.TakeImport(ArtFolders.Portraits, new SheetImportResult(["Knight.png"], []));
+
+        var bram = _catalog.Members[0];
+        Assert.Equal(("Knight.png", _bram.BattleSpriteFile), (bram.PortraitFile, bram.BattleSpriteFile));
+    }
+
+    [Theory]
+    [InlineData(ArtFolders.Battlers)]
+    [InlineData(ArtFolders.Effects)]
+    public void TakeImport_CopiedIntoAnotherFolder_PicksItInThatFoldersBox(string artFolder)
+    {
+        _catalog.TakeImport(artFolder, new SheetImportResult(["Knight.png"], []));
+
+        var bram = _catalog.Members[0].ToMember();
+        var picked = artFolder == ArtFolders.Battlers ? bram.BattleSpriteFile : bram.AttackEffectFile;
+        Assert.Equal(("Knight.png", _bram.PortraitFile), (picked, bram.PortraitFile));
+    }
+
+    [Fact]
+    public void TakeImport_NothingCopied_ChangesNothing()
+    {
+        List<string?> raised = [];
+        ((INotifyPropertyChanged)_catalog).PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        _catalog.TakeImport(ArtFolders.Portraits, new SheetImportResult([], ["Bram.gif: not a PNG image."]));
+
+        Assert.Equal((_bram, 0), (_catalog.Members[0].ToMember(), raised.Count));
+    }
+
+    [Fact]
+    public void TakeImport_CopiedPortrait_RefreshesTheFolders()
+    {
+        List<string> portraits = ["IlsaPortrait.png"];
+        var catalog = new PartyMemberCatalogViewModel(
+            World,
+            folder => folder == ArtFolders.Portraits ? [.. portraits] : ImagesIn(folder));
+        portraits.Add("IlsaFace.png");
+
+        catalog.TakeImport(ArtFolders.Portraits, new SheetImportResult(["IlsaFace.png"], []));
+
+        Assert.Equal(["IlsaPortrait.png", "IlsaFace.png"], catalog.ArtChoices.Portraits);
+        Assert.Equal("", catalog.MissingArtNote);
+    }
+
+    // The member already names the copied file, so no box changes: the note is read again all the same.
+    [Fact]
+    public void TakeImport_FileTheMemberAlreadyNames_RaisesMissingArtNote()
+    {
+        _catalog.Members[0].PortraitFile = "Knight.png";
+        List<string?> raised = [];
+        ((INotifyPropertyChanged)_catalog).PropertyChanged += (_, e) => raised.Add(e.PropertyName);
+
+        _catalog.TakeImport(ArtFolders.Portraits, new SheetImportResult(["Knight.png"], []));
+
+        Assert.Equal([nameof(PartyMemberCatalogViewModel.MissingArtNote)], raised);
     }
 
     [Fact]

@@ -157,7 +157,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   lines) → [slices/PM3.md](slices/PM3.md)
 - [x] **PM4. Database > Party members: the page with its boxes and art marks** (Editor, about 70 lines plus about 120
   of XAML; its pictures and imports are PM4b) → [slices/PM4.md](slices/PM4.md)
-- [ ] **PM4b. The Party members page's pictures and imports** (Editor, about 150 lines; split from PM4) →
+- [x] **PM4b. The Party members page's pictures and imports** (Editor, about 150 lines; split from PM4) →
   [slices/PM4b.md](slices/PM4b.md)
 
 ### Phase 5: the new game

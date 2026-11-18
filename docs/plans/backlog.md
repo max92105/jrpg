@@ -365,3 +365,12 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Editor/Shell/CombinedHistory.cs` is at 291 lines: the next undo refusal goes in a new partial (e.g.
   `CombinedHistory.Refusals.cs`), or the per-record refusals move into one first (classes and progression plan, PM3
   review).
+- `Catalogs/ArtImageImport` copies a PNG after the header check alone, so a file cut short lands in `content/art/` and
+  the game's header-only startup art check passes it: consider a full decode check at import (classes and progression
+  plan, PM4b review).
+- `Editor/Animation/StripFromCellsWindow.xaml.cs` (~68): its catch's `NotSupportedException`, `FileFormatException` and
+  `COMException` clauses can't happen since `SpriteImageFile.Read` returns null for a refused decode: drop them, or tell a
+  refused decode from a bad header in the message (classes and progression plan, PM4b review).
+- `Editor/Tiles/TileImages.cs` (~180): a tilesheet passing the header check but refused by the decoder gets a message
+  calling it a bug; the art status's readable check needs a full decode, or `LoadImage` treats the null as missing art
+  (classes and progression plan, PM4b review).

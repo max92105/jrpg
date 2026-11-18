@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Party;
+using Jrpg.Data.Art;
 using Jrpg.Editor.Objects;
 
 namespace Jrpg.Editor.Party;
@@ -87,6 +88,28 @@ internal sealed partial class PartyMemberViewModel : ObservableObject
     /// </summary>
     public string? Problem =>
         (IsNew ? ObjectIds.ProblemOf(Id, []) : null) ?? (string.IsNullOrEmpty(ClassId) ? "Class must be chosen." : null);
+
+    /// <summary>Puts a file just imported into an art folder in that folder's box.</summary>
+    /// <param name="artFolder">The battlers, portraits or effects folder (<see cref="ArtFolders"/>).</param>
+    /// <param name="file">The file's name in that folder.</param>
+    /// <exception cref="ArgumentException">No member picture comes from the folder.</exception>
+    public void Pick(string artFolder, string file)
+    {
+        switch (artFolder)
+        {
+            case ArtFolders.Battlers:
+                BattleSpriteFile = file;
+                break;
+            case ArtFolders.Portraits:
+                PortraitFile = file;
+                break;
+            case ArtFolders.Effects:
+                AttackEffectFile = file;
+                break;
+            default:
+                throw new ArgumentException($"No member picture comes from the '{artFolder}' folder.", nameof(artFolder));
+        }
+    }
 
     /// <summary>The record the boxes make, the name, summary and art file names trimmed.</summary>
     /// <exception cref="InvalidOperationException">There is a <see cref="Problem"/>.</exception>

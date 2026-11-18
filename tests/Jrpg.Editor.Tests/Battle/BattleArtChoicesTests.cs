@@ -28,32 +28,32 @@ public sealed class BattleArtChoicesTests
     };
 
     [Fact]
-    public void MissingOf_EveryPictureInItsFolder_IsEmpty()
+    public void MissingNoteOf_EveryPictureInItsFolder_IsEmpty()
     {
         var choices = new BattleArtChoices(folder => _folders[folder]);
 
-        Assert.Empty(choices.MissingOf(Wolf.BattleSpriteFile, Wolf.PortraitFile, Wolf.AttackEffectFile));
+        Assert.Equal("", choices.MissingNoteOf(Wolf.BattleSpriteFile, Wolf.PortraitFile, Wolf.AttackEffectFile));
     }
 
     [Fact]
-    public void MissingOf_SpriteNotInFolder_MarksIt()
+    public void MissingNoteOf_SpriteNotInFolder_NamesIt()
     {
         var choices = new BattleArtChoices(folder => _folders[folder]);
 
-        var missing = choices.MissingOf("Bear.png", Wolf.PortraitFile, Wolf.AttackEffectFile);
+        var note = choices.MissingNoteOf("Bear.png", Wolf.PortraitFile, Wolf.AttackEffectFile);
 
-        Assert.Equal(["battle sprite Bear.png"], missing);
+        Assert.Equal("Not in the art folders: battle sprite Bear.png.", note);
     }
 
     // A new enemy or member names no picture yet: each mark says so instead of ending in a blank.
     [Fact]
-    public void MissingOf_NoPictureNamed_MarksEachAsNone()
+    public void MissingNoteOf_NoPictureNamed_NamesEachAsNone()
     {
         var choices = new BattleArtChoices(folder => _folders[folder]);
 
-        var missing = choices.MissingOf("", "", "");
+        var note = choices.MissingNoteOf("", "", "");
 
-        Assert.Equal(["battle sprite (none)", "portrait (none)", "attack effect (none)"], missing);
+        Assert.Equal("Not in the art folders: battle sprite (none), portrait (none), attack effect (none).", note);
     }
 
     [Fact]

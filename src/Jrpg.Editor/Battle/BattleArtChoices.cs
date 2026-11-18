@@ -39,17 +39,17 @@ internal sealed partial class BattleArtChoices : ObservableObject
     }
 
     /// <summary>
-    /// Which of an enemy's or a party member's pictures its folder lacks, as "battle sprite Wolf.png" lines for the
-    /// marks (decision 442); empty when every one is there. Takes the names, so the rule holds for both without this
-    /// type knowing a member.
+    /// The mark under an enemy's or a party member's art boxes (decision 442): "Not in the art folders: battle sprite
+    /// Wolf.png, portrait (none).", each picture its folder lacks; empty when every one is there. Takes the names, so
+    /// the rule holds for both without this type knowing a member.
     /// </summary>
-    public IReadOnlyList<string> MissingOf(string battleSpriteFile, string portraitFile, string attackEffectFile)
+    public string MissingNoteOf(string battleSpriteFile, string portraitFile, string attackEffectFile)
     {
         var missing = new List<string>();
         AddMissing(missing, "battle sprite", battleSpriteFile, Battlers);
         AddMissing(missing, "portrait", portraitFile, Portraits);
         AddMissing(missing, "attack effect", attackEffectFile, Effects);
-        return missing;
+        return missing.Count == 0 ? "" : $"Not in the art folders: {string.Join(", ", missing)}.";
     }
 
     // A new enemy or member names no picture yet: its mark says so rather than ending in a blank.

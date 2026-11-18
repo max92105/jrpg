@@ -21,7 +21,10 @@ internal sealed partial class ExperienceRowViewModel : ObservableObject
     public int Level { get; }
 
     /// <summary>"Level 4 to 5".</summary>
-    public string Label => $"Level {Level} to {Level + 1}";
+    public string Label => LabelOf(Level);
+
+    /// <summary>The label of the step starting at <paramref name="level"/>, for the fill's line too.</summary>
+    public static string LabelOf(int level) => $"Level {level} to {level + 1}";
 
     [ObservableProperty]
     public partial string AmountText { get; set; }

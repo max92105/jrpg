@@ -12,10 +12,10 @@ namespace Jrpg.Editor.Progression;
 
 /// <summary>
 /// The experience table as the Experience page types it (decision 956): one row per level step, each with its amount as
-/// typed and its running total, a level added after the last or the last removed. <see cref="Problem"/> is the first
-/// box that isn't a whole number, then Data's message on the draft's rules with the typed table;
-/// <see cref="MaxLevelNote"/> warns of a max level below the saved one. One table: its host has nothing to choose
-/// (<see cref="IEditedCatalog"/>).
+/// typed and its running total, a level added after the last or the last removed, or every row filled from a curve
+/// (<see cref="Curve"/>). <see cref="Problem"/> is the first box that isn't a whole number, then Data's message on the
+/// draft's rules with the typed table; <see cref="MaxLevelNote"/> warns of a max level below the saved one. One table:
+/// its host has nothing to choose (<see cref="IEditedCatalog"/>).
 /// </summary>
 internal sealed partial class ExperienceTableViewModel : ObservableObject, IEditedCatalog
 {
@@ -45,6 +45,8 @@ internal sealed partial class ExperienceTableViewModel : ObservableObject, IEdit
             row => row.PropertyChanged -= OnRowTyped,
             OnRowsListChanged);
         UpdateTotals();
+        Curve = new ExperienceCurveBoxes(content.Rules.Experience);
+        Curve.PropertyChanged += OnCurveTyped;
     }
 
     /// <summary>The level steps from level 1 on: their count sets the max level.</summary>
@@ -52,6 +54,9 @@ internal sealed partial class ExperienceTableViewModel : ObservableObject, IEdit
 
     /// <summary>One past the last step, as the game reads the table.</summary>
     public int MaxLevel => Rows.Count + 1;
+
+    /// <summary>The fill's boxes, which Fill turns into the rows (decision 957).</summary>
+    public ExperienceCurveBoxes Curve { get; }
 
     /// <summary>
     /// "Max level 18, was 21: saved members above it drop to 18 when a save loads." while the table has fewer levels
@@ -95,6 +100,36 @@ internal sealed partial class ExperienceTableViewModel : ObservableObject, IEdit
 
     private bool HasMoreThanOneRow() => Rows.Count > 1;
 
+    /// <summary>
+    /// Replaces the rows with the curve's, row by row rather than cleared: a cleared list names no rows it lost, so
+    /// they would stay watched. The rows stay editable after.
+    /// </summary>
+    [RelayCommand(CanExecute = nameof(CanFill))]
+    private void Fill()
+    {
+        var amounts = Curve.ToRows();
+        while (Rows.Count > amounts.Count)
+        {
+            Rows.RemoveAt(Rows.Count - 1);
+        }
+
+        for (var index = 0; index < amounts.Count; index++)
+        {
+            var row = new ExperienceRowViewModel(index + 1, TypedNumber.Text(amounts[index]));
+            if (index < Rows.Count)
+            {
+                Rows[index] = row;
+            }
+            else
+            {
+                Rows.Add(row);
+            }
+        }
+    }
+
+    // The same problem the fill's line shows.
+    private bool CanFill() => Curve.Problem is null;
+
     // Read only once every box is a number.
     private ExperienceTable AsTyped() => new([.. Rows.Select(row => row.Amount!.Value)]);
 
@@ -114,6 +149,14 @@ internal sealed partial class ExperienceTableViewModel : ObservableObject, IEdit
         {
             UpdateTotals();
             OnPropertyChanged(nameof(Problem));
+        }
+    }
+
+    private void OnCurveTyped(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ExperienceCurveBoxes.Problem))
+        {
+            FillCommand.NotifyCanExecuteChanged();
         }
     }
 

@@ -388,3 +388,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   `ListItemWatch`'s summary, which names the quests' stages and drop tables' entries as users (NG2b review).
 - `NewGame/StartingItemRow` and `Party/ClassSkillRow` share a shape (a `RecordChoice`, a typed whole number, `New`, a
   throwing `ToEntry`): share it when a third row of this kind appears (classes and progression plan, NG2c review).
+- `Editor/Progression/ExperienceTableViewModel.Fill` changes the rows one by one, and each change reruns the totals and
+  Data's `OfRules` (about 100 checks on a 98-row fill): batch the list change if a fill ever feels slow (classes and
+  progression plan, XP4 review).

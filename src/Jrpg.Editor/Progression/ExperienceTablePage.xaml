@@ -10,10 +10,39 @@
       <Setter Property="VerticalAlignment" Value="Center" />
     </Style>
   </UserControl.Resources>
-  <!-- The max level, the steps in order, then the two commands and the note on a lowered max level under them. -->
+  <!-- The max level, the steps in order, then the commands, the note on a lowered max level and the fill under them. -->
   <DockPanel Width="440" HorizontalAlignment="Left">
     <TextBlock DockPanel.Dock="Top" Text="{Binding MaxLevel, StringFormat='Max level {0}'}" FontWeight="Bold"
                ToolTip="One past the last step: the table's length sets it" />
+
+    <!-- Docked bottom first, so the fill's line sits lowest, under its boxes. -->
+    <TextBlock DockPanel.Dock="Bottom" Text="{Binding Curve.Problem}" TextWrapping="Wrap" Margin="0,4,0,0">
+      <TextBlock.Style>
+        <Style TargetType="TextBlock" BasedOn="{StaticResource {x:Type TextBlock}}">
+          <Setter Property="Foreground" Value="{StaticResource ProblemTextBrush}" />
+          <Style.Triggers>
+            <DataTrigger Binding="{Binding Curve.Problem}" Value="{x:Null}">
+              <Setter Property="Visibility" Value="Collapsed" />
+            </DataTrigger>
+          </Style.Triggers>
+        </Style>
+      </TextBlock.Style>
+    </TextBlock>
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Margin="0,4,0,0">
+      <TextBlock Text="First" VerticalAlignment="Center" Margin="0,0,6,0" />
+      <TextBox Width="70" Text="{Binding Curve.FirstText, UpdateSourceTrigger=PropertyChanged}"
+               ToolTip="The experience from level 1 to 2" />
+      <TextBlock Text="Growth (%)" VerticalAlignment="Center" Margin="12,0,6,0" />
+      <TextBox Width="50" Text="{Binding Curve.GrowthText, UpdateSourceTrigger=PropertyChanged}"
+               ToolTip="Each step is the one before times (100 + growth) / 100, rounded down; above -100" />
+      <TextBlock Text="Max level" VerticalAlignment="Center" Margin="12,0,6,0" />
+      <TextBox Width="40" Text="{Binding Curve.MaxLevelText, UpdateSourceTrigger=PropertyChanged}"
+               ToolTip="From 2 to 99: the fill makes one step fewer" />
+      <Button Content="Fill" Width="60" Margin="12,0,0,0" Command="{Binding FillCommand}"
+              ToolTipService.ShowOnDisabled="True"
+              ToolTip="Replaces every row with the curve's; greyed while the line under the boxes names a problem" />
+    </StackPanel>
+    <TextBlock DockPanel.Dock="Bottom" Text="Fill from curve" FontWeight="Bold" Margin="0,12,0,0" />
 
     <TextBlock DockPanel.Dock="Bottom" Text="{Binding MaxLevelNote}" TextWrapping="Wrap" Margin="0,6,0,0">
       <TextBlock.Style>

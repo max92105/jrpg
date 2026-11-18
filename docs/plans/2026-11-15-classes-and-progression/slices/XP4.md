@@ -58,3 +58,12 @@ is first 100, 20 %, max level 21).
 3. Type growth `15`, max level `40`, Fill: 39 rows, max level 40. Type max level `100`: Fill greys and the line says
    "Max level must be 2 to 99". Type first `2000000000`, max level 10: the line names the first level step past the
    largest number. Revert: the table is as before.
+- **Done, with deviations:** past its estimate, about 420 lines (190 code, 30 XAML, 200 tests) against 190. Beyond the
+  list: `ExperienceRowViewModel.LabelOf`, so the curve's line names a step as the rows do; `Rows_WithAProblem_Throws`,
+  `ProblemOf_FirstZero_Refuses`, `ProblemOf_GrowthIntMax_NamesTheSecondStep` (the growth added in a `long`);
+  `Fill_NoProblem_IsLit`, `Fill_ReplacedRowTyped_RaisesNothing` and `Fill_FilledRowTyped_RaisesProblemChanged` (Fill
+  replaces row by row, since a cleared list names no rows it lost), and `Fill_WithProblem_IsGreyed` as a theory over
+  the three boxes and the curve. `ProblemOf_RowBelowOne_NamesTheLevelStep` takes first 5 at -60 % (Level 3 to 4): first
+  2 breaks at the second step already. Sizes: Editor `ExperienceCurve` 80, `ExperienceCurveBoxes` 57,
+  `ExperienceTableViewModel` 173, `ExperienceRowViewModel` 44, `ExperienceTablePage.xaml` 112; tests
+  `ExperienceCurveTests` 105, `ExperienceTableFillTests` 94.

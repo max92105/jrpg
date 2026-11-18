@@ -1,5 +1,5 @@
 # Classes and progression (editor push, roadmap row 12)
-Status: approved, in progress
+Status: retro pending
 
 Drafted on 2026-11-15 from roadmap row 12 of [the editor push](../2026-11-15-editor-push/README.md) ("Class windows or
 pages (stats, growth, skills, resources), skills learned by level, the experience table", its design.md section 3.11)
@@ -185,7 +185,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/XP2b.md](slices/XP2b.md)
 - [x] **XP3. Database > Experience: the page** (Editor, about 30 lines plus about 80 of XAML) →
   [slices/XP3.md](slices/XP3.md)
-- [ ] **XP4. Fill from a curve: a first amount and a growth percent** (Editor, about 190 lines) →
+- [x] **XP4. Fill from a curve: a first amount and a growth percent** (Editor, about 190 lines) →
   [slices/XP4.md](slices/XP4.md)
 
 ## Decisions

@@ -36,6 +36,12 @@ boxes and their problem line.
   `TierRows_PowersTyped_ReadAtThosePowers`; `BoxesProblem_PowerNotANumber_SaysSo`; the Power bounds at each side (0
   and the max accepted, -1, max + 1 and a word refused), the refusals emptying every box-read list;
   `TypedBox_Changed_RaisesRowsAndProblem` over the three Power boxes, `TierRows` asserted for every box.
+- **Done, with deviations:** `TierBalanceRow` 18 lines (`Amounts` as ints: a tier row has one hit, so no "x hits" text),
+  `TierBalanceRows` 49 (kind line spelled as the Tier box spells it), `BalanceTableViewModel` 183 (Power boxes 1, 10,
+  50 from 0 to `MaxTypedPower` 10000, decision 1022: an editor bound, Core's `DamageFormula` stays internal; the
+  levels' and Powers' reads share one `ReadAll`). Tests (26 cases): `TierBalanceRowsTests` 63 (6, beyond the slice's
+  4 a heal's kind line and three Powers in order), `BalanceTableViewModelTests` 285 (+20), `BalanceFixtures` 121
+  (`fire_1`, `heal_1` in the world, heal first).
 
 ## Verify by hand
 None: the page comes in BT3.

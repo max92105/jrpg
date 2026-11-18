@@ -159,7 +159,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 - [x] **BT1c. The table's level and modifier boxes** (Editor, about 190 lines) → [slices/BT1c.md](slices/BT1c.md)
 - [x] **BT2. Enemies' skills, classes and enemies** (Editor, about 180 lines; split at its start) →
   [slices/BT2.md](slices/BT2.md)
-- [ ] **BT2b. The tier sheet rows and the Power boxes** (Editor, about 160 lines) → [slices/BT2b.md](slices/BT2b.md)
+- [x] **BT2b. The tier sheet rows and the Power boxes** (Editor, about 160 lines) → [slices/BT2b.md](slices/BT2b.md)
 - [ ] **BT3. Database > Balance table...: the read-only page** (Editor + script, about 170 lines) →
   [slices/BT3.md](slices/BT3.md)
 
@@ -293,6 +293,11 @@ Plan-wide:
   (`BalanceTableViewModel.MaxModifierPercent`): -100 % cancels every amount, which tells nothing about a skill;
   10000 %, a hundredfold, is many times the developer's sheet's 473 %, and its permille (x 10), with a member's gear
   and status modifiers added, stays far within an int.
+- **1022.** (taken at BT2b: `DamageFormula.MaxPower` is internal to Core and bounds the amount, not the user's Power)
+  The tier sheet's Power boxes take a whole number from 0 to 10000, a bound of the editor's own
+  (`BalanceTableViewModel.MaxTypedPower`): the most Power Data lets content give an enemy (decision 818), so the sheet
+  reaches any Power the game holds; Core's `TieredAmount` multiplies in a long, so no typed Power and modifier wraps,
+  and an amount past 1,000,000 reads as Core's clamp. Core keeps its members internal.
 
 ## Defaults to confirm
 Taken while the developer was away, each his to overturn:

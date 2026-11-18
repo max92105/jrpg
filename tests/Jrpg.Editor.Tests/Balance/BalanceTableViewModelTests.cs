@@ -4,8 +4,9 @@ using Jrpg.Editor.Balance;
 
 namespace Jrpg.Editor.Tests.Balance;
 
-// The balance table's boxes (decision 992): three typed levels and a typed damage modifier, read into the class skill
-// rows, the enemy skill rows and the class rows, which empty while a box can't be read.
+// The balance table's boxes (decision 992): three typed levels, a typed damage modifier and three typed Powers, read
+// into the class skill rows, the enemy skill rows, the class rows and the tier rows, each list empty while any box
+// can't be read.
 public sealed class BalanceTableViewModelTests
 {
     private const int MaxLevel = 30;
@@ -14,6 +15,9 @@ public sealed class BalanceTableViewModelTests
     private const string SecondLevel = nameof(BalanceTableViewModel.SecondLevelText);
     private const string ThirdLevel = nameof(BalanceTableViewModel.ThirdLevelText);
     private const string ModifierPercent = nameof(BalanceTableViewModel.ModifierPercentText);
+    private const string FirstPower = nameof(BalanceTableViewModel.FirstPowerText);
+    private const string SecondPower = nameof(BalanceTableViewModel.SecondPowerText);
+    private const string ThirdPower = nameof(BalanceTableViewModel.ThirdPowerText);
 
     // The fixtures' classes over an experience table ending at level 30, so the boxes' top bound is known.
     private static readonly ContentCatalog _world = BalanceFixtures.World with
@@ -30,6 +34,59 @@ public sealed class BalanceTableViewModelTests
             ("1", "10", "20", "0"),
             (table.FirstLevelText, table.SecondLevelText, table.ThirdLevelText, table.ModifierPercentText));
         Assert.Null(table.BoxesProblem);
+    }
+
+    [Fact]
+    public void New_PowerBoxes_StartAtOneTenAndFifty()
+    {
+        var table = new BalanceTableViewModel(_world);
+
+        Assert.Equal(("1", "10", "50"), (table.FirstPowerText, table.SecondPowerText, table.ThirdPowerText));
+    }
+
+    // fire_1 gives 2 per Power; 50 % more is 500 permille on the modifiers' sum.
+    [Fact]
+    public void TierRows_PowersTyped_ReadAtThosePowers()
+    {
+        var table = new BalanceTableViewModel(_world);
+
+        Type(table, FirstPower, "2");
+        Type(table, SecondPower, "3");
+        Type(table, ThirdPower, "40");
+        Type(table, ModifierPercent, "50");
+
+        Assert.Equal([6, 9, 120], Assert.Single(table.TierRows, row => row.TierId == "fire_1").Amounts);
+    }
+
+    [Theory]
+    [InlineData(FirstPower, "Power 1")]
+    [InlineData(SecondPower, "Power 2")]
+    [InlineData(ThirdPower, "Power 3")]
+    public void BoxesProblem_PowerNotANumber_SaysSo(string box, string label)
+    {
+        var table = new BalanceTableViewModel(_world);
+
+        Type(table, box, "ten");
+
+        Assert.Equal($"{label} must be a whole number from 0 to 10000.", table.BoxesProblem);
+        AssertBoxRowsEmpty(table);
+    }
+
+    [Theory]
+    [InlineData(FirstPower, "-1", "Power 1")]
+    [InlineData(FirstPower, "10001", "Power 1")]
+    [InlineData(SecondPower, "-1", "Power 2")]
+    [InlineData(SecondPower, "10001", "Power 2")]
+    [InlineData(ThirdPower, "-1", "Power 3")]
+    [InlineData(ThirdPower, "10001", "Power 3")]
+    public void BoxesProblem_PowerPastABound_NamesTheBoxAndEmptiesTheRows(string box, string text, string label)
+    {
+        var table = new BalanceTableViewModel(_world);
+
+        Type(table, box, text);
+
+        Assert.Equal($"{label} must be a whole number from 0 to 10000.", table.BoxesProblem);
+        AssertBoxRowsEmpty(table);
     }
 
     // The mage's Power is 15, 18 and 99 at levels 2, 3 and 30; fire_1 gives 2 per Power.
@@ -108,6 +165,12 @@ public sealed class BalanceTableViewModelTests
     [InlineData(ThirdLevel, "30")]
     [InlineData(ModifierPercent, "-99")]
     [InlineData(ModifierPercent, "10000")]
+    [InlineData(FirstPower, "0")]
+    [InlineData(FirstPower, "10000")]
+    [InlineData(SecondPower, "0")]
+    [InlineData(SecondPower, "10000")]
+    [InlineData(ThirdPower, "0")]
+    [InlineData(ThirdPower, "10000")]
     public void BoxesProblem_BoxAtABound_NoneAndRowsListed(string box, string text)
     {
         var table = new BalanceTableViewModel(_world);
@@ -118,6 +181,7 @@ public sealed class BalanceTableViewModelTests
         Assert.NotEmpty(table.ClassSkillRows);
         Assert.NotEmpty(table.EnemySkillRows);
         Assert.NotEmpty(table.ClassRows);
+        Assert.NotEmpty(table.TierRows);
     }
 
     [Theory]
@@ -159,6 +223,9 @@ public sealed class BalanceTableViewModelTests
     [InlineData(SecondLevel)]
     [InlineData(ThirdLevel)]
     [InlineData(ModifierPercent)]
+    [InlineData(FirstPower)]
+    [InlineData(SecondPower)]
+    [InlineData(ThirdPower)]
     public void TypedBox_Changed_RaisesRowsAndProblem(string box)
     {
         var table = new BalanceTableViewModel(_world);
@@ -170,6 +237,7 @@ public sealed class BalanceTableViewModelTests
         Assert.Contains(nameof(BalanceTableViewModel.ClassSkillRows), raised);
         Assert.Contains(nameof(BalanceTableViewModel.EnemySkillRows), raised);
         Assert.Contains(nameof(BalanceTableViewModel.ClassRows), raised);
+        Assert.Contains(nameof(BalanceTableViewModel.TierRows), raised);
         Assert.Contains(nameof(BalanceTableViewModel.BoxesProblem), raised);
     }
 
@@ -179,6 +247,7 @@ public sealed class BalanceTableViewModelTests
         Assert.Empty(table.ClassSkillRows);
         Assert.Empty(table.EnemySkillRows);
         Assert.Empty(table.ClassRows);
+        Assert.Empty(table.TierRows);
     }
 
     private static SkillBalanceRow FireballOf(BalanceTableViewModel table) =>
@@ -199,6 +268,15 @@ public sealed class BalanceTableViewModelTests
                 break;
             case ModifierPercent:
                 table.ModifierPercentText = text;
+                break;
+            case FirstPower:
+                table.FirstPowerText = text;
+                break;
+            case SecondPower:
+                table.SecondPowerText = text;
+                break;
+            case ThirdPower:
+                table.ThirdPowerText = text;
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(box), box, "Not one of the table's boxes.");

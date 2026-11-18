@@ -11,8 +11,8 @@ namespace Jrpg.Editor.Tests.Balance;
 /// <summary>
 /// The balance table tests' own classes, skills and enemies, so no repository number is pinned: a mage of Power 12 (+3
 /// a level) and a cleric of Power 10 (+2), the mage first so a list in id order is sorted, not read in the dictionary's
-/// order, and the imp before the bat for the same reason; skills of every row shape, one learned at level 5; rules
-/// where each Power point adds 1 % to a flat power.
+/// order, the imp before the bat and heal_1 before fire_1 for the same reason; skills of every row shape, one learned
+/// at level 5; rules where each Power point adds 1 % to a flat power.
 /// </summary>
 internal static class BalanceFixtures
 {
@@ -65,8 +65,8 @@ internal static class BalanceFixtures
     public static EnemyDefinition Bat { get; } = Enemy("bat", "Bat") with { Tactics = [Tactic(Smite.Id)] };
 
     /// <summary>
-    /// The test world with the two classes, their six skills and the two enemies only, the imp first; rules where each
-    /// Constitution point adds 1 % to a class's max HP.
+    /// The test world with the two classes, their six skills and the two enemies and two tiers only, the imp and heal_1
+    /// first; rules where each Constitution point adds 1 % to a class's max HP.
     /// </summary>
     public static ContentCatalog World { get; } = WorldOf(
         ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world")));
@@ -76,6 +76,7 @@ internal static class BalanceFixtures
         Classes = new Dictionary<string, ClassDefinition> { [Mage.Id] = Mage, [Cleric.Id] = Cleric },
         Skills = new[] { Fireball, Flurry, Nova, Curse, Mend, Smite }.ToDictionary(skill => skill.Id),
         Enemies = new Dictionary<string, EnemyDefinition> { [Imp.Id] = Imp, [Bat.Id] = Bat },
+        TieredEffects = new Dictionary<string, TieredEffect> { [Heal1.Id] = Heal1, [Fire1.Id] = Fire1 },
         Rules = loaded.Rules with
         {
             Stats = loaded.Rules.Stats with { DamagePercentPer100Power = 100, HpPercentPer100Constitution = 100 },

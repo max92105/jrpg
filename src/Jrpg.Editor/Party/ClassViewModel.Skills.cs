@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -88,27 +87,19 @@ internal sealed partial class ClassViewModel
 
     private bool HasSelectedSkill() => SelectedSkill is not null;
 
-    private bool CanMoveSkillUp() => SelectedSkill is { } chosen && Skills.IndexOf(chosen) > 0;
+    private bool CanMoveSkillUp() => ListOrder.CanMoveUp(Skills, SelectedSkill);
 
-    private bool CanMoveSkillDown() => SelectedSkill is { } chosen && Skills.IndexOf(chosen) < Skills.Count - 1;
+    private bool CanMoveSkillDown() => ListOrder.CanMoveDown(Skills, SelectedSkill);
 
-    private void WatchSkillRows()
-    {
-        foreach (var row in Skills)
-        {
-            row.PropertyChanged += OnSkillRowTyped;
-        }
-
-        Skills.CollectionChanged += OnSkillsListChanged;
-    }
-
-    // A move changes where the chosen row stands, so the moves' greying is read again with the list.
-    private void OnSkillsListChanged(object? sender, NotifyCollectionChangedEventArgs e)
-    {
-        ListItemWatch.Follow<ClassSkillRow>(
-            e,
+    private void WatchSkillRows() =>
+        ListItemWatch.WatchRowsOf(
+            Skills,
             row => row.PropertyChanged += OnSkillRowTyped,
-            row => row.PropertyChanged -= OnSkillRowTyped);
+            row => row.PropertyChanged -= OnSkillRowTyped,
+            OnSkillsListChanged);
+
+    private void OnSkillsListChanged()
+    {
         MoveSkillUpCommand.NotifyCanExecuteChanged();
         MoveSkillDownCommand.NotifyCanExecuteChanged();
         OnPropertyChanged(nameof(SkillsToAdd));

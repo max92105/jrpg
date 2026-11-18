@@ -19,6 +19,19 @@ internal static class ListOrder
         }
     }
 
+    /// <summary>
+    /// True when the chosen row can move up: one is chosen and it isn't first. Its list re-greys Up and Down on every
+    /// change of the list, since a move changes where the chosen row stands.
+    /// </summary>
+    public static bool CanMoveUp<T>(ObservableCollection<T> items, T? chosen)
+        where T : class =>
+        chosen is not null && items.IndexOf(chosen) > 0;
+
+    /// <summary>True when the chosen row can move down: one is chosen and it isn't last.</summary>
+    public static bool CanMoveDown<T>(ObservableCollection<T> items, T? chosen)
+        where T : class =>
+        chosen is not null && items.IndexOf(chosen) < items.Count - 1;
+
     /// <summary>Puts an item right after the chosen one, or last when none is chosen.</summary>
     public static void InsertAfter<T>(ObservableCollection<T> items, T item, T? chosen)
         where T : class =>

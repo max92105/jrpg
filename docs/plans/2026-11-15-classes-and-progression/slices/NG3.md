@@ -1,6 +1,6 @@
 # NG3. Database > New game: the page
 
-Editor, about 40 lines plus about 110 of XAML. Needs NG2, NG2b and row 11's mode bar (stage 3). Design: section 3;
+Editor, about 40 lines plus about 110 of XAML. Needs NG2, NG2b, NG2c and row 11's mode bar (stage 3). Design: section 3;
 decisions 942, 962, 968; the mode bar's WS12 recipe, steps 3-7 and 10.
 
 ## Goal

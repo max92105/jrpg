@@ -1,5 +1,4 @@
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.ComponentModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -78,19 +77,13 @@ internal sealed partial class ClassViewModel
 
     private bool HasSelectedResource() => SelectedResource is not null;
 
-    private bool CanMoveResourceUp() => SelectedResource is { } chosen && Resources.IndexOf(chosen) > 0;
+    private bool CanMoveResourceUp() => ListOrder.CanMoveUp(Resources, SelectedResource);
 
-    private bool CanMoveResourceDown() =>
-        SelectedResource is { } chosen && Resources.IndexOf(chosen) < Resources.Count - 1;
+    private bool CanMoveResourceDown() => ListOrder.CanMoveDown(Resources, SelectedResource);
 
     private void WatchResources()
     {
-        foreach (var resource in Resources)
-        {
-            WatchResource(resource);
-        }
-
-        Resources.CollectionChanged += OnResourcesListChanged;
+        ListItemWatch.WatchRowsOf(Resources, WatchResource, UnwatchResource, OnResourcesListChanged);
         OfferClassmateIds();
     }
 
@@ -106,10 +99,8 @@ internal sealed partial class ClassViewModel
         resource.PropertyChanged -= OnResourcePropertyChanged;
     }
 
-    // A move changes where the chosen resource stands, so the moves' greying is read again with the list.
-    private void OnResourcesListChanged(object? sender, NotifyCollectionChangedEventArgs e)
+    private void OnResourcesListChanged()
     {
-        ListItemWatch.Follow<ClassResourceViewModel>(e, WatchResource, UnwatchResource);
         OfferClassmateIds();
         MoveResourceUpCommand.NotifyCanExecuteChanged();
         MoveResourceDownCommand.NotifyCanExecuteChanged();

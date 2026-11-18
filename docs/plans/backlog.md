@@ -356,9 +356,6 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - The `ListBoxItem` style setting `RowFocus.ChoosesRow` is copied in four pages (Item, Skill, Class as `TypedRow`,
   DropTable inline): one keyed style in `Shell/EditorTheme.xaml` would replace them (classes and progression plan, CL6b
   review).
-- `Editor/Party/ClassViewModel.Skills` and `.Resources` each hold the chosen-row move greying and the list-change
-  handler (re-watch, re-grey, raise `Problem` and `Changed`): a third chosen-row list extracts them (classes and
-  progression plan, CL7d review).
 - `Editor/Party/HexColorBrushConverter` repeats Data's private resource color rule (`#` and six hex digits,
   `ResourceDefinitionValidator.FindColorProblem`): one public check in Data used by both keeps the swatch and the problem
   line in step if the rule changes (classes and progression plan, CL8 review).
@@ -385,3 +382,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Editor/Cinematics/CinematicStillRow.cs` (~192) is a third copy of invariant-culture double parsing (exponent allowed,
   no sign): read through `Catalogs/TypedDecimal` with a styles argument when next touched (classes and progression
   plan, NG2 review).
+- Eight `Catalogs/ListItemWatch.Follow` callers still write their own first watch loop and hook (`StatusViewModel`,
+  `SkillCosts`, `SkillGrants`, `ItemEquipmentViewModel`, `UniqueAffixesViewModel`, `TacticListViewModel`,
+  `EnemyTacticsViewModel`, `CinematicViewModel`): `ListItemWatch.WatchRowsOf` fits each when next touched; then fix
+  `ListItemWatch`'s summary, which names the quests' stages and drop tables' entries as users (NG2b review).

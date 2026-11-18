@@ -165,8 +165,10 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/NG1.md](slices/NG1.md)
 - [x] **NG2. The new game as typed: gold, start, sprite; its undo step** (Editor, about 230 lines; its lists are
   NG2b) → [slices/NG2.md](slices/NG2.md)
-- [ ] **NG2b. The new game's lists: leader choices and starting items** (Editor, about 320 lines; split from NG2) →
-  [slices/NG2b.md](slices/NG2b.md)
+- [x] **NG2b. The chosen-row lists' shared piece, and the new game's leader choices** (Editor, about 320 lines; split
+  from NG2) → [slices/NG2b.md](slices/NG2b.md)
+- [ ] **NG2c. The new game's starting items** (Editor, about 220 lines; split from NG2b) →
+  [slices/NG2c.md](slices/NG2c.md)
 - [ ] **NG3. Database > New game: the page** (Editor, about 40 lines plus about 110 of XAML) →
   [slices/NG3.md](slices/NG3.md)
 
@@ -324,6 +326,12 @@ Shared and new game:
   against the members, items and maps (decision 863) and `CheckFieldSprites` its sprite's record, so a third call
   would check it twice per save with no test able to tell. `CatalogProblems.CheckNewGame` serves the problem line and
   the map saves' check (`CheckSettingsAndNewGame`), which gains the sprite's record the loader checks.
+- **1019.** (NG2b) The chosen-row lists (a class's skills and resources, the new game's leaders and starting items)
+  share their move greying (`ListOrder.CanMoveUp`, `CanMoveDown`) and their row watching (`ListItemWatch.WatchRowsOf`),
+  not a list type: each list's change step raises its own notices (the skills' add box, the resources' rival ids, the
+  leaders' add box) and its view model keeps its own commands, which the pages bind, so the Classes page and its tests
+  stay as they are. The new game raises `Problem`'s change for its lists, not a `Changed` event: it is the page's catalog
+  itself, with no list above it to relay to.
 
 ## Defaults to confirm
 Taken while the developer was away, each his to overturn, the mechanic first:

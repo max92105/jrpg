@@ -9,8 +9,9 @@ using Jrpg.Editor.Workspaces;
 namespace Jrpg.Editor.NewGame;
 
 /// <summary>
-/// The new game as the New game page types it (decision 968): its starting gold, its start's map, cell position and
-/// facing, and the player's field sprite, written over the record it came from, so an untouched new game equals it.
+/// The new game as the New game page types it (decision 968): its leader choices (the <c>.Leaders</c> partial), its
+/// starting gold, its start's map, cell position and facing, and the player's field sprite, written over the record it
+/// came from, so an untouched new game equals it; its starting items stay the record's until NG2c types them.
 /// <see cref="Problem"/> is the typed boxes first, then Data's message (decision 969). One record: its host has nothing
 /// to choose (<see cref="IEditedCatalog"/>).
 /// </summary>
@@ -19,11 +20,16 @@ internal sealed partial class NewGameViewModel : ObservableObject, IEditedCatalo
     private readonly NewGameDefinition _source;
     private readonly ContentCatalog _content;
 
-    /// <param name="content">The draft as it is: the new game edited and the maps and field sprites it names.</param>
+    /// <param name="content">
+    /// The draft as it is: the new game edited and the members, maps and field sprites it names.
+    /// </param>
     public NewGameViewModel(ContentCatalog content)
     {
         _content = content;
         _source = content.NewGame;
+        Leaders = LeadersOf(_source, content);
+        SelectedLeader = Leaders.FirstOrDefault();
+        Leaders.CollectionChanged += (_, _) => OnLeadersChanged();
         var start = _source.StartLocation;
         GoldText = TypedNumber.Text(_source.StartingGold);
         MapId = start.MapId;
@@ -105,6 +111,7 @@ internal sealed partial class NewGameViewModel : ObservableObject, IEditedCatalo
     private NewGameDefinition AsTyped() =>
         _source with
         {
+            LeaderChoices = LeadersAsTyped(),
             StartingGold = TypedNumber.Parse(GoldText)!.Value,
             StartLocation = new MapLocation(
                 MapId,

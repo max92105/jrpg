@@ -48,13 +48,8 @@ internal sealed partial class ClassViewModel
         }
     }
 
-    // The record's own list while the resources as typed equal it in order, so an untouched class equals its record
-    // (the record compares its lists by reference, decision 1014).
-    private IReadOnlyList<ResourceDefinition> ResourcesAsTyped()
-    {
-        IReadOnlyList<ResourceDefinition> typed = [.. Resources.Select(resource => resource.ToResource())];
-        return typed.SequenceEqual(_source.Resources) ? _source.Resources : typed;
-    }
+    private IReadOnlyList<ResourceDefinition> ResourcesAsTyped() =>
+        ListOrder.KeptIfEqual([.. Resources.Select(resource => resource.ToResource())], _source.Resources);
 
     /// <summary>Puts a blank resource after the chosen one (last when none), and chooses it.</summary>
     [RelayCommand]

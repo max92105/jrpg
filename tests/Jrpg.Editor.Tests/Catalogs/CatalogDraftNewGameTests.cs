@@ -48,7 +48,7 @@ public sealed class CatalogDraftNewGameTests
     [Fact]
     public void SetNewGame_ChangedItemQuantity_RecordsOneStep()
     {
-        var items = new[] { new InventoryEntry("potion", 4), new InventoryEntry("elixir", 1) };
+        var items = new[] { new InventoryEntry("tonic", 4), new InventoryEntry("ember", 1) };
 
         _draft.SetNewGame(TestNewGame with { StartingItems = items });
 

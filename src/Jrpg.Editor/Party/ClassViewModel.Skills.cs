@@ -34,13 +34,10 @@ internal sealed partial class ClassViewModel
     /// (decision 949), so a skill can be added before its resource.
     /// </summary>
     public IReadOnlyList<RecordChoice> SkillsToAdd =>
-    [
-        .. _content.Skills.Values
-            .Where(skill => !Skills.Any(row => row.Skill.Id == skill.Id))
-            .OrderBy(skill => skill.Name, StringComparer.Ordinal)
-            .ThenBy(skill => skill.Id, StringComparer.Ordinal)
-            .Select(skill => new RecordChoice(skill.Id, skill.Name)),
-    ];
+        RecordChoice.ByName(
+            _content.Skills.Values
+                .Where(skill => !Skills.Any(row => row.Skill.Id == skill.Id))
+                .Select(skill => new RecordChoice(skill.Id, skill.Name)));
 
     // The first row's problem, in menu order; the rows' own message names the skill.
     private string? SkillsProblem => Skills.Select(row => row.Problem).FirstOrDefault(problem => problem is not null);
@@ -49,20 +46,12 @@ internal sealed partial class ClassViewModel
     // rather than thrown, and Data's message on the line names it.
     private static IEnumerable<ClassSkillRow> SkillRowsOf(ClassDefinition classDefinition, ContentCatalog content) =>
         classDefinition.Skills.Select(
-            entry => new ClassSkillRow(ChoiceOf(entry.SkillId, content), TypedNumber.Text(entry.Level)));
+            entry => new ClassSkillRow(
+                RecordChoice.Of(entry.SkillId, content.Skills.GetValueOrDefault(entry.SkillId)?.Name),
+                TypedNumber.Text(entry.Level)));
 
-    private static RecordChoice ChoiceOf(string skillId, ContentCatalog content) =>
-        content.Skills.TryGetValue(skillId, out var skill)
-            ? new RecordChoice(skillId, skill.Name)
-            : RecordChoice.Missing(skillId);
-
-    // The record's own list while the rows match it in order, so an untouched class equals its record (the record
-    // compares its lists by reference).
-    private IReadOnlyList<ClassSkill> SkillsAsTyped()
-    {
-        IReadOnlyList<ClassSkill> typed = [.. Skills.Select(row => row.ToEntry())];
-        return typed.SequenceEqual(_source.Skills) ? _source.Skills : typed;
-    }
+    private IReadOnlyList<ClassSkill> SkillsAsTyped() =>
+        ListOrder.KeptIfEqual([.. Skills.Select(row => row.ToEntry())], _source.Skills);
 
     /// <summary>Puts the add box's skill after the chosen row (last when none) at level 1, and chooses it.</summary>
     [RelayCommand(CanExecute = nameof(HasSkillToAdd))]

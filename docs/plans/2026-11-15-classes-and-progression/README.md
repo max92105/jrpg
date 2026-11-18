@@ -167,7 +167,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   NG2b) → [slices/NG2.md](slices/NG2.md)
 - [x] **NG2b. The chosen-row lists' shared piece, and the new game's leader choices** (Editor, about 320 lines; split
   from NG2) → [slices/NG2b.md](slices/NG2b.md)
-- [ ] **NG2c. The new game's starting items** (Editor, about 220 lines; split from NG2b) →
+- [x] **NG2c. The new game's starting items** (Editor, about 220 lines; split from NG2b) →
   [slices/NG2c.md](slices/NG2c.md)
 - [ ] **NG3. Database > New game: the page** (Editor, about 40 lines plus about 110 of XAML) →
   [slices/NG3.md](slices/NG3.md)

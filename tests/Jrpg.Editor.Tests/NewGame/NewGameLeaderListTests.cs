@@ -204,14 +204,14 @@ public sealed class NewGameLeaderListTests
     [Theory]
     [InlineData(nameof(NewGameViewModel.Problem))]
     [InlineData(nameof(NewGameViewModel.LeadersToAdd))]
-    public void RemoveLeader_Chosen_RaisesTheListsNotices(string notice)
+    public void RemoveLeader_Chosen_RaisesTheListsNoticesOnce(string notice)
     {
-        var raised = false;
-        _newGame.PropertyChanged += (_, e) => raised |= e.PropertyName == notice;
+        var raised = 0;
+        _newGame.PropertyChanged += (_, e) => raised += e.PropertyName == notice ? 1 : 0;
 
         _newGame.RemoveLeaderCommand.Execute(null);
 
-        Assert.True(raised);
+        Assert.Equal(1, raised);
     }
 
     private IRelayCommand CommandNamed(string command) => command switch

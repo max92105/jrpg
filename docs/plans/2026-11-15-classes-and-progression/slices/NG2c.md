@@ -38,3 +38,15 @@ None: the page comes in NG3.
 - **Note from NG2b review:** count `Problem` raised exactly once on a list change (`NewGameLeaderListTests`'
   `RemoveLeader_Chosen_RaisesTheListsNotices` only checks it was raised; do the same for the items); and a comment on
   why value-equal rows (`RecordChoice` is a record) are safe for `IndexOf` (the loader refuses a repeated leader).
+- **Done, with deviations:** both review notes taken (the leaders' notices test now counts one; the comment is on
+  `Leaders`). `NewGameFixtures` replaces the test world's items with its own four (Tonic, Ember stacking to 3, Salve,
+  Yarrow), so `CatalogDraftNewGameTests`' changed quantity moved to them. Beyond the list: the missing item shown, a
+  move down written, Remove choosing the next row, Add's row at one copy, every command greyed in one theory, the
+  choices' `CanExecuteChanged`, an added row's quantity relayed and a removed one's not, `ToEntry` throwing, two bad
+  quantities naming the first row's item. Review: the third copies extracted, used by the leaders, the items and a
+  class's skills (and its resources for the last): `RecordChoice.Of` (missing when the draft has no name) and
+  `RecordChoice.ByName` (an add box's order), `ListOrder.KeptIfEqual` (decision 1014's kept list); the existing tests
+  ran unchanged; the two rows' shared shape is a backlog line. Bigger than planned: about 175 lines of code, 330 of
+  tests (38 tests). Sizes: `NewGameViewModel` 127, `.StartingItems` 108, `.Leaders` 87, `StartingItemRow` 42,
+  `RecordChoice` 39, `ListOrder` 65, `ClassViewModel.Skills` 108, `.Resources` 120; tests `NewGameItemListTests` 244,
+  `StartingItemRowTests` 35, `NewGameFixtures` 59, `RecordChoiceTests` 42, `ListOrderTests` 90.

@@ -3,8 +3,8 @@ using Jrpg.Editor.Events;
 
 namespace Jrpg.Editor.Tests.Events;
 
-// Adding after the chosen row, as every Add beside a list of rows does, greying the moves at the list's ends, and
-// numbering the rows by their place.
+// Adding after the chosen row, as every Add beside a list of rows does, greying the moves at the list's ends, numbering
+// the rows by their place, and keeping the record's own list while the typed one equals it.
 public sealed class ListOrderTests
 {
     [Fact]
@@ -66,5 +66,25 @@ public sealed class ListOrderTests
         ListOrder.Renumber(rows, (row, place) => places.Add((row, place)));
 
         Assert.Equal([("first", 0), ("second", 1), ("third", 2)], places);
+    }
+
+    [Fact]
+    public void KeptIfEqual_SameRowsInOrder_KeepsTheSourceList()
+    {
+        string[] source = ["first", "second"];
+
+        var kept = ListOrder.KeptIfEqual(["first", "second"], source);
+
+        Assert.Same(source, kept);
+    }
+
+    [Fact]
+    public void KeptIfEqual_RowsReordered_GivesTheTypedList()
+    {
+        string[] typed = ["second", "first"];
+
+        var kept = ListOrder.KeptIfEqual(typed, ["first", "second"]);
+
+        Assert.Same(typed, kept);
     }
 }

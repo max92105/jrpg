@@ -3,8 +3,8 @@ using System.Collections.ObjectModel;
 namespace Jrpg.Editor.Events;
 
 /// <summary>
-/// Adding, reordering and removing in the editor's lists, as their Add, Up, Down and Remove buttons do, and numbering
-/// their rows after each change.
+/// Adding, reordering and removing in the editor's lists, as their Add, Up, Down and Remove buttons do, numbering their
+/// rows after each change, and writing a list back over the record it came from.
 /// </summary>
 internal static class ListOrder
 {
@@ -55,4 +55,11 @@ internal static class ListOrder
         items.RemoveAt(index);
         return items.Count == 0 ? null : items[Math.Min(index, items.Count - 1)];
     }
+
+    /// <summary>
+    /// The record's own list while the list as typed equals it in order, else the typed one: a record compares its
+    /// lists by reference, so an untouched record still equals the one it came from (decision 1014).
+    /// </summary>
+    public static IReadOnlyList<T> KeptIfEqual<T>(IReadOnlyList<T> typed, IReadOnlyList<T> source) =>
+        typed.SequenceEqual(source) ? source : typed;
 }

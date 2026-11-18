@@ -16,7 +16,9 @@ namespace Jrpg.Editor.NewGame;
 internal sealed partial class NewGameViewModel
 {
     /// <summary>
-    /// The members the leader screen offers, in its order; a member the draft lacks is shown as missing.
+    /// The members the leader screen offers, in its order; a member the draft lacks is shown as missing. The rows
+    /// compare by value (<see cref="RecordChoice"/> is a record), so the moves' <c>IndexOf</c> finds a row by its
+    /// member: safe, since the loader refuses a repeated leader and the add box leaves the listed members out.
     /// </summary>
     public ObservableCollection<RecordChoice> Leaders { get; }
 
@@ -34,29 +36,19 @@ internal sealed partial class NewGameViewModel
     /// once (Data's rule).
     /// </summary>
     public IReadOnlyList<RecordChoice> LeadersToAdd =>
-    [
-        .. _content.PartyMembers.Values
-            .Where(member => !Leaders.Any(leader => leader.Id == member.Id))
-            .OrderBy(member => member.Name, StringComparer.Ordinal)
-            .ThenBy(member => member.Id, StringComparer.Ordinal)
-            .Select(member => new RecordChoice(member.Id, member.Name)),
-    ];
+        RecordChoice.ByName(
+            _content.PartyMembers.Values
+                .Where(member => !Leaders.Any(leader => leader.Id == member.Id))
+                .Select(member => new RecordChoice(member.Id, member.Name)));
 
     private static ObservableCollection<RecordChoice> LeadersOf(NewGameDefinition newGame, ContentCatalog content) =>
     [
-        .. newGame.LeaderChoices.Select(choice =>
-            content.PartyMembers.TryGetValue(choice.MemberId, out var member)
-                ? new RecordChoice(member.Id, member.Name)
-                : RecordChoice.Missing(choice.MemberId)),
+        .. newGame.LeaderChoices.Select(
+            choice => RecordChoice.Of(choice.MemberId, content.PartyMembers.GetValueOrDefault(choice.MemberId)?.Name)),
     ];
 
-    // The record's own list while the rows match it in order, so an untouched new game equals its record (the record
-    // compares its lists by reference, decision 1014's rule for a class's skills).
-    private IReadOnlyList<LeaderChoice> LeadersAsTyped()
-    {
-        IReadOnlyList<LeaderChoice> typed = [.. Leaders.Select(leader => new LeaderChoice { MemberId = leader.Id })];
-        return typed.SequenceEqual(_source.LeaderChoices) ? _source.LeaderChoices : typed;
-    }
+    private IReadOnlyList<LeaderChoice> LeadersAsTyped() =>
+        ListOrder.KeptIfEqual([.. Leaders.Select(leader => new LeaderChoice { MemberId = leader.Id })], _source.LeaderChoices);
 
     /// <summary>Puts the add box's member after the chosen row (last when none), and chooses it.</summary>
     [RelayCommand(CanExecute = nameof(HasLeaderToAdd))]

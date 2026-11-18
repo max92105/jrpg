@@ -386,3 +386,5 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   `SkillCosts`, `SkillGrants`, `ItemEquipmentViewModel`, `UniqueAffixesViewModel`, `TacticListViewModel`,
   `EnemyTacticsViewModel`, `CinematicViewModel`): `ListItemWatch.WatchRowsOf` fits each when next touched; then fix
   `ListItemWatch`'s summary, which names the quests' stages and drop tables' entries as users (NG2b review).
+- `NewGame/StartingItemRow` and `Party/ClassSkillRow` share a shape (a `RecordChoice`, a typed whole number, `New`, a
+  throwing `ToEntry`): share it when a third row of this kind appears (classes and progression plan, NG2c review).

@@ -9,9 +9,9 @@ using Jrpg.Editor.Workspaces;
 namespace Jrpg.Editor.NewGame;
 
 /// <summary>
-/// The new game as the New game page types it (decision 968): its leader choices (the <c>.Leaders</c> partial), its
-/// starting gold, its start's map, cell position and facing, and the player's field sprite, written over the record it
-/// came from, so an untouched new game equals it; its starting items stay the record's until NG2c types them.
+/// The new game as the New game page types it (decision 968): its leader choices and starting items (the
+/// <c>.Leaders</c> and <c>.StartingItems</c> partials), its starting gold, its start's map, cell position and facing,
+/// and the player's field sprite, written over the record it came from, so an untouched new game equals it.
 /// <see cref="Problem"/> is the typed boxes first, then Data's message (decision 969). One record: its host has nothing
 /// to choose (<see cref="IEditedCatalog"/>).
 /// </summary>
@@ -21,7 +21,7 @@ internal sealed partial class NewGameViewModel : ObservableObject, IEditedCatalo
     private readonly ContentCatalog _content;
 
     /// <param name="content">
-    /// The draft as it is: the new game edited and the members, maps and field sprites it names.
+    /// The draft as it is: the new game edited and the members, items, maps and field sprites it names.
     /// </param>
     public NewGameViewModel(ContentCatalog content)
     {
@@ -30,6 +30,9 @@ internal sealed partial class NewGameViewModel : ObservableObject, IEditedCatalo
         Leaders = LeadersOf(_source, content);
         SelectedLeader = Leaders.FirstOrDefault();
         Leaders.CollectionChanged += (_, _) => OnLeadersChanged();
+        StartingItems = StartingItemRowsOf(_source, content);
+        SelectedItem = StartingItems.FirstOrDefault();
+        WatchStartingItemRows();
         var start = _source.StartLocation;
         GoldText = TypedNumber.Text(_source.StartingGold);
         MapId = start.MapId;
@@ -91,9 +94,10 @@ internal sealed partial class NewGameViewModel : ObservableObject, IEditedCatalo
     /// <summary>Always null: the new game is one record, so there is nothing to choose.</summary>
     public string? ChosenKey => null;
 
-    // In the page's order: the gold above the start.
+    // In the page's order: the starting items above the gold, the gold above the start.
     private string? BoxProblem =>
-        TypedNumber.ProblemOf("Starting gold", GoldText)
+        StartingItemsProblem
+        ?? TypedNumber.ProblemOf("Starting gold", GoldText)
         ?? TypedDecimal.ProblemOf("Start x", XText)
         ?? TypedDecimal.ProblemOf("Start y", YText);
 
@@ -112,6 +116,7 @@ internal sealed partial class NewGameViewModel : ObservableObject, IEditedCatalo
         _source with
         {
             LeaderChoices = LeadersAsTyped(),
+            StartingItems = StartingItemsAsTyped(),
             StartingGold = TypedNumber.Parse(GoldText)!.Value,
             StartLocation = new MapLocation(
                 MapId,

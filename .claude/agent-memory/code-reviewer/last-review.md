@@ -5,13 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-classes-and-progression, slice PM4 (first part: the Party members page, boxes and art marks; pictures
-and imports split to PM4b). 2026-11-17. Round 1. Verdict: Ready to commit.
+Plan 2026-11-15-classes-and-progression, slice PM4b (the Party members page's pictures and imports). 2026-11-17.
+Round 2. Verdict: Ready to commit.
 
-- PM3 Follow-up (Remove of a member applied earlier): fixed (restart shows it saved; editing test
-  Start_AfterApplyingAnAddedMember_CannotRemoveIt).
-- PM3 Follow-up (CombinedHistory at 291 lines): dropped, backlog.md lines 365-366 record it.
-- Suggestion, open: "Not in the art folders: ..." sentence built twice (EnemyCatalogPage.xaml.cs:109,
-  PartyMemberCatalogViewModel.cs:78); one BattleArtChoices method could build it.
-- Follow-up, open: PM4b's TakeImport must raise MissingArtNote after ArtChoices.Refresh; picking a name the box already
-  holds raises no Changed, so the note stays stale.
+- PM4 Suggestion (missing-art sentence built twice): fixed (BattleArtChoices.MissingNoteOf).
+- PM4 Follow-up (TakeImport raising MissingArtNote): fixed.
+- Critical (SpriteImageFile.Decode threw on a PNG cut after its header): fixed (StreamSource + OnLoad, decoder
+  refusals caught to null, SpriteImageFileTests x3).
+- Follow-up (header-only check at import): dropped, backlog.md records it.
+- Follow-up, open: StripFromCellsWindow.xaml.cs:68-69 catch keeps NotSupported/FileFormat/COM clauses Read no longer
+  throws; a corrupt sheet now reads "not a PNG image.".
+- Follow-up, open: TileImages.LoadImage (Tiles/TileImages.cs:180) turns a header-readable but corrupt tilesheet into
+  InvalidOperationException "found readable" (was COMException): still the error box, now with a "bug" message.

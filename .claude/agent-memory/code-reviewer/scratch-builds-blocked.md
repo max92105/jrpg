@@ -76,3 +76,7 @@ value never picked; a switch of one DataContext feeding both ItemsSource and Tex
 an ancestor's DataContext and Text from an inner one (class vs chosen resource) clears on a class switch. Flag any
 editable combo whose list can lose the typed value. Fix that held (CL9d, decision 1017): choices on the same
 DataContext as Text, always holding the typed value (`ResourceIdChoices.Of`).
+
+WPF decode fact (probed 2026-11-17, PM4b review, PowerShell -STA BitmapImage OnLoad): a PNG cut to 60 or 200 bytes
+passes `PngSize.IsReadable` (24-byte header) and throws COMException 0x88982F07 in `EndInit`; the failed decode keeps
+the file locked. So a header check alone never guards a decode: look for the catch.

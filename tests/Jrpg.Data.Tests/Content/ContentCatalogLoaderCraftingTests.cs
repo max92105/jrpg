@@ -1,3 +1,4 @@
+using System.Text.Json.Nodes;
 using Jrpg.Data.Content;
 
 namespace Jrpg.Data.Tests.Content;
@@ -25,8 +26,9 @@ public sealed class ContentCatalogLoaderCraftingTests : IDisposable
     public void Load_SalvageYieldsAPotion_ThrowsNamingRulesJson()
     {
         var rulesPath = Path.Combine(_contentRoot, "rules.json");
-        var rules = File.ReadAllText(rulesPath);
-        File.WriteAllText(rulesPath, rules.Replace("\"common\": [{ \"itemId\": \"scrap\"", "\"common\": [{ \"itemId\": \"potion\"", StringComparison.Ordinal));
+        var rules = JsonNode.Parse(File.ReadAllText(rulesPath))!;
+        rules["crafting"]!["salvage"]!["common"]![0]!["itemId"] = "potion";
+        File.WriteAllText(rulesPath, rules.ToJsonString());
 
         var exception = Assert.Throws<ContentValidationException>(() => ContentCatalogLoader.Load(_contentRoot));
 

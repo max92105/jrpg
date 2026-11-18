@@ -1,39 +1,127 @@
 {
-  "party": { "maxActiveMembers": 5 },
-  "stats": {
-    "hpPercentPer100Constitution": 100,
-    "baseAccuracy": 90, "baseCritChance": 5, "baseDodge": 0, "baseCrowdControlResistance": 0,
-    "damagePercentPer100Power": 100, "critDamagePercentPer100Power": 50,
-    "critChancePer100Agility": 25, "dodgePer100Agility": 20,
-    "physicalResistancePer100Constitution": 25, "magicalResistancePer100Will": 25,
-    "statusPercentPer100Intelligence": 100, "intelligencePerExtraStatusTurn": 25,
-    "unarmedDamage": 18, "unarmedDamageType": "blunt"
+  "party": {
+    "maxActiveMembers": 5
   },
-  "exploration": { "walkSpeed": 3.0, "playerRadius": 0.1, "interactReach": 0.6 },
   "experience": {
     "experienceToNextLevel": [
-      100, 120, 144, 172, 206, 247, 296, 355, 426, 511,
-      613, 735, 882, 1058, 1269, 1522, 1826, 2191, 2629, 3154
+      100,
+      120,
+      144,
+      172,
+      206,
+      247,
+      296,
+      355,
+      426,
+      511,
+      613,
+      735,
+      882,
+      1058,
+      1269,
+      1522,
+      1826,
+      2191,
+      2629,
+      3154
     ]
+  },
+  "exploration": {
+    "walkSpeed": 3,
+    "playerRadius": 0.1,
+    "interactReach": 0.6
+  },
+  "stats": {
+    "hpPercentPer100Constitution": 100,
+    "baseAccuracy": 90,
+    "baseCritChance": 5,
+    "baseDodge": 0,
+    "baseCrowdControlResistance": 0,
+    "damagePercentPer100Power": 100,
+    "critDamagePercentPer100Power": 50,
+    "critChancePer100Agility": 25,
+    "dodgePer100Agility": 20,
+    "physicalResistancePer100Constitution": 25,
+    "magicalResistancePer100Will": 25,
+    "statusPercentPer100Intelligence": 100,
+    "intelligencePerExtraStatusTurn": 25,
+    "unarmedDamage": 18,
+    "unarmedDamageType": "blunt"
   },
   "loot": {
     "rarities": {
-      "common": { "weight": 650, "minAffixes": 0, "maxAffixes": 0 },
-      "magic": { "weight": 280, "minAffixes": 1, "maxAffixes": 1 },
-      "rare": { "weight": 70, "minAffixes": 2, "maxAffixes": 3 }
+      "common": {
+        "weight": 650,
+        "minAffixes": 0,
+        "maxAffixes": 0
+      },
+      "magic": {
+        "weight": 280,
+        "minAffixes": 1,
+        "maxAffixes": 1
+      },
+      "rare": {
+        "weight": 70,
+        "minAffixes": 2,
+        "maxAffixes": 3
+      }
     }
   },
-  "trade": { "sellPercent": 50 },
   "crafting": {
     "salvage": {
-      "common": [{ "itemId": "scrap", "quantity": 1 }],
-      "magic": [{ "itemId": "scrap", "quantity": 2 }],
-      "rare": [{ "itemId": "scrap", "quantity": 2 }, { "itemId": "essence", "quantity": 1 }]
+      "common": [
+        {
+          "itemId": "scrap",
+          "quantity": 1
+        }
+      ],
+      "magic": [
+        {
+          "itemId": "scrap",
+          "quantity": 2
+        }
+      ],
+      "rare": [
+        {
+          "itemId": "scrap",
+          "quantity": 2
+        },
+        {
+          "itemId": "essence",
+          "quantity": 1
+        }
+      ]
     },
     "upgradeCosts": {
-      "magic": [{ "itemId": "scrap", "quantity": 3 }],
-      "rare": [{ "itemId": "scrap", "quantity": 5 }, { "itemId": "essence", "quantity": 1 }]
+      "magic": [
+        {
+          "itemId": "scrap",
+          "quantity": 3
+        }
+      ],
+      "rare": [
+        {
+          "itemId": "scrap",
+          "quantity": 5
+        },
+        {
+          "itemId": "essence",
+          "quantity": 1
+        }
+      ]
     },
-    "rerollCost": [{ "itemId": "scrap", "quantity": 2 }, { "itemId": "essence", "quantity": 1 }]
+    "rerollCost": [
+      {
+        "itemId": "scrap",
+        "quantity": 2
+      },
+      {
+        "itemId": "essence",
+        "quantity": 1
+      }
+    ]
+  },
+  "trade": {
+    "sellPercent": 50
   }
 }

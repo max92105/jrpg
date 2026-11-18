@@ -84,8 +84,8 @@ internal sealed partial class BalanceTableViewModel : ObservableObject
 
     private int MaxLevel => _content.Rules.Experience.MaxLevel;
 
-    private string? LevelProblem(int box, string text) =>
-        TypedLevel(text) is null ? $"Level {box} must be a whole number from {LowestLevel} to {MaxLevel}." : null;
+    private string? LevelProblem(int boxNumber, string text) =>
+        TypedLevel(text) is null ? $"Level {boxNumber} must be a whole number from {LowestLevel} to {MaxLevel}." : null;
 
     /// <returns>The three levels in the boxes' order; null while one can't be read.</returns>
     private int[]? TypedLevels()

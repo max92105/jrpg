@@ -5,14 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-skill-and-status-editors, slice BT1b (class skill rows: Core `EffectAmounts.ChangesHp`, Editor
-`Balance/ClassSkillRows`, `SkillLines`, `SkillBalanceRow`; the boxes split to BT1c).
-2026-11-17. Round 1. Verdict: Ready to commit.
+Plan 2026-11-15-skill-and-status-editors, slice BT1c (Editor `Balance/BalanceTableViewModel`: three level boxes, a
+damage modifier box -99..10000 % (decision 1021), `BoxesProblem`, `ClassSkillRows` computed on read).
+2026-11-18. Round 1. Verdict: Ready to commit.
 
-- Warning, open: `Balance/ClassSkillRows` returns `SkillBalanceRow`s while `Party/ClassSkillRow` (Classes page's typed
-  row) exists in the same assembly; proposed `ClassSkillBalanceRows` (BT2's planned `EnemySkillRows`/`TierRows` follow).
-- Suggestion, open: `SkillLines.AmountText` formats the long total by interpolation (current culture) beside
-  `TypedNumber.Text` (invariant) for the per-hit; non-negative (clamped 0..MaxPower), so harmless today.
+- Carried from BT1b, fixed: the rows type renamed `ClassSkillBalanceRows`; `SkillLines.AmountText` total now invariant.
+- Suggestion, open: `LevelProblem(int box, ...)`: `box` is a 1-based position, `boxNumber` reads better.
+- Suggestion, open: test casts the view model to `INotifyPropertyChanged` though `ObservableObject.PropertyChanged`
+  is public.
 
-Checked by hand: SkillLinesTests' 17 (sum 100 - 250) differs from replacing (15) and ignoring the table (22);
-Nova's levels 4, 5, 6 give "-", 48, 54 (both sides of the bound); id-order test has the mage inserted first.
+Checked: ClassSkillRows on read matches `Party/ClassViewModel.LevelRows`; content has ~5 classes and 29 skills, one
+build is a few dozen `ClassBattleStats.At` + `EffectAmounts.PerHit` calls. Core's `TieredAmount`/`ModifiedFlat` work in
+a long and clamp to MaxPower, so 100000 permille is safe; the int add in `SkillLines.AmountText` is the only int step.

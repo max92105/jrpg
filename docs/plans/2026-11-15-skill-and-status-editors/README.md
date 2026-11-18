@@ -156,7 +156,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
   [slices/BT1.md](slices/BT1.md)
 - [x] **BT1b. The table's class skill rows** (Editor + one Core reading, about 300 lines; split at its start) →
   [slices/BT1b.md](slices/BT1b.md)
-- [ ] **BT1c. The table's level and modifier boxes** (Editor, about 190 lines) → [slices/BT1c.md](slices/BT1c.md)
+- [x] **BT1c. The table's level and modifier boxes** (Editor, about 190 lines) → [slices/BT1c.md](slices/BT1c.md)
 - [ ] **BT2. Enemies' skills, classes and enemies, and the tier sheet rows** (Editor, about 180 lines) →
   [slices/BT2.md](slices/BT2.md)
 - [ ] **BT3. Database > Balance table...: the read-only page** (Editor + script, about 170 lines) →
@@ -288,6 +288,10 @@ Plan-wide:
 - **1001.** (taken at FX2: `DamageFormula` is internal to Core) The Effects page's "At Power 10" line reads a third
   public reading, brought forward from the balance table's: `TieredEffect.AmountAt(int power)`, one hit before
   modifiers and target through `DamageFormula.TieredAmount`; BT2's tier sheet adds the modifiers when it needs them.
+- **1021.** (taken at BT1c) The balance table's damage modifier box takes a whole percent from -99 to 10000
+  (`BalanceTableViewModel.MaxModifierPercent`): -100 % cancels every amount, which tells nothing about a skill;
+  10000 %, a hundredfold, is many times the developer's sheet's 473 %, and its permille (x 10), with a member's gear
+  and status modifiers added, stays far within an int.
 
 ## Defaults to confirm
 Taken while the developer was away, each his to overturn:

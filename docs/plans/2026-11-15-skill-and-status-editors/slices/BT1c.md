@@ -35,3 +35,7 @@ and the class skill rows read through them, rebuilt on every typed change and em
 
 ## Verify by hand
 None: the page comes in BT3.
+- **Done, with deviations:** `BalanceTableViewModel` (105 lines; one class, no partial yet: BT2 splits it if its rows
+  pass the cap); the modifier's top is `MaxModifierPercent` 10000 (decision 1021); `ClassSkillRows` is computed from
+  the boxes on each read, raised with `BoxesProblem` by each box. Tests 164 lines (28 cases): the refusals as
+  theories, a word or an empty box beside 0 and max + 1, and `int.MaxValue` for the modifier.

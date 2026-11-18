@@ -5,15 +5,15 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-classes-and-progression, slice PM4b (the Party members page's pictures and imports). 2026-11-17.
-Round 2. Verdict: Ready to commit.
+Plan 2026-11-15-classes-and-progression, slice NG1 (new-game.json joins the catalogs' write and stamps). 2026-11-17.
+Round 1. Verdict: Ready to commit. No Critical, no Warning.
 
-- PM4 Suggestion (missing-art sentence built twice): fixed (BattleArtChoices.MissingNoteOf).
-- PM4 Follow-up (TakeImport raising MissingArtNote): fixed.
-- Critical (SpriteImageFile.Decode threw on a PNG cut after its header): fixed (StreamSource + OnLoad, decoder
-  refusals caught to null, SpriteImageFileTests x3).
-- Follow-up (header-only check at import): dropped, backlog.md records it.
-- Follow-up, open: StripFromCellsWindow.xaml.cs:68-69 catch keeps NotSupported/FileFormat/COM clauses Read no longer
-  throws; a corrupt sheet now reads "not a PNG image.".
-- Follow-up, open: TileImages.LoadImage (Tiles/TileImages.cs:180) turns a header-readable but corrupt tilesheet into
-  InvalidOperationException "found readable" (was COMException): still the error box, now with a "bug" message.
+- Suggestion, open: no Save all (WriteMapCatalogs) test with a new-game sprite lacking a record; only WriteMaps and
+  OfNewGame pin that half of decision 1018.
+- Suggestion, open: ContentWriter.CheckMaps summary and CheckedMapWrites comment still say "the new game's start"; the
+  check is now the whole new game, sprite record included.
+- Follow-up, open: CheckItems summary (CatalogProblems.Items.cs:29-31) says "starting items"; decision 1018 makes its
+  whole-new-game validator call load-bearing for Save all.
+- Follow-up, open: RenameMap writes new-game.json with no IsEditedOnDisk check (pre-existing), now renewing the stamp.
+- Follow-up, open: NewGameReferences + NewGameValidator.Validate in the loader, CheckItems and CheckNewGame.
+- PM4b follow-ups (StripFromCellsWindow catch, TileImages "found readable"): dropped, backlog.md lists both.

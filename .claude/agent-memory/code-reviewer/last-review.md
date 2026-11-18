@@ -5,17 +5,18 @@ metadata:
   type: project
 ---
 
-Plan 2026-11-15-skill-and-status-editors, slice BT2b: Editor `Balance/TierBalanceRows`, `TierBalanceRow`, the three
-Power boxes on `BalanceTableViewModel` (0 to `MaxTypedPower` 10000, decision 1022). 2026-11-18. Round 1. Verdict: Fix
-the Criticals, then commit.
+Plan 2026-11-15-skill-and-status-editors, slice BT3 (the plan's last): Editor `Balance/BalanceTablePage`,
+`BalanceTableEditingViewModel`, `BalanceTableViewModel : IEditedCatalog`, registration in Shell, menu entry, smoke list.
+2026-11-18. Round 1. Verdict: Ready to commit.
 
-- Carried from BT2, fixed: `EnemyDefinition.NamedSkillIds` is in Core, Data's validator and `NamesSkill` read it.
-- Carried from BT2, fixed: `Typed()` is now `ReadBoxes()`.
-- Critical, open: `BalanceTableViewModel.AllRead` reads as a bool predicate but returns `int[]?`; rename `ReadAll`.
-- Suggestion, open: the "damage, fire" kind spelling is in `TierChoice.Line` and `TierBalanceRows.KindLineOf`; share it
-  on a third copy.
-- Suggestion, open: merge the two Power refusal theories into one `BoxesProblem_PowerRefused_...` (test file at 285).
-- Suggestion, open: `MaxTypedPower` comment's "past its 1,000,000 reads as that clamp" is vague.
+- Carried from BT2b, fixed: `AllRead` is now `ReadAll`.
+- Carried from BT2b, fixed: the Power refusal theories are merged into `BoxesProblem_PowerRefused_...`.
+- Carried from BT2b, fixed: `MaxTypedPower` comment now says an amount past 1,000,000 shows as 1,000,000.
+- Carried from BT2b, dropped: "damage, fire" spelling share was a third-copy-only suggestion; only one copy in Balance.
+- Suggestion, open: `BalanceTablePage.xaml` at 289 lines; the next tab or column moves each tab into its own UserControl.
+- Suggestion, open: `ChosenKey_IsNull` lacks a scenario (`ChosenKey_NewTable_IsNull`).
+- Follow-up: backlog.md line 197 ("the first balancing tool worth building is a read-only ... table") is now built.
 
-Checked: amounts 6/9/120, 11, 30 match `DamageFormula.TieredAmount` (long product, clamp 1,000,000); Data's
-`EnemyCatalogValidator.MostPower` is 10_000; Data limits tier kinds to damage/restoreHp, so `PerHit` can't throw.
+Checked: every row-template binding matches its record (SkillBalanceRow, EnemySkillBalanceRow, ClassBalanceRow,
+EnemyBalanceRow, TierBalanceRow, IsHeal on all three AmountCell users); indexed lists are collection expressions
+(IList, same as the Skills tab the smoke run showed). Workspace has no dirty flag: Apply is a lit no-op (deviation noted).

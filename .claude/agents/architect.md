@@ -20,14 +20,37 @@ Turn a feature request into a plan that a developer can implement one slice at a
 1. Read the existing code that the feature touches. Name the actual types and files.
 2. Identify which project each piece belongs to (Core / Data / Game / Editor). Anything with game rules goes in Core.
 3. Split the feature into vertical slices. Each slice: one observable behavior, buildable, testable, under ~300 lines of change including tests. A Core change goes in the slice that first uses it, not in an up-front layer.
-   - For Game screens, plan two slices up front: behavior with a plain draw, then the look (timing, shapes). Budget tests at about the code's size, plus the existing tests the change will break.
-   - For Editor slices, aim at about 200 lines, not 300 (the editor plan split 8 slices at the size check): count tests as about as many lines as the code, and plan a new window or panel as two slices up front (its rules and catalog step, then the window).
+   - Write each slice's estimate as `N code + M tests`. Count tests at about twice the code for view-model and rule
+     slices, plus the existing tests the change will break (the editor push's slices ran 1.5-3x their estimate: BG1,
+     EC2, PM2, XP4, EB4, EB9, SK3-AN7). A slice over 200 lines names its split point and what the second part holds; a
+     slice whose code alone nears 200 is two slices.
+   - For Game screens, plan two slices up front: behavior with a plain draw, then the look (timing, shapes).
+   - For Editor slices, aim at about 200 lines, not 300 (the editor plan split 8 slices at the size check), and plan a
+     new window or panel as two slices up front (its rules and catalog step, then the window).
+   - Grep each pattern a slice copies; at the third copy the slice names the extraction and budgets it (about 80
+     lines) (BG7c, BG8b, IU9, IU11, NG2c).
+   - A slice depending on another plan's slice that hasn't landed names its fallback at planning time (encounters
+     BG1-EC5, items IU8).
    - A new event step kind or saved list touches every switch and check over kinds along the chain (Data's null-entry check, Core's `ApplyAndCheckWait`, the editor's `ToStep`): name each one's complexity room in the slice, not just Core's (the quests plan budgeted one of three, and E1 and SV had to extract a helper).
-   - The editor's `HandleObjectKey`, `HandlePaintButton`, `HandleToolKey` and `ShowSelected` sit at the CA1502 limit: a slice adding a key or a branch names the helper it extracts (the map editing flows' OM1, SN1 and PO2 each extracted one mid-slice).
+   - A slice adding a parameter to a 4-parameter constructor names its parameter object, and one adding a branch to a
+     method at complexity 9-10 names the helper it extracts (items IU9-IU13 `ItemForms`). The editor's
+     `HandleObjectKey`, `HandlePaintButton`, `HandleToolKey` and `ShowSelected` sit at the CA1502 limit (the map editing
+     flows' OM1, SN1 and PO2 each extracted one mid-slice).
+   - An Editor or Data slice reading a Core member greps that it is public; an internal formula it needs gets a public
+     wrapper with a test, named in the slice (FX2 decision 1001, BT2b decision 1022).
+   - A new optional field on a record `ContentWriter` writes lands with its `AbsentWhen*Filter` row in the slice that
+     adds the field: the identical-bytes test fails at once (EB1, SC1). Before planning a `ContentWriter` check, grep
+     `CatalogProblems.CheckItems`: it already runs the new game's validator and the Forge's materials (decisions 863,
+     1018, 1020).
+   - A Database page's problem line is `RecordListProblem`'s (the first wrong record in list order, then Data's), never
+     the chosen record's first problem: plan its tests that way (SK3, FX2).
    - A test file a phase of three or more slices fills gets its sibling named per slice, not once it reaches 250 lines (MS2 filled `MainViewModelOpenMapsTests` to 296 and MS3 had to find a sibling).
    - Glob each file a slice calls new: an existing one is extended (in a sibling once past 250 lines), and the slice says so (SH1 called `ContentWriterShopTests` new; writing it whole deleted two tests).
 4. For each slice list: goal, files to create/change, public types/signatures, tests to write (by name), and how to verify by hand if relevant.
    - Write planned test names as `Method_Scenario_ExpectedResult` under the test class's name (`CommandMenuTests: Update_ConfirmSkills_ListsActorSkills`), as the repo's test files do.
+   - List each view model's notice, `CanExecuteChanged` and relay (`[NotifyPropertyChangedFor]`) tests by name, as
+     `.claude/rules/tests.md` asks (the plans left them out: CL2b, CL7b, EB3b, SW2). A rule every exit obeys (leave,
+     undo, redo, save, close) budgets two tests per exit (mode bar WS1-WS4).
    - A planned test names the fixture it builds (a `*Fixtures` class, or records made with `with` over the test world), never a repository record's current values: the test world is the live content (the drop table plan's DT2 and DT4 each built their own instead of the planned goblin table). Name a shared fixture file only when two or more test files use it; otherwise write "built in the test" (the cinematics plan's CM1, CG1, CG2 and CG3 each built theirs locally).
    - A slice never depends on content a hand check produces: when it needs a record (a cinematic, a table), it writes a placeholder record itself and says so in the slice (the cinematics plan's CG3 waited on CE6's hand check).
    - Every new type gets a one-line responsibility next to its name. If the line needs "and", split the type.

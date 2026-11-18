@@ -14,6 +14,7 @@ type other code will build on, add or edit its line here (the `/slice` skill doe
 - **No allocation per frame**: text is formatted and measured when state changes, never in `Draw`; textures are built once (`UiTextures`, `MapArt`, `TextureLibrary.Create`).
 - **Determinism**: randomness through `IRandom` (`SeededRandom`), time through the update's delta; the only wall clock is the save stamp in `Program`.
 - **Editor edits are commands**: `IMapEdit` applied to a `MapDraft`, recorded in `EditHistory` for undo (ADR 0012); MVVM with CommunityToolkit.
+- **No file order in the catalog**: `ContentCatalog`'s dictionaries keep no file order, so an editor list, a row builder or a problem walk orders by id (the skill and status editors plan's SK3, SK5, BT2).
 
 ## Jrpg.Core (rules, no UI)
 

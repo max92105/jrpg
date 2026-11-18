@@ -5,9 +5,9 @@ metadata:
   type: reference
 ---
 
-Probe recipes for this machine. (The Application Control policy that once blocked scratch DLLs was turned off on 2026-10-25, so scratch builds can run again.)
+Probe recipes for this machine.
 
-What does work (verified 2026-10-17, slice 3b review): an F# script in the scratchpad run with `dotnet fsi probe.fsx`, using `#r "C:/git_perso/jrpg/src/Jrpg.Core/bin/Debug/net10.0/Jrpg.Core.dll"`. Good for probing System.Text.Json/runtime behavior against real Core types without editing the repo.
+What does work (verified 2026-10-17, slice 3b review): an F# script in the scratchpad run with `dotnet fsi probe.fsx`, using `#r "c:/Git/jrpg/src/Jrpg.Core/bin/Debug/net10.0/Jrpg.Core.dll"`. Good for probing System.Text.Json/runtime behavior against real Core types without editing the repo.
 
 WPF probes (verified 2026-10-22, E13b review): `dotnet fsi` can't `#r` WindowsDesktop WPF DLLs (WindowsBase type-forward error). Windows PowerShell 5.1 with `-STA` works: Add-Type PresentationFramework, `[Reflection.Assembly]::Load("PresentationFramework.Aero2, Version=4.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35")`, then `[System.Windows.Application]::LoadComponent([Uri]"/PresentationFramework.Aero2;component/themes/aero2.normalcolor.xaml")` gives the theme dictionary; read a style's Setters, or `template.LoadContent()` and walk LogicalTreeHelper to find hardcoded brushes.
 
@@ -33,9 +33,7 @@ average's `(x + 1) * step` passing the source edge (53x100 to 192 throws).
 
 WPF binding fact (probed 2026-11-13, NP1 review, PowerShell -STA + XamlReader): a non-editable ComboBox whose bound
 SelectedItem ("" or any value) is not in its ItemsSource leaves the source alone on load and close: no null write-back.
-But (probed 2026-11-16, SK4, .NET 10 scratch project) on a DataContext switch to a value not in the list the box keeps
-showing the previous item (blank only if the previous was blank or on first load): flag shared boxes over folder
-choices whose records may name a missing file; fix by appending the missing names to the choices.
+A DataContext switch to a value missing from the list (SK4): `.claude/rules/editor.md`'s combo-box rule.
 A nullable-enum SelectedItem set to null (not in the list, per-item enum arrays) shows blank and writes nothing back
 on switches or close, nor when its panel's DataContext binds to null and back (IU10, 2026-11-16); a SelectedValuePath box over a shared list writes nothing back on switches (SK6, 2026-11-16).
 A ListBox with ItemsSource="{Binding Sel.Items}" SelectedItem="{Binding Sel.Chosen}" (EB7, 2026-11-16) keeps each
@@ -70,12 +68,7 @@ an art-src script without its last calls (sed) plus Write-Host lines prints its 
 WPF lifetime fact (probed 2026-11-16, WD5 review, PowerShell -STA): a modal Window closed by DialogResult raises
 Closed, ShowDialog returns, then Unloaded reaches its content's UserControl at the next dispatcher pump; so
 Loaded/Unloaded-paired work stops a few frames after the opener's apply runs, not before it.
-Editable ComboBox (probed 2026-11-17, CL9d, .NET 10): once its Text matched an item (loaded or picked), that item
-leaving ItemsSource (list replaced) clears Text and writes "" to the source; `IsTextSearchEnabled=False` only saves a
-value never picked; a switch of one DataContext feeding both ItemsSource and Text clears nothing, but ItemsSource from
-an ancestor's DataContext and Text from an inner one (class vs chosen resource) clears on a class switch. Flag any
-editable combo whose list can lose the typed value. Fix that held (CL9d, decision 1017): choices on the same
-DataContext as Text, always holding the typed value (`ResourceIdChoices.Of`).
+Editable ComboBox losing its typed value (CL9d, decision 1017): `.claude/rules/editor.md`'s combo-box rule.
 
 WPF decode fact (probed 2026-11-17, PM4b review, PowerShell -STA BitmapImage OnLoad): a PNG cut to 60 or 200 bytes
 passes `PngSize.IsReadable` (24-byte header) and throws COMException 0x88982F07 in `EndInit`; the failed decode keeps

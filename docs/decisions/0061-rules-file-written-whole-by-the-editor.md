@@ -4,7 +4,7 @@ Status: Accepted (default taken while the developer was away; his to overturn)
 Date: 2026-11-17
 
 ## Context
-The classes and progression plan (`docs/plans/2026-11-15-classes-and-progression/`) gives the experience table a page
+The classes and progression plan (`docs/plans/done/2026-11-15-classes-and-progression/`) gives the experience table a page
 of its own in its phase XP (the Experience page, XP2-XP4). The table is `rules.json` `experience`, one of seven
 sections beside party, exploration, stats, loot, crafting and trade, and the file is laid out by hand today (about 40
 lines). For the page to save, the editor has to write that file, and ADR 0011 lets it write content only through

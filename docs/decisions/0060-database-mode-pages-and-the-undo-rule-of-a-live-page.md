@@ -5,7 +5,7 @@ Date: 2026-11-17
 
 ## Context
 The editor is more than a map editor now: the developer asked for modes and for more screen space. The mode bar plan
-(`docs/plans/2026-11-15-mode-bar/`) gives the main window two modes, World (today's map editor) and Database, where a
+(`docs/plans/done/2026-11-15-mode-bar/`) gives the main window two modes, World (today's map editor) and Database, where a
 list of catalog pages sits on the left and the chosen page fills the rest. Until then every catalog editor was a
 modal window, then a page inside the modal `CatalogDialog` (stages 1 and 2), and ADR 0045's rules leaned on that:
 a window applies its whole session as one `CatalogDraft` step, so nothing can change the draft under it and it needs
@@ -94,7 +94,7 @@ Option A (decisions 918-924, 928, 931 and 939; options B to E set aside by decis
 
 ## Consequences
 - **Easier:** a catalog fills the main window with no window to open or close; a new catalog editor is a page written
-  once ([page-recipe.md](../plans/2026-11-15-mode-bar/page-recipe.md)), its view model unchanged by the mode bar.
+  once ([page-recipe.md](../plans/done/2026-11-15-mode-bar/page-recipe.md)), its view model unchanged by the mode bar.
 - **The invariant to keep:** in Database mode only the shown page holds unapplied edits, and nothing changes the draft
   while it holds them. Any new entry point that changes the draft in Database mode (a menu entry, a key, a dialog, a
   page command reaching outside its session) calls `TryApplyShown` first, with its test; one that skips it drops the

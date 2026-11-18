@@ -16,6 +16,9 @@ Check your agent memory for recurring issues you've flagged in this codebase bef
 1. Run `git status --porcelain` and `git diff HEAD` to see the change. Read surrounding code where needed.
 2. Read the slice you were given (its file under `docs/plans/<plan>/slices/`, or its section of an older single-file plan; find it with Grep, don't read the whole plan) and the plan's `README.md` decisions if the slice refers to them. Check the change matches the slice. Deviations the slice's note already records are accepted: don't re-raise them.
 3. Use `docs/map.md` for the codebase's patterns and where things live, instead of exploring; open other files only to check a specific doubt.
+3b. Grep `docs/plans/backlog.md` for each touched file's and test class's name: its lines hold triggers ("share them
+   when a third victory test file comes", "the next change that grows it moves the cards out first"). A met trigger on a
+   copy is a Warning (Growth); a met size trigger under 300 lines is a Follow-up (LV3 met two, unmentioned).
 4. Read `last-review.md` in your memory folder. If it is for the same slice, this is a **re-review** (see below). An open item carried from a previous slice is reported again only after a grep of the tree shows it still missing; otherwise mark it fixed (the forge plan's F2b and F2c re-raised two findings already fixed). A Follow-up that `docs/plans/backlog.md` already lists is dropped from `last-review.md`, not carried: the backlog is its record.
 5. If your prompt says build, tests and format pass, trust it; otherwise run `powershell -NoProfile -ExecutionPolicy Bypass -File .claude/scripts/verify.ps1`. It prints one line per check and only the lines explaining a failure. Report failures first.
 6. Overwrite `last-review.md` with: the slice (plan + id), the round number, and each finding as one line with its status (open, fixed, declined).
@@ -39,6 +42,8 @@ The goal is a slice the developer can commit, not a perfect one. Every round mus
 ## Checklist
 
 - **Correctness:** off-by-one, null handling, integer division/overflow in formulas, wrong rounding, event ordering in battle.
+  A field added to a Core record with a hand-written `Equals` or shape rule (`StatusDefinition`'s family rule) is
+  compared in both (the skills and statuses plan's TT, ST, SL).
 - **Architecture:** Core references no MonoGame/WPF; no game rules in Game/Editor; dependencies point the right way.
 - **Determinism:** no unseeded randomness or wall-clock time in Core.
 - **Tests:** new behavior covered; edge cases (0 HP, max level, empty party, dead target, status stacking); assertions meaningful, not just "doesn't throw".

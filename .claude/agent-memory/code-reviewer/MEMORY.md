@@ -1,10 +1,5 @@
-- [Records with lists equality](records-with-lists-equality.md) — records with list members compare by reference; combined-field messages; tautological tests
 - [Scratch builds blocked](scratch-builds-blocked.md) — probe recipes: fsi for Core and MonoGame IL; PowerShell -STA or scratch WPF project; System.Drawing GetPixel for PNGs
-- [Tautological tests](tautological-tests.md) — same-seed-twice, count==count, File.Exists-only, untested `<=` boundary; pin golden values
-- [Namespace cycles](namespace-cycles.md) — grep reverse usings for each new Core using; Content is the hub (Content<->Session seen in slice 8)
+- [Tautological tests](tautological-tests.md) — same-seed-twice, count==count, File.Exists-only; pin golden values
 - [Stale comments](stale-size-comments.md) — sizing, moved drawing, a newly conditional call or a renamed file leave old sizes/places/names; grep old wording
 - [Last review](last-review.md) — slice, round and finding status of the latest review; read first to apply re-review rules
-- [Detached comments](detached-comments.md) — a member inserted under, or removed from under, a comment leaves it describing the wrong code
-- [Lax test JSON readers](lax-test-json-readers.md) — test-only manifest readers skip required/nullable checks; ContentJsonOptions.Strict exists
 - [Dead-member listing gap](dead-member-listing-gap.md) — bare-name dead-code greps miss members sharing a name; type-scoped recheck recipe
-- [Backlog triggers](backlog-triggers.md) — grep backlog.md for touched files: "when the third file comes" / "next growth splits" lines

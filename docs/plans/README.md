@@ -16,17 +16,17 @@ Older plans are single files with the same sections.
 | Plan | Status |
 |---|---|
 | [2026-11-15-editor-push](2026-11-15-editor-push/README.md) | approved (the roadmap of twelve sub-plans, and sub-plan 1: the editor's safety net, NET1; NET2 optional) |
-| [2026-11-15-skill-and-status-editors](2026-11-15-skill-and-status-editors/README.md) | retro pending (the editor push's row 7) |
-| [2026-11-15-items-uniques-affixes](2026-11-15-items-uniques-affixes/README.md) | retro pending (the editor push's row 9) |
-| [2026-11-15-classes-and-progression](2026-11-15-classes-and-progression/README.md) | retro pending (the editor push's row 12) |
-| [2026-11-15-enemy-behavior](2026-11-15-enemy-behavior/README.md) | retro pending (the editor push's row 8) |
-| [2026-11-15-encounters-and-backgrounds](2026-11-15-encounters-and-backgrounds/README.md) | retro pending (the editor push's row 10) |
-| [2026-11-15-mode-bar](2026-11-15-mode-bar/README.md) | retro pending (the editor push's row 11) |
-| [2026-11-15-skills-and-statuses-model](2026-11-15-skills-and-statuses-model/README.md) | retro pending (the editor push's row 6) |
-| [2026-11-15-event-window-cleanup](2026-11-15-event-window-cleanup/README.md) | retro pending (the editor push's row 3) |
-| [2026-11-15-sprite-cells-and-mirrors](2026-11-15-sprite-cells-and-mirrors/README.md) | retro pending (the editor push's row 5) |
-| [2026-11-15-cinematic-focus-point](2026-11-15-cinematic-focus-point/README.md) | retro pending (the editor push's row 4) |
-| [2026-11-15-skill-effect-strips](2026-11-15-skill-effect-strips/README.md) | retro pending (the editor push's row 2; SE1-SE3 done) |
+| [2026-11-15-skill-and-status-editors](done/2026-11-15-skill-and-status-editors/README.md) | done |
+| [2026-11-15-items-uniques-affixes](done/2026-11-15-items-uniques-affixes/README.md) | done |
+| [2026-11-15-classes-and-progression](done/2026-11-15-classes-and-progression/README.md) | done |
+| [2026-11-15-enemy-behavior](done/2026-11-15-enemy-behavior/README.md) | done |
+| [2026-11-15-encounters-and-backgrounds](done/2026-11-15-encounters-and-backgrounds/README.md) | done |
+| [2026-11-15-mode-bar](done/2026-11-15-mode-bar/README.md) | done |
+| [2026-11-15-skills-and-statuses-model](done/2026-11-15-skills-and-statuses-model/README.md) | done |
+| [2026-11-15-event-window-cleanup](done/2026-11-15-event-window-cleanup/README.md) | done |
+| [2026-11-15-sprite-cells-and-mirrors](done/2026-11-15-sprite-cells-and-mirrors/README.md) | done |
+| [2026-11-15-cinematic-focus-point](done/2026-11-15-cinematic-focus-point/README.md) | done |
+| [2026-11-15-skill-effect-strips](done/2026-11-15-skill-effect-strips/README.md) | done |
 | [2026-11-14-battle-turn-presentation](done/2026-11-14-battle-turn-presentation/README.md) | done |
 | [2026-11-14-animated-monsters](done/2026-11-14-animated-monsters/README.md) | done |
 | [2026-11-14-cinematics](done/2026-11-14-cinematics/README.md) | done |

@@ -11,7 +11,8 @@
 # The World menus hide in Database mode, so a list runs every World-menu entry (Map > Settings...) before the first
 # page entry. A third part names a button inside the opened window or the shown page: 'Database>Effect strips>Strip
 # from sheet cells...' shows the page, invokes that button, captures the window it opens and closes it before its
-# owner (decision 996).
+# owner (decision 996). On a page, a third part that is a tab's header selects that tab instead and captures the page
+# with it shown: 'Database>Classes>Resources' (the retro of the editor push).
 # -EventWindows: instead of the menus, open the Events tab and click the map until a cell's and an object's event
 # window have each opened; captures both, moves the object window's first step down with Alt+Down, and closes them
 # unchanged (they open from a map click, so no menu reaches them). It moves the mouse and presses keys: nobody should
@@ -137,13 +138,41 @@ function Open-Nested([string]$entry, $owner, [string]$buttonName) {
 }
 
 # A Database entry opens no window but shows its page in the main window, found by the page's automation name
-# (decision 933); the capture is the main window's, so the developer's (see the header).
-function Open-Page([string]$entry, [string]$itemName, [string]$buttonName) {
-    if (-not (Find-Named $main "$itemName page" 8)) { return "$entry`: no window opened, no page shown" }
-    if ($buttonName) { return Open-Nested $entry $main $buttonName }
-    $file = Join-Path $Out (($itemName -replace '[^A-Za-z0-9]', '') + '.png')
+# (decision 933); the capture is the main window's, so the developer's (see the header). A third part names one of the
+# page's tabs by its header, or else a button on it.
+function Open-Page([string]$entry, [string]$itemName, [string]$partName) {
+    $page = Find-Named $main "$itemName page" 8
+    if (-not $page) { return "$entry`: no window opened, no page shown" }
+    if (-not $partName) {
+        $file = Join-Path $Out (($itemName -replace '[^A-Za-z0-9]', '') + '.png')
+        Save-Screenshot $main $file
+        return "$entry`: shown as a page, $file"
+    }
+    $tab = Find-Tab $page $partName
+    if ($tab) { return Show-Tab $entry $itemName $tab }
+    if (-not (Find-Named $main $partName 4)) { return "$entry`: no '$partName' tab or button on the $itemName page" }
+    Open-Nested $entry $main $partName
+}
+
+function Find-Tab($page, [string]$header) {
+    $tabItem = [System.Windows.Automation.ControlType]::TabItem
+    $condition = New-Object System.Windows.Automation.AndCondition (
+        (New-Object System.Windows.Automation.PropertyCondition ($automation::ControlTypeProperty), $tabItem),
+        (New-Object System.Windows.Automation.PropertyCondition ($automation::NameProperty), $header))
+    return $page.FindFirst([System.Windows.Automation.TreeScope]::Descendants, $condition)
+}
+
+# The selected tab's header is read back from its tab control, so the line says which tab the capture shows.
+function Show-Tab([string]$entry, [string]$itemName, $tab) {
+    $tab.GetCurrentPattern([System.Windows.Automation.SelectionItemPattern]::Pattern).Select()
+    Start-Sleep -Seconds 2
+    $tabControl = [System.Windows.Automation.TreeWalker]::ControlViewWalker.GetParent($tab)
+    $selection = $tabControl.GetCurrentPattern([System.Windows.Automation.SelectionPattern]::Pattern)
+    $selected = $selection.Current.GetSelection()
+    $header = $(if ($selected.Count -gt 0) { $selected[0].Current.Name } else { 'none' })
+    $file = Join-Path $Out ((($itemName + $tab.Current.Name) -replace '[^A-Za-z0-9]', '') + '.png')
     Save-Screenshot $main $file
-    "$entry`: shown as a page, $file"
+    "$entry`: shown as a page, tab '$header' selected, $file"
 }
 
 # The editor is closed whatever happens here: left open, it would hold its files and the caller's output.

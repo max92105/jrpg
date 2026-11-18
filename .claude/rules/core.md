@@ -11,3 +11,5 @@ paths:
 - Battle and world logic must be runnable headless from a unit test with a fixed seed.
 - Prefer returning results/events (`BattleEvent`, `DamageResult`) over side effects, so the renderer can animate them and tests can assert them.
 - Collections exposed publicly are `IReadOnlyList<T>` / `IReadOnlyDictionary<K,V>`.
+- For each new `using Jrpg.Core.X`, grep that `Jrpg.Core.X` doesn't use this file's namespace: the build doesn't catch
+  namespace cycles (the code reviewer's namespace-cycles finding: `NewGameDefinition` moved to `Content`).

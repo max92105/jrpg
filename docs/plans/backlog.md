@@ -39,7 +39,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - Test files over 300 lines: Core's `PartyStateTests` (322). Split by behavior when next touched.
 - Comment lines over 120 columns from before the rule was enforced: `ExplorationState` (5), `GameSession` (8). Rewrap when next touched.
 - `ScreenFade` skips its black moment when one update is longer than its fade-out plus hold (about 0.33 s; the 0.08 s hold alone jumps too, so `EventPresenter.ShowWarp` never sees `Holding` and the warp's fade runs out and in over the old map, then starts again with its sound: the sound pass's FE3). Unreachable in play (decision 557): `JrpgGame` sets `IsFixedTimeStep` with a 1/60 s step, and MonoGame's `Game.Tick` (develop branch) passes `ElapsedGameTime = TargetElapsedTime` to every catch-up `DoUpdate`, its backlog capped at 500 ms; tests step at 1/60 s. Reopen (let a fade report a hold it passed) if the step is ever made variable.
-- `BattleState.cs` is at 283 lines after the enemy plan's B2 (296 at DR2): split the per-command bodies before the next command path lands (DR2 review).
+- `BattleState.cs` is at 285 lines after the enemy behavior plan's EB9 (296 at DR2): split the per-command bodies before the next command path lands (DR2 review).
 - The tip strip (dark `UiTheme.CommandHintFill` fill, highlight hairline, padded text) is drawn twice: `Battle/CommandPanelView.DrawHint` and `Menus/InventoryListView.DrawStrip`. Move it into one drawer in `Ui` when a third appears (M4 review).
 - The gap under a section title's band, `SectionTitle.Height + 10`, is written three times (`EquipmentSheetView.SectionHeight`, `StatusParametersView.BelowBand`, `StatusSheetView.AttributesBelowBand`; `StatusSkillsView`'s is 4 since decision 373): give `SectionTitle` a `ContentTop` (M3b review; the band's height itself moved there in the escape menu third pass, F1).
 - The scroll cues above and below a list are drawn twice: `PartySidebarView.DrawScrollCues` and `MemberColumnView.DrawScrollMarks`. Move them into one `Ui` drawer if a third list needs them (M2b review).
@@ -128,7 +128,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 ## From the enemy skills and bosses plan (2026-11-01)
 
 - `BossFightSimulation.PlayFight` repeats the battle setup and loop of `ForestFightsSimulation.RunBattle`: share them when a third simulation needs them (S1 review).
-- `Battle/ActionPlayback` is at 292 lines after the music plan's B2; `Read` kept its case count only by sending `EnemyPhaseEntered` through its default arm into `AddCue` (B3): the next event kind brings the handler table the `ActionPlayback.Read` line asks for.
+- `Battle/ActionPlayback` is at 275 lines after the skill effect strips plan's SE2 (292 after the music plan's B2); `Read` kept its case count only by sending `EnemyPhaseEntered` through its default arm into `AddCue` (B3): the next event kind brings the handler table the `ActionPlayback.Read` line asks for.
 - `BattleTurnSequenceTests` writes `new EnemyTactics(random, new Dictionary<string, SkillDefinition>())` five times (T1): a small helper, as `EnemyTacticsTests` has.
 - The enemy plan's out-of-scope features (a battle event step and a boss beaten for good, more conditions, enemy resources, cooldowns, phases that change stats or art, a boss banner, skills for the goblin and the beetle) are listed in `docs/plans/done/2026-10-29-enemy-skills-and-bosses/README.md`, "Out of scope".
 
@@ -186,7 +186,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `MapDrawing.DrawCanopy` repeats `CollisionShapes.InMapCell`'s arithmetic times `CellPixels`: it could map through `CollisionShapes.InMapCells` and scale (the cleanup plan's R2 review).
 - `MapDrawing.DrawObjectAt`'s NPC sprite branch has no test: `MapDrawingTests` never sets `FieldSpriteFile` (the R2 review).
 - `PngSize.Read` reads the width and height with `ReadInt32BigEndian`, so a corrupt header of 2^31 or more comes back negative; the PNG rule forbids it, nothing checks it (the cleanup plan's R3 review).
-- Files at the limit after the map fixes plan: `Shell/EditorTemplates.xaml` 297 and `Shell/MainWindow.xaml` 292 after the cinematics plan (Database > Cinematics...) (its status lines moved to `StatusBand` in the sprites plan's SI4; the Database menu took three lines); the next template goes in its own dictionary (as `EditorTreeTemplates.xaml` did) and the next control anywhere in the window in its own user control (as the Placed object panel did), never in these two.
+- Files at the limit after the map fixes plan: `Shell/EditorTemplates.xaml` 297 and `Shell/MainWindow.xaml` 296 (its code-behind 277) after the mode bar plan (Database > Cinematics...) (its status lines moved to `StatusBand` in the sprites plan's SI4; the Database menu took three lines); the next template goes in its own dictionary (as `EditorTreeTemplates.xaml` did) and the next control anywhere in the window in its own user control (as the Placed object panel did), never in these two.
 - `CommandMenuTests.OpenItems` (Down twice) and `CommandMenuSkillTests`' `RecoveryRow`/`HealAllRow` still reach rows by a fixed count of presses, against the tests rule; older than the cleanup plan's GT2 (its review).
 - Eight Game members read only inside their own file could be `private`: `TypingTicks.CharactersPerTick`, `OptionsPage.FullScreenRow`, `PromptPlacement.GapAboveObject`, `BattlerScaling.PaintingSize`, `ShatterLayout.RingShareMax`, `ResourceGaugeView.SinceChange`, `TurnOrderStrip.UpcomingCount`, `StatusSheetView.WriteLabel` (the Game cleanup plan's GX1 review).
 - `verify.ps1 -Fix` on a tree that doesn't build lets `dotnet format` delete the toolkit's generator hooks (`partial void On...Changed`) as unused code (the cleanup plan's S5): make `-Fix` refuse to format until a plain build passes, or write the rule in CLAUDE.md (the S5 review).
@@ -194,7 +194,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the character sprites and shops plans (2026-11-12, at approval)
 
-- Class and skill balancing stays in `classes.json` and `skills.json`, checked by the startup validation, until their schema settles (the class and skill editors plan was dropped at approval); the first balancing tool worth building is a read-only side-by-side table of skills and classes (and enemies), not per-record forms.
+- Class and skill balancing stays in `classes.json` and `skills.json`, checked by the startup validation, until their schema settles (the class and skill editors plan was dropped at approval); the editor push built the pages and the read-only Database > Balance table (skill and status editors plan, BT3).
 - Replacing the player's field sprite with a bought sheet: its own plan, done with help (the character sprites plan only moves the player's drawing to its `field-sprites.json` record with today's numbers).
 - A cutscene-moved NPC sorts against the player by its placed row (`MapDrawOrder` keys objects on `PlacedObject.Position`): a position lookup into the shared draw order, with the wandering NPCs plan.
 - The sprite setup's `From` divides the image size by the record's frame size, so an image with spare pixels past its frames (which the start allows) opens with a cut problem until the counts are retyped (sprites plan SI2, SI4 reviews); bought sheets are exact, so it waits.
@@ -204,7 +204,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - Six editor boxes parse a whole number their own way (`EventStepViewModel.WholeNumber`, `TypedCounts.Parse`, `TileAnimationViewModel.WholeNumberOf`, `PlacedObjectEditing.Layer`, `LayerChoiceViewModel`, `Catalogs/TypedNumber`): fold them onto one parser in a shared folder (EN2's review).
 - `TypedNumber.Parse(text)!.Value` is written at about 40 sites and as a private `NumberIn` in three Party types (`ClassStatsBoxes`, `ResourceGainsBoxes`, `ClassResourceViewModel`): a `TypedNumber.ValueOf(string)` would replace them (CL7b review).
 - `Shell/ArtStatus` refreshes the art warning only when the sheets or objects change: an Enemies window OK (or its undo) that renames a picture leaves the enemy-art lines stale until the next save (EN7's review).
-- `Shell/MainViewModel.cs` is at 285 lines after the cinematics plan (`CinematicEditing` set beside its siblings); the drop table editor plan set `DropTableEditing` in the constructor beside its siblings (283 with its using, DT5, decision 605): the next window's editing view model is built in its own partial (as `MainViewModel.Database.cs`), not in the constructor's list.
+- `Shell/MainViewModel.cs` is at 295 lines after the editor push (285 after the cinematics plan) (`CinematicEditing` set beside its siblings); the drop table editor plan set `DropTableEditing` in the constructor beside its siblings (283 with its using, DT5, decision 605): the next window's editing view model is built in its own partial (as `MainViewModel.Database.cs`), not in the constructor's list.
 
 ## From the drop table editor plan (2026-11-13, at approval)
 
@@ -243,7 +243,7 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 
 ## From the animated monsters plan's retro (2026-11-14)
 
-- `Editor/Battle/EnemyCatalogWindow.xaml.cs` grew 114 → 202 lines in this plan (the strip preview, the GIF options):
+- `Editor/Battle/EnemyCatalogWindow.xaml.cs` (now `EnemyCatalogPage.xaml.cs`, 179 lines) grew 114 → 202 lines in this plan (the strip preview, the GIF options):
   the next Art tab feature moves the battle sprite preview (`ShowFrame`, `FrameOf`, `SizeLineOf`) into its own type first.
 - `Game/Battle/BattlersView.FrameRectangle` cuts a strip's frame from the drawn size, which equals the frame's own size
   only because `BattlerScaling.AtOwnSize` never scales (MB7's review): pass the frame size if the drawn size ever differs.
@@ -393,3 +393,52 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
   progression plan, XP4 review).
 - `Editor/Balance/BalanceTablePage.xaml` is at 289 lines: the next tab or column moves each tab's body into its own
   `UserControl` (each tab already has its own shared-size scope) (skill and status editors plan, BT3 review).
+## From the editor push's retro (2026-11-18, rows 2-12)
+
+- Files near the limit: `Core/Exploration/ExplorationState.cs` 281, `Data/Content/CatalogProblems.cs` 271 (the next
+  `CheckX` or `OfX` goes in a feature partial, as `.Party`, `.Rules`, `.Items`), `Editor/Catalogs/CatalogDraft.cs` 274
+  (the next `SetX` step in a partial, as `.Party`), `Editor/Party/ClassCatalogPage.xaml` 254 (the next tab in its own
+  view, as `ClassResourcesView`), `Editor/Items/ItemViewModel.cs` 251 (encounters EC1, classes CL1, XP2b, CL8, items
+  IU13 reviews).
+- Test files past 250 lines, the next tests in a sibling: Editor `Party/ClassResourceViewModelTests` 293,
+  `Animation/StripFromCellsViewModelTests` 289, `Balance/BalanceTableViewModelTests` 285 (box refusals to their own
+  file before the next row kind), `Items/ItemEquipmentViewModelBonusTests` 278, `Statuses/StatusViewModelTests` 278,
+  `Party/ResourceRuleTests` 277, `Workspaces/DatabaseWorkspaceLeavingTests` 273, `Items/ItemCatalogViewModelTests` 272,
+  `Items/ItemViewModelTests` 268, `Progression/ExperienceTableViewModelTests` 264, `Battle/EnemyViewModelTests` 256,
+  `Backgrounds/BattleBackgroundCatalogViewModelTests` 249, `GifImportOptionsViewModelBackgroundTests` and
+  `ArtImageImportGifTests` 247, `Shell/MainViewModelWorkspaceTests` 248; Data `Party/ClassCatalogValidatorTests` 289;
+  Core `Battle/EnemyReactionTests` 272 and `EnemyTacticTargetTests` 258 (the push's reviews).
+- `MainViewModelTests.Constructor_BrokenContentFile_...` breaks a named file and is repointed whenever a new file is
+  read first (T2 `effects.json`, SR1 `statuses.json`): break the loader's first file through its own order (skills and
+  statuses model plan, T2 and SR1 reviews).
+- `Core/Battle` `TurnSkipped.Cause` holds a `StatusDefinition` under its old name: rename it `Status` when next touched
+  (skills and statuses model plan, SW review).
+- `NoticesOf` and `ChangesOf` are copied in `ResourceRuleTests` and `ResourceRivalRuleTests`: one shared Party test
+  type at a third copy (classes and progression plan, CL9b review).
+- Save all names an item problem before a rules problem (`CheckItems` runs before `CheckRules`) while the loader and
+  `OfRules` name the rules' first: align the writer's order if it ever confuses (classes and progression plan, XP1).
+- The event dialogs: a live problem line with OK greyed on it; numbered steps and Duplicate for a step or an event; the
+  theme's `Expander` keeps WPF's default arrow (`TileBrowserView`, EW5's fold) (event window cleanup plan, EW5).
+- The read-only Balance table keeps Apply and Revert on the bar, Apply recording nothing: a `CatalogPage.IsReadOnly`
+  hiding them, with tests (skill and status editors plan, BT3 review).
+- The Skills page's strip box has no Edit...: add one showing the Effect strips page on the skill's strip (skill and
+  status editors plan, SK4 review, decisions 928, 982).
+- The older previews (Enemies Art tab, Animate panel, Character sprites walk) move to `Animation/FramePreview` when
+  next touched (skill and status editors plan, AN1b review).
+- Making `Effect.Power` optional in `skills.json` needs `Effect`'s positional parameters reordered (33 source and 111
+  test sites) (skill and status editors plan, SK1 review, decision 972).
+- Balance table later: hits to fell a chosen enemy; dominance, crit, gear, resistance and hit chance (skill and status
+  editors plan, decision 993).
+- Strips: an own strip for heals, revives and status-only skills needs a status-landing strip path and an
+  `ActionPlayback` split first (decision 707); a strip loads on first use, so a mid-battle hitch is possible (skill
+  effect strips plan, SE1 and SE2 reviews).
+- Cinematic focus later: a focus moving over the still's time (start and end point), typed X/Y boxes or a draggable
+  marker (cinematic focus point plan, FP4 review).
+- Statuses later: a speed-based turn order (what Slowed should really do), status icons on the marks, a ticking part
+  that scales with a stat (decision 816, about one slice) (skills and statuses model plan, SL review).
+- Enemy behavior later (ADR 0057): a threat table, a counter out of turn, two triggers on one rule, a rule for every
+  phase's list, "on a named monster" (enemy behavior plan, Defaults item 10, EB9 review).
+- Items later: IU5 tiered items (waits on the developer's word, decision 874), an affix only uniques carry (weight 0),
+  icon import, a per-shop or per-item sell price (items, uniques and affixes plan, open questions).
+- Encounters later: Duplicate on the Encounters page, a "fought on these maps" line, Make still; no encounter names its
+  own boss arena background yet (encounters and backgrounds plan, out of scope and EC5 note).

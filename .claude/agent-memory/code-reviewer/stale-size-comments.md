@@ -1,6 +1,6 @@
 ---
 name: stale-size-comments
-description: Comments and docs that keep an old rule, name, number or owner after a change the code-quality grep rule doesn't list (second jobs, planned names in later slices, a parent's arithmetic, a removed member's noun)
+description: Comments and docs that keep an old rule, name, number or owner after a change the code-quality grep rule doesn't list (a table's new rows, planned names in later slices, a parent's arithmetic, a removed member's noun)
 metadata:
   type: feedback
 ---
@@ -8,23 +8,18 @@ metadata:
 The code-quality rule already says to grep the old value, wording or file name after a resize, a move, a conditional
 call or a rename. These cases slipped past it:
 
-- A type gaining a second job kept a summary naming only the first (Forge M2/M3a: `GameRules` without crafting,
-  `GearRoll` "Rolls a dropped base item" after `AddAffix`; M3b: the Forge's `gearRoll` param "so an upgrade draws" once
-  reroll used it too). Now a code-quality line; still reread the class summary of every type that gains a public member.
-  Also a table type gaining rows for a new reason (shops EN1: AbsentWhenNull/ZeroFilter "added after the content was
-  written" + `_addedLater`, gaining decision 586's default-valued enemy fields): reread the summary and the array name.
-  A type gaining a third source (IL1: BattlerWhiteness + the wash) had its summary updated but not its docs/map.md
-  parenthetical ("the fallen's or the blink's"): reread the type's map.md entry too.
+- Beyond code-quality.md's second-job line: a table type gaining rows for a new reason (shops EN1:
+  AbsentWhenNull/ZeroFilter "added after the content was written" + `_addedLater`, gaining decision 586's
+  default-valued enemy fields): reread the summary and the array name. A type gaining a third source (IL1:
+  BattlerWhiteness + the wash) had its summary updated but not its docs/map.md parenthetical ("the fallen's or the
+  blink's"): reread the type's map.md entry too.
 - A Done note that pulls work forward or renames a planned API (loot S1a: FromSaved -> PieceFrom) leaves the later slice
   files and design.md citing the old name; grep the next slices and design.md for the planned name. Same after a test
   split (C2): a pending slice still cited "BattleStateTests (lines 225-354)".
 - A renamed id (M1b: StatAttack -> StatWeaponDamage) leaves test names and locals with the old word; grep it in the tests.
-  Same when tests switch their data source (mana-seed T2a: content -> test-world left `EveryRepositoryTile`,
-  `RepositoryTree`, `RepositoryIntroSkipped`): grep test names for the old source's word, not only comments. A shared
-  fixture switching source (T2c: `SaveGameFixtures.Catalog` -> test-world) leaves its users' unchanged summaries saying
-  "against the repository content": grep the fixture's users, not only the diff. A test fixture's step type swapped
-  (cinematics CR2: still -> cinematic) left ExplorationArrivalTests' `IntroOfOnlyStills`, `stillsOnly` and "plays two
-  stills"; grep the old type's noun in the edited test files' names, locals and fixture comments.
+  A test fixture's step type swapped (cinematics CR2: still -> cinematic) left ExplorationArrivalTests'
+  `IntroOfOnlyStills`, `stillsOnly` and "plays two stills"; grep the old type's noun in the edited test files' names,
+  locals and fixture comments (a data source switch is tests.md's rule).
 - A record gaining a field (M2b-2: StatSheet.AttackDamage; AL2: MapSettings.ShowsBanner left MainViewModel.
   TryApplySettings's "the name, the track, the area level and the random battles", and docs/map.md's Content line naming
   only the null and zero filters) is missed by every "X, Y and Z" summary of it; grep the last listed field. A mechanic no
@@ -50,12 +45,6 @@ call or a rename. These cases slipped past it:
 - A check moved out of one layer (mana-seed X2: the writer's art check now only at game startup) leaves comments
   elsewhere saying where it refuses ("refuses it only on save" in TileImages) and summaries describing the old fallback
   (`Select`: "nothing when the sheet isn't in the box"); grep the check's name and "on save" across the feature folders.
-
-- A removed question or refusal (map flows MS1: switching no longer asks) leaves callers' summaries and window
-  comments naming it ("or the user kept the open map"); grep the old outcome's wording across the views. MS2 (one open
-  map became many) left "the open map may have changed" in TileBrowserViewModel.ApplyCut and CatalogDraft.Rewriting's
-  "the open map is replaced": grep the singular noun when a single becomes a collection. MS3 (switching keeps steps)
-  left a test comment "the switch drops forest's steps" and a param doc "the open map's": grep tests' comments too.
 
 - Renamed menu headers (mode bar WS5: "Shops..." -> "Shops") left `.claude/skills/slice/SKILL.md`'s
   `-Windows 'Database>Shops...'` example and CLAUDE.md's "opens each Database window"; grep `.claude/skills/` and

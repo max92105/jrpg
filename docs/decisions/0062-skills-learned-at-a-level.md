@@ -7,7 +7,7 @@ Date: 2026-11-17
 ADR 0020 gives every member of a class all the class's skills (`classes.json` `skillIds`, in order) from the moment
 they join, and its consequences foresee "learning skills by level" joining the same list through `PartyMember.Skills`.
 Row 12 of the editor push names "skills learned by level" beside the Classes page, and the classes and progression plan
-(`docs/plans/2026-11-15-classes-and-progression/`) builds them in its phase LV, before the Classes page's Skills tab
+(`docs/plans/done/2026-11-15-classes-and-progression/`) builds them in its phase LV, before the Classes page's Skills tab
 (CL6), so the tab has its Level column from the start.
 
 Constraints:

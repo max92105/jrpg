@@ -15,6 +15,8 @@ paths:
 - Every guard that turns an input into a no-op (a greyed entry, input before an entrance ends) has a test that presses it and asserts nothing happened.
 - UI tests pick an entry by what it is (a helper that moves until `Selected` is the wanted entry), not by a fixed count of presses.
 - `ListCursor` wraps: a "move until" helper fails when it comes back to its start row, never on "the cursor stopped moving" (the gold plan's T3 found two helpers that would have looped forever).
+- A test reading a content-side JSON file uses `ContentJsonOptions.Strict` (or `StrictWith`), never its own lax options
+  that let a typo the game refuses through (AS1; the remaining `SoundSourcesTests` copy is in backlog.md).
 - Tests on the repository's content assert the entries they need (an id is there, a named layer exists), never totals of a whole catalog or map: content changes in the editor every day.
 - A test that a value is refreshed or cached starts from a state where the old value differs from the expected one, and checks a value the runtime doesn't already share (not an enum name or a string literal).
 - A timing or presentation step is tested through to the step that follows it in real content (stills then a warp, a still then a dialogue), and a hardware probe is checked against the library's source, not assumed.

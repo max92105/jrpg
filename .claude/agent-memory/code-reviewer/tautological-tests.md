@@ -12,12 +12,10 @@ metadata:
 - **same-seed-twice** (5a, 5b): two runs compared with each other pass with the randomness removed; pin golden values.
 - **count==count / oracle** (4b, 11g, stats E1, mana T2b): the test rebuilds the production computation; pin a golden prefix instead.
 - **guard clause** (6a, 8, 1b, class-mechanics PL2b, RG1, map folders MF2: an `IsWithin` clause no sibling folder reaches): a `||` clause, a validator message or a `throw` with no test; match each to a test (one theory row per clause).
-- **boundary** (1b re-review, gold I1): `<=` tested only at the bound, or a range tested only on rejected values (0 and max + 1); test the accepted bounds too.
 - **fixture doesn't reach the scenario** (part 2 4a, 5b, slice 7, map flows MO1: an object moved out of the selection rectangle; animated MB5: "LeavesNoTemporaryFile" on a GIF refused before the folder is made; EB10: a phase test whose outcome is the same
   if the phase is never entered): coordinates, keys or identical inputs make the named case never happen; trace the fixture.
-- **single recipient / neutral rules / fixture default** (battle C1, stats M1a, M2a; mode bar WS6: a key "goblin" that is the only drop table in content, so a dropped key passes): a total equals a share, a multiplier runs at 1, a stat defaults to 0, a chosen record is the first or only one; use two recipients, a non-neutral value, a record that is not the default.
-- **stale equals expected** (demo G1a, gold L2b): the "refreshed" value was already the expected one; start from a state where it differs, one test per cache key.
-- **same observable** (gold I2b, B3): two outcomes look alike through the assertion used (`IsShowingMessage`, "a consumable row"); assert the id or value only the right outcome has. Also a one-sided "keeps falling" (`< before`) that a reset to 0 meets too (banner MB1): bound both sides.
+- **single recipient** (battle C1): a total equals a share; use two recipients.
+- **one-sided change** (banner MB1): a "keeps falling" (`< before`) that a reset to 0 meets too; bound both sides.
 - **plausible wrong formula passes** (EB11: every Nth turn tested on turns 1, 3, 6 only, which `turn >= N` also
   passes): for a modulo/periodic rule, add a point just past the first beat (turn N + 1) that only the right formula
   refuses.
@@ -26,7 +24,4 @@ metadata:
 - **constant oracle** (stats P3b, quests E3): asserting `Cap * 10`, or a list equal to the static it was set from, keeps green when the values change; pin the literals.
 - **action never taken / immutable input** (map flows MS3, CP1): a test named `Undo_..._DoesNotTouch...` asserts "unchanged" without executing Undo, or asserts an immutable record input "unchanged"; check the named action runs and could mutate it.
 - **second overload / twin hook** (gold S2/S3, composer CO2): one of two parallel overloads or property hooks (ColumnsText tested, RowsText not) has no test; check each.
-- **order already given** (quests J1): a sort test whose setup already yields the expected order by another rule (main started last, then reversed); set up the opposite order.
 - **round trip exact anyway** (map flows MO1; sprites FS4: `RoundsTheTopLeftOnce` with 2.5*48 and a whole origin, no fraction to round): "exact after undo" from 2.3 + 0.1 - 0.1, which is exact in doubles; check with powershell that offset arithmetic would fail (0.1 + 1 - 1 does).
-
-Related: [[records-with-lists-equality]].

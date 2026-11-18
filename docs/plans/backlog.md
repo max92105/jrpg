@@ -391,3 +391,5 @@ These waited at the 2026-10-23 code health review. Do each one with the next cha
 - `Editor/Progression/ExperienceTableViewModel.Fill` changes the rows one by one, and each change reruns the totals and
   Data's `OfRules` (about 100 checks on a 98-row fill): batch the list change if a fill ever feels slow (classes and
   progression plan, XP4 review).
+- `Editor/Balance/BalanceTablePage.xaml` is at 289 lines: the next tab or column moves each tab's body into its own
+  `UserControl` (each tab already has its own shared-size scope) (skill and status editors plan, BT3 review).

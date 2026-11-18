@@ -1,5 +1,5 @@
 # Skill and status editors and the animation tools (editor push, roadmap row 7)
-Status: approved, in progress
+Status: retro pending
 
 Planned on 2026-11-15 from roadmap row 7 of [the editor push](../2026-11-15-editor-push/README.md) (design.md sections
 3.4, 3.5 need 2, 3.8) and the approved row 6 plan, [skills and statuses model](../2026-11-15-skills-and-statuses-model/README.md)
@@ -160,7 +160,7 @@ a slice is done and write its deviations in the slice file. Tunables, design and
 - [x] **BT2. Enemies' skills, classes and enemies** (Editor, about 180 lines; split at its start) →
   [slices/BT2.md](slices/BT2.md)
 - [x] **BT2b. The tier sheet rows and the Power boxes** (Editor, about 160 lines) → [slices/BT2b.md](slices/BT2b.md)
-- [ ] **BT3. Database > Balance table...: the read-only page** (Editor + script, about 170 lines) →
+- [x] **BT3. Database > Balance table...: the read-only page** (Editor + script, about 170 lines) →
   [slices/BT3.md](slices/BT3.md)
 
 Files `slices/SK8.md`, `FX3.md`, `AN1.md`, `AN3.md` and `AN8.md` are superseded stubs to delete.

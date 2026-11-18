@@ -31,7 +31,7 @@ param(
         'NPCs>Character sprites',
         'Database>Quests', 'Database>Shops', 'Database>Drop tables', 'Database>Effect strips',
         'Database>Effect strips>Strip from sheet cells...', 'Database>Battle backgrounds',
-        'Database>Skills', 'Database>Effects', 'Database>Statuses', 'Database>Cinematics',
+        'Database>Skills', 'Database>Effects', 'Database>Statuses', 'Database>Balance table', 'Database>Cinematics',
         'Database>Enemies', 'Database>Items', 'Database>Affixes', 'Database>Encounters', 'Database>Classes',
         'Database>Party members', 'Database>New game', 'Database>Experience',
         'Help>Raise a test error'),

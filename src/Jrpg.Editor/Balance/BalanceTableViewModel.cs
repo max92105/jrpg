@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using Jrpg.Core.Content;
 using Jrpg.Editor.Catalogs;
+using Jrpg.Editor.Workspaces;
 
 namespace Jrpg.Editor.Balance;
 
@@ -8,9 +9,10 @@ namespace Jrpg.Editor.Balance;
 /// The balance table's boxes and rows (decisions 992, 993): three typed levels, a typed damage modifier in percent and
 /// the tier sheet's three typed Powers, the line naming a box that can't be read, and the rows read through the boxes,
 /// empty while that line shows (the enemy rows read no box). The rows' builders do the building; this only reads the
-/// boxes and hands them on.
+/// boxes and hands them on. A read-only page's catalog (the page recipe's step 8): no record to choose and never a
+/// <see cref="Problem"/> (<see cref="IEditedCatalog"/>).
 /// </summary>
-internal sealed partial class BalanceTableViewModel : ObservableObject
+internal sealed partial class BalanceTableViewModel : ObservableObject, IEditedCatalog
 {
     /// <summary>
     /// The highest typed damage modifier, a hundredfold (decision 1021): past the developer's sheet's 473 % many times
@@ -99,8 +101,7 @@ internal sealed partial class BalanceTableViewModel : ObservableObject
 
     /// <summary>
     /// "Level 2 must be a whole number from 1 to 20.", for the first box that can't be read, the levels first, then the
-    /// modifier, then the Powers; null when all can. Never named <c>Problem</c>: the Database workspace refuses leaving
-    /// a page with a problem, and a read-only table has nothing to keep the developer on.
+    /// modifier, then the Powers; null when all can. Shown on the page itself, never as its <see cref="Problem"/>.
     /// </summary>
     public string? BoxesProblem =>
         LevelProblem(1, FirstLevelText)
@@ -137,6 +138,20 @@ internal sealed partial class BalanceTableViewModel : ObservableObject
     /// </summary>
     public IReadOnlyList<TierBalanceRow> TierRows =>
         ReadBoxes() is { } boxes ? TierBalanceRows.Of(_content, boxes.Powers, boxes.ModifierPermille) : [];
+
+    /// <summary>
+    /// Always null, even while <see cref="BoxesProblem"/> shows: the Database workspace refuses leaving a page with a
+    /// problem, and a read-only table has nothing to keep the developer on.
+    /// </summary>
+    public string? Problem => null;
+
+    /// <summary>Always null: a table has no records to choose.</summary>
+    public string? ChosenKey => null;
+
+    /// <summary>Keeps everything as it is: a table has no records to choose.</summary>
+    public void Choose(string key)
+    {
+    }
 
     private int MaxLevel => _content.Rules.Experience.MaxLevel;
 

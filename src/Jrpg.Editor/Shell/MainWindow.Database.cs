@@ -1,6 +1,7 @@
 using Jrpg.Data.Art;
 using Jrpg.Editor.Animation;
 using Jrpg.Editor.Backgrounds;
+using Jrpg.Editor.Balance;
 using Jrpg.Editor.Battle;
 using Jrpg.Editor.Cinematics;
 using Jrpg.Editor.Effects;
@@ -47,6 +48,7 @@ internal sealed partial class MainWindow
         pageViews.Register<SkillCatalogViewModel>(edited => new SkillCatalogPage(edited));
         pageViews.Register<TieredEffectCatalogViewModel>(edited => new TieredEffectCatalogPage(edited));
         pageViews.Register<StatusCatalogViewModel>(edited => new StatusCatalogPage(edited));
+        pageViews.Register<BalanceTableViewModel>(edited => new BalanceTablePage(edited));
         pageViews.Register<EncounterCatalogViewModel>(edited => new EncounterPage(edited));
         pageViews.Register<ClassCatalogViewModel>(edited => new ClassCatalogPage(edited));
         pageViews.Register<NewGameViewModel>(edited => new NewGamePage(edited));

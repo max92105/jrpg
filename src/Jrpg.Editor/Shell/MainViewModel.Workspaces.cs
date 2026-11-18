@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Jrpg.Data.Art;
+using Jrpg.Editor.Balance;
 using Jrpg.Editor.Catalogs;
 using Jrpg.Editor.NewGame;
 using Jrpg.Editor.Party;
@@ -116,6 +117,7 @@ internal sealed partial class MainViewModel
                 CatalogPage.Of("Skills", CatalogGroup.Battle, SkillEditing!),
                 CatalogPage.Of("Effects", CatalogGroup.Battle, TieredEffectEditing!),
                 CatalogPage.Of("Statuses", CatalogGroup.Battle, StatusEditing!),
+                CatalogPage.Of("Balance table", CatalogGroup.Battle, new BalanceTableEditingViewModel(content)),
                 CatalogPage.Of("Drop tables", CatalogGroup.Battle, DropTableEditing!),
                 CatalogPage.Of("Effect strips", CatalogGroup.Battle, EffectStripEditing!),
                 CatalogPage.Of("Battle backgrounds", CatalogGroup.Battle, BattleBackgroundEditing!),

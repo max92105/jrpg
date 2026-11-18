@@ -59,27 +59,16 @@ public sealed class BalanceTableViewModelTests
     }
 
     [Theory]
-    [InlineData(FirstPower, "Power 1")]
-    [InlineData(SecondPower, "Power 2")]
-    [InlineData(ThirdPower, "Power 3")]
-    public void BoxesProblem_PowerNotANumber_SaysSo(string box, string label)
-    {
-        var table = new BalanceTableViewModel(_world);
-
-        Type(table, box, "ten");
-
-        Assert.Equal($"{label} must be a whole number from 0 to 10000.", table.BoxesProblem);
-        AssertBoxRowsEmpty(table);
-    }
-
-    [Theory]
+    [InlineData(FirstPower, "ten", "Power 1")]
+    [InlineData(SecondPower, "ten", "Power 2")]
+    [InlineData(ThirdPower, "ten", "Power 3")]
     [InlineData(FirstPower, "-1", "Power 1")]
     [InlineData(FirstPower, "10001", "Power 1")]
     [InlineData(SecondPower, "-1", "Power 2")]
     [InlineData(SecondPower, "10001", "Power 2")]
     [InlineData(ThirdPower, "-1", "Power 3")]
     [InlineData(ThirdPower, "10001", "Power 3")]
-    public void BoxesProblem_PowerPastABound_NamesTheBoxAndEmptiesTheRows(string box, string text, string label)
+    public void BoxesProblem_PowerRefused_NamesTheBoxAndEmptiesTheRows(string box, string text, string label)
     {
         var table = new BalanceTableViewModel(_world);
 
@@ -239,6 +228,17 @@ public sealed class BalanceTableViewModelTests
         Assert.Contains(nameof(BalanceTableViewModel.ClassRows), raised);
         Assert.Contains(nameof(BalanceTableViewModel.TierRows), raised);
         Assert.Contains(nameof(BalanceTableViewModel.BoxesProblem), raised);
+    }
+
+    // The workspace refuses leaving a page with a problem; the boxes' line is the page's own.
+    [Fact]
+    public void Problem_LevelRefused_StaysNull()
+    {
+        var table = new BalanceTableViewModel(_world);
+
+        Type(table, FirstLevel, "0");
+
+        Assert.Null(table.Problem);
     }
 
     // The rows read through the boxes; the enemy rows read none.

@@ -60,14 +60,14 @@ public sealed class CatalogProblemsSkillTests
     [Fact]
     public void OfSkills_EnemySkillWithACost_NamesEnemiesFile()
     {
-        var goblin = _catalog.Enemies["goblin"] with { Tactics = [new EnemyAction { SkillId = "spark", Weight = 1 }] };
-        var content = _catalog with { Enemies = Replaced(_catalog.Enemies, "goblin", goblin) };
+        var goblin = _catalog.Enemies["gnoll"] with { Tactics = [new EnemyAction { SkillId = "spark", Weight = 1 }] };
+        var content = _catalog with { Enemies = Replaced(_catalog.Enemies, "gnoll", goblin) };
         var spark = _spark with { ResourceChanges = [new ResourceChange("mana", -1)] };
 
         var problem = CatalogProblems.OfSkills([.. _catalog.Skills.Values, spark], content);
 
         Assert.Equal(
-            "enemies.json: enemy 'goblin': tactics[0].skillId 'spark' uses a class resource, and enemies have none.", problem);
+            "enemies.json: enemy 'gnoll': tactics[0].skillId 'spark' uses a class resource, and enemies have none.", problem);
     }
 
     [Fact]

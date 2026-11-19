@@ -22,7 +22,7 @@ public sealed class RepositoryEncounterTests
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
         Assert.True(catalog.Enemies["goblin_chief"].IsBoss);
-        Assert.False(catalog.Enemies["goblin"].IsBoss);
+        Assert.False(catalog.Enemies["gnoll"].IsBoss);
     }
 
     [Fact]

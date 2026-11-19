@@ -37,7 +37,7 @@ public sealed class ContentWriterEnemyTacticsTests : IDisposable
         _writer.WriteMapCatalogs(WithGoblinTactics(onLowestFoe));
 
         Assert.Equal("lowestHpFoe", (string?)WrittenGoblinTactics()[0]!["on"]);
-        Assert.Equal([onLowestFoe], ContentCatalogLoader.Load(_content.Path).Enemies["goblin"].Tactics);
+        Assert.Equal([onLowestFoe], ContentCatalogLoader.Load(_content.Path).Enemies["gnoll"].Tactics);
     }
 
     [Fact]
@@ -48,7 +48,7 @@ public sealed class ContentWriterEnemyTacticsTests : IDisposable
         _writer.WriteMapCatalogs(WithGoblinTactics(priority));
 
         Assert.True((bool?)WrittenGoblinTactics()[0]!["isPriority"]);
-        Assert.Equal([priority], ContentCatalogLoader.Load(_content.Path).Enemies["goblin"].Tactics);
+        Assert.Equal([priority], ContentCatalogLoader.Load(_content.Path).Enemies["gnoll"].Tactics);
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public sealed class ContentWriterEnemyTacticsTests : IDisposable
         _writer.WriteMapCatalogs(WithGoblinTactics(once));
 
         Assert.True((bool?)WrittenGoblinTactics()[0]!["isOncePerBattle"]);
-        Assert.Equal([once], ContentCatalogLoader.Load(_content.Path).Enemies["goblin"].Tactics);
+        Assert.Equal([once], ContentCatalogLoader.Load(_content.Path).Enemies["gnoll"].Tactics);
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public sealed class ContentWriterEnemyTacticsTests : IDisposable
         _writer.WriteMapCatalogs(WithGoblinTactics(everyThirdTurn));
 
         Assert.Equal(3, (int?)WrittenGoblinTactics()[0]!["when"]!["turns"]);
-        Assert.Equal([everyThirdTurn], ContentCatalogLoader.Load(_content.Path).Enemies["goblin"].Tactics);
+        Assert.Equal([everyThirdTurn], ContentCatalogLoader.Load(_content.Path).Enemies["gnoll"].Tactics);
     }
 
     // A power of 5, so a rule may name cleave, whose effect is tiered.
@@ -96,7 +96,7 @@ public sealed class ContentWriterEnemyTacticsTests : IDisposable
     {
         var enemies = new Dictionary<string, EnemyDefinition>(_catalog.Enemies)
         {
-            ["goblin"] = _catalog.Enemies["goblin"] with { Power = 5, Tactics = tactics },
+            ["gnoll"] = _catalog.Enemies["gnoll"] with { Power = 5, Tactics = tactics },
         };
 
         return _catalog with { Enemies = enemies };
@@ -105,6 +105,6 @@ public sealed class ContentWriterEnemyTacticsTests : IDisposable
     private JsonArray WrittenGoblinTactics() =>
         JsonNode.Parse(File.ReadAllText(_content.PathOf("enemies.json")))!
             .AsArray()
-            .Single(enemy => (string?)enemy!["id"] == "goblin")!["tactics"]!
+            .Single(enemy => (string?)enemy!["id"] == "gnoll")!["tactics"]!
             .AsArray();
 }

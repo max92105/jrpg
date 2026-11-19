@@ -13,7 +13,7 @@ public sealed class RepositoryLootTests
     [Fact]
     public void Goblin_DropsFromATableThatExists()
     {
-        var tableId = _catalog.Enemies["goblin"].DropTableId;
+        var tableId = _catalog.Enemies["gnoll"].DropTableId;
 
         Assert.NotNull(tableId);
         Assert.NotEmpty(_catalog.DropTables[tableId].Entries);
@@ -31,7 +31,7 @@ public sealed class RepositoryLootTests
     [Fact]
     public void GoblinGearDrops_EachHasAffixesForItsKind()
     {
-        var gear = _catalog.DropTables[_catalog.Enemies["goblin"].DropTableId!].Entries
+        var gear = _catalog.DropTables[_catalog.Enemies["gnoll"].DropTableId!].Entries
             .Select(entry => _catalog.Items[entry.ItemId].Equipment)
             .OfType<EquipmentStats>();
 
@@ -43,7 +43,7 @@ public sealed class RepositoryLootTests
     [Fact]
     public void GoblinDrops_IncludeAnOffHandThatCanRollBlock()
     {
-        var dropKinds = _catalog.DropTables[_catalog.Enemies["goblin"].DropTableId!].Entries
+        var dropKinds = _catalog.DropTables[_catalog.Enemies["gnoll"].DropTableId!].Entries
             .Select(entry => _catalog.Items[entry.ItemId].Equipment?.Kind);
 
         Assert.Contains(EquipmentKind.OffHand, dropKinds);

@@ -57,29 +57,29 @@ public sealed class ContentWriterEnemyTests : IDisposable
     [Fact]
     public void WriteMapCatalogs_BossEnemy_WritesIsBossTrueAndLeavesItOutOtherwise()
     {
-        var goblin = _catalog.Enemies["goblin"];
+        var goblin = _catalog.Enemies["gnoll"];
         var boss = goblin with { Id = "goblin_king", IsBoss = true };
 
         _writer.WriteMapCatalogs(WithEnemies(goblin with { IsBoss = false }, boss));
 
         var written = WrittenEnemies();
         Assert.True((bool?)written["goblin_king"]["isBoss"]);
-        Assert.False(written["goblin"].AsObject().ContainsKey("isBoss"));
+        Assert.False(written["gnoll"].AsObject().ContainsKey("isBoss"));
     }
 
     [Fact]
     public void WriteMapCatalogs_EnemyWithoutLoop_LeavesIdleAnimationOut()
     {
-        _writer.WriteMapCatalogs(WithEnemies(_catalog.Enemies["goblin"] with { IdleAnimation = null }));
+        _writer.WriteMapCatalogs(WithEnemies(_catalog.Enemies["gnoll"] with { IdleAnimation = null }));
 
-        Assert.False(WrittenEnemies()["goblin"].AsObject().ContainsKey("idleAnimation"));
+        Assert.False(WrittenEnemies()["gnoll"].AsObject().ContainsKey("idleAnimation"));
     }
 
     [Fact]
     public void WriteMapCatalogs_EnemyWithLoop_WritesIt()
     {
         var loop = new TileAnimation { FrameCount = 8, FrameMilliseconds = 120 };
-        var gnoll = _catalog.Enemies["goblin"] with { Id = "gnoll", IdleAnimation = loop };
+        var gnoll = _catalog.Enemies["gnoll"] with { Id = "gnoll", IdleAnimation = loop };
 
         _writer.WriteMapCatalogs(WithEnemies(gnoll));
 
@@ -95,7 +95,7 @@ public sealed class ContentWriterEnemyTests : IDisposable
             Weight = 2,
             When = new TacticCondition(TacticConditionKind.AllyHpBelow, 50),
         };
-        var healer = _catalog.Enemies["goblin"] with
+        var healer = _catalog.Enemies["gnoll"] with
         {
             Id = "goblin_healer",
             Power = 5,
@@ -117,7 +117,7 @@ public sealed class ContentWriterEnemyTests : IDisposable
     {
         var before = File.ReadAllBytes(_content.PathOf("enemies.json"));
         var unknown = new EnemyAction { SkillId = "no_such_skill", Weight = 1 };
-        var broken = _catalog.Enemies["goblin"] with { Id = "goblin_mage", Tactics = [unknown] };
+        var broken = _catalog.Enemies["gnoll"] with { Id = "goblin_mage", Tactics = [unknown] };
 
         var exception = Assert.Throws<ContentValidationException>(() => _writer.WriteMapCatalogs(WithEnemies(broken)));
 
@@ -129,19 +129,19 @@ public sealed class ContentWriterEnemyTests : IDisposable
     [Fact]
     public void WriteEnemies_PowerZero_LeavesItOut()
     {
-        _writer.WriteMapCatalogs(WithEnemies(_catalog.Enemies["goblin"] with { Power = 0 }));
+        _writer.WriteMapCatalogs(WithEnemies(_catalog.Enemies["gnoll"] with { Power = 0 }));
 
-        Assert.False(WrittenEnemies()["goblin"].AsObject().ContainsKey("power"));
+        Assert.False(WrittenEnemies()["gnoll"].AsObject().ContainsKey("power"));
     }
 
     [Fact]
     public void WriteEnemies_PowerFive_WritesItAfterDamageType()
     {
-        _writer.WriteMapCatalogs(WithEnemies(_catalog.Enemies["goblin"] with { Power = 5 }));
+        _writer.WriteMapCatalogs(WithEnemies(_catalog.Enemies["gnoll"] with { Power = 5 }));
 
-        var keys = WrittenEnemies()["goblin"].AsObject().Select(field => field.Key).ToList();
+        var keys = WrittenEnemies()["gnoll"].AsObject().Select(field => field.Key).ToList();
         Assert.Equal(keys.IndexOf("damageType") + 1, keys.IndexOf("power"));
-        Assert.Equal(5, (int?)WrittenEnemies()["goblin"]["power"]);
+        Assert.Equal(5, (int?)WrittenEnemies()["gnoll"]["power"]);
     }
 
     private ContentCatalog WithEnemies(params EnemyDefinition[] enemies)

@@ -13,7 +13,7 @@ public sealed class BattleSoundsTests
 {
     private static readonly TimeSpan _impact = StartOf(PlaybackBeatKind.Impact);
 
-    private readonly Combatant _goblin = Combatant.FromEnemy(StartMapScenarios.TestWorld.Enemies["goblin"]);
+    private readonly Combatant _goblin = Combatant.FromEnemy(StartMapScenarios.TestWorld.Enemies["gnoll"]);
 
     [Fact]
     public void Of_DamageLanded_IsTheHitAtTheImpactsStart()

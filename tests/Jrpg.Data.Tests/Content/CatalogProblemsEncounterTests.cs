@@ -11,7 +11,7 @@ public sealed class CatalogProblemsEncounterTests
     private static readonly ContentCatalog _catalog =
         ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
-    private static readonly EncounterDefinition _ambush = new() { Id = "ambush", EnemyIds = ["goblin", "goblin"] };
+    private static readonly EncounterDefinition _ambush = new() { Id = "ambush", EnemyIds = ["gnoll", "gnoll"] };
 
     [Fact]
     public void OfEncounters_ValidList_IsNull() => Assert.Null(CatalogProblems.OfEncounters([_ambush], _catalog));
@@ -19,7 +19,7 @@ public sealed class CatalogProblemsEncounterTests
     [Fact]
     public void OfEncounters_UnknownEnemy_NamesIt()
     {
-        var problem = CatalogProblems.OfEncounters([_ambush with { EnemyIds = ["goblin", "dragon"] }], _catalog);
+        var problem = CatalogProblems.OfEncounters([_ambush with { EnemyIds = ["gnoll", "dragon"] }], _catalog);
 
         Assert.Equal("encounters.json: encounter 'ambush': enemyIds has unknown enemy id 'dragon'.", problem);
     }

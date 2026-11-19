@@ -75,7 +75,7 @@ public sealed class BattleSceneTests
 
         Assert.Null(request);
         Assert.Null(session.ActiveBattle);
-        Assert.Equal(experienceBefore + catalog.Enemies["goblin"].ExperienceReward, session.Party.Leader.Experience);
+        Assert.Equal(experienceBefore + catalog.Enemies["gnoll"].ExperienceReward, session.Party.Leader.Experience);
     }
 
     [Fact]

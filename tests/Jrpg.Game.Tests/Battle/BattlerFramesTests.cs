@@ -17,7 +17,7 @@ public sealed class BattlerFramesTests
     public BattlerFramesTests()
     {
         var loop = new TileAnimation { FrameCount = 4, FrameMilliseconds = 100 };
-        var gnoll = StartMapScenarios.TestWorld.Enemies["goblin"] with { Id = "gnoll", IdleAnimation = loop };
+        var gnoll = StartMapScenarios.TestWorld.Enemies["gnoll"] with { Id = "gnoll", IdleAnimation = loop };
         _combatants =
         [
             Combatant.FromPartyMember(BattleScenarios.Recruit("sarxian")),

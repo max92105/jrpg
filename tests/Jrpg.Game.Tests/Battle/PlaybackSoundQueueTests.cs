@@ -10,7 +10,7 @@ namespace Jrpg.Game.Tests.Battle;
 [Collection(RepositoryScreenText.CollectionName)]
 public sealed class PlaybackSoundQueueTests
 {
-    private readonly Combatant _goblin = Combatant.FromEnemy(StartMapScenarios.TestWorld.Enemies["goblin"]);
+    private readonly Combatant _goblin = Combatant.FromEnemy(StartMapScenarios.TestWorld.Enemies["gnoll"]);
     private readonly PlaybackSoundQueue _queue = new();
     private readonly AskedSounds _asked = new();
 

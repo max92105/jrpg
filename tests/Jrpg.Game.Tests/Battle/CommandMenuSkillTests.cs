@@ -38,7 +38,7 @@ public sealed class CommandMenuSkillTests
             BattleScenarios.Catalog.Skills,
             BattleScenarios.Catalog.Rules.Stats);
         var party = new PartyState([member], [member], BattleScenarios.Catalog.Rules.Party);
-        var goblin = BattleScenarios.Catalog.Enemies["goblin"];
+        var goblin = BattleScenarios.Catalog.Enemies["gnoll"];
 
         menu.Start(BattleState.Start(party, [goblin], _inventory, new SeededRandom(BattleScenarios.SarxianFirstSeed)));
 

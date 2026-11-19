@@ -11,7 +11,7 @@ namespace Jrpg.Data.Tests.Art;
 // line. The enemy is the test world's goblin, renamed and given the strip.
 public sealed class ArtReferenceCheckBattlerTests : IDisposable
 {
-    private const string Strip = "Gnoll.png";
+    private const string Strip = "TestStrip.png";
 
     private static readonly ContentCatalog _catalog =
         ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
@@ -54,7 +54,7 @@ public sealed class ArtReferenceCheckBattlerTests : IDisposable
 
     private static ContentCatalog WithGnoll(TileAnimation? idle)
     {
-        var gnoll = _catalog.Enemies["goblin"] with { Id = "gnoll", BattleSpriteFile = Strip, IdleAnimation = idle };
+        var gnoll = _catalog.Enemies["gnoll"] with { Id = "gnoll", BattleSpriteFile = Strip, IdleAnimation = idle };
         return _catalog with { Enemies = new Dictionary<string, EnemyDefinition>(_catalog.Enemies) { ["gnoll"] = gnoll } };
     }
 }

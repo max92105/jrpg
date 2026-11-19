@@ -115,9 +115,9 @@ public sealed class EnemyTacticConditionValidatorTests
         using var content = new CopiedContentRoot("enemy-condition-reaction", "test-world");
         content.Replace(
             "enemies.json",
-            "\"id\": \"goblin\",",
+            "\"id\": \"gnoll\",",
             """
-            "id": "goblin", "tactics": [ { "weight": 1, "when": { "kind": "wasCriticallyHit" }, "on": "lowestHpFoe" } ],
+            "id": "gnoll", "tactics": [ { "weight": 1, "when": { "kind": "wasCriticallyHit" }, "on": "lowestHpFoe" } ],
             """);
 
         var expected = new EnemyAction
@@ -129,7 +129,7 @@ public sealed class EnemyTacticConditionValidatorTests
 
         var catalog = ContentCatalogLoader.Load(content.Path);
 
-        Assert.Equal(expected, catalog.Enemies["goblin"].Tactics[0]);
+        Assert.Equal(expected, catalog.Enemies["gnoll"].Tactics[0]);
     }
 
     private static string? ProblemOf(EnemyAction action) =>

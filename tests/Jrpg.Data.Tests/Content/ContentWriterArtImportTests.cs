@@ -74,14 +74,14 @@ public sealed class ContentWriterArtImportTests : IDisposable
     [Fact]
     public void ImportArtImage_BattlerWiderThan4096_IsRefusedNamingTheWidth()
     {
-        var source = PngHeaderFile.Write(ImportSource("GnollWarrior.png"), width: 4097, height: 128);
+        var source = PngHeaderFile.Write(ImportSource("TooWideBattler.png"), width: 4097, height: 128);
 
         var exception = Assert.Throws<ContentValidationException>(() => Import(ArtFolders.Battlers, source));
 
         Assert.Equal(
-            "GnollWarrior.png: a 4097 px wide image is wider than the game loads (4096 px); import it at a smaller height.",
+            "TooWideBattler.png: a 4097 px wide image is wider than the game loads (4096 px); import it at a smaller height.",
             exception.Message);
-        Assert.False(_writer.HasArtImage(ArtFolders.Battlers, "GnollWarrior.png"));
+        Assert.False(_writer.HasArtImage(ArtFolders.Battlers, "TooWideBattler.png"));
     }
 
     [Fact]

@@ -66,7 +66,7 @@ public sealed class BattleLayoutTests
     public void SpotsOf_TwoMembersThenThreeEnemies_GivesPartySpotsThenEncounterSlots()
     {
         var catalog = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
-        var goblin = catalog.Enemies["goblin"];
+        var goblin = catalog.Enemies["gnoll"];
         Combatant[] combatants =
         [
             Combatant.FromPartyMember(BattleScenarios.Recruit("sarxian")),
@@ -90,7 +90,7 @@ public sealed class BattleLayoutTests
     public void SpotsOf_AfterSwap_MembersTradeSpots()
     {
         var (sarxian, jazog) = (Combatant.FromPartyMember(BattleScenarios.Recruit("sarxian")), Combatant.FromPartyMember(BattleScenarios.Recruit("jazog")));
-        var goblin = Combatant.FromEnemy(BattleScenarios.Catalog.Enemies["goblin"]);
+        var goblin = Combatant.FromEnemy(BattleScenarios.Catalog.Enemies["gnoll"]);
         var battle = new BattleState([sarxian, jazog, goblin], new Inventory(), new SeededRandom(0));
         while (battle.CurrentActor == goblin)
         {

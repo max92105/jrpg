@@ -111,16 +111,16 @@ public sealed class EnemyTacticsValidatorTests
         // A tiered skill multiplies its user's Power (decision 787).
         content.Replace(
             "enemies.json",
-            "\"id\": \"goblin\",",
+            "\"id\": \"gnoll\",",
             """
-            "id": "goblin", "power": 1, "tactics": [ { "weight": 4 }, { "skillId": "test_strike", "weight": 2 } ],
+            "id": "gnoll", "power": 1, "tactics": [ { "weight": 4 }, { "skillId": "test_strike", "weight": 2 } ],
             """);
 
         var catalog = ContentCatalogLoader.Load(content.Path);
 
         Assert.Equal(
             [new EnemyAction { Weight = 4 }, new EnemyAction { SkillId = "test_strike", Weight = 2 }],
-            catalog.Enemies["goblin"].Tactics);
+            catalog.Enemies["gnoll"].Tactics);
     }
 
     [Theory]
@@ -163,12 +163,12 @@ public sealed class EnemyTacticsValidatorTests
         using var content = new CopiedContentRoot("enemy-condition", "test-world");
         content.Replace(
             "enemies.json",
-            "\"id\": \"goblin\",",
-            "\"id\": \"goblin\", \"tactics\": [ { \"weight\": 1, \"when\": { \"kind\": \"allyHpBelow\", \"percent\": 50 } } ],");
+            "\"id\": \"gnoll\",",
+            "\"id\": \"gnoll\", \"tactics\": [ { \"weight\": 1, \"when\": { \"kind\": \"allyHpBelow\", \"percent\": 50 } } ],");
 
         var catalog = ContentCatalogLoader.Load(content.Path);
 
-        Assert.Equal(new TacticCondition(TacticConditionKind.AllyHpBelow, 50), catalog.Enemies["goblin"].Tactics[0].When);
+        Assert.Equal(new TacticCondition(TacticConditionKind.AllyHpBelow, 50), catalog.Enemies["gnoll"].Tactics[0].When);
     }
 
     [Theory]

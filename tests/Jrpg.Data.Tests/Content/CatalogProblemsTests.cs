@@ -51,11 +51,11 @@ public sealed class CatalogProblemsTests
     public void OfEnemies_AccuracyTooHigh_NamesEnemyAndField()
     {
         List<EnemyDefinition> enemies =
-            [.. _catalog.Enemies.Values.Select(enemy => enemy.Id == "goblin" ? enemy with { Accuracy = 250 } : enemy)];
+            [.. _catalog.Enemies.Values.Select(enemy => enemy.Id == "gnoll" ? enemy with { Accuracy = 250 } : enemy)];
 
         var problem = CatalogProblems.OfEnemies(enemies, _catalog);
 
-        Assert.Equal("enemies.json: enemy 'goblin': accuracy must be within 0..200 (was 250).", problem);
+        Assert.Equal("enemies.json: enemy 'gnoll': accuracy must be within 0..200 (was 250).", problem);
     }
 
     [Fact]

@@ -61,7 +61,7 @@ public sealed class ContentWriterEncounterTests : IDisposable
         var before = File.ReadAllBytes(_content.PathOf(FileName));
 
         var exception = Assert.Throws<ContentValidationException>(
-            () => _writer.WriteMapCatalogsAndMaps(With(Ambush("ambush") with { EnemyIds = ["goblin", "dragon"] }), []));
+            () => _writer.WriteMapCatalogsAndMaps(With(Ambush("ambush") with { EnemyIds = ["gnoll", "dragon"] }), []));
 
         Assert.Equal("encounters.json: encounter 'ambush': enemyIds has unknown enemy id 'dragon'.", exception.Message);
         Assert.Equal(before, File.ReadAllBytes(_content.PathOf(FileName)));
@@ -71,15 +71,15 @@ public sealed class ContentWriterEncounterTests : IDisposable
     [Fact]
     public void WriteMapCatalogsAndMaps_SameEnemyTwice_WritesBothSlotsInOrder()
     {
-        var ambush = Ambush("ambush") with { EnemyIds = ["goblin", "stone_beetle", "goblin"] };
+        var ambush = Ambush("ambush") with { EnemyIds = ["gnoll", "stone_beetle", "gnoll"] };
 
         _writer.WriteMapCatalogsAndMaps(With(ambush), []);
 
         var enemyIds = WrittenEncounter("ambush")["enemyIds"]!.AsArray().Select(id => (string?)id);
-        Assert.Equal(["goblin", "stone_beetle", "goblin"], enemyIds);
+        Assert.Equal(["gnoll", "stone_beetle", "gnoll"], enemyIds);
     }
 
-    private static EncounterDefinition Ambush(string id) => new() { Id = id, EnemyIds = ["goblin"] };
+    private static EncounterDefinition Ambush(string id) => new() { Id = id, EnemyIds = ["gnoll"] };
 
     // The test world's encounters stay: its maps' random battles name them.
     private ContentCatalog With(params EncounterDefinition[] encounters)

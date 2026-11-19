@@ -21,7 +21,7 @@ public sealed class BattlerWhitenessTests
     [Fact]
     public void Of_FallenBattler_IsTheFallensWhite()
     {
-        var fallen = Combatant.FromEnemy(StartMapScenarios.TestWorld.Enemies["goblin"]);
+        var fallen = Combatant.FromEnemy(StartMapScenarios.TestWorld.Enemies["gnoll"]);
         fallen.Vitals.TakeDamage(9999);
 
         Assert.Equal(Strength, BattlerWhiteness.Of(fallen, AttackAtTheFirstBlink(), 0));
@@ -66,7 +66,7 @@ public sealed class BattlerWhitenessTests
     [Fact]
     public void Of_FallenWashed_IsTheFallensWhite()
     {
-        var fallen = Combatant.FromEnemy(StartMapScenarios.TestWorld.Enemies["goblin"]);
+        var fallen = Combatant.FromEnemy(StartMapScenarios.TestWorld.Enemies["gnoll"]);
         fallen.Vitals.TakeDamage(9999);
 
         Assert.Equal(Strength, BattlerWhiteness.Of(fallen, null, 0.3f));

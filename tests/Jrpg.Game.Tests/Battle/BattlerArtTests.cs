@@ -13,7 +13,7 @@ public sealed class BattlerArtTests
     [Fact]
     public void Of_Enemy_UsesEnemySpriteAndFlip()
     {
-        var goblin = _catalog.Enemies["goblin"] with { IsSpriteFlipped = true };
+        var goblin = _catalog.Enemies["gnoll"] with { IsSpriteFlipped = true };
 
         var art = BattlerArt.Of(Combatant.FromEnemy(goblin));
 
@@ -39,7 +39,7 @@ public sealed class BattlerArtTests
     public void Of_EnemyWithLoop_CarriesIt()
     {
         var loop = new TileAnimation { FrameCount = 6, FrameMilliseconds = 120 };
-        var gnoll = _catalog.Enemies["goblin"] with { IdleAnimation = loop };
+        var gnoll = _catalog.Enemies["gnoll"] with { IdleAnimation = loop };
 
         Assert.Equal(loop, BattlerArt.Of(Combatant.FromEnemy(gnoll)).IdleAnimation);
     }

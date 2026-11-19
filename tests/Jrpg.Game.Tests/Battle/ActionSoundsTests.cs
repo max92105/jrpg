@@ -8,7 +8,7 @@ namespace Jrpg.Game.Tests.Battle;
 // The sound each kind of action opens with, as its wind-up starts (decision 647); BattleSoundsTests holds the impact's.
 public sealed class ActionSoundsTests
 {
-    private readonly Combatant _goblin = Combatant.FromEnemy(StartMapScenarios.TestWorld.Enemies["goblin"]);
+    private readonly Combatant _goblin = Combatant.FromEnemy(StartMapScenarios.TestWorld.Enemies["gnoll"]);
 
     [Fact]
     public void OpeningOf_SkillWithASound_IsItsSound()

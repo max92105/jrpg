@@ -48,12 +48,12 @@ public sealed class EnemyTacticRuleValidatorTests
         using var content = new CopiedContentRoot("enemy-rule-on", "test-world");
         content.Replace(
             "enemies.json",
-            "\"id\": \"goblin\",",
-            "\"id\": \"goblin\", \"tactics\": [ { \"weight\": 1, \"on\": \"lowestHpFoe\" } ],");
+            "\"id\": \"gnoll\",",
+            "\"id\": \"gnoll\", \"tactics\": [ { \"weight\": 1, \"on\": \"lowestHpFoe\" } ],");
 
         var catalog = ContentCatalogLoader.Load(content.Path);
 
-        Assert.Equal(TacticTarget.LowestHpFoe, catalog.Enemies["goblin"].Tactics[0].On);
+        Assert.Equal(TacticTarget.LowestHpFoe, catalog.Enemies["gnoll"].Tactics[0].On);
     }
 
     [Fact]
@@ -173,8 +173,8 @@ public sealed class EnemyTacticRuleValidatorTests
         using var content = new CopiedContentRoot("enemy-rule-unknown-on", "test-world");
         content.Replace(
             "enemies.json",
-            "\"id\": \"goblin\",",
-            "\"id\": \"goblin\", \"tactics\": [ { \"weight\": 1, \"on\": \"everyone\" } ],");
+            "\"id\": \"gnoll\",",
+            "\"id\": \"gnoll\", \"tactics\": [ { \"weight\": 1, \"on\": \"everyone\" } ],");
 
         var exception = Assert.Throws<ContentValidationException>(() => ContentCatalogLoader.Load(content.Path));
 

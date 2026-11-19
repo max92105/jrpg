@@ -45,7 +45,7 @@ public sealed class BattlerScalingTests
     public void OfImage_RepositoryChiefArt_IsTwiceTheGoblinsDrawnSize()
     {
         var chief = ScalingOfBattlerOf("goblin_chief");
-        var goblin = ScalingOfBattlerOf("goblin");
+        var goblin = ScalingOfBattlerOf("gnoll");
 
         Assert.False(chief.IsShrunkSmoothly);
         Assert.Equal(new Point(goblin.DrawnSize.X * 2, goblin.DrawnSize.Y * 2), chief.DrawnSize);

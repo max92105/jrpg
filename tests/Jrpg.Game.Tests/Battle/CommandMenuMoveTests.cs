@@ -55,7 +55,7 @@ public sealed class CommandMenuMoveTests
     {
         var (zanyr, ragnir) = (BattleScenarios.Recruit("zanyr"), BattleScenarios.Recruit("ragnir"));
         var party = new PartyState([zanyr, ragnir], [zanyr, ragnir], BattleScenarios.Catalog.Rules.Party);
-        var goblin = BattleScenarios.Catalog.Enemies["goblin"];
+        var goblin = BattleScenarios.Catalog.Enemies["gnoll"];
         var battle = BattleState.Start(party, [goblin, goblin, goblin], _inventory, new SeededRandom(BattleScenarios.SarxianFirstSeed));
         while (battle.CurrentActor.Side == BattleSide.Enemies)
         {

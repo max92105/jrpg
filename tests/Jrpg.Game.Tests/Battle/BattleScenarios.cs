@@ -41,7 +41,7 @@ internal static class BattleScenarios
     /// The repository's goblin, hitting for certain, never dodging or critting, and shrugging off nothing.
     /// </summary>
     public static EnemyDefinition Goblin { get; } =
-        Catalog.Enemies["goblin"] with { Accuracy = 100, Dodge = 0, CritChance = 0, CrowdControlResistance = 0 };
+        Catalog.Enemies["gnoll"] with { Accuracy = 100, Dodge = 0, CritChance = 0, CrowdControlResistance = 0 };
 
     /// <summary>No effect strip records: every strip at the unlisted pace, no swing.</summary>
     public static IReadOnlyDictionary<string, EffectStripDefinition> NoEffectStrips { get; } =
@@ -83,11 +83,11 @@ internal static class BattleScenarios
     /// <summary>The forest's encounter as a single goblin, changed as the test needs.</summary>
     public static ContentCatalog WithOneGoblin(ContentCatalog catalog, Func<EnemyDefinition, EnemyDefinition> change)
     {
-        var goblin = change(catalog.Enemies["goblin"]);
-        var trio = catalog.Encounters["goblin_trio"] with { EnemyIds = ["goblin"] };
+        var goblin = change(catalog.Enemies["gnoll"]);
+        var trio = catalog.Encounters["goblin_trio"] with { EnemyIds = ["gnoll"] };
         return catalog with
         {
-            Enemies = new Dictionary<string, EnemyDefinition>(catalog.Enemies) { ["goblin"] = goblin },
+            Enemies = new Dictionary<string, EnemyDefinition>(catalog.Enemies) { ["gnoll"] = goblin },
             Encounters = new Dictionary<string, EncounterDefinition>(catalog.Encounters) { ["goblin_trio"] = trio },
         };
     }

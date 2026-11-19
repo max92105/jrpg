@@ -87,7 +87,7 @@ public sealed class ActionPlaybackTests
     [Fact]
     public void Start_TwoTurnsSkipped_ShareOneSkipBeat()
     {
-        var second = Combatant.FromEnemy(BattleScenarios.Catalog.Enemies["goblin"]);
+        var second = Combatant.FromEnemy(BattleScenarios.Catalog.Enemies["gnoll"]);
         BattleEvent[] events =
         [
             new ActionStarted(_sarxian, new AttackCommand(_goblin)),

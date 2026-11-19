@@ -2,8 +2,8 @@
   {
     "id": "gnoll",
     "name": "Gnoll",
-    "portraitFile": "Gnoll Warrior Pixel Portrait.png",
-    "battleSpriteFile": "Guerrier gnoll anim\u00E9 en combat.png",
+    "portraitFile": "Gnoll.png",
+    "battleSpriteFile": "Gnoll.png",
     "idleAnimation": {
       "frameCount": 3,
       "frameMilliseconds": 220
@@ -30,8 +30,8 @@
   {
     "id": "gnoll_archer",
     "name": "Gnoll Archer",
-    "portraitFile": "Pixel-Art Hyena Warrior Portrait.png",
-    "battleSpriteFile": "Animation d\u2019un archer gnoll en mouvement.png",
+    "portraitFile": "GnollArcher.png",
+    "battleSpriteFile": "GnollArcher.png",
     "idleAnimation": {
       "frameCount": 4,
       "frameMilliseconds": 260
@@ -51,8 +51,8 @@
   {
     "id": "gnoll_chief",
     "name": "Gnoll Chief",
-    "portraitFile": "Pixel-Art Gnoll Warlord Portrait.png",
-    "battleSpriteFile": "Boss hy\u00E8ne guerrier anim\u00E9 au fl\u00E9au geschniegelt.png",
+    "portraitFile": "GnollChief.png",
+    "battleSpriteFile": "GnollChief.png",
     "idleAnimation": {
       "frameCount": 4,
       "frameMilliseconds": 260
@@ -72,8 +72,8 @@
   {
     "id": "gnoll_shaman",
     "name": "Gnoll Shaman",
-    "portraitFile": "Gnoll Shaman Staff Portrait.png",
-    "battleSpriteFile": "Animation idle du chaman hy\u00E8ne pixel-art.png",
+    "portraitFile": "GnollShaman.png",
+    "battleSpriteFile": "GnollShaman.png",
     "idleAnimation": {
       "frameCount": 4,
       "frameMilliseconds": 260
@@ -93,8 +93,8 @@
   {
     "id": "gnoll_warrior",
     "name": "Gnoll Warrior",
-    "portraitFile": "Snarling Gnoll Warrior with Axe.png",
-    "battleSpriteFile": "Gnoll guerrier anim\u00E9 \u00E0 la hache.png",
+    "portraitFile": "GnollWarrior.png",
+    "battleSpriteFile": "GnollWarrior.png",
     "idleAnimation": {
       "frameCount": 4,
       "frameMilliseconds": 240

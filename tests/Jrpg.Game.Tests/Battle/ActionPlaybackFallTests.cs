@@ -82,7 +82,7 @@ public sealed class ActionPlaybackFallTests
     [Fact]
     public void Start_TwoTargetsFell_HoldsOneImpactAndOneDefeat()
     {
-        var second = Combatant.FromEnemy(BattleScenarios.Catalog.Enemies["goblin"]);
+        var second = Combatant.FromEnemy(BattleScenarios.Catalog.Enemies["gnoll"]);
         BattleEvent[] events =
         [
             new ActionStarted(_sarxian, new SkillCommand(BattleScenarios.Catalog.Skills["fireball"], [_goblin, second])),

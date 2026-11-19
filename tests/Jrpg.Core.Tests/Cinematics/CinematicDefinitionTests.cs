@@ -13,7 +13,12 @@ public sealed class CinematicDefinitionTests
         Zoom = new StillZoom { StartPercent = 100, EndPercent = 110 },
     };
 
-    private static readonly CinematicStill _road = new() { ImageFile = "intro/2.png", Seconds = 3, Caption = "He left." };
+    private static readonly CinematicStill _road = new()
+    {
+        ImageFile = "intro/2.png",
+        Seconds = 3,
+        Captions = [new StillCaption { Text = "He left.", Seconds = 2 }],
+    };
     private static readonly CinematicDefinition _intro =
         new() { Id = "intro", MusicFile = "town/loop.wav", Stills = [_home, _road] };
 

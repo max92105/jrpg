@@ -39,7 +39,7 @@ public sealed class SkillUsersTests
     public void UsedBy_EnemyPhaseNamesIt_NamesTheEnemy()
     {
         var bolt = new EnemyAction { SkillId = "bolt", Weight = 1 };
-        var chief = _world.Enemies["goblin"] with
+        var chief = _world.Enemies["gnoll"] with
         {
             Name = "Goblin Chief",
             Tactics = [],
@@ -56,8 +56,8 @@ public sealed class SkillUsersTests
     public void UsedBy_TwoEnemies_NamesBothInIdOrder()
     {
         var tactics = new[] { new EnemyAction { SkillId = "bolt", Weight = 1 } };
-        var wolf = _world.Enemies["goblin"] with { Id = "wolf", Name = "Alpha", Tactics = tactics, Phases = [] };
-        var bat = _world.Enemies["goblin"] with { Id = "bat", Name = "Zubat", Tactics = tactics, Phases = [] };
+        var wolf = _world.Enemies["gnoll"] with { Id = "wolf", Name = "Alpha", Tactics = tactics, Phases = [] };
+        var bat = _world.Enemies["gnoll"] with { Id = "bat", Name = "Zubat", Tactics = tactics, Phases = [] };
 
         var line = SkillUsers.UsedBy("bolt", _world with { Enemies = EnemiesOf(wolf, bat) });
 
@@ -67,7 +67,7 @@ public sealed class SkillUsersTests
     [Fact]
     public void UsedBy_NoEnemy_IsEmpty()
     {
-        var goblin = _world.Enemies["goblin"] with { Tactics = [new EnemyAction { SkillId = "zap", Weight = 1 }], Phases = [] };
+        var goblin = _world.Enemies["gnoll"] with { Tactics = [new EnemyAction { SkillId = "zap", Weight = 1 }], Phases = [] };
 
         var line = SkillUsers.UsedBy("bolt", _world with { Enemies = EnemiesOf(goblin) });
 

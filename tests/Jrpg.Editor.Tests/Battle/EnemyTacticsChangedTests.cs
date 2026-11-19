@@ -13,7 +13,7 @@ public sealed class EnemyTacticsChangedTests
         ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
     // The test world's goblin with rules of the test's own: the attack from the start, then two phases.
-    private static readonly EnemyDefinition _boss = _catalog.Enemies["goblin"] with
+    private static readonly EnemyDefinition _boss = _catalog.Enemies["gnoll"] with
     {
         Tactics = [new EnemyAction { Weight = 4 }],
         Phases =

@@ -115,7 +115,7 @@ public sealed class SkillCatalogLinesTests
     private static ContentCatalog Catalog() => SkillFixtures.CatalogWithoutUsers([SkillFixtures.Bolt], [SkillFixtures.Fire1]);
 
     private static EnemyDefinition EnemyNaming(string skillId) =>
-        SkillFixtures.TestWorld.Enemies["goblin"] with
+        SkillFixtures.TestWorld.Enemies["gnoll"] with
         {
             Name = "Goblin Chief",
             Tactics = [],

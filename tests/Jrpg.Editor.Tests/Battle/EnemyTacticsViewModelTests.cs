@@ -14,7 +14,7 @@ public sealed class EnemyTacticsViewModelTests
         ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
     // The test world's goblin with rules of the test's own: two phases, a skill named in two lists.
-    private static readonly EnemyDefinition _boss = _catalog.Enemies["goblin"] with
+    private static readonly EnemyDefinition _boss = _catalog.Enemies["gnoll"] with
     {
         Tactics = [new EnemyAction { Weight = 4 }, new EnemyAction { SkillId = "cleave", Weight = 2 }],
         Phases =

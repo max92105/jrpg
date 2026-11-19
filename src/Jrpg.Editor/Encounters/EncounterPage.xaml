@@ -57,6 +57,19 @@
           <TextBlock Text="Music" Style="{StaticResource FieldLabel}" />
           <ComboBox Width="260" ItemsSource="{Binding MusicChoices}" SelectedItem="{Binding SelectedMusic}" />
         </StackPanel>
+
+        <!-- The maps rolling the chosen encounter: a link or a removal goes to the map at once, as its own undo step. -->
+        <StackPanel DataContext="{Binding DataContext, RelativeSource={RelativeSource AncestorType=encounters:EncounterPage}}" Margin="0,12,0,0">
+          <TextBlock Text="Maps whose random battles pick it" FontWeight="Bold" />
+          <ListBox ItemsSource="{Binding LinkedMaps}" SelectedItem="{Binding SelectedLinkedMap}" DisplayMemberPath="Label"
+                   Height="96" Margin="0,4,0,0" />
+          <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+            <Button Content="Link..." Width="60" Click="OnLinkMapClicked" IsEnabled="{Binding CanLinkMaps}"
+                    ToolTip="Pick a map whose random battles will pick this encounter; a new encounter is applied first. The map changes at once and shows as unsaved." />
+            <Button Content="Remove" Width="60" Margin="4,0,0,0" Command="{Binding UnlinkMapCommand}"
+                    ToolTip="The chosen map stops picking this encounter; random battles turn off on a map left with none" />
+          </StackPanel>
+        </StackPanel>
       </StackPanel>
 
       <ListBox ItemsSource="{Binding Enemies}" SelectedItem="{Binding SelectedSlot}">

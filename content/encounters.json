@@ -3,7 +3,7 @@
     "id": "gnoll_test",
     "enemyIds": [
       "gnoll_archer",
-      "goblin",
+      "gnoll",
       "gnoll_chief",
       "gnoll_shaman",
       "gnoll_warrior"
@@ -12,8 +12,8 @@
   {
     "id": "goblin_chief",
     "enemyIds": [
-      "goblin",
-      "goblin",
+      "gnoll",
+      "gnoll",
       "goblin_chief"
     ],
     "musicFile": "boss/loop.wav"
@@ -21,9 +21,9 @@
   {
     "id": "goblin_trio",
     "enemyIds": [
-      "goblin",
-      "goblin",
-      "goblin"
+      "gnoll",
+      "gnoll",
+      "gnoll"
     ]
   },
   {

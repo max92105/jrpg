@@ -10,7 +10,7 @@ public sealed class EncounterCatalogViewModelChoiceTests
     [Fact]
     public void Choose_KnownId_ChoosesIt()
     {
-        var catalog = new EncounterCatalogViewModel(Catalog, Choices);
+        var catalog = new EncounterCatalogViewModel(Catalog, Choices, NoMaps);
 
         catalog.Choose("b_pair");
 
@@ -20,7 +20,7 @@ public sealed class EncounterCatalogViewModelChoiceTests
     [Fact]
     public void Choose_UnknownId_KeepsTheChoice()
     {
-        var catalog = new EncounterCatalogViewModel(Catalog, Choices);
+        var catalog = new EncounterCatalogViewModel(Catalog, Choices, NoMaps);
         catalog.Choose("b_pair");
 
         catalog.Choose("missing");
@@ -31,7 +31,7 @@ public sealed class EncounterCatalogViewModelChoiceTests
     [Fact]
     public void ChosenKey_EncounterChosen_IsItsId()
     {
-        var catalog = new EncounterCatalogViewModel(Catalog, Choices);
+        var catalog = new EncounterCatalogViewModel(Catalog, Choices, NoMaps);
 
         catalog.SelectedEncounter = catalog.Encounters.Single(encounter => encounter.Id == "b_pair");
 
@@ -42,7 +42,7 @@ public sealed class EncounterCatalogViewModelChoiceTests
     [Fact]
     public void ChosenKey_NewEncounterWithoutId_IsNull()
     {
-        var catalog = new EncounterCatalogViewModel(Catalog, Choices);
+        var catalog = new EncounterCatalogViewModel(Catalog, Choices, NoMaps);
 
         catalog.AddEncounterCommand.Execute(null);
 

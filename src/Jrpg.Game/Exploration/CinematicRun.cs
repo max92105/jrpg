@@ -27,6 +27,7 @@ internal sealed class CinematicRun(ExplorationState exploration, StillView view)
     private TimeSpan? _leadInLeft;
     private TimeSpan _elapsed;
     private StillMoment? _moment;
+    private StillCaption? _caption;
     private TimeSpan _leadOutLeft;
     private SkipHold _skip = new();
 
@@ -63,6 +64,9 @@ internal sealed class CinematicRun(ExplorationState exploration, StillView view)
 
     /// <summary>The still on screen; null while none shows.</summary>
     internal CinematicStill? ShownStill => _moment is { } moment ? _cinematic!.Stills[moment.StillIndex] : null;
+
+    /// <summary>The subtitle on screen; null while no still shows or none of its lines has its turn.</summary>
+    internal string? ShownCaption => _moment is null ? null : _caption?.Text;
 
     /// <summary>Counts down the black after the last still, while <see cref="IsLeadingOut"/>.</summary>
     public void AdvanceLeadOut(TimeSpan delta) => _leadOutLeft -= delta;
@@ -160,7 +164,8 @@ internal sealed class CinematicRun(ExplorationState exploration, StillView view)
         _elapsed = TimeSpan.Zero;
     }
 
-    // A new still measures its subtitle once; past the last, the event goes on behind the black.
+    // A subtitle is measured once, when its turn comes in its still's sequence; past the last still, the event goes on
+    // behind the black.
     private void ShowMoment()
     {
         if (_cinematic!.MomentAt(_elapsed) is not { } moment)
@@ -169,9 +174,11 @@ internal sealed class CinematicRun(ExplorationState exploration, StillView view)
             return;
         }
 
-        if (moment.StillIndex != _moment?.StillIndex)
+        var caption = _cinematic.Stills[moment.StillIndex].CaptionAt(moment.IntoStill);
+        if (moment.StillIndex != _moment?.StillIndex || !ReferenceEquals(caption, _caption))
         {
-            view.Begin(_cinematic.Stills[moment.StillIndex].Caption);
+            view.Begin(caption?.Text);
+            _caption = caption;
         }
 
         _moment = moment;

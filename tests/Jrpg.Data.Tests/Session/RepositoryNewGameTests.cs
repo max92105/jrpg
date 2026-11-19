@@ -60,7 +60,7 @@ public sealed class RepositoryNewGameTests
 
         Assert.Equal("intro", exploration.CurrentMap.Id);
         var step = Assert.IsType<CinematicStep>(exploration.CurrentEventStep);
-        Assert.Contains("Zanyr", catalog.Cinematics[step.CinematicId].Stills[0].Caption, StringComparison.Ordinal);
+        Assert.Contains("Zanyr", catalog.Cinematics[step.CinematicId].Stills[0].Captions[0].Text, StringComparison.Ordinal);
     }
 
     [Fact]

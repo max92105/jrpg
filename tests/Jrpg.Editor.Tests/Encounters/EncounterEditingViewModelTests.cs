@@ -12,7 +12,7 @@ public sealed class EncounterEditingViewModelTests
     private readonly CatalogDraft _draft = new(Catalog);
     private readonly EncounterEditingViewModel _editing;
 
-    public EncounterEditingViewModelTests() => _editing = new EncounterEditingViewModel(_draft, () => Choices);
+    public EncounterEditingViewModelTests() => _editing = new EncounterEditingViewModel(_draft, () => Choices, NoMaps);
 
     [Fact]
     public void Apply_BackgroundChanged_RecordsOneStep()
@@ -45,7 +45,7 @@ public sealed class EncounterEditingViewModelTests
         var mixed = new EncounterDefinition { Id = "mixed", EnemyIds = ["goblin", "orc"] };
         var encounters = new Dictionary<string, EncounterDefinition> { [mixed.Id] = mixed };
         var draft = new CatalogDraft(Catalog with { Encounters = encounters });
-        var editing = new EncounterEditingViewModel(draft, () => Choices);
+        var editing = new EncounterEditingViewModel(draft, () => Choices, NoMaps);
         var steps = 0;
         draft.StepRecorded += (_, _) => steps++;
         var edited = editing.Start();
@@ -72,7 +72,7 @@ public sealed class EncounterEditingViewModelTests
     public void Start_ImageAddedSinceTheEditorStarted_IsOffered()
     {
         var backgrounds = new List<string> { "Cave.png" };
-        var editing = new EncounterEditingViewModel(_draft, () => Choices with { Backgrounds = [.. backgrounds] });
+        var editing = new EncounterEditingViewModel(_draft, () => Choices with { Backgrounds = [.. backgrounds] }, NoMaps);
         backgrounds.Add("Swamp.png");
 
         var edited = editing.Start();

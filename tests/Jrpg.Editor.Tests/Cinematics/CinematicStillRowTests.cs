@@ -11,7 +11,7 @@ public sealed class CinematicStillRowTests
     {
         ImageFile = "intro/2_road.png",
         Seconds = 5.5,
-        Caption = "He left at dawn.",
+        Captions = [new StillCaption { Text = "He left at dawn.", Seconds = 2 }],
         VoiceFile = "intro_2.wav",
         Zoom = new StillZoom { StartPercent = 110, EndPercent = 100 },
     };
@@ -22,7 +22,8 @@ public sealed class CinematicStillRowTests
         var row = CinematicStillRow.From(_road);
 
         Assert.Equal(("intro/2_road.png", "5.5"), (row.ImageFile, row.SecondsText));
-        Assert.Equal(("He left at dawn.", "intro_2.wav"), (row.Caption, row.VoiceFile));
+        Assert.Equal(("He left at dawn.", "2"), (row.Captions.Single().Text, row.Captions.Single().SecondsText));
+        Assert.Equal("intro_2.wav", row.VoiceFile);
         Assert.Equal(("110", "100"), (row.ZoomStartText, row.ZoomEndText));
     }
 
@@ -48,7 +49,9 @@ public sealed class CinematicStillRowTests
         var row = CinematicStillRow.New("intro/1_home.png");
         row.ImageFile = " intro/2_road.png ";
         row.SecondsText = "5.5";
-        row.Caption = "He left at dawn.";
+        row.AddCaptionCommand.Execute(null);
+        row.Captions[0].Text = " He left at dawn. ";
+        row.Captions[0].SecondsText = "2";
         row.VoiceFile = "intro_2.wav";
         row.ZoomStartText = "110";
 
@@ -65,15 +68,14 @@ public sealed class CinematicStillRowTests
     }
 
     [Fact]
-    public void ToStill_EmptyCaptionAndVoice_AreNull()
+    public void ToStill_EmptyVoice_IsNull()
     {
         var row = CinematicStillRow.From(_road);
-        row.Caption = " ";
         row.VoiceFile = "";
 
         var still = row.ToStill();
 
-        Assert.Equal((null, null), (still.Caption, still.VoiceFile));
+        Assert.Null(still.VoiceFile);
     }
 
     [Fact]

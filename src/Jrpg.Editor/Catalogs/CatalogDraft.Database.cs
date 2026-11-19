@@ -97,10 +97,13 @@ internal sealed partial class CatalogDraft
 
     /// <summary>
     /// Replaces the enemies as one undo step (decision 591); nothing when they are the same by content, tactics and
-    /// phases included. No undo refusal: only encounters name an enemy, and catalog steps undo in order, so an
+    /// phases included. The encounters naming an enemy whose id was retyped name its new one in the same step, so an
+    /// undo brings both back. No undo refusal: only encounters name an enemy, and catalog steps undo in order, so an
     /// encounter's pick of an added enemy is undone before the enemy.
     /// </summary>
-    public void SetEnemies(IReadOnlyList<EnemyDefinition> enemies)
+    /// <param name="enemies">Every enemy as edited.</param>
+    /// <param name="renamedIds">Each retyped id of the draft's enemies with its new one; empty when none was.</param>
+    public void SetEnemies(IReadOnlyList<EnemyDefinition> enemies, IReadOnlyDictionary<string, string> renamedIds)
     {
         var before = Current.Enemies;
         var after = enemies.ToDictionary(enemy => enemy.Id, StringComparer.Ordinal);
@@ -109,8 +112,22 @@ internal sealed partial class CatalogDraft
             return;
         }
 
-        Do(new CatalogEdit(catalog => catalog with { Enemies = after }, catalog => catalog with { Enemies = before }));
+        var encountersBefore = Current.Encounters;
+        var encountersAfter = WithEnemiesRenamed(encountersBefore, renamedIds);
+        Do(new CatalogEdit(
+            catalog => catalog with { Enemies = after, Encounters = encountersAfter },
+            catalog => catalog with { Enemies = before, Encounters = encountersBefore }));
     }
+
+    // An encounter naming no renamed enemy stays the same record, so the encounters' own step still compares it equal.
+    private static Dictionary<string, EncounterDefinition> WithEnemiesRenamed(
+        IReadOnlyDictionary<string, EncounterDefinition> encounters, IReadOnlyDictionary<string, string> renamedIds) =>
+        encounters.ToDictionary(
+            pair => pair.Key,
+            pair => pair.Value.EnemyIds.Any(renamedIds.ContainsKey)
+                ? pair.Value with { EnemyIds = [.. pair.Value.EnemyIds.Select(id => renamedIds.GetValueOrDefault(id, id))] }
+                : pair.Value,
+            StringComparer.Ordinal);
 
     /// <summary>
     /// Replaces the encounters as one undo step (decision 905); nothing when they are the same by content, enemies in

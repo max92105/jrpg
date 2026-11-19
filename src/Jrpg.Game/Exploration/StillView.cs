@@ -8,22 +8,21 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Exploration;
 
 /// <summary>
-/// Draws a cinematic's still (ADR 0046) over black: the picture, its subtitle in a dark band that fades out upward, and
-/// the skip hint at the bottom right (<see cref="SkipHintView"/>).
+/// Draws a cinematic's still (ADR 0046) over black: the picture, a black bar over its top and its bottom, its subtitle
+/// in the bottom bar and the skip hint at that bar's right (<see cref="SkipHintView"/>).
 /// </summary>
 internal sealed class StillView
 {
-    // Placeholder look (decision 82): subtitles 32 px with their middle 80 px above the bottom, over a 160 px band.
+    // Placeholder look (decision 82): subtitles 32 px, their middle the bottom bar's.
     private const int CaptionTextPixels = 32;
-    private const int CaptionMiddleAbove = 80;
-    private const int CaptionBandHeight = 160;
 
     private static readonly Rectangle _screen = new(0, 0, VirtualScreen.Width, VirtualScreen.Height);
-    private static readonly Rectangle _band = new(0, VirtualScreen.Height - CaptionBandHeight, VirtualScreen.Width, CaptionBandHeight);
+    private static readonly Rectangle _topBar = new(0, 0, VirtualScreen.Width, UiTheme.StillBarHeight);
+    private static readonly Rectangle _bottomBar =
+        new(0, VirtualScreen.Height - UiTheme.StillBarHeight, VirtualScreen.Width, UiTheme.StillBarHeight);
 
     private readonly OutlinedFont _captionFont;
     private readonly SkipHintView _hint;
-    private Texture2D? _bandTexture;
     private MeasuredText? _caption;
 
     public StillView(ScreenText text, UiTextures ui)
@@ -44,11 +43,11 @@ internal sealed class StillView
 
     /// <summary>
     /// Draws the still: black, then its picture in a batch of its own with linear sampling (decision 627), so a picture
-    /// scaled to the screen, or drifting by fractions of a pixel, stays smooth; then its subtitle and the hint, sharp,
-    /// in the scene's batch again.
+    /// scaled to the screen, or drifting by fractions of a pixel, stays smooth; then the bars, which never fade with
+    /// the picture, its subtitle and the hint, sharp, in the scene's batch again.
     /// </summary>
     /// <param name="batch">Begun with <see cref="VirtualScreen.BeginBatch"/>; ended, then begun again with it.</param>
-    /// <param name="textures">The still's picture, and where the band is made once.</param>
+    /// <param name="textures">The still's picture, and the pixel the bars are drawn with.</param>
     /// <param name="frame">The still as it shows this frame.</param>
     public void Draw(SpriteBatch batch, TextureLibrary textures, StillFrame frame)
     {
@@ -59,11 +58,12 @@ internal sealed class StillView
         CoverFit.DrawZoomedOverScreen(batch, textures.Get(ArtFolders.Cinematics, frame.ImageFile), tint, frame.Zoom);
         batch.End();
         VirtualScreen.BeginBatch(batch);
+        batch.Draw(textures.Pixel, _topBar, Color.Black);
+        batch.Draw(textures.Pixel, _bottomBar, Color.Black);
         if (_caption is { } caption)
         {
-            _bandTexture ??= textures.Create(1, CaptionBandHeight, GradientStrip.Colors(UiTheme.CaptionBand, CaptionBandHeight));
-            batch.Draw(_bandTexture, _band, tint);
-            var position = new Vector2((VirtualScreen.Width - caption.Width) / 2, VirtualScreen.Height - CaptionMiddleAbove - (_captionFont.Font.LineHeight / 2f));
+            var middle = VirtualScreen.Height - (UiTheme.StillBarHeight / 2f);
+            var position = new Vector2((VirtualScreen.Width - caption.Width) / 2, middle - (_captionFont.Font.LineHeight / 2f));
             _captionFont.Draw(batch, caption.Text, position, UiTheme.TextPrimary * frame.Opacity);
         }
 

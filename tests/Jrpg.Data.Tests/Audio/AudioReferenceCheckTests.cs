@@ -20,9 +20,9 @@ public sealed class AudioReferenceCheckTests
     }
 
     [Fact]
-    public void FindProblems_PlaceholderVoice_IsFound()
+    public void FindProblems_VoiceInTheFolder_IsFound()
     {
-        Assert.Empty(AudioReferenceCheck.FindProblems(WithIntroVoice("Placeholder.wav"), _audioRoot));
+        Assert.Empty(AudioReferenceCheck.FindProblems(WithIntroVoice(RepositoryVoice.Name), _audioRoot));
     }
 
     [Fact]
@@ -36,10 +36,13 @@ public sealed class AudioReferenceCheckTests
     [Fact]
     public void FindProblems_CaseMismatch_NamesTheActualFile()
     {
-        var problem = Assert.Single(AudioReferenceCheck.FindProblems(WithIntroVoice("placeholder.wav"), _audioRoot));
+        var otherCase = RepositoryVoice.Name.ToUpperInvariant();
+
+        var problem = Assert.Single(AudioReferenceCheck.FindProblems(WithIntroVoice(otherCase), _audioRoot));
 
         Assert.Equal(
-            "voices/placeholder.wav: the file is named Placeholder.wav; names must match exactly. Named by event 'cell_0_0' on map 'intro'.",
+            $"voices/{otherCase}: the file is named {RepositoryVoice.Name}; names must match exactly. "
+            + "Named by event 'cell_0_0' on map 'intro'.",
             problem);
     }
 

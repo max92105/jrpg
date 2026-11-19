@@ -160,7 +160,7 @@ internal sealed partial class MainViewModel
             () => ReadableImagesIn(ArtFolders.Backgrounds),
             file => ReadableSizeOf(ArtFolders.Backgrounds, file));
 
-    private EncounterEditingViewModel CreateEncounterEditing() => new(Content!, ReadEncounterChoices);
+    private EncounterEditingViewModel CreateEncounterEditing() => new(Content!, ReadEncounterChoices, CreateEncounterMapLinks());
 
     // Read when the page opens, so an enemy, image or track added since the editor started is offered.
     private EncounterChoices ReadEncounterChoices() =>

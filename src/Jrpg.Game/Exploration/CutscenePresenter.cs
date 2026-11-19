@@ -35,6 +35,9 @@ internal sealed class CutscenePresenter(ExplorationState exploration, StillView 
     /// <summary>The cinematic's picture on screen, as a test reads it; null while none shows.</summary>
     internal string? ShownCinematicImage => _cinematic.ShownStill?.ImageFile;
 
+    /// <summary>The subtitle on screen, as a test reads it.</summary>
+    internal string? ShownCinematicCaption => _cinematic.ShownCaption;
+
     /// <summary>The skip hint the run last asked for, as a test reads it.</summary>
     internal string SkipHint => view.SkipHint;
 

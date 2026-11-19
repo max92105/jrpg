@@ -52,10 +52,9 @@ public sealed class WavDurationTests : IDisposable
     }
 
     [Fact]
-    public void Read_RepositoryPlaceholderVoice_IsAboveZero()
+    public void Read_RepositoryVoice_IsAboveZero()
     {
-        var audioRoot = AudioFolders.RootIn(Path.Combine(AppContext.BaseDirectory, "content"));
-        var voice = Path.Combine(audioRoot, AudioFolders.Voices, "Placeholder.wav");
+        var voice = Path.Combine(RepositoryVoice.AudioRoot, AudioFolders.Voices, RepositoryVoice.Name);
 
         Assert.True(WavDuration.Read(voice) > TimeSpan.Zero);
     }

@@ -17,11 +17,16 @@ public sealed class CinematicPreviewTests
             {
                 ImageFile = "intro/1.png",
                 Seconds = 2,
-                Caption = "Long ago.",
+                Captions = [new StillCaption { Text = "Long ago.", Seconds = 2 }],
                 Zoom = new StillZoom { StartPercent = 100, EndPercent = 110 },
                 Focus = new StillFocus { XPercent = 25, YPercent = 75 },
             },
-            new CinematicStill { ImageFile = "intro/2.png", Seconds = 3, Caption = "Far away." },
+            new CinematicStill
+            {
+                ImageFile = "intro/2.png",
+                Seconds = 3,
+                Captions = [new StillCaption { Text = "Far away.", Seconds = 2 }],
+            },
         ],
     };
 

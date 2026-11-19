@@ -1,5 +1,33 @@
 [
   {
+    "id": "gnoll",
+    "name": "Gnoll",
+    "portraitFile": "Gnoll Warrior Pixel Portrait.png",
+    "battleSpriteFile": "Guerrier gnoll anim\u00E9 en combat.png",
+    "idleAnimation": {
+      "frameCount": 3,
+      "frameMilliseconds": 220
+    },
+    "attackEffectFile": "GoldenSlashImpact.png",
+    "isSpriteFlipped": false,
+    "maxHp": 30,
+    "damage": 9,
+    "damageType": "piercing",
+    "accuracy": 75,
+    "dodge": 0,
+    "critChance": 5,
+    "crowdControlResistance": 10,
+    "resistances": {
+      "fire": -25
+    },
+    "experienceReward": 40,
+    "dropTableId": "goblin",
+    "gold": {
+      "min": 6,
+      "max": 12
+    }
+  },
+  {
     "id": "gnoll_archer",
     "name": "Gnoll Archer",
     "portraitFile": "Pixel-Art Hyena Warrior Portrait.png",
@@ -82,34 +110,6 @@
     "crowdControlResistance": 0,
     "resistances": {},
     "experienceReward": 0
-  },
-  {
-    "id": "goblin",
-    "name": "Gnoll",
-    "portraitFile": "Gnoll Warrior Pixel Portrait.png",
-    "battleSpriteFile": "Guerrier gnoll anim\u00E9 en combat.png",
-    "idleAnimation": {
-      "frameCount": 3,
-      "frameMilliseconds": 220
-    },
-    "attackEffectFile": "GoldenSlashImpact.png",
-    "isSpriteFlipped": false,
-    "maxHp": 30,
-    "damage": 9,
-    "damageType": "piercing",
-    "accuracy": 75,
-    "dodge": 0,
-    "critChance": 5,
-    "crowdControlResistance": 10,
-    "resistances": {
-      "fire": -25
-    },
-    "experienceReward": 40,
-    "dropTableId": "goblin",
-    "gold": {
-      "min": 6,
-      "max": 12
-    }
   },
   {
     "id": "goblin_chief",

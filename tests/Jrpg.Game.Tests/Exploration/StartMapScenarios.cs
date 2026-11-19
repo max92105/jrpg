@@ -79,7 +79,8 @@ internal static class StartMapScenarios
 
     /// <summary>
     /// Below the chest, which now plays the cinematic <c>test_cinematic</c> every time (ADR 0046): <c>a.png</c> then
-    /// <c>b.png</c>, 4 s each, subtitled "Long ago." and "Far away.", then a line to read.
+    /// <c>b.png</c>, 4 s each, the first subtitled "Long ago." for 2 s, the second "Far away." for 2 s, nothing for
+    /// half a second, then "So far." for 1 s; then a line to read.
     /// </summary>
     public static ContentCatalog BelowChestPlayingCinematic { get; } = WithChestSaying(
         WithTestCinematic(BelowChest),
@@ -193,8 +194,23 @@ internal static class StartMapScenarios
                 Id = "test_cinematic",
                 Stills =
                 [
-                    new CinematicStill { ImageFile = "a.png", Seconds = 4, Caption = "Long ago." },
-                    new CinematicStill { ImageFile = "b.png", Seconds = 4, Caption = "Far away." },
+                    new CinematicStill
+                    {
+                        ImageFile = "a.png",
+                        Seconds = 4,
+                        Captions = [new StillCaption { Text = "Long ago.", Seconds = 2 }],
+                    },
+                    new CinematicStill
+                    {
+                        ImageFile = "b.png",
+                        Seconds = 4,
+                        Captions =
+                        [
+                            new StillCaption { Text = "Far away.", Seconds = 2 },
+                            new StillCaption { Text = "", Seconds = 0.5 },
+                            new StillCaption { Text = "So far.", Seconds = 1 },
+                        ],
+                    },
                 ],
             },
         },

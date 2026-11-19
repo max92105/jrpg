@@ -14,7 +14,7 @@ public sealed class EnemyResistanceTests
 
     // The tests' own weakness to fire over the test world's goblin, whose numbers are the developer's to change.
     private static EnemyDefinition FireWeakGoblin =>
-        _catalog.Enemies["goblin"] with { Resistances = Resistances.None with { Fire = -250 } };
+        _catalog.Enemies["gnoll"] with { Resistances = Resistances.None with { Fire = -250 } };
 
     [Fact]
     public void Resistances_FireWeakGoblin_OneRowPerTypeFireMinus25()
@@ -61,10 +61,10 @@ public sealed class EnemyResistanceTests
         var notified = new List<string?>();
         catalog.PropertyChanged += (_, e) => notified.Add(e.PropertyName);
 
-        var goblin = catalog.Enemies.Single(enemy => enemy.Id == "goblin");
+        var goblin = catalog.Enemies.Single(enemy => enemy.Id == "gnoll");
         goblin.Resistances.Single(row => row.Type == DamageType.Fire).PercentText = "80";
 
-        Assert.Equal("enemies.json: enemy 'goblin': resistances.fire must be within -100..75 (was 80).", catalog.Problem);
+        Assert.Equal("enemies.json: enemy 'gnoll': resistances.fire must be within -100..75 (was 80).", catalog.Problem);
         Assert.Contains(nameof(EnemyCatalogViewModel.Problem), notified);
     }
 

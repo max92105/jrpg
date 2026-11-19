@@ -14,7 +14,7 @@ public sealed class EnemyArtViewModelTests
         ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
     // The tests' own pictures over the test world's goblin.
-    private static EnemyDefinition Wolf => _catalog.Enemies["goblin"] with
+    private static EnemyDefinition Wolf => _catalog.Enemies["gnoll"] with
     {
         BattleSpriteFile = "Wolf.png",
         PortraitFile = "WolfFace.png",

@@ -19,10 +19,6 @@
         "onlyWhenLeaderId": "sarxian",
         "steps": [
           {
-            "type": "voice",
-            "file": "Placeholder.wav"
-          },
-          {
             "type": "cinematic",
             "cinematicId": "sarxian_intro"
           },
@@ -50,10 +46,6 @@
         "onlyWhenObjectId": null,
         "onlyWhenLeaderId": "jazog",
         "steps": [
-          {
-            "type": "voice",
-            "file": "Placeholder.wav"
-          },
           {
             "type": "cinematic",
             "cinematicId": "jazog_intro"
@@ -83,10 +75,6 @@
         "onlyWhenLeaderId": "teelle",
         "steps": [
           {
-            "type": "voice",
-            "file": "Placeholder.wav"
-          },
-          {
             "type": "cinematic",
             "cinematicId": "teelle_intro"
           },
@@ -114,10 +102,6 @@
         "onlyWhenObjectId": null,
         "onlyWhenLeaderId": "zaruk",
         "steps": [
-          {
-            "type": "voice",
-            "file": "Placeholder.wav"
-          },
           {
             "type": "cinematic",
             "cinematicId": "zaruk_intro"
@@ -147,10 +131,6 @@
         "onlyWhenLeaderId": "zanyr",
         "steps": [
           {
-            "type": "voice",
-            "file": "Placeholder.wav"
-          },
-          {
             "type": "cinematic",
             "cinematicId": "zanyr_intro"
           },
@@ -178,10 +158,6 @@
         "onlyWhenObjectId": null,
         "onlyWhenLeaderId": "thaali",
         "steps": [
-          {
-            "type": "voice",
-            "file": "Placeholder.wav"
-          },
           {
             "type": "cinematic",
             "cinematicId": "thaali_intro"
@@ -239,10 +215,6 @@
         "onlyWhenLeaderId": "omer",
         "steps": [
           {
-            "type": "voice",
-            "file": "Placeholder.wav"
-          },
-          {
             "type": "cinematic",
             "cinematicId": "omer_intro"
           },
@@ -270,10 +242,6 @@
         "onlyWhenObjectId": null,
         "onlyWhenLeaderId": "lazarus",
         "steps": [
-          {
-            "type": "voice",
-            "file": "Placeholder.wav"
-          },
           {
             "type": "cinematic",
             "cinematicId": "lazarus_intro"

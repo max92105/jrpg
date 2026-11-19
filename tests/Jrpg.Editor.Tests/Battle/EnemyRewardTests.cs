@@ -12,7 +12,7 @@ public sealed class EnemyRewardTests
         ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
     // The tests' own rewards over the test world's goblin, whose numbers are the developer's to change.
-    private static EnemyDefinition Pauper => _catalog.Enemies["goblin"] with { Gold = null, DropTableId = null, IsBoss = false };
+    private static EnemyDefinition Pauper => _catalog.Enemies["gnoll"] with { Gold = null, DropTableId = null, IsBoss = false };
 
     private static EnemyDefinition Rich => Pauper with { Gold = new GoldRange(6, 12), DropTableId = "goblin", IsBoss = true };
 
@@ -106,12 +106,12 @@ public sealed class EnemyRewardTests
     [Fact]
     public void Problem_GoldMaxBelowMin_IsDataMessage()
     {
-        var onlyRich = _catalog with { Enemies = new Dictionary<string, EnemyDefinition> { ["goblin"] = Rich } };
+        var onlyRich = _catalog with { Enemies = new Dictionary<string, EnemyDefinition> { ["gnoll"] = Rich } };
         var catalog = new EnemyCatalogViewModel(onlyRich, _ => []);
 
         catalog.Enemies[0].GoldMaxText = "4";
 
-        Assert.Equal("enemies.json: enemy 'goblin': gold.max must be within 6..9999999 (was 4).", catalog.Problem);
+        Assert.Equal("enemies.json: enemy 'gnoll': gold.max must be within 6..9999999 (was 4).", catalog.Problem);
     }
 
     [Fact]

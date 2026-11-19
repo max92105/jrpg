@@ -268,6 +268,12 @@ internal sealed partial class CombinedHistory : ObservableObject
         return null;
     }
 
+    /// <summary>
+    /// Orders a step a map took while it wasn't the shown one (a link from the Encounters page): undone once that map
+    /// is shown, as its other steps.
+    /// </summary>
+    public void RecordStepOnMap(string mapId) => RecordStep(UndoStep.OnMap(mapId));
+
     private string? ShownMapId => _openMap?.Map.Id;
 
     private bool CanUndo() => _journal.CanUndo(ShownMapId);

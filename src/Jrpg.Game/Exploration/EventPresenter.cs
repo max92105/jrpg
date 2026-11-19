@@ -70,6 +70,9 @@ internal sealed class EventPresenter
     /// <summary>The cinematic's picture on screen, as a test reads it; null while none shows.</summary>
     internal string? ShownCinematicImage => _cutscene.ShownCinematicImage;
 
+    /// <summary>The cinematic's subtitle on screen, as a test reads it.</summary>
+    internal string? ShownCinematicCaption => _cutscene.ShownCinematicCaption;
+
     /// <summary>The cutscene's skip hint, as a test reads it.</summary>
     internal string SkipHint => _cutscene.SkipHint;
 

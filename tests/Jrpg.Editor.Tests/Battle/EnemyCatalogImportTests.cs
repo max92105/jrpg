@@ -54,7 +54,7 @@ public sealed class EnemyCatalogImportTests
     [Fact]
     public void Pick_FolderOfNoEnemyPicture_Throws()
     {
-        var art = EnemyViewModel.From(_catalog.Enemies["goblin"]).Art;
+        var art = EnemyViewModel.From(_catalog.Enemies["gnoll"]).Art;
 
         Assert.Throws<ArgumentException>(() => art.Pick(ArtFolders.Tilesheets, "Grass.png"));
     }

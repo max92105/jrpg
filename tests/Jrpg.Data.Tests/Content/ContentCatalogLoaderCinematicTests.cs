@@ -35,7 +35,7 @@ public sealed class ContentCatalogLoaderCinematicTests : IDisposable
                   {
                     "imageFile": "intro/b.png",
                     "seconds": 4.5,
-                    "caption": "Long ago.",
+                    "captions": [ { "text": "Long ago.", "seconds": 2 }, { "text": "", "seconds": 1.5 } ],
                     "voiceFile": "intro_1.wav",
                     "zoom": {
                       "startPercent": 110,
@@ -56,7 +56,8 @@ public sealed class ContentCatalogLoaderCinematicTests : IDisposable
         Assert.Equal("town/loop.wav", intro.MusicFile);
         Assert.Equal(["intro/b.png", "intro/a.png"], intro.Stills.Select(still => still.ImageFile));
         var first = intro.Stills[0];
-        Assert.Equal((4.5, "Long ago.", "intro_1.wav"), (first.Seconds, first.Caption, first.VoiceFile));
+        Assert.Equal((4.5, "intro_1.wav"), (first.Seconds, first.VoiceFile));
+        Assert.Equal([("Long ago.", 2), ("", 1.5)], first.Captions.Select(caption => (caption.Text, caption.Seconds)));
         Assert.Equal(new StillZoom { StartPercent = 110, EndPercent = 130 }, first.Zoom);
     }
 
@@ -69,7 +70,8 @@ public sealed class ContentCatalogLoaderCinematicTests : IDisposable
 
         var still = Assert.Single(intro.Stills);
         Assert.Null(intro.MusicFile);
-        Assert.Equal((null, null, null, null), (still.Caption, still.VoiceFile, still.Zoom, still.Focus));
+        Assert.Empty(still.Captions);
+        Assert.Equal((null, null, null), (still.VoiceFile, still.Zoom, still.Focus));
     }
 
     [Fact]

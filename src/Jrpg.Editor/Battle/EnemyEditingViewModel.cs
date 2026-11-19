@@ -17,6 +17,8 @@ internal sealed class EnemyEditingViewModel(CatalogDraft catalog, Func<string, I
     /// </summary>
     public EnemyCatalogViewModel Start() => new(catalog.Current, artImagesIn);
 
-    /// <summary>Gives the draft the page's enemies; nothing when they didn't change.</summary>
-    public void Apply(EnemyCatalogViewModel edited) => catalog.SetEnemies(edited.ToEnemies());
+    /// <summary>
+    /// Gives the draft the page's enemies, the encounters following a retyped id; nothing when they didn't change.
+    /// </summary>
+    public void Apply(EnemyCatalogViewModel edited) => catalog.SetEnemies(edited.ToEnemies(), edited.RenamedIds());
 }

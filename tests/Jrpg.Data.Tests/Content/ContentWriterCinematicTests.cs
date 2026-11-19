@@ -93,7 +93,7 @@ public sealed class ContentWriterCinematicTests : IDisposable
     {
         var still = Still("intro/1.png") with
         {
-            Caption = "Long ago.",
+            Captions = [new StillCaption { Text = "Long ago.", Seconds = 2 }],
             VoiceFile = "Placeholder.wav",
             Zoom = new StillZoom { StartPercent = 100, EndPercent = 120 },
             Focus = new StillFocus { XPercent = 30, YPercent = 62 },

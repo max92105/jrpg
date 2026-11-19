@@ -237,7 +237,7 @@ public sealed class DropTableCatalogViewModelTests
     private static ContentCatalog WithEnemiesRolling(string tableId, params string[] enemyIds) =>
         _testWorld with
         {
-            Enemies = enemyIds.ToDictionary(id => id, id => _testWorld.Enemies["goblin"] with { Id = id, DropTableId = tableId }),
+            Enemies = enemyIds.ToDictionary(id => id, id => _testWorld.Enemies["gnoll"] with { Id = id, DropTableId = tableId }),
         };
 
     private static ItemDefinition Item(string id, string name) => new()

@@ -20,13 +20,16 @@ internal sealed partial class EncounterCatalogViewModel : ObservableObject, IEdi
 {
     private readonly ContentCatalog _content;
     private readonly EncounterChoices _choices;
+    private readonly EncounterMapLinks _maps;
 
     /// <param name="content">The draft as it is: the encounters edited and the enemies they name.</param>
     /// <param name="choices">What each encounter's boxes offer.</param>
-    public EncounterCatalogViewModel(ContentCatalog content, EncounterChoices choices)
+    /// <param name="maps">The session's maps, which the chosen encounter is linked to and unlinked from.</param>
+    public EncounterCatalogViewModel(ContentCatalog content, EncounterChoices choices, EncounterMapLinks maps)
     {
         _content = content;
         _choices = choices;
+        _maps = maps;
         Encounters =
         [
             .. content.Encounters.Values

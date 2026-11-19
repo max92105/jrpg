@@ -26,7 +26,7 @@ public sealed class EnemyCatalogViewModelTests
 
         var ids = catalog.Enemies.Select(enemy => enemy.Id).ToList();
         Assert.Equal(ids.Order(StringComparer.Ordinal), ids);
-        Assert.Contains(catalog.Enemies, enemy => enemy.Id == "goblin");
+        Assert.Contains(catalog.Enemies, enemy => enemy.Id == "gnoll");
         Assert.Same(catalog.Enemies[0], catalog.SelectedEnemy);
         Assert.Null(catalog.Problem);
     }
@@ -92,9 +92,9 @@ public sealed class EnemyCatalogViewModelTests
         var notified = new List<string?>();
         catalog.PropertyChanged += (_, e) => notified.Add(e.PropertyName);
 
-        catalog.Enemies.Single(enemy => enemy.Id == "goblin").DodgeText = "51";
+        catalog.Enemies.Single(enemy => enemy.Id == "gnoll").DodgeText = "51";
 
-        Assert.Equal("enemies.json: enemy 'goblin': dodge must be within 0..50 (was 51).", catalog.Problem);
+        Assert.Equal("enemies.json: enemy 'gnoll': dodge must be within 0..50 (was 51).", catalog.Problem);
         Assert.Contains(nameof(EnemyCatalogViewModel.Problem), notified);
     }
 
@@ -130,17 +130,17 @@ public sealed class EnemyCatalogViewModelTests
             },
         };
         var cleaves = new EnemyAction { SkillId = cleave.Id, Weight = 1 };
-        var goblin = _catalog.Enemies["goblin"] with { Power = 0, Tactics = [cleaves] };
+        var goblin = _catalog.Enemies["gnoll"] with { Power = 0, Tactics = [cleaves] };
         var draft = _catalog with
         {
             Skills = new Dictionary<string, SkillDefinition>(_catalog.Skills) { [cleave.Id] = cleave },
-            Enemies = new Dictionary<string, EnemyDefinition>(_catalog.Enemies) { ["goblin"] = goblin },
+            Enemies = new Dictionary<string, EnemyDefinition>(_catalog.Enemies) { ["gnoll"] = goblin },
         };
 
         var catalog = new EnemyCatalogViewModel(draft, _ => []);
 
         Assert.Equal(
-            "enemies.json: enemy 'goblin': power must be at least 1: its skill 'tiered_cleave' names a tiered effect (was 0).",
+            "enemies.json: enemy 'gnoll': power must be at least 1: its skill 'tiered_cleave' names a tiered effect (was 0).",
             catalog.Problem);
     }
 
@@ -149,21 +149,21 @@ public sealed class EnemyCatalogViewModelTests
     {
         var catalog = new EnemyCatalogViewModel(_catalog, _ => []);
 
-        catalog.Enemies.Single(enemy => enemy.Id == "goblin").PowerText = "10001";
+        catalog.Enemies.Single(enemy => enemy.Id == "gnoll").PowerText = "10001";
 
-        Assert.Equal("enemies.json: enemy 'goblin': power must be within 0..10000 (was 10001).", catalog.Problem);
+        Assert.Equal("enemies.json: enemy 'gnoll': power must be within 0..10000 (was 10001).", catalog.Problem);
     }
 
     [Fact]
     public void Problem_FrameCountOne_IsDatasMessage()
     {
         var catalog = new EnemyCatalogViewModel(_catalog, _ => []);
-        var goblin = catalog.Enemies.Single(enemy => enemy.Id == "goblin");
+        var goblin = catalog.Enemies.Single(enemy => enemy.Id == "gnoll");
 
         goblin.Art.IsAnimated = true;
         goblin.Art.FrameCountText = "1";
 
-        Assert.Equal("enemies.json: enemy 'goblin': idleAnimation.frameCount must be at least 2 (was 1).", catalog.Problem);
+        Assert.Equal("enemies.json: enemy 'gnoll': idleAnimation.frameCount must be at least 2 (was 1).", catalog.Problem);
     }
 
     [Fact]
@@ -275,7 +275,7 @@ public sealed class EnemyCatalogViewModelTests
 
     // The test world's goblin under each id, the only enemies, so a choice is told apart by its id alone.
     private static ContentCatalog WithEnemies(params string[] ids) =>
-        _catalog with { Enemies = ids.ToDictionary(id => id, id => _catalog.Enemies["goblin"] with { Id = id }) };
+        _catalog with { Enemies = ids.ToDictionary(id => id, id => _catalog.Enemies["gnoll"] with { Id = id }) };
 
     private static ContentCatalog WithSkills(params SkillDefinition[] added)
     {

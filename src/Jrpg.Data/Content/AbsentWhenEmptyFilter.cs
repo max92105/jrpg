@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Text.Json.Serialization.Metadata;
 using Jrpg.Core.Battle;
+using Jrpg.Core.Cinematics;
 using Jrpg.Core.Effects;
 using Jrpg.Core.Items;
 using Jrpg.Core.Resources;
@@ -40,6 +41,9 @@ internal static class AbsentWhenEmptyFilter
 
         // ADR 0058: only a unique has fixed affixes.
         (typeof(ItemDefinition), "fixedAffixes"),
+
+        // A still may have no subtitle.
+        (typeof(CinematicStill), "captions"),
 
         // Decision 1011: a resource only its skills change gains on no trigger.
         (typeof(ResourceDefinition), "gains"),

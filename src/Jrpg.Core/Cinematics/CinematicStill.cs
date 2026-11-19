@@ -3,8 +3,8 @@ using Jrpg.Core.Geometry;
 namespace Jrpg.Core.Cinematics;
 
 /// <summary>
-/// One still of a cinematic as content: its picture, how long it shows, its subtitle, voice line, zoom and the point
-/// the zoom heads to.
+/// One still of a cinematic as content: its picture, how long it shows, its subtitles in sequence, voice line, zoom and
+/// the point the zoom heads to.
 /// </summary>
 public sealed record CinematicStill
 {
@@ -17,8 +17,11 @@ public sealed record CinematicStill
     /// <summary>How long the still shows, fades included; above 0.</summary>
     public required double Seconds { get; init; }
 
-    /// <summary>The subtitle shown under the still; null shows none.</summary>
-    public string? Caption { get; init; }
+    /// <summary>
+    /// The subtitles shown one after the other from the still's start, each for its own time; none shows once the last
+    /// one's time is over. Empty for a still without subtitles.
+    /// </summary>
+    public IReadOnlyList<StillCaption> Captions { get; init; } = [];
 
     /// <summary>A voice line in the voices folder, started with the still; null starts none (decision 613).</summary>
     public string? VoiceFile { get; init; }
@@ -46,4 +49,37 @@ public sealed record CinematicStill
     /// </summary>
     public double ScaleAt(TimeSpan intoStill) =>
         Zoom is { } zoom ? zoom.ScaleAt(Math.Clamp(intoStill / Duration, 0, 1)) : 1;
+
+    /// <summary>
+    /// The subtitle shown at a time into the still: the one whose turn it is in the sequence; null before the still
+    /// starts, during a pause, and once the last one's time is over.
+    /// </summary>
+    public StillCaption? CaptionAt(TimeSpan intoStill)
+    {
+        var start = TimeSpan.Zero;
+        foreach (var caption in Captions)
+        {
+            var end = start + caption.Duration;
+            if (intoStill >= start && intoStill < end)
+            {
+                return caption.Text.Length > 0 ? caption : null;
+            }
+
+            start = end;
+        }
+
+        return null;
+    }
+
+    // The generated Equals compares the subtitles by reference; a changed-record check needs them by content.
+    public bool Equals(CinematicStill? other) =>
+        other is not null
+        && ImageFile == other.ImageFile
+        && Seconds.Equals(other.Seconds)
+        && VoiceFile == other.VoiceFile
+        && Zoom == other.Zoom
+        && Focus == other.Focus
+        && Captions.SequenceEqual(other.Captions);
+
+    public override int GetHashCode() => HashCode.Combine(ImageFile, Seconds, VoiceFile, Zoom, Focus, Captions.Count);
 }

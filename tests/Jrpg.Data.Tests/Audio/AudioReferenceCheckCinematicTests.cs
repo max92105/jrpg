@@ -5,8 +5,8 @@ using Jrpg.Data.Content;
 
 namespace Jrpg.Data.Tests.Audio;
 
-// A cinematic's voices and track (ADR 0046), on the repository's audio, whose Placeholder.wav voice and town track the
-// other audio tests also read; the cinematic is built here, since the repository's are the developer's.
+// A cinematic's voices and track (ADR 0046), on the repository's audio, whose first voice and town track the other
+// audio tests also read; the cinematic is built here, since the repository's are the developer's.
 public sealed class AudioReferenceCheckCinematicTests
 {
     private static readonly string _audioRoot = AudioFolders.RootIn(Path.Combine(AppContext.BaseDirectory, "content"));
@@ -14,7 +14,7 @@ public sealed class AudioReferenceCheckCinematicTests
         ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "content"));
 
     private static readonly CinematicStill _voiced =
-        new() { ImageFile = "intro/1.png", Seconds = 4, VoiceFile = "Placeholder.wav" };
+        new() { ImageFile = "intro/1.png", Seconds = 4, VoiceFile = RepositoryVoice.Name };
     private static readonly CinematicStill _silent = new() { ImageFile = "intro/2.png", Seconds = 4 };
 
     [Fact]

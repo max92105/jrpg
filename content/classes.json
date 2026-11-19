@@ -185,7 +185,7 @@
     "name": "Fighter",
     "description": "A trained fighter who stands in front and wins by steel and endurance.",
     "base": {
-      "maxHp": 220,
+      "maxHp": 200,
       "speed": 12,
       "primaries": {
         "power": 15,

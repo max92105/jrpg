@@ -98,8 +98,32 @@
             </TextBlock>
           </StackPanel>
           <StackPanel Style="{StaticResource FieldRow}">
-            <TextBlock Text="Subtitle" Style="{StaticResource FieldLabel}" />
-            <TextBox Width="380" Text="{Binding Caption, UpdateSourceTrigger=PropertyChanged}" ToolTip="Empty for none" />
+            <TextBlock Text="Subtitles" Style="{StaticResource FieldLabel}" VerticalAlignment="Top" />
+            <!-- The still's lines in the order they show, each for its seconds; an empty line is a pause. -->
+            <StackPanel>
+              <ItemsControl ItemsSource="{Binding Captions}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate>
+                    <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
+                      <TextBox Width="640" MinHeight="44" TextWrapping="Wrap" VerticalContentAlignment="Top"
+                               Text="{Binding Text, UpdateSourceTrigger=PropertyChanged}"
+                               ToolTip="The line shown; empty for a pause. It wraps here to stay readable; the game shows it on one line" />
+                      <TextBox Width="44" Margin="4,0,0,0" VerticalAlignment="Top" Text="{Binding SecondsText, UpdateSourceTrigger=PropertyChanged}"
+                               ToolTip="How many seconds this line shows before the next one" />
+                      <TextBlock Text="s" VerticalAlignment="Top" Margin="2,3,0,0" />
+                      <Button Content="X" Width="22" Margin="4,0,0,0" VerticalAlignment="Top" ToolTip="Remove this line"
+                              Command="{Binding DataContext.RemoveCaptionCommand, RelativeSource={RelativeSource AncestorType=ItemsControl}}"
+                              CommandParameter="{Binding}" />
+                    </StackPanel>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <StackPanel Orientation="Horizontal">
+                <Button Content="Add line" Width="70" Command="{Binding AddCaptionCommand}"
+                        ToolTip="A new line last, on the time the still has left; the lines show one after the other from the still's start" />
+                <TextBlock Text="{Binding CaptionsTimeText}" VerticalAlignment="Center" Margin="8,0,0,0" Foreground="{StaticResource MutedTextBrush}" />
+              </StackPanel>
+            </StackPanel>
           </StackPanel>
           <StackPanel Style="{StaticResource FieldRow}">
             <TextBlock Text="Voice" Style="{StaticResource FieldLabel}" />

@@ -144,7 +144,7 @@ public sealed class CinematicViewModelTests
         var raised = 0;
         cinematic.StillsChanged += (_, _) => raised++;
 
-        cinematic.Stills[2].Caption = "The end.";
+        cinematic.Stills[2].VoiceFile = "end.wav";
 
         Assert.Equal(1, raised);
     }
@@ -170,7 +170,7 @@ public sealed class CinematicViewModelTests
         var raised = 0;
         cinematic.StillsChanged += (_, _) => raised++;
 
-        cinematic.Stills[1].Caption = "Moved.";
+        cinematic.Stills[1].VoiceFile = "moved.wav";
 
         Assert.Equal(1, raised);
     }

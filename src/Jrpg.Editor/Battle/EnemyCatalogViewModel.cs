@@ -16,9 +16,10 @@ namespace Jrpg.Editor.Battle;
 /// <summary>
 /// Every enemy as the Enemies page edits it (ADR 0045): the draft's enemies in id order, the ones added this session
 /// after them; Add starts from the tunable defaults, Duplicate from the chosen one (decision 585); only an added one
-/// can be removed, since encounters name a saved one (decision 581). <see cref="Problem"/> is an enemy's own problem
-/// first, then Data's message for the whole list (decision 580). An enemy is chosen by its id. A rule's boxes offer
-/// every trigger and target, and the skills an enemy can use (decisions 850, 851).
+/// can be removed, since encounters name a saved one (decision 581), while a saved one's id can be retyped, the
+/// encounters following it (<see cref="RenamedIds"/>). <see cref="Problem"/> is an enemy's own problem first, then
+/// Data's message for the whole list (decision 580). An enemy is chosen by its id. A rule's boxes offer every trigger
+/// and target, and the skills an enemy can use (decisions 850, 851).
 /// </summary>
 internal sealed partial class EnemyCatalogViewModel : ObservableObject, IEditedCatalog
 {
@@ -111,6 +112,15 @@ internal sealed partial class EnemyCatalogViewModel : ObservableObject, IEditedC
     /// </exception>
     public IReadOnlyList<EnemyDefinition> ToEnemies() =>
         Problem is { } problem ? throw new InvalidOperationException(problem) : [.. Enemies.Select(enemy => enemy.ToEnemy())];
+
+    /// <summary>
+    /// Each saved enemy's id that was retyped, with its new one, so the encounters naming it follow; an enemy added
+    /// this session has no id to follow.
+    /// </summary>
+    public IReadOnlyDictionary<string, string> RenamedIds() =>
+        Enemies
+            .Where(enemy => enemy.SavedId is { } savedId && savedId != enemy.Id)
+            .ToDictionary(enemy => enemy.SavedId!, enemy => enemy.Id, StringComparer.Ordinal);
 
     /// <summary>
     /// Adds an enemy with nothing typed yet, last, and chooses it, so its id is the next thing typed.

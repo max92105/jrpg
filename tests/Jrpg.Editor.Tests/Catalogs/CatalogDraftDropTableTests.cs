@@ -52,14 +52,16 @@ public sealed class CatalogDraftDropTableTests
     public void Undo_AfterEnemyTookAddedTable_UndoesTheEnemyStepFirst()
     {
         _draft.SetDropTables([.. _draft.Current.DropTables.Values, _slime]);
-        var goblin = _draft.Current.Enemies["goblin"];
+        var goblin = _draft.Current.Enemies["gnoll"];
         var takesSlime = goblin with { DropTableId = "slime" };
-        _draft.SetEnemies([.. _draft.Current.Enemies.Values.Select(enemy => enemy.Id == "goblin" ? takesSlime : enemy)]);
+        _draft.SetEnemies(
+            [.. _draft.Current.Enemies.Values.Select(enemy => enemy.Id == "gnoll" ? takesSlime : enemy)],
+            new Dictionary<string, string>());
 
         _draft.Undo();
 
         Assert.True(_draft.Current.DropTables.ContainsKey("slime"));
-        Assert.Equal(goblin.DropTableId, _draft.Current.Enemies["goblin"].DropTableId);
+        Assert.Equal(goblin.DropTableId, _draft.Current.Enemies["gnoll"].DropTableId);
     }
 
     private static DropTable WithFirstChanceRaised(DropTable table) =>

@@ -14,7 +14,7 @@ public sealed class EnemyViewModelTests
     private static readonly ContentCatalog _catalog =
         ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
 
-    private static EnemyDefinition Goblin => _catalog.Enemies["goblin"];
+    private static EnemyDefinition Goblin => _catalog.Enemies["gnoll"];
 
     private static EnemyDefinition Chief => _catalog.Enemies["goblin_chief"];
 
@@ -24,11 +24,11 @@ public sealed class EnemyViewModelTests
         var enemy = EnemyViewModel.From(Goblin);
 
         Assert.False(enemy.IsNew);
-        Assert.Equal(("goblin", Goblin.Name), (enemy.Id, enemy.Name));
+        Assert.Equal(("gnoll", Goblin.Name), (enemy.Id, enemy.Name));
         Assert.Equal(TypedNumber.Text(Goblin.MaxHp), enemy.MaxHpText);
         Assert.Equal(TypedNumber.Text(Goblin.Accuracy), enemy.AccuracyText);
         Assert.Equal(Goblin.DamageType, enemy.DamageType);
-        Assert.Equal($"goblin: {Goblin.Name}", enemy.Label);
+        Assert.Equal($"gnoll: {Goblin.Name}", enemy.Label);
         Assert.Null(enemy.Problem);
     }
 
@@ -131,6 +131,16 @@ public sealed class EnemyViewModelTests
 
         Assert.Equal("The id must not be empty.", enemy.Problem);
         Assert.Throws<InvalidOperationException>(enemy.ToEnemy);
+    }
+
+    [Fact]
+    public void Problem_SavedIdRetypedBadly_NamesTheRule()
+    {
+        var enemy = EnemyViewModel.From(Goblin);
+
+        enemy.Id = "Big Goblin";
+
+        Assert.Equal("The id may only use lowercase letters, digits and _ (like tree_4).", enemy.Problem);
     }
 
     [Fact]

@@ -20,7 +20,7 @@ public sealed class BattleArtChoicesTests
         [ArtFolders.Effects] = ["AttackEnemy.png", "Bite.png"],
     };
 
-    private static EnemyDefinition Wolf => _catalog.Enemies["goblin"] with
+    private static EnemyDefinition Wolf => _catalog.Enemies["gnoll"] with
     {
         BattleSpriteFile = "Wolf.png",
         PortraitFile = "WolfFace.png",

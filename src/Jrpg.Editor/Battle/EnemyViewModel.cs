@@ -7,10 +7,11 @@ using Jrpg.Editor.Objects;
 namespace Jrpg.Editor.Battle;
 
 /// <summary>
-/// One enemy as the Enemies page edits it (ADR 0045): its id (typed while new, fixed once the draft holds it, decision
-/// 582), name, numbers, resistances, rewards, art and rules as typed, each written over the record it came from; a
-/// duplicate copies them as typed (decision 585). <see cref="Problem"/> is the typed id's or a box that isn't a number,
-/// the art's loop boxes, then the first rule's; the ranges are Data's rules, shown by the list.
+/// One enemy as the Enemies page edits it (ADR 0045): its id (a saved one's retyped too, the encounters naming it
+/// following, which overturns decision 582 for enemies), name, numbers, resistances, rewards, art and rules as typed,
+/// each written over the record it came from; a duplicate copies them as typed (decision 585). <see cref="Problem"/> is
+/// the typed id's or a box that isn't a number, the art's loop boxes, then the first rule's; the ranges are Data's
+/// rules, shown by the list.
 /// </summary>
 internal sealed partial class EnemyViewModel : ObservableObject
 {
@@ -95,9 +96,14 @@ internal sealed partial class EnemyViewModel : ObservableObject
     public EnemyArtViewModel Art { get; }
 
     /// <summary>
-    /// True while the enemy was added this session: the only time its id can be typed (decision 582).
+    /// True while the enemy was added this session: the only time it can be removed (decision 581).
     /// </summary>
     public bool IsNew { get; private init; }
+
+    /// <summary>
+    /// The id the draft holds it under, whatever is typed since; null for an enemy added this session.
+    /// </summary>
+    public string? SavedId => IsNew ? null : _original.Id;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Label), nameof(Problem))]
@@ -152,7 +158,7 @@ internal sealed partial class EnemyViewModel : ObservableObject
 
     /// <summary>Why the typed id, a number or a rule can't be read; null when the record can be built.</summary>
     public string? Problem =>
-        (IsNew ? ObjectIds.ProblemOf(Id, []) : null) ?? FirstNumberProblem() ?? FirstResistanceProblem() ?? FirstGoldProblem()
+        ObjectIds.ProblemOf(Id, []) ?? FirstNumberProblem() ?? FirstResistanceProblem() ?? FirstGoldProblem()
         ?? Art.Problem ?? Tactics.Problem;
 
     /// <summary>The record it came from with every field as typed over it, its rules rebuilt from their rows.</summary>

@@ -10,7 +10,7 @@ public sealed class EncounterCatalogViewModelTests
     [Fact]
     public void Constructor_Encounters_InIdOrder()
     {
-        var catalog = new EncounterCatalogViewModel(Catalog, Choices);
+        var catalog = new EncounterCatalogViewModel(Catalog, Choices, NoMaps);
 
         Assert.Equal(["a_trio", "b_pair"], catalog.Encounters.Select(encounter => encounter.Id));
         Assert.Same(catalog.Encounters[0], catalog.SelectedEncounter);
@@ -19,7 +19,7 @@ public sealed class EncounterCatalogViewModelTests
     [Fact]
     public void Problem_Constructed_IsNull()
     {
-        var catalog = new EncounterCatalogViewModel(Catalog, Choices);
+        var catalog = new EncounterCatalogViewModel(Catalog, Choices, NoMaps);
 
         Assert.Null(catalog.Problem);
     }
@@ -27,7 +27,7 @@ public sealed class EncounterCatalogViewModelTests
     [Fact]
     public void AddEncounter_NewEncounter_LastAndChosen()
     {
-        var catalog = new EncounterCatalogViewModel(Catalog, Choices);
+        var catalog = new EncounterCatalogViewModel(Catalog, Choices, NoMaps);
 
         catalog.AddEncounterCommand.Execute(null);
 
@@ -39,7 +39,7 @@ public sealed class EncounterCatalogViewModelTests
     [Fact]
     public void RemoveEncounter_SavedEncounter_CannotExecute()
     {
-        var catalog = new EncounterCatalogViewModel(Catalog, Choices);
+        var catalog = new EncounterCatalogViewModel(Catalog, Choices, NoMaps);
 
         Assert.False(catalog.RemoveEncounterCommand.CanExecute(null));
     }
@@ -47,7 +47,7 @@ public sealed class EncounterCatalogViewModelTests
     [Fact]
     public void RemoveEncounter_AddedEncounter_RemovesItAndChoosesTheNext()
     {
-        var catalog = new EncounterCatalogViewModel(Catalog, Choices);
+        var catalog = new EncounterCatalogViewModel(Catalog, Choices, NoMaps);
         catalog.AddEncounterCommand.Execute(null);
         var first = catalog.SelectedEncounter!;
         catalog.AddEncounterCommand.Execute(null);
@@ -63,7 +63,7 @@ public sealed class EncounterCatalogViewModelTests
     [Fact]
     public void CanExecuteChanged_AddedEncounterChosen_LightsRemove()
     {
-        var catalog = new EncounterCatalogViewModel(Catalog, Choices);
+        var catalog = new EncounterCatalogViewModel(Catalog, Choices, NoMaps);
         var raised = 0;
         catalog.RemoveEncounterCommand.CanExecuteChanged += (_, _) => raised++;
 
@@ -76,7 +76,7 @@ public sealed class EncounterCatalogViewModelTests
     [Fact]
     public void Problem_TwoEncountersSameId_NamesTheLaterOne()
     {
-        var catalog = new EncounterCatalogViewModel(Catalog, Choices);
+        var catalog = new EncounterCatalogViewModel(Catalog, Choices, NoMaps);
         AddWithAnOrc(catalog, "a_trio");
 
         catalog.SelectedEncounter = catalog.Encounters[1];
@@ -88,7 +88,7 @@ public sealed class EncounterCatalogViewModelTests
     [Fact]
     public void Problem_AnotherChosen_RaisedAndNamesTheNewOneByPosition()
     {
-        var catalog = new EncounterCatalogViewModel(Catalog, Choices);
+        var catalog = new EncounterCatalogViewModel(Catalog, Choices, NoMaps);
         catalog.AddEncounterCommand.Execute(null);
         Assert.Equal("The id must not be empty.", catalog.Problem);
         var raised = new List<string?>();
@@ -104,7 +104,7 @@ public sealed class EncounterCatalogViewModelTests
     [Fact]
     public void Problem_EnemyAddedToAnotherEncounter_Refreshes()
     {
-        var catalog = new EncounterCatalogViewModel(Catalog, Choices);
+        var catalog = new EncounterCatalogViewModel(Catalog, Choices, NoMaps);
         catalog.AddEncounterCommand.Execute(null);
         var added = catalog.SelectedEncounter!;
         added.Id = "c_lone";
@@ -125,7 +125,7 @@ public sealed class EncounterCatalogViewModelTests
     public void Problem_EnemyTheContentLacks_IsDatasMessage()
     {
         var dragon = new EnemyChoice("dragon", "Dragon");
-        var catalog = new EncounterCatalogViewModel(Catalog, Choices with { Enemies = [Goblin, Orc, dragon] });
+        var catalog = new EncounterCatalogViewModel(Catalog, Choices with { Enemies = [Goblin, Orc, dragon] }, NoMaps);
         var trio = catalog.Encounters[0];
 
         trio.EnemyToAdd = dragon;
@@ -137,7 +137,7 @@ public sealed class EncounterCatalogViewModelTests
     [Fact]
     public void ToEncounters_AddedEncounter_Included()
     {
-        var catalog = new EncounterCatalogViewModel(Catalog, Choices);
+        var catalog = new EncounterCatalogViewModel(Catalog, Choices, NoMaps);
         AddWithAnOrc(catalog, "c_lone");
 
         var written = catalog.ToEncounters();
@@ -149,7 +149,7 @@ public sealed class EncounterCatalogViewModelTests
     [Fact]
     public void ToEncounters_WithAProblem_Throws()
     {
-        var catalog = new EncounterCatalogViewModel(Catalog, Choices);
+        var catalog = new EncounterCatalogViewModel(Catalog, Choices, NoMaps);
 
         catalog.AddEncounterCommand.Execute(null);
 

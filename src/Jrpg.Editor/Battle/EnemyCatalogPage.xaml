@@ -36,8 +36,7 @@
                 <TextBlock Text="Id" Style="{StaticResource FieldLabel}" />
                 <TextBox Width="220"
                          Text="{Binding Id, UpdateSourceTrigger=PropertyChanged}"
-                         IsEnabled="{Binding IsNew}"
-                         ToolTip="Lowercase letters, digits and _; fixed once saved, since encounters name it" />
+                         ToolTip="Lowercase letters, digits and _; the encounters naming it follow a change" />
               </StackPanel>
               <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
                 <TextBlock Text="Name" Style="{StaticResource FieldLabel}" />

@@ -42,6 +42,42 @@ public sealed class EnemyEditingViewModelTests
         Assert.False(_draft.Current.Enemies.ContainsKey("wolf_chief"));
     }
 
+    [Fact]
+    public void Apply_SavedEnemyIdRetyped_EncountersNameTheNewId()
+    {
+        var slots = _draft.Current.Encounters["goblin_chief"].EnemyIds;
+        var edited = _enemyEditing.Start();
+        edited.Enemies.Single(enemy => enemy.Id == "gnoll").Id = "imp";
+
+        _enemyEditing.Apply(edited);
+
+        Assert.False(_draft.Current.Enemies.ContainsKey("gnoll"));
+        Assert.Equal("imp", _draft.Current.Enemies["imp"].Id);
+        Assert.Contains("gnoll", slots);
+        Assert.Equal(slots.Select(id => id == "gnoll" ? "imp" : id), _draft.Current.Encounters["goblin_chief"].EnemyIds);
+    }
+
+    // An enemy added this session has no saved id, so typing its id renames nothing.
+    [Fact]
+    public void RenamedIds_NewEnemyIdTyped_IsEmpty()
+    {
+        var edited = _enemyEditing.Start();
+        edited.AddEnemyCommand.Execute(null);
+        edited.SelectedEnemy!.Id = "imp";
+
+        Assert.Empty(edited.RenamedIds());
+    }
+
+    [Fact]
+    public void Problem_SavedEnemyRetypedToATakenId_SaysListedTwice()
+    {
+        var edited = _enemyEditing.Start();
+
+        edited.Enemies.Single(enemy => enemy.Id == "goblin_chief").Id = "gnoll";
+
+        Assert.Equal("Enemy gnoll is listed twice.", edited.Problem);
+    }
+
     // Every rule is rebuilt from its rows into new lists, which the draft compares by content, so an untouched session
     // still records no step.
     [Fact]
@@ -65,7 +101,7 @@ public sealed class EnemyEditingViewModelTests
         GoblinsRule(edited).On = TacticTargetChoice.Of(TacticTarget.LowestHpFoe);
         editing.Apply(edited);
 
-        Assert.Equal(TacticTarget.LowestHpFoe, Assert.Single(draft.Current.Enemies["goblin"].Tactics).On);
+        Assert.Equal(TacticTarget.LowestHpFoe, Assert.Single(draft.Current.Enemies["gnoll"].Tactics).On);
     }
 
     [Fact]
@@ -79,7 +115,7 @@ public sealed class EnemyEditingViewModelTests
         draft.Undo();
 
         Assert.False(draft.CanUndo);
-        Assert.Null(Assert.Single(draft.Current.Enemies["goblin"].Tactics).On);
+        Assert.Null(Assert.Single(draft.Current.Enemies["gnoll"].Tactics).On);
     }
 
     // The page reads the draft when it opens, so a table added before is offered, after the saved ones by id.
@@ -99,12 +135,12 @@ public sealed class EnemyEditingViewModelTests
     private static (EnemyEditingViewModel Editing, CatalogDraft Draft) WithGoblinAttacking()
     {
         var world = ContentCatalogLoader.Load(Path.Combine(AppContext.BaseDirectory, "test-world"));
-        var goblin = world.Enemies["goblin"] with { Tactics = [new EnemyAction { Weight = 4 }], Phases = [] };
-        var enemies = new Dictionary<string, EnemyDefinition>(world.Enemies) { ["goblin"] = goblin };
+        var goblin = world.Enemies["gnoll"] with { Tactics = [new EnemyAction { Weight = 4 }], Phases = [] };
+        var enemies = new Dictionary<string, EnemyDefinition>(world.Enemies) { ["gnoll"] = goblin };
         var draft = new CatalogDraft(world with { Enemies = enemies });
         return (new EnemyEditingViewModel(draft, _ => []), draft);
     }
 
     private static TacticRuleRow GoblinsRule(EnemyCatalogViewModel edited) =>
-        edited.Enemies.Single(enemy => enemy.Id == "goblin").Tactics.Lists[0].Rules[0];
+        edited.Enemies.Single(enemy => enemy.Id == "gnoll").Tactics.Lists[0].Rules[0];
 }

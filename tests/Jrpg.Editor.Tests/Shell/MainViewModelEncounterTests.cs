@@ -17,15 +17,16 @@ public sealed class MainViewModelEncounterTests : IDisposable
     public void ReadEncounterChoices_Enemies_OfferedByNameThenId()
     {
         var viewModel = _content.Open(_content.TestWorld);
-        var goblin = viewModel.Catalog!.Enemies["goblin"];
+        var goblin = viewModel.Catalog!.Enemies["gnoll"];
         viewModel.Content!.SetEnemies(
-            [.. viewModel.Catalog.Enemies.Values, goblin with { Id = "a_goblin" }, goblin with { Id = "z_ant", Name = "Ant" }]);
+            [.. viewModel.Catalog.Enemies.Values, goblin with { Id = "a_goblin" }, goblin with { Id = "z_ant", Name = "Ant" }],
+            new Dictionary<string, string>());
 
         var offered = viewModel.EncounterEditing!.Start().OfferedEnemies;
 
         Assert.Equal(
-            ["z_ant", "a_goblin", "goblin"],
-            offered.Select(enemy => enemy.Id).Where(id => id is "z_ant" or "a_goblin" or "goblin"));
+            ["z_ant", "a_goblin", "gnoll"],
+            offered.Select(enemy => enemy.Id).Where(id => id is "z_ant" or "a_goblin" or "gnoll"));
     }
 
     [Fact]

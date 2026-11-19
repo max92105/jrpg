@@ -7,9 +7,10 @@ using Jrpg.Editor.Catalogs;
 namespace Jrpg.Editor.Cinematics;
 
 /// <summary>
-/// One still as the Cinematics page edits it (ADR 0046): its picture, seconds, subtitle, voice and zoom boxes kept as
-/// typed, and the point its zoom heads to, set by a click on the picture. <see cref="Problem"/> is only a box that
-/// can't be read; the ranges are Data's rules, which the page's problem line shows for the whole list.
+/// One still as the Cinematics page edits it (ADR 0046): its picture, seconds, subtitles (the `.Captions` partial),
+/// voice and zoom boxes kept as typed, and the point its zoom heads to, set by a click on the picture.
+/// <see cref="Problem"/> is only a box that can't be read; the ranges are Data's rules, which the page's problem line
+/// shows for the whole list.
 /// </summary>
 internal sealed partial class CinematicStillRow : ObservableObject
 {
@@ -38,12 +39,9 @@ internal sealed partial class CinematicStillRow : ObservableObject
 
     /// <summary>How long the still shows, as typed: a dot decimal.</summary>
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(Label), nameof(Problem), nameof(IsShorterThanVoice))]
+    [NotifyPropertyChangedFor(nameof(Label), nameof(Problem), nameof(IsShorterThanVoice), nameof(CaptionsTimeText))]
     public partial string SecondsText { get; set; } = "";
 
-    /// <summary>The subtitle; empty for none.</summary>
-    [ObservableProperty]
-    public partial string Caption { get; set; } = "";
 
     /// <summary>The voice line in the voices folder; empty for none.</summary>
     [ObservableProperty]
@@ -99,7 +97,7 @@ internal sealed partial class CinematicStillRow : ObservableObject
     public bool IsShorterThanVoice =>
         VoiceFile.Trim() is { Length: > 0 } voice
         && VoiceLengthOf(voice) is { } length
-        && Seconds(SecondsText) is { } seconds
+        && SecondsOf(SecondsText) is { } seconds
         && seconds < ShownSeconds(length);
 
     /// <summary>"3. ragnir_intro/3_son_becoming_soldier.png, 6 s".</summary>
@@ -108,21 +106,26 @@ internal sealed partial class CinematicStillRow : ObservableObject
     /// <summary>The first box, in the row's order, that can't be read; null when the still can be built.</summary>
     public string? Problem =>
         string.IsNullOrWhiteSpace(ImageFile) ? $"Still {Number}: choose its picture."
-        : Seconds(SecondsText) is null ? $"Still {Number}: the seconds must be a number above 0 (was '{SecondsText.Trim()}')."
+        : SecondsOf(SecondsText) is null ? $"Still {Number}: the seconds must be a number above 0 (was '{SecondsText.Trim()}')."
         : (TypedNumber.ProblemOf("zoom start", ZoomStartText) ?? TypedNumber.ProblemOf("zoom end", ZoomEndText)) is { } zoom
             ? $"Still {Number}: {zoom}"
+        : CaptionProblem is { } caption ? caption
         : null;
 
-    public static CinematicStillRow From(CinematicStill still) => new()
+    public static CinematicStillRow From(CinematicStill still)
     {
-        ImageFile = still.ImageFile,
-        SecondsText = still.Seconds.ToString(CultureInfo.InvariantCulture),
-        Caption = still.Caption ?? "",
-        VoiceFile = still.VoiceFile ?? "",
-        ZoomStartText = TypedNumber.Text(still.Zoom?.StartPercent ?? StillZoom.MinPercent),
-        ZoomEndText = TypedNumber.Text(still.Zoom?.EndPercent ?? StillZoom.MinPercent),
-        Focus = still.Focus,
-    };
+        var row = new CinematicStillRow
+        {
+            ImageFile = still.ImageFile,
+            SecondsText = still.Seconds.ToString(CultureInfo.InvariantCulture),
+            VoiceFile = still.VoiceFile ?? "",
+            ZoomStartText = TypedNumber.Text(still.Zoom?.StartPercent ?? StillZoom.MinPercent),
+            ZoomEndText = TypedNumber.Text(still.Zoom?.EndPercent ?? StillZoom.MinPercent),
+            Focus = still.Focus,
+        };
+        row.ReadCaptions(still.Captions);
+        return row;
+    }
 
     /// <summary>A still just added on a picture: four seconds, no subtitle, voice or zoom (decision 616).</summary>
     public static CinematicStillRow New(string imageFile) =>
@@ -139,8 +142,8 @@ internal sealed partial class CinematicStillRow : ObservableObject
         return new CinematicStill
         {
             ImageFile = ImageFile.Trim(),
-            Seconds = Seconds(SecondsText)!.Value,
-            Caption = TextOrNull(Caption),
+            Seconds = SecondsOf(SecondsText)!.Value,
+            Captions = [.. Captions.Select(caption => caption.ToCaption())],
             VoiceFile = TextOrNull(VoiceFile),
             Zoom = ZoomOrNull(TypedNumber.Parse(ZoomStartText)!.Value, TypedNumber.Parse(ZoomEndText)!.Value),
             Focus = Focus,
@@ -158,8 +161,6 @@ internal sealed partial class CinematicStillRow : ObservableObject
     partial void OnImageFileChanged(string value) => Changed?.Invoke(this, EventArgs.Empty);
 
     partial void OnSecondsTextChanged(string value) => Changed?.Invoke(this, EventArgs.Empty);
-
-    partial void OnCaptionChanged(string value) => Changed?.Invoke(this, EventArgs.Empty);
 
     partial void OnVoiceFileChanged(string value) => Changed?.Invoke(this, EventArgs.Empty);
 
@@ -188,7 +189,7 @@ internal sealed partial class CinematicStillRow : ObservableObject
     private static string? TextOrNull(string text) => string.IsNullOrWhiteSpace(text) ? null : text.Trim();
 
     // TryParse also reads "Infinity", which content can't hold.
-    private static double? Seconds(string text) =>
+    internal static double? SecondsOf(string text) =>
         double.TryParse(text.Trim(), SecondsStyle, CultureInfo.InvariantCulture, out var seconds)
         && seconds > 0
         && double.IsFinite(seconds)

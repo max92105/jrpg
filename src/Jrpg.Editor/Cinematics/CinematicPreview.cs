@@ -37,7 +37,7 @@ internal sealed partial class CinematicPreview : ObservableObject
     [ObservableProperty]
     public partial Point ZoomOrigin { get; private set; } = new(0.5, 0.5);
 
-    /// <summary>The shown still's subtitle; null while stopped or when it has none.</summary>
+    /// <summary>The subtitle whose turn it is in the shown still; null while stopped or when none shows.</summary>
     [ObservableProperty]
     public partial string? Caption { get; private set; }
 
@@ -98,7 +98,7 @@ internal sealed partial class CinematicPreview : ObservableObject
         Opacity = StillFade.OpacityAt(moment.IntoStill, still.Duration);
         Scale = still.ScaleAt(moment.IntoStill);
         ZoomOrigin = new Point(still.ZoomOrigin.X, still.ZoomOrigin.Y);
-        Caption = still.Caption;
+        Caption = still.CaptionAt(moment.IntoStill)?.Text;
         TimeLine = string.Create(
             CultureInfo.InvariantCulture,
             $"Still {moment.StillIndex + 1} of {_cinematic.Stills.Count}, {moment.IntoStill.TotalSeconds:0.0} s");

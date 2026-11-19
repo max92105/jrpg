@@ -1,5 +1,6 @@
 using Jrpg.Core.Battle;
 using Jrpg.Core.Content;
+using Jrpg.Core.Maps;
 using Jrpg.Data.Content;
 using Jrpg.Editor.Encounters;
 
@@ -30,9 +31,26 @@ internal static class EncounterFixtures
     /// </summary>
     public static ContentCatalog Catalog => _catalog.Value;
 
+    /// <summary>No map at all, for the tests that link nothing.</summary>
+    public static EncounterMapLinks NoMaps => new(() => [], _ => { });
+
+    /// <summary>An empty map with these random battles, fought on the Cave background.</summary>
+    public static MapDefinition MapRolling(string id, params string[] encounterIds)
+    {
+        var map = MapWithoutBattles(id, "Cave.png");
+        var table = new RandomEncounterTable { OneInSteps = 12, GraceSteps = 3, EncounterIds = encounterIds };
+        return new MapDefinition(map.Layout, map.Settings with { RandomEncounters = table });
+    }
+
+    /// <summary>An empty map without random battles, named as its id in upper case.</summary>
+    public static MapDefinition MapWithoutBattles(string id, string? background) =>
+        new(
+            new MapLayout { Id = id, Width = 1, Height = 1, Layers = [], Objects = [] },
+            new MapSettings { Id = id, DisplayName = id.ToUpperInvariant(), BattleBackgroundFile = background });
+
     private static ContentCatalog CatalogOf(ContentCatalog world)
     {
-        var goblin = world.Enemies["goblin"];
+        var goblin = world.Enemies["gnoll"] with { Id = "goblin", Name = "Goblin" };
         return world with
         {
             Enemies = new Dictionary<string, EnemyDefinition>(StringComparer.Ordinal)

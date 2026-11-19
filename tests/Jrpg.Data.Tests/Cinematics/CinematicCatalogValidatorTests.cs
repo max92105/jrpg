@@ -15,7 +15,7 @@ public sealed class CinematicCatalogValidatorTests
     {
         ImageFile = "intro/2_road.png",
         Seconds = 5,
-        Caption = "He left at dawn.",
+        Captions = [new StillCaption { Text = "He left at dawn.", Seconds = 2 }],
         VoiceFile = "intro_2.wav",
         Zoom = new StillZoom { StartPercent = 100, EndPercent = 120 },
     };
@@ -47,7 +47,11 @@ public sealed class CinematicCatalogValidatorTests
             },
             "the stills' seconds together must be a time the game can count."
         },
-        { WithSecond(_second with { Caption = " " }), "stills[1]: caption must hold text or be left out." },
+        { WithCaption(Line("Late.", 0)), "stills[1]: captions[0]: seconds must be above 0 (was 0)." },
+        { WithCaption(Line("Late.", double.NaN)), "stills[1]: captions[0]: seconds must be above 0 (was NaN)." },
+        { WithCaption(null!), "stills[1]: captions[0] must hold a text, empty for a pause." },
+        { WithCaption(Line(null!, 1)), "stills[1]: captions[0] must hold a text, empty for a pause." },
+        { WithSecond(_second with { Captions = null! }), "stills[1]: captions must be a list or be left out." },
         { WithSecond(_second with { VoiceFile = "" }), "stills[1]: voiceFile must name a voice line or be left out." },
         { _twoStills with { MusicFile = " " }, "musicFile must name a track or be left out." },
         { WithZoom(99, 120), "stills[1]: zoom startPercent must be within 100..150 (was 99)." },
@@ -119,7 +123,9 @@ public sealed class CinematicCatalogValidatorTests
     [Fact]
     public void Validate_SmallestSeconds_Passes()
     {
-        Assert.Null(ValidationError(WithSecond(_second with { Seconds = 0.01 })));
+        var shortest = _second with { Seconds = 0.01, Captions = [Line("He left at dawn.", 0.01)] };
+
+        Assert.Null(ValidationError(WithSecond(shortest)));
     }
 
     [Fact]
@@ -129,6 +135,30 @@ public sealed class CinematicCatalogValidatorTests
 
         Assert.Null(ValidationError(oneLongStill));
     }
+
+    // A pause is an empty line; the lines may fill the still to its last second, the typed tenths' rounding included.
+    [Fact]
+    public void Validate_CaptionsFillingTheStillWithAPause_Passes()
+    {
+        var filled = _second with { Seconds = 0.3, Captions = [Line("He left.", 0.1), Line("", 0.1), Line("At dawn.", 0.1)] };
+
+        Assert.Null(ValidationError(WithSecond(filled)));
+    }
+
+    [Fact]
+    public void Validate_CaptionsLongerThanTheirStill_ThrowsNamingBothTimes()
+    {
+        var tooLong = _second with { Seconds = 5, Captions = [Line("He left.", 3), Line("At dawn.", 2.5)] };
+
+        var error = Assert.IsType<ContentValidationException>(ValidationError(WithSecond(tooLong)));
+
+        var problem = "stills[1]: captions show for 5.5 seconds together, longer than the still's 5.";
+        Assert.Equal($"cinematics.json: cinematic 'intro': {problem}", error.Message);
+    }
+
+    private static StillCaption Line(string text, double seconds) => new() { Text = text, Seconds = seconds };
+
+    private static CinematicDefinition WithCaption(StillCaption caption) => WithSecond(_second with { Captions = [caption] });
 
     private static Exception? ValidationError(params CinematicDefinition[] cinematics) =>
         Record.Exception(() => CinematicCatalogValidator.Validate(FileName, cinematics));

@@ -91,6 +91,9 @@ internal static partial class UiTheme
     public static ImmutableArray<GradientStop> SpeakerStrip { get; } =
         [new(0, new Color(0, 0, 0, 0xE0)), new(0.6f, new Color(0, 0, 0, 0x99)), new(1, Color.Transparent)];
 
-    /// <summary>The band behind a cutscene subtitle, from the top down: clear, then dark at the bottom edge.</summary>
-    public static ImmutableArray<GradientStop> CaptionBand { get; } = [new(0, FromStraightArgb(0x00000000)), new(1, FromStraightArgb(0xCC000000))];
+    /// <summary>
+    /// The height of the black bar at the top and at the bottom of a cinematic's still, in virtual pixels: small, yet
+    /// room for a subtitle's line in the bottom one, with the skip hint at its right.
+    /// </summary>
+    public const int StillBarHeight = 96;
 }

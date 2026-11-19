@@ -8,18 +8,21 @@ using Microsoft.Xna.Framework.Graphics;
 namespace Jrpg.Game.Exploration;
 
 /// <summary>
-/// The small skip hint at the bottom right of a cinematic's still, naming the device's Confirm button (decisions 171,
-/// 172): "Hold {button} to skip", the key's name inside a ring that fills as Confirm is held (decisions 623, 626).
-/// Measured once per device, drawn without allocating.
+/// The small skip hint at the right of a cinematic's bottom black bar, white so it stands out on it, naming the
+/// device's Confirm button (decisions 171, 172): "Hold {button} to skip", the key's name inside a ring that fills as
+/// Confirm is held (decisions 623, 626). Measured once per device, drawn without allocating.
 /// </summary>
 internal sealed class SkipHintView
 {
-    // Placeholder look (decision 82): 20 px text, 32 px in from the screen's corner.
+    // Placeholder look (decision 82): 20 px text, 32 px in from the screen's right, its middle the bottom bar's.
     private const int TextPixels = 20;
     private const int Margin = 32;
 
     // Room between the ring and the hint's words on either side of it (placeholder).
     private const int RingPadding = 4;
+
+    // Whiter than the theme's text colors: the hint must stand out on the black bar.
+    private static readonly Color _color = Color.White;
 
     private readonly SpriteFontBase _font;
     private readonly UiMessages _messages;
@@ -60,7 +63,8 @@ internal sealed class SkipHintView
         // Room for the ring around the key, whatever the key's name's width.
         _keyGap = Math.Max(0, UiTheme.SkipRingRadius + RingPadding - (_key.Width / 2));
         var width = _before.Width + _keyGap + _key.Width + _keyGap + _after.Width;
-        _position = new Vector2(VirtualScreen.Width - Margin - width, VirtualScreen.Height - Margin - _font.LineHeight);
+        var middle = VirtualScreen.Height - (UiTheme.StillBarHeight / 2f);
+        _position = new Vector2(VirtualScreen.Width - Margin - width, middle - (_font.LineHeight / 2f));
         _keyCenter = new Vector2(_position.X + _before.Width + _keyGap + (_key.Width / 2), _position.Y + (_font.LineHeight / 2f));
     }
 
@@ -71,11 +75,11 @@ internal sealed class SkipHintView
     public void Draw(SpriteBatch batch)
     {
         var x = _position.X;
-        batch.DrawString(_font, _before.Text, new Vector2(x, _position.Y), UiTheme.TextSecondary);
+        batch.DrawString(_font, _before.Text, new Vector2(x, _position.Y), _color);
         x += _before.Width + _keyGap;
-        batch.DrawString(_font, _key.Text, new Vector2(x, _position.Y), UiTheme.TextSecondary);
+        batch.DrawString(_font, _key.Text, new Vector2(x, _position.Y), _color);
         x += _key.Width + _keyGap;
-        batch.DrawString(_font, _after.Text, new Vector2(x, _position.Y), UiTheme.TextSecondary);
+        batch.DrawString(_font, _after.Text, new Vector2(x, _position.Y), _color);
     }
 
     /// <summary>The ring around the key's name, lit up to <paramref name="share"/>; for the hold's hint.</summary>

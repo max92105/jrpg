@@ -9,7 +9,7 @@ namespace Jrpg.Editor.Tests.Shell;
 // decision 581 refuses an opened shop); a refused undo leaves the encounter and its step in place.
 public sealed class CombinedHistoryEncounterTests : IDisposable
 {
-    private static readonly EncounterDefinition _wisps = new() { Id = "test_wisps", EnemyIds = ["goblin"] };
+    private static readonly EncounterDefinition _wisps = new() { Id = "test_wisps", EnemyIds = ["gnoll"] };
 
     private readonly EditorTestContent _content = new();
 

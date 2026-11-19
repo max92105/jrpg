@@ -7,5 +7,14 @@
       "frameCount": 4,
       "frameMilliseconds": 200
     }
+  },
+  {
+    "file": "forest_leaves_and_glimmers.png",
+    "frameWidth": 540,
+    "frameHeight": 360,
+    "animation": {
+      "frameCount": 48,
+      "frameMilliseconds": 60
+    }
   }
 ]

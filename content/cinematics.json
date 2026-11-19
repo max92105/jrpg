@@ -65,27 +65,75 @@
       {
         "imageFile": "ragnir_intro/1_happy_life.png",
         "seconds": 4,
-        "voiceFile": "Placeholder.wav"
+        "voiceFile": "Placeholder.wav",
+        "zoom": {
+          "startPercent": 100,
+          "endPercent": 120
+        },
+        "focus": {
+          "xPercent": 42,
+          "yPercent": 51
+        }
       },
       {
         "imageFile": "ragnir_intro/2_training_son.png",
-        "seconds": 4
+        "seconds": 4,
+        "zoom": {
+          "startPercent": 100,
+          "endPercent": 120
+        },
+        "focus": {
+          "xPercent": 48,
+          "yPercent": 49
+        }
       },
       {
         "imageFile": "ragnir_intro/3_son_becoming_soldier.png",
-        "seconds": 4
+        "seconds": 4,
+        "zoom": {
+          "startPercent": 100,
+          "endPercent": 120
+        },
+        "focus": {
+          "xPercent": 71,
+          "yPercent": 49
+        }
       },
       {
         "imageFile": "ragnir_intro/4_son_deployed.png",
-        "seconds": 4
+        "seconds": 4,
+        "zoom": {
+          "startPercent": 100,
+          "endPercent": 120
+        },
+        "focus": {
+          "xPercent": 24,
+          "yPercent": 38
+        }
       },
       {
         "imageFile": "ragnir_intro/5_son_letters.png",
-        "seconds": 4
+        "seconds": 4,
+        "zoom": {
+          "startPercent": 100,
+          "endPercent": 120
+        },
+        "focus": {
+          "xPercent": 47,
+          "yPercent": 37
+        }
       },
       {
         "imageFile": "ragnir_intro/6_i_will_get_him_back.png",
-        "seconds": 4
+        "seconds": 4,
+        "zoom": {
+          "startPercent": 100,
+          "endPercent": 120
+        },
+        "focus": {
+          "xPercent": 60,
+          "yPercent": 26
+        }
       }
     ]
   },

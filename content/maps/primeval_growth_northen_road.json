@@ -2,5 +2,12 @@
   "id": "primeval_growth_northen_road",
   "displayName": "Primeval Growth - Northen Road",
   "folder": "Milestone Area",
-  "randomEncounters": null
+  "battleBackgroundFile": "forest_leaves_and_glimmers.png",
+  "randomEncounters": {
+    "oneInSteps": 15,
+    "graceSteps": 20,
+    "encounterIds": [
+      "goblin_trio"
+    ]
+  }
 }

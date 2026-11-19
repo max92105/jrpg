@@ -3,7 +3,7 @@
   "displayName": "Primeval Growth Crossroad",
   "musicFile": "forest/loop.wav",
   "folder": "Milestone Area",
-  "battleBackgroundFile": "Forest.png",
+  "battleBackgroundFile": "forest_leaves_and_glimmers.png",
   "randomEncounters": {
     "oneInSteps": 15,
     "graceSteps": 5,

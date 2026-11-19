@@ -1,5 +1,15 @@
 [
   {
+    "id": "gnoll_test",
+    "enemyIds": [
+      "gnoll_archer",
+      "goblin",
+      "gnoll_chief",
+      "gnoll_shaman",
+      "gnoll_warrior"
+    ]
+  },
+  {
     "id": "goblin_chief",
     "enemyIds": [
       "goblin",

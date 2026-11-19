@@ -8,8 +8,7 @@
     "oneInSteps": 25,
     "graceSteps": 3,
     "encounterIds": [
-      "goblin_trio",
-      "stone_beetle"
+      "gnoll_test"
     ]
   }
 }
